@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.info.back.dao.ICollectionStatisticsDao" >
+  
+<resultMap id="countPrincipalMap" type="com.info.web.pojo.CollectionStatistics" >
+    <result column="loan_money" property="loanMoney" jdbcType="DECIMAL" />
+    <result column="not_repayment" property="notRepayment" jdbcType="DECIMAL" />
+    <result column="yesterday_money" property="yesterdayMoney" jdbcType="DECIMAL" />
+</resultMap>
+<resultMap id="countPrincipalOrderMap" type="com.info.web.pojo.CollectionStatisticsOrder" >
+    <result column="loan_num" property="loanNum" jdbcType="DECIMAL" />
+    <result column="not_repayment" property="notRepayment" jdbcType="DECIMAL" />
+    <result column="yesterday" property="yesterday" jdbcType="DECIMAL" />
+</resultMap>
+<resultMap id="countBySevenDayMap" type="com.info.web.pojo.CollectionStatisticsOrder" >
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" /> 
+    <result column="loan_num" property="loanNum" jdbcType="DECIMAL" />
+    <result column="not_repayment" property="notRepayment" jdbcType="DECIMAL" />
+   
+</resultMap>
+<resultMap id="countByDistributeMap" type="com.info.web.pojo.StatisticsDistribute" >
+    <result column="wait_money" property="waitMoney" jdbcType="DECIMAL" /> 
+    <result column="wait_penalty" property="waitPenalty" jdbcType="DECIMAL" />
+    <result column="in_money" property="inMoney" jdbcType="DECIMAL" />
+    <result column="in_penalty" property="inPenalty" jdbcType="DECIMAL" /> 
+    <result column="promise_money" property="promiseMoney" jdbcType="DECIMAL" />
+    <result column="promise_penalty" property="promisePenalty" jdbcType="DECIMAL" />
+    <result column="finish_money" property="finishMoney" jdbcType="DECIMAL" /> 
+    <result column="finish_penalty" property="finishPenalty" jdbcType="DECIMAL" />
+    <result column="loan_money" property="loanMoney" jdbcType="DECIMAL" />
+    <result column="loan_penalty" property="loanPenalty" jdbcType="DECIMAL" />
+     <result column="type" property="type" jdbcType="VARCHAR" />
+   
+</resultMap>
+
+<!--  ====================本金总计===================== --> 
+<select id="countPrincipal" resultMap="countPrincipalMap" parameterType="map">
+	<!--select -->
+		<!--sum(l.loan_money) loan_money,-->
+		<!--sum(pay.receivable_principle) as not_repayment,-->
+		<!--sum(if(DATE_FORMAT(l.create_time,'%Y-%m-%d') = DATE_FORMAT(#{yesterday},'%Y-%m-%d'),l.loan_money,0)) as yesterday_money-->
+	<!--from mman_user_loan l -->
+	<!--inner join credit_loan_pay pay on l.id = pay.loan_id-->
+	<!--where 1=1-->
+	<!--<if test="begDate != null">-->
+	  <!--and DATE_FORMAT(l.create_time,'%Y-%m-%d')  >=  DATE_FORMAT(#{begDate},'%Y-%m-%d')-->
+	<!--</if>-->
+	<!--<if test="endDate != null">-->
+	 <!--<![CDATA[ and DATE_FORMAT(l.create_time,'%Y-%m-%d')  <=  DATE_FORMAT(#{endDate},'%Y-%m-%d')]]>-->
+	<!--</if>-->
+
+	SELECT
+	loanMoney,
+	-- 本金
+	yetRepayment,
+	-- 已还本金
+	(loanMoney - yetRepayment) AS notRepayment,
+	-- 未还本金
+	ROUND(
+	(yetRepayment) / loanMoney * 100,
+	-- 本金还款率
+	2
+	) AS loanMoneyRate,
+	yesterdayMoney -- 昨日新增本金
+	FROM
+	(
+	SELECT
+	(
+	SELECT
+	SUM(uln.loan_money) AS loanMoney
+	FROM
+	mman_loan_collection_order ord
+	LEFT JOIN mman_user_loan uln ON ord.loan_id = uln.id
+	WHERE
+	DATE_FORMAT(create_date, '%Y-%m-%d') BETWEEN #{begDate}
+	AND #{endDate}
+	) AS loanMoney,
+	(
+	SELECT
+	SUM(real_money) AS yetRepayment
+	FROM
+	credit_loan_pay_detail
+	WHERE
+	DATE_FORMAT(create_date, '%Y-%m-%d') BETWEEN #{begDate}
+	AND #{endDate}
+	) AS yetRepayment,
+	(
+	SELECT
+	SUM(uln.loan_money) AS yesterdayMoney
+	FROM
+	mman_loan_collection_order ord
+	LEFT JOIN mman_user_loan uln ON ord.loan_id = uln.id
+	WHERE
+	DATE_FORMAT(ord.create_date, '%Y-%m-%d') = DATE_SUB(
+	DATE_FORMAT(now(), '%Y-%m-%d'),
+	INTERVAL 1 DAY
+	)
+	) AS yesterdayMoney
+	) pp;
+
+</select>
+<select id="countPrincipalOrder" resultMap="countPrincipalOrderMap" parameterType="map">
+	<!--select -->
+	    <!--count(1) as loan_num,-->
+		<!--sum(if(l.loan_status=4,1,0)) as not_repayment,-->
+		<!--sum(if(DATE_FORMAT(l.create_time,'%Y-%m-%d') = DATE_FORMAT(#{yesterday},'%Y-%m-%d'),1,0)) as yesterday-->
+	<!--from mman_user_loan l -->
+	<!--where 1=1-->
+	<!--<if test="begDate != null">-->
+	  <!--and DATE_FORMAT(l.create_time,'%Y-%m-%d')  >=  DATE_FORMAT(#{begDate},'%Y-%m-%d')-->
+	<!--</if>-->
+	<!--<if test="endDate != null">-->
+	 <!--<![CDATA[ and DATE_FORMAT(l.create_time,'%Y-%m-%d')  <=  DATE_FORMAT(#{endDate},'%Y-%m-%d')]]>-->
+	<!--</if>-->
+
+	SELECT
+	order_count AS loanNum,
+	paid_order_count AS yetRepayment,
+	order_count - paid_order_count AS notRepayment,
+	ROUND(paid_order_count / order_count * 100, 2) AS loanRate,
+	yesterday_order_count AS yesterday
+	FROM
+	(SELECT
+	(SELECT
+	COUNT(loan_id) AS order_count
+	FROM
+	mman_loan_collection_order ord
+	LEFT JOIN mman_user_loan uln ON ord.loan_id = uln.id
+	WHERE
+	DATE_FORMAT(create_date, '%Y-%m-%d') BETWEEN #{begDate} AND #{endDate}) AS order_count,
+	(SELECT
+	COUNT(DISTINCT loan_collection_order_id) AS paid_order_count
+	FROM
+	mman_loan_collection_status_change_log
+	WHERE
+	DATE_FORMAT(create_date, '%Y-%m-%d') BETWEEN #{begDate} AND #{endDate}
+	AND type = 5) AS paid_order_count,
+	(SELECT
+	COUNT(DISTINCT loan_id) AS yesterday_order_count
+	FROM
+	mman_loan_collection_order ord
+	LEFT JOIN mman_user_loan uln ON ord.loan_id = uln.id
+	WHERE
+	DATE_FORMAT(ord.create_date, '%Y-%m-%d') = DATE_SUB(DATE_FORMAT(now(), '%Y-%m-%d'), INTERVAL 1 DAY)) AS yesterday_order_count
+	) pp
+
+</select>
+  <!--   本金总计——折线图(近7日)-->
+<select id="countBySevenDay" resultType="map" parameterType="map">
+	  select l.create_time as create_date,
+		sum(l.loan_money) loan_money,
+		sum(pay.receivable_principle) as not_repayment 
+	  from mman_user_loan l
+	  inner join credit_loan_pay pay  on l.id = pay.loan_id
+	  where 1=1
+		<if test="begDate != null">
+		  and DATE_FORMAT(l.create_time,'%Y-%m-%d')  >=  DATE_FORMAT(#{begDate},'%Y-%m-%d')
+		</if>
+		<if test="endDate != null">
+		 <![CDATA[ and DATE_FORMAT(l.create_time,'%Y-%m-%d')  <=  DATE_FORMAT(#{endDate},'%Y-%m-%d')]]>
+		</if>	 
+	      group by DATE_FORMAT(l.create_time,'%Y-%m-%d')
+</select>
+<select id="countOrderBySevenDay" resultType="map" parameterType="map">
+	  select l.create_time as create_date,
+		count(1) as loan_num,
+		sum(if(l.loan_status =4,1,0)) as not_repayment
+	  from mman_user_loan l
+	  where 1=1
+		<if test="begDate != null">
+		  and DATE_FORMAT(l.create_time,'%Y-%m-%d')  >=  DATE_FORMAT(#{begDate},'%Y-%m-%d')
+		</if>
+		<if test="endDate != null">
+		 <![CDATA[ and DATE_FORMAT(l.create_time,'%Y-%m-%d')  <=  DATE_FORMAT(#{endDate},'%Y-%m-%d')]]>
+		</if>	 
+	      group by DATE_FORMAT(l.create_time,'%Y-%m-%d')
+</select>
+<select id="countByDistribute" resultMap="countByDistributeMap" parameterType="map">
+	<!--select-->
+	  <!--o.status as type,l.loan_money,l.loan_penalty-->
+	<!--from  mman_loan_collection_order o inner join  mman_user_loan l  on o.loan_id = l.id -->
+	<!--where 1=1-->
+	<!--<if test="begDate != null">-->
+	  <!--and DATE_FORMAT(o.create_date,'%Y-%m-%d')  >=  DATE_FORMAT(#{begDate},'%Y-%m-%d')-->
+	<!--</if>-->
+	<!--<if test="endDate != null">-->
+	 <!--<![CDATA[ and DATE_FORMAT(o.create_date,'%Y-%m-%d')  <=  DATE_FORMAT(#{endDate},'%Y-%m-%d')]]>-->
+	<!--</if>-->
+
+	<![CDATA[
+		SELECT
+		pp.status,
+		pp.label as csType,
+		SUM(pp.loan_money) AS ownnerMoney,
+		ROUND(SUM(pp.loan_money)/kk.total_loan_money*100,2) ownnerMoneyRate,
+		SUM(pp.loan_penalty) AS penalty,
+		ROUND(SUM(pp.loan_penalty)/kk.total_loan_penalty*100,2) AS penaltyRate,
+		kk.total_loan_money,
+		kk.total_loan_penalty
+		FROM
+		(SELECT
+		IF(IFNULL(ord.status, ord.renew_status) = 3, 0, IFNULL(ord.status, ord.renew_status)) AS status,
+		dct.label,
+		SUM(uln.loan_money) AS loan_money,
+		SUM(uln.loan_penalty) AS loan_penalty
+		FROM
+		mman_loan_collection_order ord
+		LEFT JOIN sys_dict dct ON IFNULL(ord.status, ord.renew_status) = dct.value
+		AND description = '催收状态'
+		LEFT JOIN mman_user_loan uln ON ord.loan_id = uln.id
+		WHERE
+		DATE_FORMAT(ord.create_date, '%Y-%m-%d') BETWEEN #{begDate} AND #{endDate}
+		AND ord.status <> 5
+		GROUP BY IF(IFNULL(ord.status, ord.renew_status) = 3, 0, IFNULL(ord.status, ord.renew_status)) , dct.label) pp,
+		(SELECT
+		SUM(loan_money) AS total_loan_money,
+		SUM(loan_penalty) AS total_loan_penalty
+		FROM
+		mman_loan_collection_order ord
+		LEFT JOIN mman_user_loan uln ON ord.loan_id = uln.id
+		WHERE
+		DATE_FORMAT(ord.create_date, '%Y-%m-%d') BETWEEN #{begDate} AND #{endDate}
+		AND ord.status <> 5) kk
+		GROUP BY status;
+	]]>
+</select>
+</mapper>

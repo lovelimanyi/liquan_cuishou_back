@@ -1,0 +1,709 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.info.back.dao.ILocalDataDao">
+	<!-- 还款信息 -->
+	<select id="checkLoan"  resultType="Integer" parameterType="HashMap">
+		select count(1) from mman_user_loan where id = #{ID}
+	</select>
+	
+	<select id="checkLoanStatus"  resultType="java.lang.String" parameterType="HashMap">
+		select loan_status from mman_user_loan where id = #{ID}
+	</select>
+	
+	<select id="checkUserInfo" resultType="Integer" parameterType="HashMap">
+		select count(1) from mman_user_info where id = #{ID}
+	</select>
+	
+	<select id="checkUserRela" resultType="Integer" parameterType="HashMap">
+		select count(1) from mman_user_rela where user_id = #{ID}
+	</select>
+	<insert id="saveMmanUserLoan" parameterType="com.info.web.pojo.MmanUserLoan" >
+		<![CDATA[
+			insert into mman_user_loan(
+				id,
+				user_id,
+				loan_py_id,
+				loan_money,
+				loan_rate,
+				loan_penalty,
+				loan_penalty_rate,
+				service_charge,
+				paid_money,
+				loan_start_time,
+				loan_end_time,
+				loan_status,
+				create_time,
+				update_time,
+				del_flag,
+				loan_penalty_time,
+				loan_sys_status,
+				loan_sys_remark
+			)values(
+				#{id},
+				#{userId},
+				#{loanPyId},
+				#{loanMoney},
+				#{loanRate},
+				#{loanPenalty},
+				#{loanPenaltyRate},
+				#{serviceCharge},
+				#{paidMoney},
+				#{loanStartTime},
+				#{loanEndTime},
+				#{loanStatus},
+				#{createTime},
+				#{updateTime},
+				#{delFlag},
+				#{loanPenaltyTime},
+				#{loanSysStatus},
+				#{loanSysRemark}
+			)
+		]]>
+	</insert>
+	
+	<update id="updateMmanUserLoan" parameterType="com.info.web.pojo.MmanUserLoan">
+			update mman_user_loan
+			<set>
+				<if test="userId != null and userId !=''">
+				  <![CDATA[user_id = #{userId},]]>
+				</if>
+				<if test="loanPyId != null and loanPyId !=''">
+				  <![CDATA[loan_py_id = #{loanPyId},]]>
+				</if>
+				<if test="loanMoney != null">
+				  <![CDATA[loan_money = #{loanMoney},]]>
+				</if>
+				<if test="loanRate != null and loanRate !=''">
+				  <![CDATA[loan_rate = #{loanRate},]]>
+				</if>
+				<if test="loanPenalty != null">
+				  <![CDATA[loan_penalty = #{loanPenalty},]]>
+				</if>
+				<if test="loanPenaltyRate != null and loanPenaltyRate !=''">
+				  <![CDATA[loan_penalty_rate = #{loanPenaltyRate},]]>
+				</if>
+				<if test="serviceCharge != null">
+					<![CDATA[service_charge = #{serviceCharge},]]>
+				</if>
+				<if test="loanStartTime != null and loanStartTime !=''">
+				  <![CDATA[loan_start_time = #{loanStartTime},]]>
+				</if>
+				<if test="loanEndTime != null and loanEndTime !=''">
+				  <![CDATA[loan_end_time = #{loanEndTime},]]>
+				</if>
+				<if test="loanStatus != null and loanStatus !=''">
+				  <![CDATA[loan_status = #{loanStatus},]]>
+				</if>
+				<if test="createTime != null and createTime !=''">
+				  <![CDATA[create_time = #{createTime},]]>
+				</if>
+				<if test="updateTime != null and updateTime !=''">
+				  <![CDATA[update_time = #{updateTime},]]>
+				</if>
+				<if test="updateTime == null">
+					update_time = now(),
+				</if>
+				<if test="delFlag != null and delFlag !=''">
+				  <![CDATA[del_flag = #{delFlag},]]>
+				</if>
+				<if test="loanPenaltyTime != null and loanPenaltyTime !=''">
+				  <![CDATA[loan_penalty_time = #{loanPenaltyTime},]]>
+				</if>
+				<if test="loanSysStatus != null and loanSysStatus !=''">
+				  <![CDATA[loan_sys_status = #{loanSysStatus},]]>
+				</if>
+				<if test="loanSysRemark != null and loanSysRemark !=''">
+				  <![CDATA[loan_sys_remark = #{loanSysRemark},]]>
+				</if>
+			</set>
+			where id=#{id}
+	</update>
+	<insert id="saveCreditLoanPay" parameterType="com.info.web.pojo.CreditLoanPay">
+
+			insert into credit_loan_pay (
+				id,
+				loan_id,
+				receivable_startdate,
+				receivable_date,
+				receivable_money,
+				receivable_principle,
+				receivable_interest,
+				real_money,
+				realget_principle,
+				realget_interest,
+				status,
+				create_date,
+				update_Date,
+				rest_principle,
+				installmentMethod,
+				create_By,
+				update_By
+			)values(
+				#{id},
+				#{loanId},
+				#{receivableStartdate},
+				#{receivableDate},
+				#{receivableMoney},
+				#{receivablePrinciple},
+				#{receivableInterest},
+				#{realMoney},
+				#{realgetPrinciple},
+				#{realgetInterest},
+				#{status},
+				#{createDate},
+		<if test="updateDate != null and updateDate !=''">
+			#{updateDate},
+		</if>
+		<if test="updateDate == null">
+			now(),
+		</if>
+
+				#{restPrinciple},
+				#{installmentMethod},
+				#{createBy},
+				#{updateBy}
+			)
+
+	</insert>
+	<update id="updateCreditLoanPay" parameterType="com.info.web.pojo.CreditLoanPay">
+		update credit_loan_pay 
+		<set>
+			<if test="loanId != null and loanId !=''">
+			  <![CDATA[loan_id = #{loanId},]]>
+			</if>
+			<if test="receivableStartdate != null and receivableStartdate !=''">
+			  <![CDATA[receivable_startdate = #{receivableStartdate},]]>
+			</if>
+			<if test="receivableDate != null and receivableDate !=''">
+			  <![CDATA[receivable_date = #{receivableDate},]]>
+			</if>
+			<if test="receivableMoney != null">
+			  <![CDATA[receivable_money = #{receivableMoney},]]>
+			</if>
+			<if test="receivablePrinciple !=null">
+			  <![CDATA[receivable_principle = #{receivablePrinciple},]]>
+			</if>
+			<if test="receivableInterest != null">
+			  <![CDATA[receivable_interest = #{receivableInterest},]]>
+			</if>
+			<if test="realMoney != null">
+			  <![CDATA[real_money = #{realMoney},]]>
+			</if>
+			<if test="realgetPrinciple != null">
+			  <![CDATA[realget_principle = #{realgetPrinciple},]]>
+			</if>
+			<if test="realgetInterest != null">
+			  <![CDATA[realget_interest = #{realgetInterest},]]>
+			</if>
+			<if test="reductionMoney != null">
+			    reduction_money = reduction_money + #{reductionMoney},
+			</if>
+			<if test="status != null and status !=''">
+			  <![CDATA[status = #{status},]]>
+			</if>
+			<if test="createDate != null and createDate !=''">
+			  <![CDATA[create_date = #{createDate},]]>
+			</if>
+			<if test="updateDate != null and updateDate !=''">
+			  <![CDATA[update_date = #{updateDate},]]>
+			</if>
+			<if test="updateDate == null">
+				update_date = now(),
+			</if>
+			<if test="restPrinciple != null">
+			  <![CDATA[rest_principle = #{restPrinciple},]]>
+			</if>
+			<if test="installmentMethod != null and installmentMethod !=''">
+			  <![CDATA[installmentMethod = #{installmentMethod},]]>
+			</if>
+			<if test="createBy != null and createBy !=''">
+			  <![CDATA[create_By = #{createBy},]]>
+			</if>
+			<if test="updateBy != null and updateBy !=''">
+			  <![CDATA[update_By = #{updateBy}]]>
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+	<delete id="delCreditLoanPayDetail" parameterType="HashMap">
+		<![CDATA[
+			delete from credit_loan_pay_detail where pay_id=#{PAY_ID}
+		]]>
+	</delete>
+	<select id="selectCreditLoanPayDetail" parameterType="HashMap" resultType="String">
+		<![CDATA[
+			select id from credit_loan_pay_detail where pay_id=#{PAY_ID}
+		]]>
+	</select>
+	<select id="selectOrderByDetail" parameterType="HashMap" resultType="HashMap">
+		<![CDATA[
+			select 
+			current_collection_user_id,
+			overdueDays,
+			s1_flag 
+			from mman_loan_collection_order 
+			where pay_id=#{PAY_ID} and loan_id=#{ORDER_ID} 
+		]]>
+	</select>
+	<insert id="saveCreditLoanPayDetail" parameterType="com.info.web.pojo.CreditLoanPayDetail">
+			insert into credit_loan_pay_detail(
+				id,
+				pay_id,
+				real_money,
+				real_penlty,
+				real_principle,
+				real_interest,
+				return_type,
+				remark,
+				update_Date,
+				create_By,
+				update_By,
+				create_date,
+				bank_id,
+				bank_flownum,
+				real_date,
+				current_collection_user_id,
+				s1_flag
+			)values(
+				#{id},
+				#{payId},
+				#{realMoney},
+				#{realPenlty},
+				#{realPrinciple},
+				#{realInterest},
+				#{returnType},
+				#{remark},
+		<if test="updateDate != null and updateDate !=''">
+			#{updateDate},
+		</if>
+		<if test="updateDate == null">
+			now(),
+		</if>
+				#{createBy},
+				#{updateBy},
+				#{createDate},
+				#{bankId},
+				#{bankFlownum},
+				#{realDate},
+				#{currentCollectionUserId},
+				#{s1Flag}
+			)
+	</insert>
+	<insert id="saveMmanUserInfo" parameterType="HashMap">
+		<![CDATA[
+			insert into mman_user_info(
+				id,
+				user_name,
+				password,
+				pay_password,
+				realname,
+				realname_status,
+				realname_time,
+				id_number,
+				user_sex,
+				user_age,
+				qq,
+				user_phone,
+				taobao_account,
+				email,
+				wechat_account,
+				education,
+				marital_status,
+				present_address,
+				present_address_distinct,
+				present_latitude,
+				present_longitude,
+				present_period,
+				company_name,
+				company_address,
+				company_address_distinct,
+				company_longitude,
+				company_latitude,
+				company_phone,
+				company_period,
+				first_contact_name,
+				first_contact_phone,
+				frist_contact_relation,
+				second_contact_name,
+				second_contact_phone,
+				second_contact_relation,
+				create_time,
+				create_ip,
+				update_time,
+				status,
+				invite_userid,
+				is_save,
+				head_portrait,
+				idcard_img_z,
+				idcard_img_f,
+				customer_type,
+				amount_min,
+				amount_max,
+				amount_available,
+				equipment_number,
+				zm_score,
+				zm_score_time,
+				zm_industy_black,
+				zm_over,
+				zm_no_pay_over,
+				zm_industy_time,
+				zm_status,
+				my_hb,
+				my_hb_time,
+				jxl_token,
+				jxl_token_time,
+				jxl_status,
+				jxl_detail,
+				jxl_detail_time,
+				jxl_zj_dk_num,
+				jxl_bj_dk_num,
+				jxl_yj_hf,
+				jxl_link2_days,
+				jxl_link1_days,
+				jxl_link2_num,
+				jxl_link1_num,
+				jxl_link2_order,
+				jxl_link1_order,
+				jxl_gj_ts,
+				jxl_ht_phone_num,
+				jxl_amth_num,
+				jxl_phone_reg_days,
+				jxl_time,
+				user_contact_size,
+				history_over_num,
+				last_over_days,
+				csjy,
+				user_from
+			)values(
+				#{id},
+				#{user_name},
+				#{password},
+				#{pay_password},
+				#{realname},
+				#{realname_status},
+				#{realname_time},
+				#{id_number},
+				#{user_sex},
+				#{user_age},
+				#{qq},
+				#{user_phone},
+				#{taobao_account},
+				#{email},
+				#{wechat_account},
+				#{education},
+				#{marital_status},
+				#{present_address},
+				#{present_address_distinct},
+				#{present_latitude},
+				#{present_longitude},
+				#{present_period},
+				#{company_name},
+				#{company_address},
+				#{company_address_distinct},
+				#{company_longitude},
+				#{company_latitude},
+				#{company_phone},
+				#{company_period},
+				#{first_contact_name},
+				#{first_contact_phone},
+				#{frist_contact_relation},
+				#{second_contact_name},
+				#{second_contact_phone},
+				#{second_contact_relation},
+				#{create_time},
+				#{create_ip},
+				#{update_time},
+				#{status},
+				#{invite_userid},
+				#{is_save},
+				#{head_portrait},
+				#{idcard_img_z},
+				#{idcard_img_f},
+				#{customer_type},
+				#{amount_min},
+				#{amount_max},
+				#{amount_available},
+				#{equipment_number},
+				#{zm_score},
+				#{zm_score_time},
+				#{zm_industy_black},
+				#{zm_over},
+				#{zm_no_pay_over},
+				#{zm_industy_time},
+				#{zm_status},
+				#{my_hb},
+				#{my_hb_time},
+				#{jxl_token},
+				#{jxl_token_time},
+				#{jxl_status},
+				#{jxl_detail},
+				#{jxl_detail_time},
+				#{jxl_zj_dk_num},
+				#{jxl_bj_dk_num},
+				#{jxl_yj_hf},
+				#{jxl_link2_days},
+				#{jxl_link1_days},
+				#{jxl_link2_num},
+				#{jxl_link1_num},
+				#{jxl_link2_order},
+				#{jxl_link1_order},
+				#{jxl_gj_ts},
+				#{jxl_ht_phone_num},
+				#{jxl_amth_num},
+				#{jxl_phone_reg_days},
+				#{jxl_time},
+				#{user_contact_size},
+				#{history_over_num},
+				#{last_over_days},
+				#{csjy},
+				#{user_from}
+			)
+		]]>
+	</insert>
+	<insert id="saveMmanUserRela" parameterType="com.info.web.pojo.MmanUserRela">
+		<![CDATA[
+			insert into mman_user_rela(
+				id,
+				user_id,
+				contacts_key,
+				rela_key,
+				info_name,
+				info_value,
+				contactsFlag,
+				del_flag,
+				contacts_value,
+				rela_value,
+				kv_vars,
+				phone_num_loc,
+				call_cnt,
+				call_out_cnt,
+				call_in_cnt,
+				call_len,
+				call_out_len,
+				call_in_len
+			)values(
+				#{id},
+				#{userId},
+				#{contactsKey},
+				#{relaKey},
+				#{infoName},
+				#{infoValue},
+				#{contactsFlag},
+				#{delFlag},
+				#{contactsValue},
+				#{relaValue},
+				#{kvVars},
+				#{phoneNumLoc},
+				#{callCnt},
+				#{callOutCnt},
+				#{callInCnt},
+				#{callLen},
+				#{callOutLen},
+				#{callInLen}
+			)
+		]]>
+	</insert>
+	
+	<insert id="saveSysUserBankCard" parameterType="com.info.web.pojo.SysUserBankCard">
+		<![CDATA[
+			insert into sys_user_bank_card (
+				id,
+				user_id,
+				bank_card,
+				deposit_bank,
+				bank_institution_no,
+				branch_bank,
+				name,
+				mobile,
+				id_card,
+				cvn,
+				bank_code,
+				city_code,
+				city_name
+			)values(
+				#{id},
+				#{userId},
+				#{bankCard},
+				#{depositBank},
+				#{bankInstitutionNo},
+				#{branchBank},
+				#{name},
+				#{mobile},
+				#{idCard},
+				#{cvn},
+				#{bankCode},
+				#{cityCode},
+				#{cityName}
+			)
+		]]>
+	</insert>
+	
+	<update id="updateSysUserBankCard" parameterType="com.info.web.pojo.SysUserBankCard">
+		update sys_user_bank_card
+		<set>
+			<if test="userId != null and userId !=''">
+			  <![CDATA[user_id = #{userId},]]>
+			</if>
+			<if test="bankCard != null and bankCard !=''">
+			  <![CDATA[bank_card = #{bankCard},]]>
+			</if>
+			<if test="depositBank != null and depositBank !=''">
+			  <![CDATA[deposit_bank = #{depositBank},]]>
+			</if>
+			<if test="bankInstitutionNo != null and bankInstitutionNo !=''">
+			  <![CDATA[bank_institution_no = #{bankInstitutionNo},]]>
+			</if>
+			<if test="branchBank != null and branchBank !=''">
+			  <![CDATA[branch_bank = #{branchBank},]]>
+			</if>
+			<if test="name != null and name !=''">
+			  <![CDATA[name = #{name},]]>
+			</if>
+			<if test="mobile != null and mobile !=''">
+			  <![CDATA[mobile = #{mobile},]]>
+			</if>
+			<if test="idCard != null and idCard !=''">
+			  <![CDATA[id_card = #{idCard},]]>
+			</if>
+			<if test="cvn != null and cvn !=''">
+			  <![CDATA[cvn = #{cvn},]]>
+			</if>
+			<if test="bankCode != null and bankCode !=''">
+			  <![CDATA[bank_code = #{bankCode},]]>
+			</if>
+			<if test="cityCode != null and cityCode !=''">
+			  <![CDATA[city_code = #{cityCode},]]>
+			</if>
+			<if test="cityName != null and cityName !=''">
+			  <![CDATA[city_name = #{cityName},]]>
+			</if>
+		</set>
+		where id=#{id}
+	</update>
+	<update id="updateOrderStatus" parameterType="HashMap">
+			update mman_loan_collection_order set 
+			<if test="STATUS != null and STATUS !=''">
+			  status=#{STATUS},
+			</if>
+			<if test="updateDate != null and updateDate !=''">
+				<![CDATA[update_date = #{updateDate},]]>
+			</if>
+			real_money=#{REAL_MONEY} where 
+			user_id=#{USER_ID}
+			and loan_id=#{ORDER_ID}
+		
+	</update>
+	<update id="updateWithHold" parameterType="HashMap">
+		<![CDATA[
+			update collection_withholding_record set status=1 where id = #{ID}
+		]]>
+	</update>
+	<insert id="saveLoanChangeLog" parameterType="com.info.web.pojo.MmanLoanCollectionStatusChangeLog">
+		<![CDATA[
+			insert into mman_loan_collection_status_change_log(
+				id,
+				loan_collection_order_id,
+				before_status,
+				after_status,
+				type,
+				create_date,
+				operator_name,
+				remark,
+				company_id,
+				current_collection_user_id,
+				current_collection_user_level,
+				current_collection_Order_Level
+			)values(
+				#{id},
+				#{loanCollectionOrderId},
+				#{beforeStatus},
+				#{afterStatus},
+				#{type},
+				#{createDate},
+				#{operatorName},
+				#{remark},
+				#{companyId},
+				#{currentCollectionUserId},
+				#{currentCollectionUserLevel},
+				#{currentCollectionOrderLevel}
+			)
+		]]>
+	</insert>
+	<select id="selectLoanOrder" parameterType="HashMap" resultType="com.info.web.pojo.MmanLoanCollectionOrder">
+		<![CDATA[
+			select 
+			id as id,
+			order_id as orderId,
+			dispatch_name as dispatchName,
+			current_collection_user_id as currentCollectionUserId,
+			current_overdue_level as currentOverdueLevel,
+			status as status,
+			operator_name as operatorName,
+			s1_flag as s1Flag,
+			remark as remark
+			from mman_loan_collection_order
+			where user_id=#{USER_ID}
+			and loan_id=#{ORDER_ID}
+		]]>
+	</select>
+	<select id="selectBackUser" parameterType="HashMap" resultType="com.info.web.pojo.BackUser">
+		<![CDATA[
+			select
+			id as id,
+			user_name as userName,
+			company_id as companyId,
+			group_level as groupLevel,
+			uuid as uuid
+			from back_user
+			where uuid=#{ID}
+		]]>
+	</select>
+	<select id="sumRealMoneyAndPenlty" parameterType="String" resultType="com.info.web.pojo.CreditLoanPaySum">
+	    <![CDATA[
+		     SELECT 
+		     	SUM(d.real_money) as sumRealMoney,
+		     	SUM(d.real_penlty) as sumRealPenlty 
+		     FROM credit_loan_pay_detail d 
+		     WHERE d.pay_id = #{payId}
+	      ]]>
+	</select>
+	
+	<select id="getDetailCount" parameterType="String" resultType="java.lang.Integer">
+	    <![CDATA[
+		     SELECT  count(1) as detailCount
+		     FROM credit_loan_pay_detail
+		     WHERE pay_id = #{payId}
+	     ]]>
+	</select>
+	
+	<select id="getAuditCenterByPayId" parameterType="String" resultType="com.info.web.pojo.AuditCenter">
+		 <![CDATA[
+			SELECT
+			id AS id,
+			operation_user_id AS operationUserId,
+			orderId AS orderId,
+			loan_user_id AS loanUserId,
+			status AS status,
+			pay_id AS payId,
+			createtime AS createtime,
+			type AS type,
+			reduction_money AS reductionMoney
+			FROM audit_center
+			WHERE pay_id = #{payId}
+			ORDER BY createtime DESC limit 1
+		 ]]>
+	</select>
+
+	<delete id="deleteOrderAndOther" parameterType="java.lang.String">
+		DELETE l, p, o, log, d, r
+		FROM
+		mman_user_loan l
+		LEFT JOIN mman_loan_collection_order o ON l.id = o.loan_id
+		LEFT JOIN credit_loan_pay p ON p.loan_id = o.loan_id
+		LEFT JOIN mman_loan_collection_status_change_log log ON log.loan_collection_order_id = o.order_id
+		LEFT JOIN credit_loan_pay_detail d ON d.pay_id = p.id
+		LEFT JOIN mman_loan_collection_record r ON r.order_id = o.id
+		WHERE
+		l.id=#{loanId}
+	</delete>
+</mapper>

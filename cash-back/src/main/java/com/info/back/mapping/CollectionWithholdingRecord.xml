@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.info.back.dao.ICollectionWithholdingRecordDao">
+	<resultMap id="BaseResultMap" type="com.info.web.pojo.CollectionWithholdingRecord">
+		<id column="id" property="id" />
+		<result column="loan_user_id" property="loanUserId" />
+		<result column="loan_user_name" property="loanUserName" />
+		<result column="loan_user_phone" property="loanUserPhone" />
+		<result column="order_status" property="orderStatus" />
+		<result column="arrears_money" property="arrearsMoney" />
+		<result column="hasalso_money" property="hasalsoMoney" />
+		<result column="deductions_money" property="deductionsMoney" />
+		<result column="status" property="status" />
+		<result column="operation_user_id" property="operationUserId" />
+		<result column="create_date" property="createDate" />
+		<result column="order_id" property="orderId" />
+		<result column="update_date" property="updateDate" />
+	</resultMap>
+	<!-- 保存,保存不为NULL的字段 -->
+	<insert id="insert" parameterType="com.info.web.pojo.CollectionWithholdingRecord" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO collection_withholding_record 
+		<trim prefix="(" suffix=")" suffixOverrides=","> 
+			<if test="id != null">`id`,</if>  
+			<if test="loanUserId != null">`loan_user_id`,</if>  
+			<if test="loanUserName != null">`loan_user_name`,</if>  
+			<if test="loanUserPhone != null">`loan_user_phone`,</if>  
+			<if test="orderStatus != null">`order_status`,</if>  
+			<if test="arrearsMoney != null">`arrears_money`,</if> 
+			<if test="deductionsMoney !=null">deductions_money,</if>
+			<if test="status !=null">status,</if>
+			<if test="operationUserId !=null">operation_user_id,</if>
+			<if test="createDate !=null">create_date,</if>
+			<if test="orderId !=null">order_id,</if>
+			<if test="updateDate !=null">update_date,</if>
+		</trim>  
+		<trim prefix="values (" suffix=")" suffixOverrides=","> 
+			<if test="id != null">#{id,jdbcType=VARCHAR},</if>  
+			<if test="loanUserId != null">#{loanUserId,jdbcType=VARCHAR},</if>  
+			<if test="loanUserName != null">#{loanUserName,jdbcType=TIMESTAMP},</if>  
+			<if test="loanUserPhone != null">#{loanUserPhone,jdbcType=VARCHAR},</if>  
+			<if test="orderStatus != null">#{orderStatus,jdbcType=VARCHAR},</if>  
+			<if test="arrearsMoney != null">#{arrearsMoney,jdbcType=VARCHAR},</if> 
+			<if test="deductionsMoney !=null">#{deductionsMoney},</if>
+			<if test="status !=null">#{status},</if>
+			<if test="operationUserId !=null">#{operationUserId},</if>
+			<if test="createDate !=null">#{createDate},</if>
+			<if test="orderId !=null">#{orderId},</if>
+			<if test="updateDate !=null">#{updateDate},</if>
+		</trim> 
+	</insert>
+	<select id="findCurrDayWithhold" parameterType="HashMap" resultType="Integer">
+		<![CDATA[	SELECT COUNT(1) FROM collection_withholding_record w WHERE w.`order_id`=#{orderId} AND  DATE_FORMAT(w.`create_date`,'%Y-%m-%d')=#{currDate}  ]]>
+	</select>
+	
+	<select id="findOrderList"  parameterType="String" resultMap="BaseResultMap">
+		
+		SELECT w.`loan_user_name`,w.`loan_user_phone`,w.`arrears_money`,w.`hasalso_money`,w.`deductions_money`,w.`status`,w.`order_status`,w.`create_date`,w.`update_date` FROM collection_withholding_record w WHERE w.`order_id`=#{id}
+		ORDER BY w.`create_date` DESC
+	</select>
+	<select id="findTowHoursList"  parameterType="String" resultType="com.info.web.pojo.CollectionWithholdingRecord">
+		<![CDATA[ SELECT r.id FROM collection_withholding_record r WHERE r.`create_date`<=DATE_SUB(NOW(), INTERVAL 2 HOUR)  AND r.`status`='0'	]]>	
+	</select>
+	<update id="updateStatusFail" parameterType="com.info.web.pojo.CollectionWithholdingRecord">
+		<![CDATA[ update collection_withholding_record r	 set status=2 where  r.`create_date`<=DATE_SUB(NOW(), INTERVAL 2 HOUR)  AND r.`status`='0' ]]>
+	</update>
+
+	<update id="updateWithholdStatus" >
+		<![CDATA[
+			UPDATE installment_pay_record ipr
+			SET operation_status = '0'
+			WHERE
+				ipr.repay_status IS NULL
+			AND DATE_FORMAT(now(), '%Y-%m-%d') >= DATE_FORMAT(
+				date_add(
+					ipr.repay_time,
+					INTERVAL - 6 DAY
+				),
+				'%Y-%m-%d'
+			)
+			AND DATE_FORMAT(now(), '%Y-%m-%d') <= DATE_FORMAT(ipr.repay_time, '%Y-%m-%d')
+		]]>
+	</update>
+
+	<update id="updateOverdueStatus" >
+		<![CDATA[
+			UPDATE installment_pay_record ipr
+			SET repay_status = '1',
+			 operation_status = '1'
+			WHERE
+				ipr.repay_status IS NULL
+			AND DATE_FORMAT(ipr.repay_time, '%Y-%m-%d') < DATE_FORMAT(now(), '%Y-%m-%d')
+		]]>
+	</update>
+</mapper>

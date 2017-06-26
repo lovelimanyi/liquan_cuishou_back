@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.info.back.dao.IBackUserCompanyPermissionsDao">
+	<resultMap id="BaseResultMap" type="com.info.web.pojo.BackUserCompanyPermissions">
+		<id column="id" property="id" />
+		<result column="user_id" property="userId" />
+		<result column="company_id" property="companyId" />
+	</resultMap>
+	<select id="findAll" resultType="com.info.web.pojo.BackUserCompanyPermissions" parameterType="HashMap">
+			select * from back_user_company_permissions
+	</select>
+	<select id="findCompanyPermissions" resultType="com.info.web.pojo.BackUserCompanyPermissions" parameterType="java.lang.Integer">
+			select id as id,user_id as userId, company_id as companyId from back_user_company_permissions  where user_id=#{id}
+	</select>
+	<delete id="deleteBycompanyId" parameterType="Integer">
+		delete from back_user_company_permissions where company_id=#{companyId}
+	</delete>
+	<!--根据用户删除所有关联的公司-->
+	<delete id="deleteUserCompanyByUserId" parameterType="java.lang.Integer">
+		DELETE FROM
+		back_user_company_permissions
+		WHERE user_id=#{id}
+	</delete>
+	<!--	插入用户关联的公司-->
+	<insert id="inserUserCompanyList" parameterType="HashMap">
+		INSERT INTO back_user_company_permissions(company_id,user_id)VALUES
+		<foreach collection="companyIds" item="item" index="index"
+			separator=",">
+			( #{item}, #{id})
+		</foreach>
+	</insert>
+	<insert id="inserCompanyPermission" parameterType="BackUserRole">
+		INSERT INTO back_user_company_permissions(company_id,user_id)
+		VALUES (#{companyId}, #{userId})
+	</insert>
+	<!-- 根据用户id查询用户拥有查看对应公司权限的集合 -->
+	<select id="findSelfCompanyPermissions" resultType="com.info.web.pojo.BackUserCompanyPermissions" parameterType="java.lang.Integer">
+			select id as id,user_id as userId, company_id as companyId from back_user_company_permissions  where user_id=#{id}
+	</select>
+</mapper>

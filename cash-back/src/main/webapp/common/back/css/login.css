@@ -1,0 +1,24 @@
+
+
+		form.default ul{
+		 border:0; margin:0; padding:0; padding-left:10px;
+		}
+		form.default li{
+		 float:left;
+		 list-style:none;
+		 padding:5px 5px 5px 15px;
+		}
+		form.default ul li{
+			border:0; 
+			margin:0; 
+			width:90%;
+		}
+		form.default input{
+			float:left;
+			height:25px;
+		}
+		form.default label{
+		 width:80px;
+		 float:left;
+		 padding-top:4px;
+		}

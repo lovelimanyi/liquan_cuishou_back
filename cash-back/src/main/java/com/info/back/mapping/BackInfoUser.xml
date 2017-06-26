@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.info.back.dao.IBackInfoUserDao">
+	<resultMap id="BaseResultMap" type="User">
+		<id column="id" property="id" />
+		<result column="user_account" property="userAccount" />
+		<result column="user_password" property="userPassword"/>
+		<result column="user_paypassword" property="userPaypassword"/>
+		<result column="user_type" property="userType" />
+		<result column="user_name" property="userName" />
+		<result column="user_sex" property="userSex" />
+		<result column="user_age" property="userAge" />
+		<result column="user_province" property="userProvince" />
+		<result column="user_city" property="userCity" />
+		<result column="user_area" property="userArea" />
+		<result column="user_address" property="userAddress" />
+		<result column="user_telephone" property="userTelephone" />
+		<result column="user_mobile" property="userMobile" />
+		<result column="user_email" property="userEmail" />
+		<result column="user_qq" property="userQq" />
+		<result column="user_card_num" property="userCardNum" />
+		<result column="user_cart_type" property="userCartType" />
+		<result column="name_status" property="nameStatus" />
+		<result column="phone_status" property="phoneStatus" />
+		<result column="email_status" property="emailStatus" />
+		<result column="img_status" property="imgStatus" />
+		<result column="create_date" property="createDate" />
+		<result column="update_date" property="updateDate" />
+		<result column="regist_ip" property="registIp" />
+		<result column="remark" property="remark" />
+		<result column="status" property="status" />
+		<result column="avatar_img" property="avatarImg" />
+		<result column="login_time" property="loginTime" />
+		<result column="login_ip" property="loginIp" />
+	</resultMap>
+	<select id="findById"  resultMap="BaseResultMap" parameterType="java.lang.Integer">
+		select * from info_user where id=#{id}
+	</select>
+	<select id="findId" resultType="Integer" parameterType="HashMap">
+		select id  
+		<include refid="sql"/>
+	</select>
+	<sql id="sql">
+		from info_user 
+		<where>
+			<if test="id != null and id != ''">
+				 and  id=#{id}
+			</if>
+			<if test="userAccount != null and userAccount != ''">
+				 and user_account like CONCAT('%', #{userAccount}, '%')
+			</if>
+			<if test="userAccountEq != null and userAccountEq != ''">
+				 and user_account=#{userAccountEq}
+			</if>
+			<if test="userTelephone != null and userTelephone != ''">
+				 and user_telephone like CONCAT('%', #{userTelephone}, '%')
+			</if>
+			<if test="userTelephoneEq != null and userTelephoneEq != ''">
+				 and user_telephone =#{userTelephoneEq}
+			</if>
+			<if test="userMobileEq != null and userMobileEq != ''">
+				 and user_mobile =#{userMobileEq}
+			</if>
+			<if test="beginDate != null and beginDate != ''">
+				 and create_date>=#{beginDate}
+			</if>
+			<if test="userEmail != null and userEmail != ''">
+				 and user_email=#{userEmail}
+			</if>
+			<if test="endDate != null and endDate != ''">
+				 <![CDATA[ and create_date<=#{endDate} ]]>
+			</if>
+		</where>
+	</sql>
+	<select id="findByParamsCount" resultType="Integer" parameterType="HashMap">
+			select COUNT(1)  <include refid="sql"/>
+	</select>
+	<select id="findByParams" parameterType="HashMap" resultMap="BaseResultMap">
+			select  *
+			<include refid="sql"/>
+			order by id desc 
+	</select>
+<!--	修改用户信息-->
+	<update id="updateUser" parameterType="User">
+		update info_user
+		<set>
+			<if test="userAccount != null and userAccount !=''">
+				user_account = #{userAccount},
+			</if>
+			<if test="userPassword != null">
+				user_password = #{userPassword},
+			</if>
+			<if test="userPaypassword != null">
+				user_paypassword = #{userPaypassword},
+			</if>
+			<if test="userType != null">
+				user_type = #{userType},
+			</if>
+			<if test="userName != null">
+				user_name = #{userName},
+			</if>
+			<if test="userSex != null">
+				user_sex = #{userSex},
+			</if>
+			<if test="userAge != null">
+				user_age = #{userAge},
+			</if>
+			<if test="userCity != null">
+				user_city = #{userCity},
+			</if>
+			<if test="userProvince != null">
+				user_province = #{userProvince},
+			</if>
+			<if test="userArea != null">
+				user_area = #{userArea},
+			</if>
+			<if test="userAddress != null">
+				user_address = #{userAddress},
+			</if>
+			<if test="userTelephone != null">
+				user_telePhone = #{userTelephone},
+			</if>
+			<if test="userMobile != null">
+				user_mobile = #{userMobile},
+			</if>
+			<if test="userEmail != null">
+				user_email = #{userEmail},
+			</if>
+			<if test="userQq != null">
+				user_qq = #{userQq},
+			</if>
+			<if test="userCardNum != null">
+				user_card_num = #{userCardNum},
+			</if>
+			<if test="userCartType != null">
+				user_cart_type = #{userCartType},
+			</if>
+			<if test="nameStatus != null">
+				name_status = #{nameStatus},
+			</if>
+			<if test="phoneStatus != null">
+				phone_status = #{phoneStatus},
+			</if>
+			<if test="emailStatus != null">
+				email_status = #{emailStatus},
+			</if>
+			<if test="imgStatus != null">
+				img_status = #{imgStatus},
+			</if>
+			<if test="updateDate != null">
+				update_date = #{updateDate},
+			</if>
+			<if test="registIp != null">
+				regist_ip = #{registIp},
+			</if>
+			<if test="remark != null">
+				remark = #{remark},
+			</if>
+			<if test="status != null">
+				status = #{status},
+			</if>
+			<if test="avatarImg != null">
+				avatar_img = #{avatarImg},
+			</if>
+			<if test="loginTime != null">
+				login_time = #{loginTime},
+			</if>
+			<if test="loginIp != null">
+				login_ip = #{loginIp},
+			</if>
+		</set>
+		where id = #{id}
+	</update>
+</mapper>

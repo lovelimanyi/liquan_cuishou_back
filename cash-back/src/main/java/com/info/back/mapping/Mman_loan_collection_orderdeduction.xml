@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.info.back.dao.IMman_loan_collection_orderdeductionDao">
+  <resultMap id="BaseResultMap" type="com.info.web.pojo.Mman_loan_collection_orderdeduction">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="loanRealName" jdbcType="VARCHAR" property="loanrealname" />
+    <result column="loanUserPhone" jdbcType="VARCHAR" property="loanuserphone" />
+    <result column="returnMoney" jdbcType="DECIMAL" property="returnmoney" />
+    <result column="deductionmoney" jdbcType="DECIMAL" property="deductionmoney" />
+    <result column="createtime" jdbcType="TIMESTAMP" property="createtime" />
+    <result column="deductionremark" jdbcType="VARCHAR" property="deductionremark" />
+  </resultMap>
+  <sql id="Base_Column_List">
+      fo.id,
+      fo.loanRealName AS loanRealName,
+      fo.loanUserPhone AS loanUserPhone,
+      fo.returnMoney AS returnMoney,
+      fo.deductionmoney AS deductionmoney,
+      fo.createtime AS  createtime,
+      fo.deductionremark AS deductionremark
+  </sql>
+  
+  <select id="findAll" parameterType="HashMap" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from mman_loan_collection_orderdeduction fo
+    <where>
+			1=1
+				<if test="createtime!=null">
+					<![CDATA[	AND DATE_FORMAT(createtime,'%Y-%m-%d') >=  #{createtime}  ]]>
+				</if>				
+<!-- 				<if test="status !=null and status!=''">
+					AND a.status=#{status}
+				</if> -->
+			</where>  
+  </select>
+  <select id="findAllCount" parameterType="HashMap" resultType="Integer">
+		select count(1) 
+		from
+          mman_loan_collection_orderdeduction fo
+           <where>
+			1=1
+				<if test="createtime!=null">
+					<![CDATA[	AND DATE_FORMAT(createtime,'%Y-%m-%d') >=  #{createtime}  ]]>
+				</if>				
+<!-- 				<if test="status !=null and status!=''">
+					AND a.status=#{status}
+				</if> -->
+			</where>
+	</select>
+   <select id="findAllList" parameterType="String" resultMap="BaseResultMap">
+      SELECT
+        mm.loanRealName,
+		mm.loanUserPhone,
+		mm.returnMoney,
+		mm.deductionmoney,
+		mm.createtime,
+		mm.deductionremark
+      FROM
+         mman_loan_collection_orderdeduction AS mm
+      WHERE
+           mm.id=#{id}
+  </select>
+  <delete id="deleteid" parameterType="java.lang.Integer">
+    delete from mman_loan_collection_orderdeduction
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.info.web.pojo.Mman_loan_collection_orderdeduction">
+    insert into mman_loan_collection_orderdeduction (id, loanRealName, loanUserPhone, 
+      returnMoney, deductionmoney, createtime,deductionremark
+      )
+    values (#{id,jdbcType=VARCHAR}, #{loanrealname,jdbcType=VARCHAR}, #{loanuserphone,jdbcType=VARCHAR}, 
+      #{returnmoney,jdbcType=DECIMAL}, #{deductionmoney,jdbcType=DECIMAL}, #{createtime,jdbcType=TIMESTAMP},
+      #{deductionremark,jdbcType=VARCHAR})
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.info.web.pojo.Mman_loan_collection_orderdeduction">
+    insert into mman_loan_collection_orderdeduction
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="loanrealname != null">
+        loanRealName,
+      </if>
+      <if test="loanuserphone != null">
+        loanUserPhone,
+      </if>
+      <if test="returnmoney != null">
+        returnMoney,
+      </if>
+      <if test="deductionmoney != null">
+        deductionmoney,
+      </if>
+      <if test="createtime != null">
+        createtime,
+      </if>
+       <if test="deductionremark != null">
+        deductionremark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="loanrealname != null">
+        #{loanrealname,jdbcType=VARCHAR},
+      </if>
+      <if test="loanuserphone != null">
+        #{loanuserphone,jdbcType=VARCHAR},
+      </if>
+      <if test="returnmoney != null">
+        #{returnmoney,jdbcType=DECIMAL},
+      </if>
+      <if test="deductionmoney != null">
+        #{deductionmoney,jdbcType=DECIMAL},
+      </if>
+      <if test="createtime != null">
+        #{createtime,jdbcType=TIMESTAMP},
+      </if>
+         <if test="deductionremark != null">
+        #{deductionremark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateBy" parameterType="com.info.web.pojo.Mman_loan_collection_orderdeduction">
+    update mman_loan_collection_orderdeduction
+    <set>
+      <if test="loanrealname != null">
+        loanRealName = #{loanrealname,jdbcType=VARCHAR},
+      </if>
+      <if test="loanuserphone != null">
+        loanUserPhone = #{loanuserphone,jdbcType=VARCHAR},
+      </if>
+      <if test="returnmoney != null">
+        returnMoney = #{returnmoney,jdbcType=DECIMAL},
+      </if>
+      <if test="deductionmoney != null">
+        deductionmoney = #{deductionmoney,jdbcType=DECIMAL},
+      </if>
+      <if test="createtime != null">
+        createtime = #{createtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="deductionremark != null">
+        deductionremark = #{deductionremark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updatesev" parameterType="com.info.web.pojo.Mman_loan_collection_orderdeduction">
+    update mman_loan_collection_orderdeduction
+    set loanRealName = #{loanrealname,jdbcType=VARCHAR},
+      loanUserPhone = #{loanuserphone,jdbcType=VARCHAR},
+      returnMoney = #{returnmoney,jdbcType=DECIMAL},
+      deductionmoney = #{deductionmoney,jdbcType=DECIMAL},
+      createtime = #{createtime,jdbcType=TIMESTAMP},
+      deductionremark = #{deductionremark,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

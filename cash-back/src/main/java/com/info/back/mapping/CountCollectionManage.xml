@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.info.back.dao.ICountCollectionManageDao">
+	<resultMap id="queryResultMap" type="com.info.web.pojo.CountCollectionManage">
+		<!-- id -->
+		<result column="id" property="id"/>
+		<!--  -->
+		<result column="person_id" property="personId"/>
+		<!-- 姓名 -->
+		<result column="person_name" property="personName"/>
+		<!-- 催单公司id -->
+		<result column="company_id" property="companyId"/>
+		<!-- 催单公司名称 -->
+		<result column="company_title" property="companyTitle" />
+		<!-- 催收员分组（3，4，5，6，7对应S1，S2，M1-M2，M2-M3，M3+对应1-10,11-30（1），1个月-2个月，2个月-3个月，3个月+） -->
+		<result column="group_id" property="groupId" />
+		<!-- 催收员分组组名 -->
+		<result column="group_name" property="groupName" />
+		<!-- 订单分组组名 -->
+		<result column="order_group_name" property="groupOrderName"/>
+		<!-- 本金 -->
+		<result column="loan_money" property="loanMoney" />
+		<!-- 已还本金 -->
+		<result column="repayment_money" property="repaymentMoney"/>
+		<!-- 未还本金 -->
+		<result column="not_yet_repayment_money" property="notYetRepaymentMoney"/>
+		<!-- 本金还款率 -->
+		<result column="repayment_reta" property="repaymentReta" />
+		<!-- 迁徙率 -->
+		<result column="migrate_rate" property="migrateRate" />
+		<!-- 滞纳金总额-->
+		<result column="penalty" property="penalty" />
+		<!-- 已还滞纳金 -->
+		<result column="repayment_penalty" property="repaymentPenalty" />
+		<!-- 待还滞纳金 -->
+		<result column="not_repayment_penalty" property="notRepaymentPenalty"/>
+		<!-- 滞纳金回款率 -->
+		<result column="penalty_repayment_reta" property="penaltyRepaymentReta" />
+		<!-- 订单总数 -->
+		<result column="order_total" property="orderTotal" />
+		<!-- 已处理订单数 -->
+		<result column="dispose_order_num" property="disposeOrderNum" />
+		<!-- 已还款订单数 -->
+		<result column="repayment_order_num" property="repaymentOrderNum" />
+		<result column="risk_order_num" property="riskOrderNum"/>
+		<!-- 订单还款率 -->
+		<result column="repayment_order_rate" property="repaymentOrderRate"/>
+		<!-- 统计时间 -->
+		<result column="count_date" property="countDate" />
+	</resultMap>
+	<!-- 执行存储过程 -->
+	<select id="callManage" parameterType="HashMap" statementType="CALLABLE"> 
+	  {call P_COUNT_COLLECTION_MANAGE(#{begDate,jdbcType=TIMESTAMP,mode=IN},#{endDate,jdbcType=TIMESTAMP,mode=IN})}
+	</select>
+	
+	
+	<!-- 保存,保存不为NULL的字段 -->
+	<sql id="where">
+	  <where>
+	     1=1 
+	     <if test="begDate != null">
+	       and DATE_FORMAT(c.count_date,'%Y-%m-%d') >= DATE_FORMAT(#{begDate},'%Y-%m-%d')
+	     </if>
+	     <if test="endDate != null">
+	       <![CDATA[and DATE_FORMAT(c.count_date,'%Y-%m-%d') <= DATE_FORMAT(#{endDate},'%Y-%m-%d')]]>
+	     </if>
+	     <if test="companyName != null and companyName != ''">
+	       and c.company_title like CONCAT('%',#{companyName},'%')
+	     </if>
+	     <if test="companyId != null and companyId != ''">
+	       and c.company_id =#{companyId}
+	     </if>
+	     <if test="groupId != null">
+	       and c.group_id = #{groupId}
+	     </if>
+	     <if test="orderGroupId != null">
+	       and c.order_group_id = #{orderGroupId}
+	     </if>
+	     <if test="personName != null and personName != ''">
+	       and c.person_name like CONCAT('%',#{personName},'%')
+	     </if>
+	      <if test="personId != null and personId != ''">
+	       and c.person_id = #{personId}
+	     </if>
+	  </where>
+	</sql>
+	<select id="findAll" resultMap="queryResultMap" parameterType="HashMap">
+		select 
+		<include refid="base_select"></include> 
+		from 
+		count_collection_manage c
+		<include refid="where"></include>
+	</select>
+	
+	<select id="findAllCount" parameterType="HashMap" resultType="Integer">
+		select count(1) from count_collection_manage c
+		<include refid="where"></include>
+	</select>
+	
+	<sql id="base_select">
+		c.person_name,
+		c.company_title,c.group_name,c.order_group_name,
+		c.loan_money,c.repayment_money,c.not_yet_repayment_money,
+		c.repayment_reta,c.migrate_rate,c.penalty,c.repayment_penalty,
+		c.not_repayment_penalty,c.penalty_repayment_reta,c.order_total,
+		c.dispose_order_num,c.repayment_order_num,c.repayment_order_rate,c.count_date 
+	</sql>
+	<!-- 根据主键获取单条记录 -->
+	<select id="getOne" resultMap="queryResultMap" parameterType="com.info.web.pojo.CountCollectionAssessment">
+		SELECT
+		<include refid="base_select"></include> 
+		from 
+		count_collection_manage c 
+		WHERE id = #{id}
+	</select>
+</mapper>

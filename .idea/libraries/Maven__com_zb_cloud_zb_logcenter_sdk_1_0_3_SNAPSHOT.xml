@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.zb.cloud:zb-logcenter-sdk:1.0.3-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/zb/cloud/zb-logcenter-sdk/1.0.3-SNAPSHOT/zb-logcenter-sdk-1.0.3-20170601.082718-1.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/com/zb/cloud/zb-logcenter-sdk/1.0.3-SNAPSHOT/zb-logcenter-sdk-1.0.3-20170601.082718-1-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/zb/cloud/zb-logcenter-sdk/1.0.3-SNAPSHOT/zb-logcenter-sdk-1.0.3-20170601.082718-1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

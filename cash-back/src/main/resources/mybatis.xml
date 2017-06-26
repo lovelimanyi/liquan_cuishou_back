@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<settings>
+		<!-- 延迟加载总开关 -->
+		<setting name="lazyLoadingEnabled" value="true" />
+		<!-- 禁止积极主动的加载 -->
+		<setting name="aggressiveLazyLoading" value="false" />
+		<setting name="callSettersOnNulls" value="true" />
+	</settings>
+	<typeAliases>
+		<!-- 后台相关 -->
+		<typeAlias type="com.info.web.pojo.BackModule" alias="BackModule" />
+		<typeAlias type="com.info.web.pojo.BackRole" alias="BackRole" />
+		<typeAlias type="com.info.web.pojo.BackRoleModule" alias="BackRoleModule" />
+		<typeAlias type="com.info.web.pojo.BackUser" alias="BackUser" />
+		<typeAlias type="com.info.web.pojo.BackUserRole" alias="BackUserRole" />
+		<typeAlias type="com.info.web.pojo.BackTree" alias="BackTree" />
+		<typeAlias type="com.info.web.pojo.BackConfigParams" alias="BackConfigParams" />
+		<typeAlias type="com.info.web.pojo.BackNotice" alias="BackNotice" />
+		<typeAlias type="com.info.web.pojo.BackMessageCenter" alias="BackMessageCenter" />
+		<!--前台 -->
+		<typeAlias type="com.info.web.pojo.User" alias="User" />
+
+
+
+		<typeAlias type="com.info.web.pojo.IndexPage" alias="IndexPage" />
+
+		<typeAlias type="com.info.web.pojo.Orders" alias="Orders" />
+		<typeAlias type="com.info.web.pojo.Content" alias="Content" />
+		<typeAlias type="com.info.web.pojo.SmsUser" alias="SmsUser" />
+		<typeAlias type="com.info.web.pojo.SmsLog" alias="SmsLog" />
+	</typeAliases>
+	<plugins>
+		<plugin
+			interceptor="com.github.miemiedev.mybatis.paginator.OffsetLimitInterceptor">
+			<property name="dialectClass"
+				value="com.github.miemiedev.mybatis.paginator.dialect.MySQLDialect" />
+		</plugin>
+	</plugins>
+</configuration>

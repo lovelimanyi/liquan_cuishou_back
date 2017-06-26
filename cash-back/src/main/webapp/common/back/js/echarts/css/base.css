@@ -1,0 +1,412 @@
+@charset "utf-8";
+/*
+ *名称: base.css
+ *功能: 重设浏览器默认样式
+ *命名方法（命名空间法则）：tf- 如：.tf-clearfloat 这样做的目的是为了避免和其他样式或者插件样式冲突
+ *板块介绍：《base reset》、《HTML5 reset》、《经常使用样式》
+ *Author:枫LT;
+ *QQ：957987132
+ */
+
+/*---------------------base reset--------------------------*/
+/*使其容器如DIV的内容自动换行*/
+*{
+  word-wrap:break-word;
+  /*box-sizing:border-box;*/
+}
+*::after, *::before {
+    box-sizing: border-box;
+}
+/*去掉内外边距-内外边距通常让各个浏览器样式的表现位置不同*/
+html,body,h1,h2,h3,h4,h5,h6,hr,p,iframe,dl,dt,dd,ul,ol,li,pre,form,button,input,textarea,th,td,fieldset{
+	margin:0;padding:0
+}
+
+/*去掉列表标签的默认样式*/
+ul,ol,dl{list-style-type:none}
+
+/*防止用户自定义背景颜色对网页的影响，添加让用户可以自定义字体 */
+html{
+	-webkit-text-size-adjust:100%; /*禁用Webkit内核浏览器的文字大小调整功能，默认是auto；*/
+	-ms-text-size-adjust:100%; /*禁用IE内核浏览器的文字大小调整功能，默认是auto；*/
+	font-family: sans-serif; /* 1 */
+  	-webkit-font-smoothing: antialiased;
+}
+
+address,caption,cite,code,dfn,em,th,var{font-style:normal;font-weight:normal}
+input,button,textarea,select,optgroup,option{font-family:inherit;font-size:inherit;font-style:inherit;font-weight:inherit}
+button{overflow: visible;vertical-align:middle;outline:none}
+body,th,td,button,input,select,textarea{
+  font-family:"微软雅黑","Microsoft Yahei","Hiragino Sans GB","Helvetica Neue",Helvetica,tahoma,arial,Verdana,sans-serif,"WenQuanYi Micro Hei","\5B8B\4F53";
+  font-size:14px;
+  color: #333;
+  -webkit-font-smoothing:antialiased;  /*字体抗锯齿*/
+  -moz-font-smoothing:antialiased
+}
+body{
+  font-size: 14px; /* =14px  将浏览器的基准字号设置为 60%，也就是 10px，现在 1rem = 10px —— 为了计算方便。然后在 body 上应用了 font-size: 1.6rem;，将页面字号设置为 16px*/
+  line-height: 1.42857143;
+  color: #333;
+  background-color: #ffffff;
+}
+hr{
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+  height: 0;
+}
+
+h1,h2,h3,h4,h5,h6{font-size:100%}
+a,area{outline:none;blr:expression(this.onFocus=this.blur())}
+a{text-decoration:none;cursor: pointer}
+a:hover{text-decoration:none;outline:none}
+a.ie6:hover{zoom:1}
+a:focus{outline:none}
+a:hover,a:active{outline:none}:focus{outline:none}
+sub,sup{vertical-align:baseline}
+
+/*img自适应*/
+img{
+	border:0;
+	height: auto;
+	vertical-align:middle
+}
+a img,img{-ms-interpolation-mode:bicubic}
+
+.a-img-responsive{max-width: 100%;height: auto}
+
+/*IE下a:hover 背景闪烁*/
+html{overflow:-moz-scrollbars-vertical;zoom:expression(function(ele){ele.style.zoom = "1";document.execCommand("BackgroundImageCache",false,true)}(this))}
+
+
+/*重置table样式*/
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+td,
+th {
+  padding: 0;
+}
+
+
+/*---------------------HTML5 reset--------------------------*/
+header,footer,section,aside,details,menu,article,section,nav,address,hgroup,figure,figcaption,legend{display:block;margin:0;padding:0}time{display:inline}
+audio,canvas,video{display:inline-block;*display:inline;*zoom:1}
+audio:not([controls]){display:none}
+svg:not(:root) {overflow: hidden}
+fieldset {
+	border-width:0;
+	padding: 0.35em 0.625em 0.75em;
+	margin: 0 2px;
+	border: 1px solid #c0c0c0
+}
+legend{
+	margin-bottom:10px;
+	font-size:21px;
+	line-height:40px;
+	border:0;
+	padding: 0 10px;
+}
+legend small{font-size:15px;color:#999}
+
+
+input[type="number"]::-webkit-inner-spin-button,input[type="number"]::-webkit-outer-spin-button {height: auto}
+input[type="search"] {-webkit-appearance: textfield; /* 1 */-moz-box-sizing: content-box;-webkit-box-sizing: content-box; /* 2 */box-sizing: content-box}
+input[type="search"]::-webkit-search-cancel-button,input[type="search"]::-webkit-search-decoration {-webkit-appearance: none}
+
+/* HTML5 媒体文件跟 img 保持一致 */
+audio,canvas,video {
+    display: inline-block;*display: inline;*zoom: 1;
+}
+
+/*HTML5新模块元素在IE8、9版本浏览器中没有被定义默认样式。为解决该问题，给下列元素添加“block”显示属性*/
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+main,
+nav,
+section,
+summary {
+    display: block;
+}
+
+
+/*
+	Name:			clearfloat清除浮动
+	Example:		class="clearfloat/cl"
+	Explain:		clearfloat（简写cl）避免因子元素浮动而导致的父元素高度缺失能问题
+	使用方法：      <ul class="clearfloat">
+						<li class="fl"></li>
+						<li class="fl"></li>
+					</ul>
+*/
+.cl:after,.clearfloat:after,.tf-row:after{
+	content:".";
+	display:block;
+	height:0;
+	clear:both;
+	visibility:hidden
+}
+.cl,.clearfloat,.row{zoom:1}
+.clear{clear: both;}
+/*浮动*/
+.fl{float:left; display:block;}
+.fr{float:right; display:block;}
+
+/**外边距**/
+.ml4{margin-left:3px;}
+.ml5{margin-left:5px;}
+.ml8{margin-left:8px;}
+.ml10{margin-left:10px;}
+.ml11{margin-left:11px;}
+.ml15{margin-left:15px;}
+.ml20{margin-left:20px;}
+.ml25{margin-left:25px;}
+.ml30{margin-left:30px;}
+.ml35{margin-left:35px;}
+.ml40{margin-left:40px;}
+.ml50{margin-left:50px;}
+.ml55{margin-left:55px;}
+.ml60{margin-left:60px;}
+.ml68{margin-left:68px;}
+.ml80{margin-left:85px;}
+.ml100{margin-left:100px;}
+.ml130{margin-left:130px;}
+.ml160{margin-left:160px;}
+
+.mt2{margin-top:2px;}
+.mt3{margin-top:3px;}
+.mt5{margin-top:5px;}
+.mt6{margin-top:6px;}
+.mt8{margin-top:8px;}
+.mt10{margin-top:10px;}
+.mt15{margin-top:15px;}
+.mt20{margin-top:20px;}
+.mt25{margin-top:25px;}
+.mt30{margin-top:30px;}
+.mt50{margin-top:50px;}
+.mt60{margin-top:60px;}
+.mt80{margin-top:80px;}
+
+.mr5{margin-right:5px;}
+.mr10{margin-right:10px;}
+.mr15{margin-right:15px;}
+.mr20{margin-right:20px;}
+.mr25{margin-right:25px;}
+.mr30{margin-right:30px;}
+
+.mb5{margin-bottom:5px;}
+.mb10{margin-bottom:10px;}
+.mb15{margin-bottom:15px;}
+.mb20{margin-bottom:20px;}
+.mb25{margin-bottom:25px;}
+.mb30{margin-bottom:30px;}
+
+/**内边距**/
+.pl5{padding-left:5px;}
+.pl10{padding-left:10px;}
+.pl15{padding-left:15px;}
+.pl20{padding-left:20px;}
+.pl25{padding-left:25px;}
+.pl30{padding-left:30px;}
+.pl60{padding-left:60px;}
+
+.pr5{padding-right:5px;}
+.pr10{padding-right:10px;}
+.pr15{padding-right:15px;}
+.pr20{padding-right:20px;}
+.pr25{padding-right:25px;}
+.pr30{padding-right:30px;}
+.pr50{padding-right:50px;}
+
+
+.pt5{padding-top:5px;}
+.pt10{padding-top:10px;}
+.pt15{padding-top:15px;}
+.pt20{padding-top:20px;}
+.pt25{padding-top:25px;}
+.pt30{padding-top:30px;}
+
+.pb5{padding-bottom:5px;}
+.pb10{padding-bottom:10px;}
+.pb15{padding-bottom:15px;}
+.pb20{padding-bottom:20px;}
+.pb25{padding-bottom:25px;}
+.pb30{padding-bottom:30px;}
+.pb40{padding-bottom:40px;}
+/*隐藏*/
+.tf-hidden{display: none;}
+/*网站宽度*/
+.w1000{
+    width:1000px;
+    text-align:left;
+    zoom:1;
+    margin:0 auto;
+}
+
+
+/*2.1 栅格系统
+  Name:     style_span
+  Example:    
+  Explain:    栅格系统
+*/
+/*2.1.1 两列布局*/
+/*2.1.2 三列布局*/
+/*2.1.1 五列布局*/
+/*2.1.1 980 20 column*/
+.row:after{content:".";display:block;height:0;clear:both;visibility:hidden}.row{zoom:1}
+[class^="span-"],[class*=" span-"] { float:left; margin-top:20px}
+.row-980-20 [class^="span-"],.row-980-20 [class*=" span-"]{margin-right:20px}
+.row-980-20{ margin-right:-20px}
+.row-980-20 .span-1 {width:30px}
+.row-980-20 .span-2 {width:80px}
+.row-980-20 .span-3 {width:130px}
+.row-980-20 .span-4 {width:180px}
+.row-980-20 .span-5 {width:230px}
+.row-980-20 .span-6 {width:280px}
+.row-980-20 .span-7 {width:330px}
+.row-980-20 .span-8 {width:380px}
+.row-980-20 .span-9 {width:430px}
+.row-980-20 .span-10{width:480px}
+.row-980-20 .span-11{width:530px}
+.row-980-20 .span-12{width:580px}
+.row-980-20 .span-13{width:630px}
+.row-980-20 .span-14{width:680px}
+.row-980-20 .span-15{width:730px}
+.row-980-20 .span-16{width:780px}
+.row-980-20 .span-17{width:830px}
+.row-980-20 .span-18{width:880px}
+.row-980-20 .span-19{width:930px}
+.row-980-20 .span-20{width:980px}
+
+
+/*2.1 栅格系统
+  Name:     style_span
+  Example:    
+  Explain:    栅格系统
+*/
+/*2.1.1 两列布局*/
+/*2.1.2 三列布局*/
+/*2.1.1 五列布局*/
+/*2.1.1 1000 20 column*/
+.row:after{content:".";display:block;height:0;clear:both;visibility:hidden}.row{zoom:1}
+[class^="span-"],[class*=" span-"] { float:left; margin-top:20px}
+/*.row-1000-20 [class^="span-"],.row-1000-20 [class*=" span-"]{margin-right:20px}
+.row-1000-20{ margin-right:-20px}*/
+.row-1000-20 .span-1 {width:50px}
+.row-1000-20 .span-2 {width:100px}
+.row-1000-20 .span-3 {width:150px}
+.row-1000-20 .span-4 {width:200px}
+.row-1000-20 .span-5 {width:250px}
+.row-1000-20 .span-6 {width:300px}
+.row-1000-20 .span-7 {width:350px}
+.row-1000-20 .span-8 {width:400px}
+.row-1000-20 .span-9 {width:450px}
+.row-1000-20 .span-10{width:520px}
+.row-1000-20 .span-11{width:520px}
+.row-1000-20 .span-12{width:600px}
+.row-1000-20 .span-13{width:650px}
+.row-1000-20 .span-14{width:700px}
+.row-1000-20 .span-15{width:750px}
+.row-1000-20 .span-16{width:800px}
+.row-1000-20 .span-17{width:850px}
+.row-1000-20 .span-18{width:900px}
+.row-1000-20 .span-19{width:950px}
+.row-1000-20 .span-20{width:1000px}
+
+
+/*流动栅格系统-共分为12格，需要配合tf-row:自动清除浮动使用*/
+.tf-row{
+    width: 100%;
+}
+.tf-col-1,.tf-col-2,.tf-col-3,.tf-col-4,.tf-col-5,.tf-col-6,.tf-col-7,.tf-col-8,.tf-col-9,.tf-col-10,.tf-col-11,.tf-col-12{
+    float: left;
+}
+.tf-col-1{width:8.33333333%;}
+.tf-col-2{width:16.66666666%;}
+.tf-col-3{width:25%;}
+.tf-col-4{width:33.33333333%;}
+.tf-col-5{width:41.66666665%;}
+.tf-col-6{width:50%;}
+.tf-col-7{width:58.33333331%;}
+.tf-col-8{width:66.66666667%;}
+.tf-col-9{width:75%;}
+.tf-col-10{width:83.33333333%;}
+.tf-col-11{width:91.66666667%;}
+.tf-col-12{width:100%;}
+/*偏移*/
+.tf-col-offset-12 {
+  margin-left: 100%;
+}
+.tf-col-offset-11 {
+  margin-left: 91.66666667%;
+}
+.tf-col-offset-10 {
+  margin-left: 83.33333333%;
+}
+.tf-col-offset-9 {
+  margin-left: 75%;
+}
+.tf-col-offset-8 {
+  margin-left: 66.66666667%;
+}
+.tf-col-offset-7 {
+  margin-left: 58.33333333%;
+}
+.tf-col-offset-6 {
+  margin-left: 50%;
+}
+.tf-col-offset-5 {
+  margin-left: 41.66666667%;
+}
+.tf-col-offset-4 {
+  margin-left: 33.33333333%;
+}
+.tf-col-offset-3 {
+  margin-left: 25%;
+}
+.tf-col-offset-2 {
+  margin-left: 16.66666667%;
+}
+.tf-col-offset-1 {
+  margin-left: 8.33333333%;
+}
+/*垂直居中*/
+.vmiddle{vertical-align: middle;}
+
+/*左右*/
+.tf-tl{text-align: left;}
+.tf-tr{text-align: right;}
+.tf-tc{text-align: center;}
+
+/*重置a链接颜色*/
+a,span{color:#666; display:inline-block;}
+a:hover{color:#e84c3d;}
+
+/*字体白色*/
+.fa-w{color:#fff !important;}
+.fa-r{color:#e84c3d !important;}
+.fa-h{color:#666 !important;}
+.fa-9{color:#999 !important;}
+.fa-b{color:#000 !important;}
+.fa-y{color:#ff8400 !important;}
+/*字体大小*/
+.f10{font-size: 10px;}
+.f12{font-size: 12px;}
+.f14{font-size: 14px;}
+.f16{font-size: 16px;}
+.f18{font-size: 18px;}
+.f20{font-size: 20px;}
+.f25{font-size: 25px;}
+.f60{font-size: 60px;}
+
+.green {
+    color: #57ba52;
+}
+.hidden{display:none;}
+.bold{font-weight:bold}

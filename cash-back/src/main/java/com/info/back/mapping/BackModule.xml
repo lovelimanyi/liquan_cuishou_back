@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.info.back.dao.IBackModuleDao">
+	<resultMap id="BaseResultMap" type="BackModule">
+		<id column="id" property="id" />
+		<result column="module_name" property="moduleName" />
+		<result column="module_url" property="moduleUrl" />
+		<result column="module_style" property="moduleStyle"/>
+		<result column="module_describe" property="moduleDescribe"/>
+		<result column="module_sequence" property="moduleSequence"/>
+		<result column="module_view" property="moduleView"/>
+		<result column="module_parent_id" property="moduleParentId"/>
+	</resultMap>
+<!--	根据父节点获得超级管理员的所有菜单总数-->
+	<select id="findAdminCount" resultType="Integer" parameterType="HashMap">
+			select count(1)  
+			from back_module rm 
+			where rm.module_view = 1
+			and rm.module_parent_id=#{myId}
+	</select>
+<!--	根据父节点获得超级管理员的所有菜单-->
+	<select id="findAdminAll" resultMap="BaseResultMap" parameterType="HashMap">
+			select 
+			*
+			from back_module rm 
+			where rm.module_view = 1
+			and rm.module_parent_id=#{parentId}
+			ORDER BY rm.module_sequence
+	</select>
+	<!--	获得超级管理员的权限树-->
+	<select id="findAdminTree" resultType="BackTree" parameterType="HashMap">
+			select 
+			rm.id ,
+			rm.module_name as title,
+			rm.module_parent_id as pid,
+			rm.module_url as url
+			from back_module rm 
+			where rm.module_view = 1
+			ORDER BY rm.module_sequence
+	</select>
+	<sql id="sql">
+			from back_module rm 
+			LEFT JOIN back_role_module brm ON rm.id=brm.module_id
+			LEFT JOIN back_role br ON brm.role_id=br.id 
+			LEFT JOIN back_user_role bur ON br.id=bur.role_id
+			LEFT JOIN back_user bu ON bur.user_id=bu.id
+			where rm.module_view = 1
+			and rm.module_parent_id=#{parentId}
+			AND bu.id=#{userId} 
+	</sql>
+<!--	根据父节点ID获得普通户的全部菜单总数-->
+	<select id="findUserCount" resultType="Integer" parameterType="HashMap">
+			select count(1)  
+			<include refid="sql"/>
+	</select>
+<!--	根据父节点ID获得普通户的全部菜单-->
+	<select id="findUserAll" resultMap="BaseResultMap" parameterType="HashMap">
+			select 
+			*
+			<include refid="sql"/>
+			order by rm.module_sequence
+	</select>
+<!--	获得普通用户的权限树-->
+	<select id="findUserTree" resultType="BackTree" parameterType="HashMap">
+			select 
+			rm.id ,
+			rm.module_name as title,
+			rm.module_parent_id as pid,
+			rm.module_url as url
+			from back_module rm 
+			LEFT JOIN back_role_module brm ON rm.id=brm.module_id
+			LEFT JOIN back_role br ON brm.role_id=br.id 
+			LEFT JOIN back_user_role bur ON br.id=bur.role_id
+			LEFT JOIN back_user bu ON bur.user_id=bu.id
+			where rm.module_view = 1
+			AND bu.id=#{userId} 
+	</select>
+	<select id="findModuleByUrl" parameterType="HashMap" resultType="Integer">
+			select count(1)   
+			from back_module rm 
+			LEFT JOIN back_role_module brm ON rm.id=brm.module_id
+			LEFT JOIN back_role br ON brm.role_id=br.id 
+			LEFT JOIN back_user_role bur ON br.id=bur.role_id
+			LEFT JOIN back_user bu ON bur.user_id=bu.id
+			where  rm.module_view = 1
+			AND bu.id=#{id} 
+			and (module_url  =#{moduleUrl} or module_url like CONCAT('',CONCAT(#{moduleUrl},'?') , '%'))  
+	</select>
+	<select id="findById" resultMap="BaseResultMap" parameterType="HashMap">
+		select * from back_module where id =#{id}
+	</select>
+<!--	根据主键更新菜单-->
+	<update id="updateById" parameterType="BackModule">
+		update back_module  
+		<set>
+			<if test="moduleName != null and moduleName != ''">
+				module_name =#{moduleName}, 
+			</if>
+			<if test="moduleUrl != null and moduleUrl !=''">
+				module_url =#{moduleUrl},
+			</if>
+			<if test="moduleStyle != null and moduleStyle != ''">
+				module_style =#{moduleStyle}, 
+			</if>
+			<if test="moduleDescribe != null and moduleDescribe != ''">
+				module_describe =#{moduleDescribe}, 
+			</if>
+			<if test="moduleSequence != null and moduleSequence != ''">
+				module_sequence =#{moduleSequence}, 
+			</if>
+			<if test="moduleView != null and moduleView != ''">
+				module_view =#{moduleView},
+			</if>
+			<if test="moduleParentId != null and moduleParentId != ''">
+				module_parent_id =#{moduleParentId},
+			</if>
+		</set>
+		where id =#{id}
+	</update>
+<!--	根据主键删除对象-->
+	<update id="deleteById" parameterType="Integer">
+		update back_module  set module_view =0 where id =#{id}
+	</update>
+	<insert id="insert" parameterType="BackModule">
+		insert back_module  
+			(module_name,module_url,module_style,module_describe,module_sequence,module_parent_id)
+		values (#{moduleName},#{moduleUrl},#{moduleStyle},#{moduleDescribe},#{moduleSequence},#{moduleParentId})
+	</insert>
+</mapper>

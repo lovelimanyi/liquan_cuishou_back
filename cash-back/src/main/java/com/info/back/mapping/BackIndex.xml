@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.info.back.dao.IBackIndexDao">
+ <select id="searchIndex" resultType="IndexPage">
+		<![CDATA[
+			select
+			id as id,
+			index_banner as indexBanner,
+			index_notice as indexNotice,
+			index_cv as indexCv,
+			index_amount as indexAmount,
+			index_hot_borrow as indexHotBorrow,
+			index_t_tender as indexTTender,
+			index_c_tender as indexCTender,
+			index_report as indexReport,
+			index_question as indexQuestion,
+			index_link as indexLink,
+			DATE_FORMAT(update_date,'%Y-%m-%d')as updateDate,
+			remark as remark,
+			status as status
+			from info_index
+			where status=1
+		]]>
+	</select> 
+<!--	根据主键更新菜单-->
+	<update id="update" parameterType="IndexPage">
+		update info_index  
+		<set>
+			<if test="indexBanner != null and indexBanner != ''">
+				index_banner =#{indexBanner}, 
+			</if>
+			<if test="indexNotice != null and indexNotice !=''">
+				index_notice =#{indexNotice},
+			</if>
+			<if test="indexCv != null and indexCv !=''">
+				index_cv =#{indexCv},
+			</if>
+			<if test="indexHotBorrow != null and indexHotBorrow !=''">
+				index_hot_borrow =#{indexHotBorrow},
+			</if>
+			<if test="indexLink != null and indexLink !=''">
+				index_link =#{indexLink},
+			</if>
+		</set>
+	</update>
+</mapper>
