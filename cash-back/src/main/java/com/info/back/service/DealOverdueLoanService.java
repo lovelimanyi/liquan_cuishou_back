@@ -3,6 +3,7 @@ package com.info.back.service;
 import com.info.back.dao.IMmanUserLoanDao;
 import com.info.back.service.TaskJobMiddleService;
 import com.info.back.utils.BackConstant;
+import com.info.web.pojo.MmanUserInfo;
 import com.info.web.pojo.MmanUserLoan;
 import com.info.web.util.DateUtil;
 
@@ -26,6 +27,9 @@ public class DealOverdueLoanService {
     private IMmanUserLoanDao mmanUserLoanDao;
     @Autowired
 	private IBackUserService backUserService;
+    @Autowired
+	private IMmanUserInfoService mmanUserInfoService;
+
 
     public void dealOverdueLoan() {
         loger.error("处理预期升级订单 开始" + DateUtil.getDateFormat(new Date(), "yyyy-MM-dd hh:mm:ss"));
@@ -37,8 +41,11 @@ public class DealOverdueLoanService {
         for (MmanUserLoan loan : overdueList) {
         	synchronized(this)
         	{
-	        	DealOverdueLoanThread dealOverdueOrderThread = new DealOverdueLoanThread(loan.getId(),taskJobMiddleService);
-	        	pool.execute(dealOverdueOrderThread);
+				MmanUserInfo userInfo = mmanUserInfoService.getUserInfoById(loan.getUserId());
+				if(userInfo != null){
+					DealOverdueLoanThread dealOverdueOrderThread = new DealOverdueLoanThread(loan.getId(),taskJobMiddleService,userInfo.getIdNumber());
+					pool.execute(dealOverdueOrderThread);
+				}
         	}
         	try {
         		Thread.sleep(10);

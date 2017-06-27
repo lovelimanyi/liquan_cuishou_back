@@ -11,10 +11,12 @@ public class DealOverdueLoanThread implements Runnable {
 			.getLogger(DealOverdueLoanThread.class);
 	private String loanId;
 	private TaskJobMiddleService taskJobMiddleService;
-	public DealOverdueLoanThread(String loanId,TaskJobMiddleService taskJobMiddleService) {
+	private String idNumber;
+
+	public DealOverdueLoanThread(String loanId,TaskJobMiddleService taskJobMiddleService,String idNumber) {
 		this.loanId = loanId;
 		this.taskJobMiddleService = taskJobMiddleService;
-		
+		this.idNumber = idNumber;
 	}
 
 	@Override
@@ -22,7 +24,7 @@ public class DealOverdueLoanThread implements Runnable {
 		logger.error("处理逾期订单/派单开始  " + new Date() + "借款id:" + loanId);
 		
 			try{
-				taskJobMiddleService.dispatchforLoanId(loanId);
+				taskJobMiddleService.dispatchforLoanId(loanId,idNumber);
 			}catch(Exception e){
 				logger.error("处理逾期订单/派单出错 " + new Date()+ "借款id:" + loanId);
 			}

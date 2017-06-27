@@ -84,6 +84,8 @@
 		<result column="loan_user_name" property="loanUserName" jdbcType="VARCHAR"/>
 		<!-- 借款人电话 -->
 		<result column="loan_user_phone" property="loanUserPhone" jdbcType="VARCHAR"/>
+		<!-- 借款人电话 -->
+		<result column="id_number" property="idNumber" jdbcType="VARCHAR"/>
 		<!-- 减免滞纳金金额-->
 		<result column="reduction_money" jdbcType="DECIMAL" property="reductionMoney" />
 	</resultMap>
@@ -107,6 +109,7 @@
 			  a.loan_user_phone as phoneNumber,
 			  a.real_money as returnMoney,
 			  a.`top_important` as topImportant,
+			  a.id_number as idNumber,
 			  a.current_overdue_level collectionGroup,
 		      a.reduction_money as reductionMoney
 			  FROM mman_loan_collection_order a
@@ -185,7 +188,6 @@
             LEFT JOIN credit_loan_pay c ON a.pay_id = c.id
             LEFT JOIN mman_user_loan d ON a.loan_id = d.id
             LEFT JOIN mman_loan_collection_company e ON b.`company_id`= e.id
-            LEFT JOIN mman_user_info i ON i.id = a.user_id
             LEFT JOIN back_user bu on bu.uuid = a.last_collection_user_id
 			<include refid="base_where"></include>
 	</select>
@@ -275,13 +277,12 @@
 			b.`group_level` as collectionGroup,
 			a.loan_user_name as realName,
 			a.loan_user_phone as  phoneNumber,
-			i.id_number AS idCard,
+			a.id_number AS idCard,
 			a.real_money as returnMoney,
 			d.`loan_money` as loanMoney,
 			a.`overdueDays` as overdueDays,
 			d.`loan_penalty` as loanPenlty,
 			a.`status` as collectionStatus,
-			c.`status` as returnStatus,
 			c.`real_money` as returnMoney,
 			c.`update_Date` as currentReturnDay,
 			d.`loan_end_time` as loanEndTime,
@@ -335,6 +336,7 @@
 			<if test="jxAuditIme != null">`jx_audit_ime`,</if>  
 			<if test="csstatus != null">`csstatus`,</if>
 			<if test="reductionMoney != null">`reduction_money`,</if>
+			<if test="idNumber != null">`id_number`,</if>
 		</trim>  
 		<trim prefix="values (" suffix=")" suffixOverrides=","> 
 			<if test="id != null">#{id,jdbcType=VARCHAR},</if>  
@@ -375,6 +377,7 @@
 			<if test="jxAuditIme != null">#{jxAuditIme,jdbcType=TIMESTAMP},</if>  
 			<if test="csstatus != null">#{csstatus,jdbcType=VARCHAR},</if>
 			<if test="reductionMoney != null">#{reductionMoney,jdbcType=DECIMAL},</if>
+			<if test="idNumber != null">#{idNumber,jdbcType=DECIMAL},</if>
 		</trim> 
 	</insert>
 	<!-- 更新不为NULL的字段 -->
@@ -416,11 +419,12 @@
 			<if test="jxlApplyTime != null">jxl_apply_Time=#{jxlApplyTime,jdbcType=TIMESTAMP},</if>  
 			<if test="jxAuditIme != null">jx_audit_ime=#{jxAuditIme,jdbcType=TIMESTAMP},</if>  
 			<if test="csstatus != null">csstatus=#{csstatus,jdbcType=VARCHAR},</if>
+			<if test="idNumber != null">csstatus=#{idNumber,jdbcType=VARCHAR},</if>
 		</set> WHERE id = #{id,jdbcType=VARCHAR}
 	</update>
 	<!-- 根据id获取单条记录 -->
 	<select id="getOrderById" resultMap="queryResultMap" parameterType="String">
-	SELECT t.id , t.order_id , t.user_id , t.loan_id , t.pay_id , t.dispatch_name , t.dispatch_time , t.last_collection_user_id , t.current_collection_user_id , t.current_overdue_level , t.overdueDays , t.m1_approve_id , t.m1OperateStatus , t.m2_approve_id , t.m2OperateStatus , t.m3_approve_id , t.m3OperateStatus , t.m4_approve_id , t.m4OperateStatus , t.m5_approve_id , t.m5OperateStatus , t.m6_approve_id , t.status , t.promise_repayment_time , t.last_collection_time , t.create_date , t.update_date , t.operator_name , t.remark , t.outside_person_id , t.before_status , t.outside_company_id , t.jxl_status , t.renew_status , t.jxl_apply_Time , t.jx_audit_ime ,t.s1_flag , t.csstatus , t.loan_user_name , t.loan_user_phone,t.reduction_money FROM mman_loan_collection_order t WHERE t.id = #{id,jdbcType=VARCHAR}</select>
+	SELECT t.id , t.order_id , t.user_id , t.loan_id , t.pay_id , t.dispatch_name , t.dispatch_time , t.last_collection_user_id , t.current_collection_user_id , t.current_overdue_level , t.overdueDays , t.m1_approve_id , t.m1OperateStatus , t.m2_approve_id , t.m2OperateStatus , t.m3_approve_id , t.m3OperateStatus , t.m4_approve_id , t.m4OperateStatus , t.m5_approve_id , t.m5OperateStatus , t.m6_approve_id , t.status , t.promise_repayment_time , t.last_collection_time , t.create_date , t.update_date , t.operator_name , t.remark , t.outside_person_id , t.before_status , t.outside_company_id , t.jxl_status , t.renew_status , t.jxl_apply_Time , t.jx_audit_ime ,t.s1_flag , t.csstatus , t.loan_user_name , t.loan_user_phone,t.reduction_money,t.id_number FROM mman_loan_collection_order t WHERE t.id = #{id,jdbcType=VARCHAR}</select>
 	<select id="getBaseOrderById" resultType="com.info.web.pojo.OrderBaseResult" parameterType="String">
 		SELECT
 			a.`id` AS  id,
@@ -435,9 +439,9 @@
 	</select>
 
 	<select id="getOrderByUserId" resultMap="queryResultMap" parameterType="String">
-		SELECT t.id , t.order_id , t.user_id , t.loan_id , t.pay_id , t.dispatch_name , t.dispatch_time , t.last_collection_user_id , t.current_collection_user_id , t.current_overdue_level , t.overdueDays , t.m1_approve_id , t.m1OperateStatus , t.m2_approve_id , t.m2OperateStatus , t.m3_approve_id , t.m3OperateStatus , t.m4_approve_id , t.m4OperateStatus , t.m5_approve_id , t.m5OperateStatus , t.m6_approve_id , t.status , t.promise_repayment_time , t.last_collection_time , t.create_date , t.update_date , t.operator_name , t.remark , t.outside_person_id , t.before_status , t.outside_company_id , t.jxl_status , t.renew_status , t.jxl_apply_Time , t.jx_audit_ime , t.csstatus , t.loan_user_name , t.loan_user_phone,t.reduction_money FROM mman_loan_collection_order t WHERE t.user_id = #{userId,jdbcType=VARCHAR}</select>
+		SELECT t.id , t.order_id , t.user_id , t.loan_id , t.pay_id , t.dispatch_name , t.dispatch_time , t.last_collection_user_id , t.current_collection_user_id , t.current_overdue_level , t.overdueDays , t.m1_approve_id , t.m1OperateStatus , t.m2_approve_id , t.m2OperateStatus , t.m3_approve_id , t.m3OperateStatus , t.m4_approve_id , t.m4OperateStatus , t.m5_approve_id , t.m5OperateStatus , t.m6_approve_id , t.status , t.promise_repayment_time , t.last_collection_time , t.create_date , t.update_date , t.operator_name , t.remark , t.outside_person_id , t.before_status , t.outside_company_id , t.jxl_status , t.renew_status , t.jxl_apply_Time , t.jx_audit_ime , t.csstatus , t.loan_user_name , t.loan_user_phone,t.reduction_money,t.id_number FROM mman_loan_collection_order t WHERE t.user_id = #{userId,jdbcType=VARCHAR}</select>
 	<!-- 根据主键获取单条记录 -->
-	<select id="get" resultMap="queryResultMap" parameterType="com.info.web.pojo.MmanLoanCollectionOrder">SELECT t.id , t.order_id , t.user_id , t.loan_id , t.pay_id , t.dispatch_name , t.dispatch_time , t.last_collection_user_id , t.current_collection_user_id , t.current_overdue_level , t.overdueDays , t.m1_approve_id , t.m1OperateStatus , t.m2_approve_id , t.m2OperateStatus , t.m3_approve_id , t.m3OperateStatus , t.m4_approve_id , t.m4OperateStatus , t.m5_approve_id , t.m5OperateStatus , t.m6_approve_id , t.status , t.promise_repayment_time , t.last_collection_time , t.create_date , t.update_date , t.operator_name , t.remark , t.outside_person_id , t.before_status , t.outside_company_id , t.jxl_status , t.renew_status , t.jxl_apply_Time , t.jx_audit_ime , t.csstatus FROM mman_loan_collection_order t WHERE id = #{id,jdbcType=VARCHAR}</select>
+	<select id="get" resultMap="queryResultMap" parameterType="com.info.web.pojo.MmanLoanCollectionOrder">SELECT t.id , t.order_id , t.user_id , t.loan_id , t.pay_id , t.dispatch_name , t.dispatch_time , t.last_collection_user_id , t.current_collection_user_id , t.current_overdue_level , t.overdueDays , t.m1_approve_id , t.m1OperateStatus , t.m2_approve_id , t.m2OperateStatus , t.m3_approve_id , t.m3OperateStatus , t.m4_approve_id , t.m4OperateStatus , t.m5_approve_id , t.m5OperateStatus , t.m6_approve_id , t.status , t.promise_repayment_time , t.last_collection_time , t.create_date , t.update_date , t.operator_name , t.remark , t.outside_person_id , t.before_status , t.outside_company_id , t.jxl_status , t.renew_status , t.jxl_apply_Time , t.jx_audit_ime , t.csstatus,t.id_number FROM mman_loan_collection_order t WHERE id = #{id,jdbcType=VARCHAR}</select>
 	<!-- 根据主键删除记录 -->
 	<delete id="del" parameterType="com.info.web.pojo.MmanLoanCollectionOrder">DELETE FROM mman_loan_collection_order WHERE id = #{id,jdbcType=VARCHAR}</delete>
 	
@@ -480,7 +484,8 @@
 		t.jx_audit_ime , 
 		t.s1_flag,
 	    t.csstatus ,
-		t.reduction_money
+		t.reduction_money,
+		t.id_number
 		FROM mman_loan_collection_order t
 		WHERE 1=1 
 	 	<if test="id !=null and id !=''">
@@ -533,7 +538,8 @@
 			<if test="csstatus != null and csstatus!=''">`csstatus`,</if> 
 			<if test="s1Flag!= null and s1Flag!=''">s1_flag,</if> 
 			<if test="loanUserName!= null and loanUserName!=''">loan_user_name,</if> 
-			<if test="loanUserPhone!= null and loanUserPhone!=''">loan_user_phone,</if> 
+			<if test="loanUserPhone!= null and loanUserPhone!=''">loan_user_phone,</if>
+			<if test="idNumber!= null and idNumber!=''">id_number,</if>
 		</trim>  
 		<trim prefix="values (" suffix=")" suffixOverrides=","> 
 			<if test="id != null and id!=''">#{id,jdbcType=VARCHAR},</if>  
@@ -575,7 +581,8 @@
 			<if test="csstatus != null and csstatus!=''">#{csstatus,jdbcType=VARCHAR},</if> 
 			<if test="s1Flag!= null and s1Flag!=''">#{s1Flag},</if> 
 			<if test="loanUserName!= null and loanUserName!=''">#{loanUserName},</if> 
-			<if test="loanUserPhone!= null and loanUserPhone!=''">#{loanUserPhone},</if> 
+			<if test="loanUserPhone!= null and loanUserPhone!=''">#{loanUserPhone},</if>
+			<if test="idNumber!= null and idNumber!=''">#{idNumber},</if>
 		</trim> 
 	</insert>
 	
@@ -620,7 +627,8 @@
 			<if test="csstatus != null and csstatus!=''">csstatus=#{csstatus,jdbcType=VARCHAR},</if> 
 			s1_flag=#{s1Flag},
 			<if test="loanUserName!= null and loanUserName!=''">loan_user_name=#{loanUserName},</if> 
-			<if test="loanUserPhone!= null and loanUserPhone!=''">loan_user_phone=#{loanUserPhone},</if> 
+			<if test="loanUserPhone!= null and loanUserPhone!=''">loan_user_phone=#{loanUserPhone},</if>
+			<if test="idNumber!= null and idNumber!=''">id_number=#{idNumber},</if>
 		</set> WHERE id = #{id,jdbcType=VARCHAR}
 	</update>
 	<!-- 标记订单 -->
@@ -644,7 +652,7 @@
 	
 	<!-- 根据条件查询符合的订单 -->
 	<select id="getOrderList" resultMap="queryResultMap" parameterType="com.info.web.pojo.MmanLoanCollectionOrder">
-	SELECT t.id , t.order_id , t.user_id , t.loan_id , t.pay_id , t.dispatch_name , t.dispatch_time , t.last_collection_user_id , t.current_collection_user_id , t.current_overdue_level , t.overdueDays , t.m1_approve_id , t.m1OperateStatus , t.m2_approve_id , t.m2OperateStatus , t.m3_approve_id , t.m3OperateStatus , t.m4_approve_id , t.m4OperateStatus , t.m5_approve_id , t.m5OperateStatus , t.m6_approve_id , t.status , t.promise_repayment_time , t.last_collection_time , t.create_date , t.update_date , t.operator_name , t.remark , t.outside_person_id , t.before_status , t.outside_company_id , t.jxl_status , t.renew_status , t.jxl_apply_Time , t.jx_audit_ime , t.csstatus FROM mman_loan_collection_order t WHERE 1=1 
+	SELECT t.id , t.order_id , t.user_id , t.loan_id , t.pay_id , t.dispatch_name , t.dispatch_time , t.last_collection_user_id , t.current_collection_user_id , t.current_overdue_level , t.overdueDays , t.m1_approve_id , t.m1OperateStatus , t.m2_approve_id , t.m2OperateStatus , t.m3_approve_id , t.m3OperateStatus , t.m4_approve_id , t.m4OperateStatus , t.m5_approve_id , t.m5OperateStatus , t.m6_approve_id , t.status , t.promise_repayment_time , t.last_collection_time , t.create_date , t.update_date , t.operator_name , t.remark , t.outside_person_id , t.before_status , t.outside_company_id , t.jxl_status , t.renew_status , t.jxl_apply_Time , t.jx_audit_ime , t.csstatus,t.id_number FROM mman_loan_collection_order t WHERE 1=1
 			<if test="orderId != null">and order_id=#{orderId,jdbcType=VARCHAR}</if>  
 			<if test="userId != null">and user_id=#{userId,jdbcType=VARCHAR}</if>  
 			<if test="loanId != null">and loan_id=#{loanId,jdbcType=VARCHAR}</if>  
@@ -686,7 +694,7 @@
 	</select>
 	
 	<select id="getOrderPage" resultMap="queryResultMap" parameterType="HashMap">
-		SELECT t.id , t.order_id , t.user_id , t.loan_id , t.pay_id , t.dispatch_name , t.dispatch_time , t.last_collection_user_id , t.current_collection_user_id , t.current_overdue_level , t.overdueDays , t.m1_approve_id , t.m1OperateStatus , t.m2_approve_id , t.m2OperateStatus , t.m3_approve_id , t.m3OperateStatus , t.m4_approve_id , t.m4OperateStatus , t.m5_approve_id , t.m5OperateStatus , t.m6_approve_id , t.status , t.promise_repayment_time , t.last_collection_time , t.create_date , t.update_date , t.operator_name , t.remark , t.outside_person_id , t.before_status , t.outside_company_id , t.jxl_status , t.renew_status , t.jxl_apply_Time , t.jx_audit_ime , t.csstatus FROM mman_loan_collection_order t 
+		SELECT t.id , t.order_id , t.user_id , t.loan_id , t.pay_id , t.dispatch_name , t.dispatch_time , t.last_collection_user_id , t.current_collection_user_id , t.current_overdue_level , t.overdueDays , t.m1_approve_id , t.m1OperateStatus , t.m2_approve_id , t.m2OperateStatus , t.m3_approve_id , t.m3OperateStatus , t.m4_approve_id , t.m4OperateStatus , t.m5_approve_id , t.m5OperateStatus , t.m6_approve_id , t.status , t.promise_repayment_time , t.last_collection_time , t.create_date , t.update_date , t.operator_name , t.remark , t.outside_person_id , t.before_status , t.outside_company_id , t.jxl_status , t.renew_status , t.jxl_apply_Time , t.jx_audit_ime , t.csstatus,t.id_number FROM mman_loan_collection_order t
 		WHERE 1=1
 	</select>
 	

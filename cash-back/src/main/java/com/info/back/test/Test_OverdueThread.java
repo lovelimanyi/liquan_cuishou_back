@@ -81,7 +81,7 @@ public class Test_OverdueThread {
                             //保存用户信息表--联系人表--银行卡
                             saveUserInfo(userId,userInfo,userContactsList,cardInfo);
                         }
-                        this.taskJobMiddleService.dispatchforLoanId(loanId);
+                        this.taskJobMiddleService.dispatchforLoanId(loanId,userInfo.get("id_number").toString());
                         RedisUtil.delRedisKey(Constant.TYPE_OVERDUE_ + payId);
                     } else {
                         if (null != borrowOrder && null != repaymentDetailList) {

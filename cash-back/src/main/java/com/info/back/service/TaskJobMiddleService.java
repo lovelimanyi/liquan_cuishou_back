@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.info.web.pojo.*;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,12 +19,6 @@ import org.springframework.stereotype.Service;
 import com.info.back.dao.IBackUserDao;
 import com.info.back.dao.IMmanLoanCollectionStatusChangeLogDao;
 import com.info.back.utils.BackConstant;
-import com.info.web.pojo.BackUser;
-import com.info.web.pojo.CreditLoanPay;
-import com.info.web.pojo.MmanLoanCollectionOrder;
-import com.info.web.pojo.MmanLoanCollectionPerson;
-import com.info.web.pojo.MmanUserLoan;
-import com.info.web.pojo.SysAlertMsg;
 import com.info.web.util.DateUtil;
 
 @Service
@@ -50,7 +45,10 @@ public class TaskJobMiddleService {
 	private IMmanLoanCollectionStatusChangeLogDao mmanLoanCollectionStatusChangeLogDao;
 	
 	@Autowired
-	private IAlertMsgService sysAlertMsgService; 
+	private IAlertMsgService sysAlertMsgService;
+
+	@Autowired
+	private IMmanUserInfoService mmanUserInfoService;
 	
 	
 	
@@ -69,7 +67,8 @@ public class TaskJobMiddleService {
 		
 		if (null!=overdueList && overdueList.size()>0) {
 			for (MmanUserLoan mmanUserLoanOri : overdueList) {
-				dispatchforLoanId(mmanUserLoanOri.getId()); 
+				MmanUserInfo userInfo = mmanUserInfoService.getUserInfoById(mmanUserLoanOri.getUserId());
+				dispatchforLoanId(mmanUserLoanOri.getId(),userInfo.getIdNumber());
 			}
 		}
 		
@@ -77,7 +76,7 @@ public class TaskJobMiddleService {
 	}
 	
 	
-	public void dispatchforLoanId(String loanId){
+	public void dispatchforLoanId(String loanId,String idNumber){
 		logger.error("dispatchforLoanId start,loanId:"+loanId);
 		
 		if(StringUtils.isBlank(loanId)){
@@ -97,7 +96,7 @@ public class TaskJobMiddleService {
 			return;
 		}
 		
-		dispatchForLoanId(mmanUserLoan);
+		dispatchForLoanId(mmanUserLoan,idNumber);
 		
 		logger.error("dispatchforLoanId end,loanId:"+loanId);
 		
@@ -108,7 +107,7 @@ public class TaskJobMiddleService {
 	/**
 	 * 分配催收任务，更新催收相关操作(更新催收订单，添加流转日志，更新借款、还款逾期额天数状态等)
 	 */
-	public void dispatchForLoanId(MmanUserLoan mmanUserLoan) {
+	public void dispatchForLoanId(MmanUserLoan mmanUserLoan,String idNumber) {
 		
 		logger.error("TaskJobMiddleService dispatchForLoanId start" + "开始时间 : " + Calendar.getInstance().getTimeInMillis() + "借款id :" + mmanUserLoan.getId());
 		//初始化参数
@@ -213,12 +212,13 @@ public class TaskJobMiddleService {
 						clrLoanEnd.setTime(mmanUserLoanOri.getLoanEndTime());
 						int yearLoanEnd = clrLoanEnd.get(Calendar.YEAR);  
 						int monthLoanEnd = clrLoanEnd.get(Calendar.MONTH) + 1;  
-						if (dayNow == 1) {//1.1 若当前为每月1号，订单和所有分组要分多种情况（注意新订单和跨月订单升级流转日志类型不同）
+						if (dayNow == 1) {
+							//1.1 若当前为每月1号，订单和所有分组要分多种情况（注意新订单和跨月订单升级流转日志类型不同）
 							
 							//1.1.1 所有新订单分组为 M1-M2
 							MmanLoanCollectionOrder mmanLoanCollectionOrder = new MmanLoanCollectionOrder();
 							mmanLoanCollectionOrder.setLoanId(mmanUserLoanOri.getId());
-							
+
 							List<MmanLoanCollectionOrder> mmanLoanCollectionOrderList = manLoanCollectionOrderService.findList(mmanLoanCollectionOrder);
 							if (null==mmanLoanCollectionOrderList || mmanLoanCollectionOrderList.isEmpty()) {
 								
@@ -235,6 +235,7 @@ public class TaskJobMiddleService {
 								mmanLoanCollectionOrderNo111.setOperatorName(sysName);
 								mmanLoanCollectionOrderNo111.setRemark(sysRemark);
 								mmanLoanCollectionOrderNo111.setJxlStatus(BackConstant.XJX_JXL_STATUS_REFUSE);
+								mmanLoanCollectionOrderNo111.setIdNumber(idNumber);  // 借款人身份证号
 								mmanLoanCollectionOrderNo111List.add(mmanLoanCollectionOrderNo111);
 								
 								
@@ -275,7 +276,7 @@ public class TaskJobMiddleService {
 								 }
 								
 								mmanLoanCollectionOrderOri.setOverdueDays(pday);
-								
+								mmanLoanCollectionOrderOri.setIdNumber(idNumber);  // 借款人身份证
 								int monthDiff = (yearNow * 12 + monthNow) - (yearLoanEnd * 12 + monthLoanEnd);//跨月次数，monthDiff == 0的是今天派过的不能参与
 								if (monthDiff == 0) {
 									//原订单不在条件内的只需更新逾期天数
@@ -452,6 +453,7 @@ public class TaskJobMiddleService {
 								mmanLoanCollectionOrderNo12.setRemark(sysRemark);
 								mmanLoanCollectionOrderNo12.setJxlStatus(BackConstant.XJX_JXL_STATUS_REFUSE);
 								mmanLoanCollectionOrderNo12.setS1Flag("S1");
+								mmanLoanCollectionOrderNo12.setIdNumber(idNumber);  // 借款人身份证号码
 								mmanLoanCollectionOrderNo12List.add(mmanLoanCollectionOrderNo12);
 								
 								
@@ -463,9 +465,6 @@ public class TaskJobMiddleService {
 								personMap.put("userStatus", BackConstant.ON);
 
 								mmanLoanCollectionPersonNo12List = backUserDao.findUnCompleteCollectionOrderByCurrentUnCompleteCountListByMap(personMap);
-								for(MmanLoanCollectionPerson aa : mmanLoanCollectionPersonNo12List){
-									System.out.println(aa.getId());
-								}
 								
 								if (null==mmanLoanCollectionPersonNo12List || mmanLoanCollectionPersonNo12List.isEmpty()){
 									
@@ -503,7 +502,8 @@ public class TaskJobMiddleService {
 								manLoanCollectionOrderService.saveMmanLoanCollectionOrder(mmanLoanCollectionOrderOri);
 								continue;
 							}
-						} else {//1.3 若当前为每月12号-月底，订单和所有分组要分多种情况
+						} else {
+							//1.3 若当前为每月12号-月底，订单和所有分组要分多种情况
 							
 							//1.3.1 所有新订单，分组为S1
 							MmanLoanCollectionOrder mmanLoanCollectionOrder = new MmanLoanCollectionOrder();
@@ -526,6 +526,7 @@ public class TaskJobMiddleService {
 //								mmanLoanCollectionOrderNo131.setOutsideCompanyId(ourCompanyId);
 								mmanLoanCollectionOrderNo131.setRemark(sysRemark);
 								mmanLoanCollectionOrderNo131.setJxlStatus(BackConstant.XJX_JXL_STATUS_REFUSE);
+								mmanLoanCollectionOrderNo131.setIdNumber(idNumber);  // 借款人身份证号码
 								mmanLoanCollectionOrderNo131List.add(mmanLoanCollectionOrderNo131);
 								
 								

@@ -201,7 +201,7 @@
 							 ${order.loanPenlty}
 						</td>
 						<td align="center" width="50">
-								${order.reductionMoney}
+							 ${order.reductionMoney}
 						</td>
 						<td align="center" width="50">
 							<c:choose>
@@ -221,11 +221,11 @@
 						</td>
 						<!--<td align="center" width="50">
 							 还款状态（3，4，5，6，7对应S1，S2，M1-M2，M2-M3，M3+对应1-10,11-30（1），1个月-2个月，2个月-3个月，3个月+）
-							<c:if test="${order.returnStatus == '3'}">S1</c:if>
+							<%--<c:if test="${order.returnStatus == '3'}">S1</c:if>
 							<c:if test="${order.returnStatus == '4'}">S2</c:if>
 							<c:if test="${order.returnStatus == '5'}">M1-M2</c:if>
 							<c:if test="${order.returnStatus == '6'}">M2-M3</c:if>
-							<c:if test="${order.returnStatus == '7'}">M3+</c:if>
+							<c:if test="${order.returnStatus == '7'}">M3+</c:if>--%>
 						</td>-->
 						<td align="center" width="50">
 							 ${order.returnMoney}

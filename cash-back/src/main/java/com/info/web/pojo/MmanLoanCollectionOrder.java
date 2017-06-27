@@ -94,6 +94,9 @@ public class MmanLoanCollectionOrder {
 		this.reductionMoney = reductionMoney;
 	}
 
+	private String idNumber;  // 借款人身份证号码
+
+
 	//用户信息
 	private MmanUserInfo mmanUserInfo;
 	
@@ -194,6 +197,14 @@ public class MmanLoanCollectionOrder {
 
 	public void setCurrentCollectionUserId(String currentCollectionUserId){
 		this.currentCollectionUserId = currentCollectionUserId;
+	}
+
+	public String getIdNumber() {
+		return idNumber;
+	}
+
+	public void setIdNumber(String idNumber) {
+		this.idNumber = idNumber;
 	}
 
 	public String getCurrentCollectionUserId(){
