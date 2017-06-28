@@ -2,29 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="d8edfa22-fe8d-486f-a77a-71afe7019898" name="Default" comment="系统优化———&gt;减少订单查询时关联表数量（订单表添加借款人身份证号字段）">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/cash-back/cash-back.iml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/cuishou.iml" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/cash-back/src/main/java/com/info/back/dao/ITongBuDao.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/cash-back/src/main/java/com/info/back/service/TongBuService.java" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cash-back/src/main/java/com/info/back/controller/MmanLoanCollectionOrderController.java" afterPath="$PROJECT_DIR$/cash-back/src/main/java/com/info/back/controller/MmanLoanCollectionOrderController.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cash-back/src/main/java/com/info/back/controller/MmanLoanCollectionRecordController.java" afterPath="$PROJECT_DIR$/cash-back/src/main/java/com/info/back/controller/MmanLoanCollectionRecordController.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cash-back/src/main/java/com/info/back/controller/MmanLoanCollectionStatusChangeLogController.java" afterPath="$PROJECT_DIR$/cash-back/src/main/java/com/info/back/controller/MmanLoanCollectionStatusChangeLogController.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cash-back/src/main/java/com/info/back/controller/MyCollectionOrderController.java" afterPath="$PROJECT_DIR$/cash-back/src/main/java/com/info/back/controller/MyCollectionOrderController.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cash-back/src/main/java/com/info/back/dao/IMmanLoanCollectionStatusChangeLogDao.java" afterPath="$PROJECT_DIR$/cash-back/src/main/java/com/info/back/dao/IMmanLoanCollectionStatusChangeLogDao.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cash-back/src/main/java/com/info/back/dao/IProblemFeedbackDao.java" afterPath="$PROJECT_DIR$/cash-back/src/main/java/com/info/back/dao/IProblemFeedbackDao.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cash-back/src/main/java/com/info/back/mapping/FengKong.xml" afterPath="$PROJECT_DIR$/cash-back/src/main/java/com/info/back/mapping/FengKong.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cash-back/src/main/java/com/info/back/mapping/MmanLoanCollectionRecord.xml" afterPath="$PROJECT_DIR$/cash-back/src/main/java/com/info/back/mapping/MmanLoanCollectionRecord.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cash-back/src/main/java/com/info/back/mapping/MmanLoanCollectionStatusChangeLog.xml" afterPath="$PROJECT_DIR$/cash-back/src/main/java/com/info/back/mapping/MmanLoanCollectionStatusChangeLog.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cash-back/src/main/java/com/info/back/service/FengKongService.java" afterPath="$PROJECT_DIR$/cash-back/src/main/java/com/info/back/service/FengKongService.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cash-back/src/main/java/com/info/back/service/IMmanLoanCollectionStatusChangeLogService.java" afterPath="$PROJECT_DIR$/cash-back/src/main/java/com/info/back/service/IMmanLoanCollectionStatusChangeLogService.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cash-back/src/main/java/com/info/back/service/MmanLoanCollectionRecordService.java" afterPath="$PROJECT_DIR$/cash-back/src/main/java/com/info/back/service/MmanLoanCollectionRecordService.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cash-back/src/main/java/com/info/back/service/MmanLoanCollectionStatusChangeLogService.java" afterPath="$PROJECT_DIR$/cash-back/src/main/java/com/info/back/service/MmanLoanCollectionStatusChangeLogService.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cash-back/src/main/java/com/info/back/service/TaskJobMiddleService.java" afterPath="$PROJECT_DIR$/cash-back/src/main/java/com/info/back/service/TaskJobMiddleService.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cash-back/src/main/java/com/info/back/utils/BackConstant.java" afterPath="$PROJECT_DIR$/cash-back/src/main/java/com/info/back/utils/BackConstant.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cash-back/src/main/java/com/info/web/pojo/MmanLoanCollectionOrder.java" afterPath="$PROJECT_DIR$/cash-back/src/main/java/com/info/web/pojo/MmanLoanCollectionOrder.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cash-back/src/main/resources/spring-back.xml" afterPath="$PROJECT_DIR$/cash-back/src/main/resources/spring-back.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/cash-back/src/main/webapp/WEB-INF/viewback/mmanLoanCollectionRecord/mmanLoanCollectionRecordList.jsp" afterPath="$PROJECT_DIR$/cash-back/src/main/webapp/WEB-INF/viewback/mmanLoanCollectionRecord/mmanLoanCollectionRecordList.jsp" />
     </list>
     <ignored path="$PROJECT_DIR$/cash-back/target/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -40,11 +18,11 @@
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
-    <leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file leaf-file-name="mmanLoanCollectionRecordList.jsp" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/cash-back/src/main/webapp/WEB-INF/viewback/mmanLoanCollectionRecord/mmanLoanCollectionRecordList.jsp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3132">
+            <state relative-caret-position="4578">
               <caret line="218" column="36" lean-forward="false" selection-start-line="218" selection-start-column="36" selection-end-line="218" selection-end-column="36" />
               <folding />
             </state>
@@ -54,8 +32,8 @@
       <file leaf-file-name="TaskJobMiddleService.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/cash-back/src/main/java/com/info/back/service/TaskJobMiddleService.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1197">
-              <caret line="76" column="4" lean-forward="true" selection-start-line="76" selection-start-column="4" selection-end-line="76" selection-end-column="4" />
+            <state relative-caret-position="172">
+              <caret line="72" column="9" lean-forward="true" selection-start-line="72" selection-start-column="9" selection-end-line="72" selection-end-column="9" />
               <folding />
             </state>
           </provider>
@@ -64,7 +42,7 @@
       <file leaf-file-name="spring-back.xml" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/cash-back/src/main/resources/spring-back.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="296">
+            <state relative-caret-position="1533">
               <caret line="73" column="54" lean-forward="false" selection-start-line="73" selection-start-column="54" selection-end-line="73" selection-end-column="54" />
               <folding />
             </state>
@@ -74,7 +52,7 @@
       <file leaf-file-name="MmanLoanCollectionRecordService.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/cash-back/src/main/java/com/info/back/service/MmanLoanCollectionRecordService.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="8157">
+            <state relative-caret-position="12999">
               <caret line="642" column="28" lean-forward="false" selection-start-line="642" selection-start-column="28" selection-end-line="642" selection-end-column="28" />
               <folding />
             </state>
@@ -84,7 +62,7 @@
       <file leaf-file-name="TaskJobMiddleService.class" pinned="false" current-in-tab="false">
         <entry file="file://$USER_HOME$/Desktop/TaskJobMiddleService.class">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2310">
+            <state relative-caret-position="3696">
               <caret line="204" column="92" lean-forward="false" selection-start-line="204" selection-start-column="92" selection-end-line="204" selection-end-column="92" />
               <folding />
             </state>
@@ -94,7 +72,7 @@
       <file leaf-file-name="MmanUserInfo.xml" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/cash-back/src/main/java/com/info/back/mapping/MmanUserInfo.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="178">
+            <state relative-caret-position="9051">
               <caret line="431" column="19" lean-forward="false" selection-start-line="431" selection-start-column="16" selection-end-line="431" selection-end-column="19" />
               <folding>
                 <marker date="1498526233423" expanded="true" signature="19903:27159" ph="UPDATE mman_... " />
@@ -151,7 +129,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="master" />
+        <entry key="$PROJECT_DIR$" value="develop" />
       </map>
     </option>
     <push-targets>
@@ -294,114 +272,6 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="cash-back" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="cuishou" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="cuishou" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="cash-back" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="target" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="cuishou" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="cuishou" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="cash-back" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="webapp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="cuishou" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="cuishou" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="cash-back" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="webapp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="WEB-INF" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="cuishou" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="cuishou" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="cash-back" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="main" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="webapp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="WEB-INF" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="viewback" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -990,6 +860,7 @@
       <workItem from="1498527972738" duration="25965000" />
       <workItem from="1498559741615" duration="401000" />
       <workItem from="1498611914473" duration="7905000" />
+      <workItem from="1498634325702" duration="408000" />
     </task>
     <task id="LOCAL-00001" summary="系统优化———&gt;减少订单查询时关联表数量（订单表添加借款人身份证号字段）">
       <created>1498550795494</created>
@@ -1041,7 +912,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="38717000" />
+    <option name="totallyTimeSpent" value="39125000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
@@ -1061,25 +932,25 @@
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.18851571" sideWeight="0.79272324" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32827735" sideWeight="0.4911797" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Java Enterprise" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32917964" sideWeight="0.49558985" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.30444205" sideWeight="0.4911797" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.38786566" sideWeight="0.4978678" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.38786566" sideWeight="0.4978678" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.30444205" sideWeight="0.4911797" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Spring" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.21801706" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22014925" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2567714" sideWeight="0.49573562" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32827735" sideWeight="0.4911797" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2567714" sideWeight="0.49573562" order="1" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1404,7 +1275,7 @@
     <entry file="file://$PROJECT_DIR$/cash-back/src/main/java/com/info/back/service/TongBuService.java" />
     <entry file="file://$PROJECT_DIR$/cash-back/src/main/webapp/WEB-INF/viewback/mmanLoanCollectionRecord/mmanLoanCollectionRecordList.jsp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3132">
+        <state relative-caret-position="4578">
           <caret line="218" column="36" lean-forward="false" selection-start-line="218" selection-start-column="36" selection-end-line="218" selection-end-column="36" />
           <folding />
         </state>
@@ -1412,7 +1283,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/cash-back/src/main/resources/spring-back.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="296">
+        <state relative-caret-position="1533">
           <caret line="73" column="54" lean-forward="false" selection-start-line="73" selection-start-column="54" selection-end-line="73" selection-end-column="54" />
           <folding />
         </state>
@@ -1428,7 +1299,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/cash-back/src/main/java/com/info/back/service/MmanLoanCollectionRecordService.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="8157">
+        <state relative-caret-position="12999">
           <caret line="642" column="28" lean-forward="false" selection-start-line="642" selection-start-column="28" selection-end-line="642" selection-end-column="28" />
           <folding />
         </state>
@@ -1436,7 +1307,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/cash-back/src/main/java/com/info/back/mapping/MmanUserInfo.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="178">
+        <state relative-caret-position="9051">
           <caret line="431" column="19" lean-forward="false" selection-start-line="431" selection-start-column="16" selection-end-line="431" selection-end-column="19" />
           <folding>
             <marker date="1498526233423" expanded="true" signature="19903:27159" ph="UPDATE mman_... " />
@@ -1474,7 +1345,7 @@
     </entry>
     <entry file="file://$USER_HOME$/Desktop/TaskJobMiddleService.class">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2310">
+        <state relative-caret-position="3696">
           <caret line="204" column="92" lean-forward="false" selection-start-line="204" selection-start-column="92" selection-end-line="204" selection-end-column="92" />
           <folding />
         </state>
@@ -1482,8 +1353,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/cash-back/src/main/java/com/info/back/service/TaskJobMiddleService.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1197">
-          <caret line="76" column="4" lean-forward="true" selection-start-line="76" selection-start-column="4" selection-end-line="76" selection-end-column="4" />
+        <state relative-caret-position="172">
+          <caret line="72" column="9" lean-forward="true" selection-start-line="72" selection-start-column="9" selection-end-line="72" selection-end-column="9" />
           <folding />
         </state>
       </provider>
