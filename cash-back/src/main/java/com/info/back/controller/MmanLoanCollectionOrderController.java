@@ -137,9 +137,7 @@ public class MmanLoanCollectionOrderController extends BaseController{
 				PageConfig<OrderBaseResult> pm = mmanLoanCollectionOrderService.getPage(params);
 				List<OrderBaseResult> list = pm.getItems();
 				System.out.println("list>>>>>>>>="+list.size());
-				logger.error("test11111111111111111111111111111111111111111111111");
 				List<Object[]> contents = new ArrayList<Object[]>();
-				int count = 0;
 				for (OrderBaseResult r : list) {
 					String[] conList = new String[titles.length];
 					conList[0]=r.getLoanId();
@@ -166,10 +164,7 @@ public class MmanLoanCollectionOrderController extends BaseController{
 					conList[17]=r.getLastUserName()==null?"":r.getLastUserName();
 					conList[18]= String.valueOf(r.getReductionMoney()==null?"":r.getReductionMoney());
 					contents.add(conList);
-					count ++;
 				}
-				logger.error("count=======================" + count);
-				logger.error("test222222222222222222222222222222222222");
 				ExcelUtil.buildExcel(workbook, "管理跟踪统计", titles, contents, i, total, os);
 			}
 		} catch (Exception e) {

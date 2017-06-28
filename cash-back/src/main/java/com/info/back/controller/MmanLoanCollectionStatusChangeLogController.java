@@ -1,14 +1,14 @@
 package com.info.back.controller;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.OutputStream;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.info.back.utils.ExcelUtil;
 import org.apache.log4j.Logger;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -116,5 +116,74 @@ public class MmanLoanCollectionStatusChangeLogController extends BaseController 
 			logger.error("getMmanLoanCollectionStatusChangeLog error", e);
 		}
 		return "mmanLoanCollectionStatusChangeLog/mmanLoanCollectionStatusChangeLogList";
+	}
+
+	/**
+	 * 流转日志导出
+	 * @param request
+	 * @param response
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping("/execlToStatusChangeLog")
+	public void reportManage(HttpServletResponse response,HttpServletRequest request, Model model) {
+		HashMap<String, Object> params = getParametersO(request);
+		System.out.println("map==========="+params.size());
+		try {
+			BackUser backUser = (BackUser) request.getSession().getAttribute(Constant.BACK_USER);
+			List<BackUserCompanyPermissions> CompanyPermissionsList=backUserService.findCompanyPermissions(backUser.getId());
+			if(CompanyPermissionsList!=null){
+				params.put("CompanyPermissionsList", CompanyPermissionsList);
+			}
+			if(backUser.getRoleId()!=null&&BackConstant.COLLECTION_ROLE_ID.toString().equals(backUser.getRoleId())){
+				params.put("roleUserId", backUser.getId());
+			}
+			int size = 50000;
+			int total = 0;
+			params.put(Constant.PAGE_SIZE, size);
+			int totalPageNum = mmanLoanCollectionStatusChangeLogService.getAllCount(params);
+			if (totalPageNum > 0) {
+				if (totalPageNum % size > 0) {
+					total = totalPageNum / size + 1;
+				} else {
+					total = totalPageNum / size;
+				}
+			}
+			OutputStream os = response.getOutputStream();
+			response.reset();// 清空输出流
+			ExcelUtil.setFileDownloadHeader(request, response, "催收流转日志.xlsx");
+			response.setContentType("application/msexcel");// 定义输出类型
+			SXSSFWorkbook workbook = new SXSSFWorkbook(10000);
+			String[] titles = {  "序号", "借款编号", "操作前状态", "操作后状态","操作类型","催收组","当前催收员","订单组","创建时间","操作人","操作备注"};
+			List<SysDict> dictlist=sysDictService.getStatus("collection_group");
+			HashMap<String, String> dictMap=BackConstant.orderState(dictlist);
+			List<SysDict> statulist=sysDictService.getStatus("xjx_collection_order_state");
+			HashMap<String, String> StatuMap=BackConstant.orderState(statulist);
+			for (int i = 1; i <= total; i++) {
+				params.put(Constant.CURRENT_PAGE, i);
+				PageConfig<MmanLoanCollectionStatusChangeLog> pm = mmanLoanCollectionStatusChangeLogService.findPage(params);
+				List<MmanLoanCollectionStatusChangeLog> list = pm.getItems();
+				System.out.println("list>>>>>>>>="+list.size());
+				List<Object[]> contents = new ArrayList<Object[]>();
+				for (MmanLoanCollectionStatusChangeLog r : list) {
+					String[] conList = new String[titles.length];
+					conList[0] = String.valueOf(i);
+					conList[1] = r.getLoanCollectionOrderId();
+					conList[2] = dictMap.get(r.getBeforeStatus() + "");
+					conList[3] = dictMap.get(r.getAfterStatus() + "");
+					conList[4] = StatuMap.get(r.getType());
+					conList[5] = dictMap.get(r.getCurrentCollectionUserLevel() + "");
+					conList[6] = r.getCurrentCollectionUserId() == null ? "" : r.getCurrentCollectionUserId();
+					conList[7] = dictMap.get(r.getCurrentCollectionOrderLevel()+"");
+					conList[8] = r.getCreateDate() == null ? "" : DateUtil.getDateFormat(r.getCreateDate(),"yyyy-MM-dd HH:mm:ss");
+					conList[9] = r.getOperatorName() == null ? "" : r.getOperatorName();
+					conList[10] = r.getRemark() == null ? "" : r.getRemark();
+					contents.add(conList);
+				}
+				ExcelUtil.buildExcel(workbook, "催收流转日志", titles, contents, i, total, os);
+			}
+		} catch (Exception e) {
+			logger.error("催收流转日志导出excel失败", e);
+		}
 	}
 }

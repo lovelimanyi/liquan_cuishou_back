@@ -68,7 +68,7 @@
 	<bean id="taskJianmianStatus" class="com.info.back.task.TaskJianmianStatus"></bean>
 	<bean id="TaskDisableOrEnableCollections" class="com.info.back.task.TaskDisableOrEnableCollections"></bean>
 
-	<!--<task:scheduled-tasks scheduler="myScheduler"> -->
+	<task:scheduled-tasks scheduler="myScheduler">
 		<!--<task:scheduled ref="taskJobMiddleService" method="autoDispatch" cron="0 11 1,12,20 * * ?" />每天凌晨3、5、9、20点11分 跑分单，逾期计算-->
 		<!--<task:scheduled ref="taskJobStatistics" method="callProcedure" cron="0 0 5 * * ?" />-->
 		<!--<task:scheduled ref="taskJobStatistics" method="callCountCollection" cron="0 10 0 * * ?" />--> <!-- 催收记录统计 凌晨10分跑 -->
@@ -83,8 +83,8 @@
 
 		<!--<task:scheduled ref="TaskDisableOrEnableCollections" method="disableCollections" cron="0 10 0 1 * ?" />-->
 		<!-- <task:scheduled ref="TaskDisableOrEnableCollections" method="enableCollections" cron="0 0 6 1 * ?" /> -->
-		<!--<task:scheduled ref="dealOverdueLoanService" method="dealOverdueLoan" cron="0 15 0 * * ?" />-->
-	<!--</task:scheduled-tasks>-->
+		<task:scheduled ref="dealOverdueLoanService" method="dealOverdueLoan" cron="0 15 0 * * ?" />
+	</task:scheduled-tasks>
 	<!--最多 5个定时任务线程-->
-	<!--<task:scheduler id="myScheduler" pool-size="5"/>--> 
+	<task:scheduler id="myScheduler" pool-size="5"/>
 </beans>

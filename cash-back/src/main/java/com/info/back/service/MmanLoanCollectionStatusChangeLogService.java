@@ -46,8 +46,11 @@ public class MmanLoanCollectionStatusChangeLogService implements
 	public List<MmanLoanCollectionStatusChangeLog> findListLog(String orderId) {
 		return mmanLoanCollectionStatusChangeLogDao.findListLog(orderId);
 	}
-	
-	
+
+	@Override
+	public int getAllCount(HashMap<String, Object> params) {
+		return mmanLoanCollectionStatusChangeLogDao.findAllCount(params);
+	}
 	
 
 }

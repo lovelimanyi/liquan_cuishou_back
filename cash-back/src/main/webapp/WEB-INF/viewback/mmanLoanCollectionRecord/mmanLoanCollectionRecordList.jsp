@@ -54,7 +54,7 @@
 							</c:forEach>
 						</select> --%>
 						<select name="collectionStatus" >
-							<option value="-1" <c:if test="${'-1' eq params.collectionStatus}">selected = "selected"</c:if>>全部</option>
+							<option value="" <c:if test="${'' eq params.collectionStatus}">selected = "selected"</c:if>>全部</option>
 							<option value="0"  <c:if test="${'0' eq params.collectionStatus}">selected = "selected"</c:if>>待催收</option>
 							<option value="1" <c:if test="${'1' eq params.collectionStatus}">selected = "selected"</c:if>>催收中</option>
 							<option value="2" <c:if test="${'2' eq params.collectionStatus}">selected = "selected"</c:if>>承诺还款</option>
@@ -65,22 +65,22 @@
 					</td>
 				</tr>	
 				<tr>	
-					<td>
+					<%--<td>
 						催收类型:
-						<%-- <select name="collectionType">
+						&lt;%&ndash; <select name="collectionType">
 							<option value="">全部</option>
 							<c:forEach var="type" items="${collectionType}">
 								<option value="${type.id}" 
 									<c:if test="${type.id eq params.collectionType}">selected = "selected"</c:if>>
 										${type.label}</option>
 							</c:forEach>
-						</select> --%>
+						</select> &ndash;%&gt;
 						<select name="collectionType" >
 							<option value=""  <c:if test="${'' eq params.collectionStatus}">selected = "selected"</c:if>>全部</option>
 							<option value="1" <c:if test="${'1' eq params.collectionType}">selected = "selected"</c:if>>电话催收</option>
 							<option value="2" <c:if test="${'2' eq params.collectionType}">selected = "selected"</c:if>>短信催收</option>
 						</select>
-					</td>
+					</td>--%>
 					<%-- <td>
 						施压等级:
 						<select name="stressLevel">
@@ -107,6 +107,17 @@
 							value="${params.collectionDateEnd }" />
 					</td>
 					<td>
+						风控标签:
+						<select name="fengKongLabel" >
+							<option value="">全部</option>
+							<c:forEach var="fengKongLabel" items="${fengKongLabels }">
+								<option value="${fengKongLabel.id }" <c:if test="${fengKongLabel.id eq labels.get(params.fengKongLabel)}">selected = "selected"</c:if>>
+										${fengKongLabel.fkLabel}
+								</option>
+							</c:forEach>
+						</select>
+					</td>
+					<td>
 						<div class="buttonActive">
 							<div class="buttonContent">
 								<button type="submit">
@@ -124,50 +135,59 @@
 				nowrapTD="false">
 				<thead>
 					<tr>
-						<th align="center" width="50">
+						<th align="center" width="30">
 							序号
 						</th>
-						<th align="center" width="80">
+						<th align="center" width="40">
 							借款编号
 						</th>
 						<!-- <th align="center" width="50">
 							催收员姓名
 						</th> -->
-						<th align="center" width="60">
+						<th align="center" width="50">
 							借款人
 						</th>
-						<th align="center" width="100">
+						<%--<th align="center" width="100">
 							联系人类型
 						</th>
 						<th align="center" width="50">
 							关系
-						</th>
-						<th align="center" width="100">
+						</th>--%>
+						<th align="center" width="60">
 							联系人姓名
 						</th>
-						<th align="center" width="90">
+						<th align="center" width="80">
 							联系人电话
 						</th>
 						<!-- <th align="center" width="80">
 							施压等级
 						</th> -->
-						<th align="center" width="120">
+						<th align="center" width="80">
 							当前催收状态
 						</th>
-						<th align="center" width="80">
+						<%--<th align="center" width="80">
 							催收类型
-						</th>
+						</th>--%>
 						<th align="center" width="120">
 							催收时间
 						</th>
 						<!-- <th align="center" width="90">
 							催收到的金额
 						</th> -->
-						<th align="center" width="100">
+						<th align="center" width="80">
 							催收组
 						</th>
-						<th align="center" width="100">
+						<th align="center" width="80">
 							催收员
+						</th>
+						<%--<th align="center" width="170">
+							公司名称
+						</th>--%>
+						<th align="center" width="60">
+							催收建议
+						</th>
+						<th align="center" width="200">
+							风控标签
 						</th>
 						<!-- <th align="center" width="120">
 							催收内容
@@ -175,10 +195,10 @@
 						<!-- <th align="center" width="120">
 							创建时间
 						</th> -->
-						<th align="center" width="120">
+						<%--<th align="center" width="120">
 							更新时间
-						</th>
-						<th align="center" width="120">
+						</th>--%>
+						<th align="center" width="180">
 							催收内容
 						</th>
 					</tr>
@@ -193,19 +213,19 @@
 							<td>
 								${record.orderId}
 							</td>
-							<%-- <td>
-								${record.collectionId}
-							</td> --%>
 							<td>
-								${record.userId}
+								${record.collectionId}
 							</td>
-							<td >
+							<%--<td>
+								${record.userId}
+							</td>--%>
+							<%--<td >
 								<c:if test="${record.contactType == '1'}">紧急联系人</c:if>
 								<c:if test="${record.contactType == '2'}">通讯录联系人</c:if>
 							</td>
 							<td>
 								${record.relation }
-							</td>
+							</td>--%>
 							<td>
 								${record.contactName }
 							</td>
@@ -226,10 +246,10 @@
 								<%-- <c:if test="${record.orderState == '5'}">催收成功</c:if> --%>
 								
 							</td>
-							<td>
+							<%--<td>
 								<c:if test="${record.collectionType == '1'}">电话催收</c:if>
 								<c:if test="${record.collectionType == '2'}">短信催收</c:if>
-							</td>
+							</td>--%>
 							<td>
 								<fmt:formatDate value="${record.collectionDate }" pattern="yyyy-MM-dd HH:mm:ss"/>
 							</td>
@@ -247,15 +267,22 @@
 							<td>
 								${record.collectionPerson }
 							</td>
-							<%-- <td>
-								${record.content }
-							</td> --%>
-							<%-- <td>
-								<fmt:formatDate value="${record.createDate }"	pattern="yyyy-MM-dd HH:mm:ss" />
-							</td> --%>
-							<td>
-								<fmt:formatDate value="${record.updateDate }"	pattern="yyyy-MM-dd HH:mm:ss" />
-							</td>
+                            <%--<td>
+                                    ${record.companyTitle }
+                            </td>--%>
+                            <td>
+                                <c:if test="${record.collectionAdvice == '1'}">通过</c:if>
+                                <c:if test="${record.collectionAdvice == '2'}">拒绝</c:if>
+                                <c:if test="${record.collectionAdvice == '3'}">无建议</c:if>
+                            </td>
+                            <td>
+                                    ${record.fengKongLabel}
+                                    <%--<c:if test="${record.fengKongLabel eq '0'}">无</c:if>
+                                    <c:if test="${record.fengKongLabel ne '0'}">有</c:if>--%>
+                            </td>
+                                <%--<td>
+                                    <fmt:formatDate value="${record.updateDate }"	pattern="yyyy-MM-dd HH:mm:ss" />
+                                </td>--%>
 							<td>
 								${record.content }
 							</td>

@@ -9,22 +9,26 @@ import com.info.web.util.PageConfig;
 public interface IMmanLoanCollectionStatusChangeLogService {
 	/**
 	 * 催款流转日志记录分页
-	 * 
+	 *
 	 * @param params
 	 * @return
 	 */
-	public PageConfig<MmanLoanCollectionStatusChangeLog> findPage(
+	PageConfig<MmanLoanCollectionStatusChangeLog> findPage(
 			HashMap<String, Object> params);
-	
-	
-	
-	public void insert(MmanLoanCollectionStatusChangeLog mmanLoanCollectionStatusChangeLog);
-	
-	
+
+
+
+	void insert(MmanLoanCollectionStatusChangeLog mmanLoanCollectionStatusChangeLog);
+
+
 	/**
 	 * 根据orderid查询日志
 	 * @param OrderId
 	 * @return
 	 */
-	public List<MmanLoanCollectionStatusChangeLog> findListLog(String orderId);
+	List<MmanLoanCollectionStatusChangeLog> findListLog(String orderId);
+
+
+
+	int getAllCount(HashMap<String,Object> params);
 }

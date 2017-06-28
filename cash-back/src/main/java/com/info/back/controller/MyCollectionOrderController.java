@@ -316,7 +316,7 @@ public class MyCollectionOrderController extends BaseController {
 		MmanLoanCollectionOrder mmanLoanCollectionOrderOri = mmanLoanCollectionOrderService
 				.getOrderById(params.get("id").toString());
 //		System.out.println("订单状态=【===========================】"+mmanLoanCollectionOrderOri.getStatus());
-		if(!"4".equals(mmanLoanCollectionOrderOri.getStatus())){
+//		if(!"4".equals(mmanLoanCollectionOrderOri.getStatus())){
 			try {
 				result = mmanLoanCollectionRecordService.saveCollection(params,
 						backUser);
@@ -334,10 +334,10 @@ public class MyCollectionOrderController extends BaseController {
 			} catch (Exception e) {
 				logger.error(" error", e);
 			}
-		}else {
-			result.setMsg("催收成功订单不能 添加催收记录");
-			result.setCode("-1");
-		}
+//		}else {
+//			result.setMsg("催收成功订单不能 添加催收记录");
+//			result.setCode("-1");
+//		}
 		SpringUtils.renderDwzResult(response, "0".equals(result.getCode()),
 				result.getMsg(), DwzResult.CALLBACK_CLOSECURRENT,
 				"");

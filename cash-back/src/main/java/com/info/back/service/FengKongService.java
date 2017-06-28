@@ -95,6 +95,7 @@ public class FengKongService implements IFengKongService {
 			collectionAdvice.setFengkongIds(params.get("fengkongIds"));
 			collectionAdvice.setFkLabels(params.get("fkLabels"));
 			collectionAdvice.setCreateDate(new Date());
+			collectionAdvice.setCollectionRecordId(params.get("collectionRecordId"));
 			collectionAdvice.setStatus(params.get("status"));
 			if(fengKongDao.insertCollectionAdvice(collectionAdvice)>0){
 				result.setCode("0");
