@@ -345,28 +345,6 @@ public class MyCollectionOrderController extends BaseController {
 		return null;
 	}
 
-	private ITongBuService tongBuService;
-
-	/**
-	 * 同步测试
-	 * 
-	 * @param request
-	 * @param response
-	 * @param orderId
-	 * @param model
-	 * @return
-	 */
-	@RequestMapping("tongbu")
-	public String tongbu(HttpServletRequest request,
-			HttpServletResponse response, String orderId, Model model) {
-		tongBuService.tongbu("12462", "12121");
-		try {
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return "";
-	}
-
 	/**
 	 * 催收流转日志
 	 * 
