@@ -68,7 +68,12 @@ public class TaskJobMiddleService {
 		if (null!=overdueList && overdueList.size()>0) {
 			for (MmanUserLoan mmanUserLoanOri : overdueList) {
 				MmanLoanCollectionOrder order = manLoanCollectionOrderService.getOrderByLoanId(mmanUserLoanOri.getId());
-				dispatchforLoanId(mmanUserLoanOri.getId(),order.getIdNumber());
+				if(order != null){
+					dispatchforLoanId(mmanUserLoanOri.getId(),order.getIdNumber());
+				}else {
+					logger.error("处理逾期数据失败，原因：借款订单对象为空，借款id" + mmanUserLoanOri.getId());
+				}
+
 			}
 		}
 		
