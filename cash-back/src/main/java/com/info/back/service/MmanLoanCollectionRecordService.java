@@ -41,9 +41,9 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
 	@Autowired
 	private IAlertMsgService sysAlertMsgService;
 
+
 	@Autowired
 	private ICreditLoanPayService creditLoanPayService;
-
 
 	@Autowired
 	private IMmanLoanCollectionOrderService mmanLoanCollectionOrderService;
