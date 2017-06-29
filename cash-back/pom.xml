@@ -313,7 +313,7 @@
     </dependencies>
 
     <build>
-        <finalName>cash-back</finalName>
+        <finalName>cuishou</finalName>
         <resources>
             <resource>
                 <directory>src/main/java</directory>

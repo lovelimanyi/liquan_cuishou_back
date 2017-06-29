@@ -315,6 +315,8 @@ public class MyCollectionOrderController extends BaseController {
 		BackUser backUser = this.loginAdminUser(request);
 		MmanLoanCollectionOrder mmanLoanCollectionOrderOri = mmanLoanCollectionOrderService
 				.getOrderById(params.get("id").toString());
+		String recordId = IdGen.uuid();
+		params.put("recordId",recordId);
 //		System.out.println("订单状态=【===========================】"+mmanLoanCollectionOrderOri.getStatus());
 //		if(!"4".equals(mmanLoanCollectionOrderOri.getStatus())){
 			try {
@@ -329,7 +331,7 @@ public class MyCollectionOrderController extends BaseController {
 				}
 				params.put("backUserId", backUser.getId().toString());
 				params.put("userName",backUser.getUserName());
-
+				params.put("collectionRecordId",recordId);
 				result=fengKongService.saveCollectionAdvice(params);
 			} catch (Exception e) {
 				logger.error(" error", e);

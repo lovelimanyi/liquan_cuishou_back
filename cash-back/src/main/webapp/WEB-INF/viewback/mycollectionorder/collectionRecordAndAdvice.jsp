@@ -248,9 +248,9 @@
                     labels = labels.substring(0,labels.length-1);
                     $("#fengkongIds").val(ids);
                     $("#fkLabels").val(labels);
-                    if(confirm("您确认要保存吗?") == true){
+                    alertMsg.confirm("您确认要保存吗?",{okCall:function () {
                         $("#frm").submit();
-                    }
+                    }})
                 });
             });
 
