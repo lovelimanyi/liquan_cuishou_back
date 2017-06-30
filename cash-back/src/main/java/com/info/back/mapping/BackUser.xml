@@ -310,11 +310,11 @@
 	</select>
 	<!-- 查询出每个公司添加时间最早的催收员uuid(启用中的) -->
 	<select id="getEarliestCollection" resultMap="BaseResultMap" parameterType="HashMap">
-		SELECT uuid,company_id FROM back_user WHERE create_date = (SELECT MIN(create_date) FROM back_user WHERE company_id = #{companyId} AND group_level &gt;= #{groupLevel}) AND company_id = #{companyId} AND `status` = #{status}
+		SELECT uuid,company_id FROM back_user WHERE create_date = (SELECT MIN(create_date) FROM back_user WHERE company_id = #{companyId} AND group_level = #{groupLevel}) AND company_id = #{companyId} AND `status` = #{status}
 	</select>
 	<!-- 查询该公司对应的其他启用中的催收员(需要被禁用的)UUID -->
 	<select id="getOtherCollections" resultMap="BaseResultMap" parameterType="HashMap">
-		SELECT uuid,company_id FROM back_user WHERE uuid != #{userId} AND company_id = #{companyId} AND group_level &gt;= #{groupLevel} AND `status` = #{status}
+		SELECT uuid,company_id FROM back_user WHERE uuid != #{userId} AND company_id = #{companyId} AND group_level = #{groupLevel} AND `status` = #{status}
 	</select>
 	<select id="getUsersByStatusAndCompanyId" resultMap="BaseResultMap" parameterType="HashMap">
 		SELECT uuid,company_id FROM back_user WHERE company_id IN 

@@ -41,6 +41,7 @@
 							<option value="5" <c:if test="${'5' eq params.overdueLevel}">selected = "selected"</c:if>>M1-M2</option>
 							<option value="6" <c:if test="${'6' eq params.overdueLevel}">selected = "selected"</c:if>>M2-M3</option>
 							<option value="7" <c:if test="${'7' eq params.overdueLevel}">selected = "selected"</c:if>>M3+</option>
+							<option value="8" <c:if test="${'8' eq params.overdueLevel}">selected = "selected"</c:if>>M6+</option>
 						</select>
 					</td>
 					<td>
