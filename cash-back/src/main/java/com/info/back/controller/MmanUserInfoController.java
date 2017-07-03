@@ -49,33 +49,36 @@ public class MmanUserInfoController extends BaseController{
 			HashMap<String, Object> params = getParametersO(request);
 			if(StringUtils.isNotBlank(params.get("id")+"")){
 				MmanLoanCollectionOrder mmanLoanCollectionOrderOri = mmanLoanCollectionOrderService.getOrderById(params.get("id").toString());
-				int overdueDay = mmanLoanCollectionOrderOri.getOverdueDays();
-				BackUser backUser=this.loginAdminUser(request);
-				
-				if((BackConstant.COLLECTION_ROLE_ID.toString().equals(backUser.getRoleId()) && "2".equals(mmanLoanCollectionOrderOri.getJxlStatus()))|| !BackConstant.COLLECTION_ROLE_ID.toString().equals(backUser.getRoleId())){
-				   String returnString = handleJxl(model, params, mmanLoanCollectionOrderOri);
-                   if(StringUtils.isNotBlank(returnString)){
-                       if ("exception".equals(returnString)){
-                           erroMsg="聚信立报告请求超时";
-                       }else {
-                           model.addAttribute("rong360Url", url);
-                       }
-                       url = "mycollectionorder/rong360Report";
-                   }else {
-                       url="mycollectionorder/jxlReport";
-                   }
+				if(mmanLoanCollectionOrderOri != null){
+                    int overdueDay = mmanLoanCollectionOrderOri.getOverdueDays();
+                    BackUser backUser=this.loginAdminUser(request);
+                    if((BackConstant.COLLECTION_ROLE_ID.toString().equals(backUser.getRoleId()) && "2".equals(mmanLoanCollectionOrderOri.getJxlStatus()))|| !BackConstant.COLLECTION_ROLE_ID.toString().equals(backUser.getRoleId())){
+                        String returnString = handleJxl(model, params, mmanLoanCollectionOrderOri);
+                        if(StringUtils.isNotBlank(returnString)){
+                            if ("exception".equals(returnString)){
+                                erroMsg="聚信立报告请求超时";
+                            }else {
+                                model.addAttribute("rong360Url", url);
+                            }
+                            url = "mycollectionorder/rong360Report";
+                        }else {
+                            url="mycollectionorder/jxlReport";
+                        }
 
-				}else {
-					if (overdueDay < 25){
-						erroMsg = "逾期25天以上订单才能查看聚信里报告！";
-						url="mycollectionorder/jxlReport";
-					}else if (overdueDay>30){
-						handleJxl(model, params, mmanLoanCollectionOrderOri);
-						url="mycollectionorder/jxlReport";
-					}else {
-						url="mycollectionorder/tapplyJxlRepor";
-					}
-				}
+                    }else {
+                        if (overdueDay < 25){
+                            erroMsg = "逾期25天以上订单才能查看聚信里报告！";
+                            url="mycollectionorder/jxlReport";
+                        }else if (overdueDay>30){
+                            handleJxl(model, params, mmanLoanCollectionOrderOri);
+                            url="mycollectionorder/jxlReport";
+                        }else {
+                            url="mycollectionorder/tapplyJxlRepor";
+                        }
+                    }
+                }else{
+				    logger.error("该订单异常，请核实，订单号：" + params.get("id"));
+                }
 			}
 			model.addAttribute("params", params);
 		} catch (Exception e) {

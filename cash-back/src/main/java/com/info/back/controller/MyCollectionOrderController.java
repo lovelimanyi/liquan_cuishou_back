@@ -223,8 +223,8 @@ public class MyCollectionOrderController extends BaseController {
                     conList[5] = r.getLoanMoney() == null ? "0" : r.getLoanMoney() + "";
                     conList[6] = r.getLoanPenlty() + "";
                     conList[7] = r.getReductionMoney() + "";
-                    conList[8] = r.getReturnMoney() == null ? "0" : r.getReturnMoney() + ""; //StatuMap.get(r.getCollectionStatus());
-                    conList[9] = r.getOverdueDays() + "";//r.getLoanEndTime()==null?"":DateUtil.getDateFormat(r.getLoanEndTime(), "yyyy-MM-dd HH:mm:ss");
+                    conList[8] = r.getReturnMoney() == null ? "0" : r.getReturnMoney() + "";  //StatuMap.get(r.getCollectionStatus());
+                    conList[9] = r.getOverdueDays() + ""; //r.getLoanEndTime()==null?"":DateUtil.getDateFormat(r.getLoanEndTime(), "yyyy-MM-dd HH:mm:ss");
                     conList[10] = dictMap.get(r.getCollectionGroup() + "");
                     conList[11] = r.getLoanEndTime() == null ? "" : DateUtil.getDateFormat(r.getLoanEndTime(), "yyyy-MM-dd HH:mm:ss");
                     conList[12] = r.getDispatchTime() == null ? "" : DateUtil.getDateFormat(r.getDispatchTime(), "yyyy-MM-dd HH:mm:ss");
@@ -273,8 +273,12 @@ public class MyCollectionOrderController extends BaseController {
                 //根据orderId查询订单
 				orderId = params.get("id").toString();
 				MmanLoanCollectionOrder	order = mmanLoanCollectionOrderService.getOrderById(orderId);
-				params.put("infoName",order.getLoanUserName());
-				params.put("infoVlue",order.getLoanUserPhone());
+				if(order != null){
+					params.put("infoName",order.getLoanUserName());
+					params.put("infoVlue",order.getLoanUserPhone());
+				}else {
+					logger.error("添加催收记录和催收建议，该订单未null ,借款id: " + orderId + " 请核实!");
+				}
             }
 			OrderBaseResult	baseOrder = mmanLoanCollectionOrderService.getBaseOrderById(orderId);
 			params.put("loanId",baseOrder.getLoanId());
@@ -364,8 +368,12 @@ public class MyCollectionOrderController extends BaseController {
 			if (StringUtils.isNotBlank(params.get("id") + "")) {
 				MmanLoanCollectionOrder mmanLoanCollectionOrderOri = mmanLoanCollectionOrderService
 						.getOrderById(params.get("id").toString());
-				list = mmanLoanCollectionStatusChangeLogService
-						.findListLog(mmanLoanCollectionOrderOri.getOrderId());
+				if(mmanLoanCollectionOrderOri != null){
+					list = mmanLoanCollectionStatusChangeLogService
+							.findListLog(mmanLoanCollectionOrderOri.getOrderId());
+				}else{
+					logger.error("催收流转日志，该订单异常，请核实：" + params.get("id"));
+				}
 				List<SysDict> statulist = sysDictService
 						.getStatus("xjx_collection_order_state");
 				// 查询所有的催收状态
@@ -401,8 +409,12 @@ public class MyCollectionOrderController extends BaseController {
 			//该条订单是否已审//			int count = auditCenterService.findAuditStatus(params);
 //			if(count != 0 || !BackConstant.COLLECTION_ROLE_ID.toString().equals(backUser.getRoleId())){
 				MmanLoanCollectionOrder mmanLoanCollectionOrderOri = mmanLoanCollectionOrderService.getOrderById(params.get("id").toString());
-				MmanUserLoan userLoan = mmanUserLoanService.get(mmanLoanCollectionOrderOri.getLoanId());
-				model.addAttribute("userLoan", userLoan);
+				if(mmanLoanCollectionOrderOri != null){
+					MmanUserLoan userLoan = mmanUserLoanService.get(mmanLoanCollectionOrderOri.getLoanId());
+					model.addAttribute("userLoan", userLoan);
+				}else{
+					logger.error("mmanLoanCollectionOrderOri 为null 借款id:" + params.get("id").toString());
+				}
 				model.addAttribute("collectionOrder", mmanLoanCollectionOrderOri);
 				MmanUserInfo userInfo = mmanUserInfoService.getUserInfoById(mmanLoanCollectionOrderOri.getUserId());
 				model.addAttribute("userInfo", userInfo);

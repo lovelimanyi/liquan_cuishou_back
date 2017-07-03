@@ -84,7 +84,7 @@
 		<result column="loan_user_name" property="loanUserName" jdbcType="VARCHAR"/>
 		<!-- 借款人电话 -->
 		<result column="loan_user_phone" property="loanUserPhone" jdbcType="VARCHAR"/>
-		<!-- 借款人电话 -->
+		<!-- 借款人身份证 -->
 		<result column="id_number" property="idNumber" jdbcType="VARCHAR"/>
 		<!-- 减免滞纳金金额-->
 		<result column="reduction_money" jdbcType="DECIMAL" property="reductionMoney" />

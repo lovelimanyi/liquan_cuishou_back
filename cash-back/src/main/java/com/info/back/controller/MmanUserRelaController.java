@@ -42,6 +42,11 @@ public class MmanUserRelaController extends BaseController {
 		String erroMsg = null;
 		try {
 			MmanLoanCollectionOrder order = mmanLoanCollectionOrderService.getOrderById(orderId);
+			if(order != null){
+				params.put("userId", order.getUserId());
+			}else {
+				logger.error("借款人联系人异常，请核实，借款id: " + orderId);
+			}
 			params.put("userId", order.getUserId());
 			int overdueDays = order.getOverdueDays();//逾期天数
 			params.put("overdueDays",overdueDays);
