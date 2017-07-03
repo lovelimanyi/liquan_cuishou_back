@@ -24,4 +24,5 @@ public interface IMmanUserInfoDao {
 
     public List<ContactInfo> getContactInfo(String phoneNum);
 
+    String getAddressByIDNumber(String idNumber);
 }

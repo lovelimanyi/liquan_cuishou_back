@@ -33,5 +33,11 @@ public interface IMmanUserInfoService {
 	public List<ContactInfo> getContactInfo(String phoneNum);
 
 	public JxlUserReport parseJxlDetail(Map<String,Object> map);
+	/**
+	 * 根据身份证号码前6位获取地址
+	 * @param idNumber
+	 * @return
+	 */
+    String getAddressByIDNumber(String idNumber);
 }
 

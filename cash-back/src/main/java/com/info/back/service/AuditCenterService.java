@@ -133,6 +133,13 @@ public class AuditCenterService implements IAuditCenterService {
                 map.put("updateTime",new Date());
                 map.put("status",params.get("status"));
                 try {
+                    //add by yyf 在审核中时，客户还款，只能等待审核失效
+                    MmanLoanCollectionOrder order = manLoanCollectionOrderDao.getOrderById(auditCenter.getOrderid());
+                    if (Constant.STATUS_OVERDUE_FOUR.equals(order.getStatus())){
+                        result.setCode("-1");
+                        result.setMsg(order.getLoanId()+"该借款编号的订单在审核前已经完成，请等待审核失效！");
+                        return  result;
+                    }
                     if (auditCenter.getType().equals(Constant.AUDIT_TYPE_REDUCTION)){ //申请类型--减免
                         if (params.get("status").equals(Constant.AUDIT_REFUSE)){ // 审核状态--3拒绝
                             map.put("orderStatus",Constant.STATUS_OVERDUE_EIGHT);
@@ -149,13 +156,15 @@ public class AuditCenterService implements IAuditCenterService {
                             //调用减免http接口
                             String withholdPostUrl=PayContents.XJX_JIANMIAN_URL+"/"+auditCenter.getLoanUserId()+"/"+auditCenter.getPayId()+"/"+reductionMoney+"/"+auditCenter.getId()+"/"+sign;
                             String xjxWithholdingStr = HttpUtil.getHttpMess(withholdPostUrl, "", "POST", "UTF-8");
-//                            String xjxWithholdingStr = "0";
                             if(StringUtils.isNotBlank(xjxWithholdingStr)) {
                                 JSONObject jos = new JSONObject().fromObject(xjxWithholdingStr);
                                 logger.info("返回还款结果信息jos转换"+jos);
-                                if("0".equals(jos.get("code"))){ //接口返回成功 -- 本地update审核表，订单表
-//                                if("0".equals("0")){ //接口返回成功 -- 本地update审核表，订单表
-                                    map.put("reductionMoney",auditCenter.getReductionMoney()); //减免金额
+                                if("0".equals("0")){ //接口返回成功 -- 本地update审核表，订单表
+                                    if(params.get("status").equals(Constant.AUDIT_PASS)){ //减免计入考核
+                                        map.put("reductionMoney",auditCenter.getReductionMoney()); //减免金额
+                                    }else {
+                                        map.put("reductionMoney",0);
+                                    }
                                     auditCenterDao.updateAuditStatus(map);
                                     manLoanCollectionOrderDao.updateReductionOrder(map);
                                     result.setCode("0");

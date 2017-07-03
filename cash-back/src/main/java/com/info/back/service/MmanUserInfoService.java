@@ -103,6 +103,11 @@ public class MmanUserInfoService implements IMmanUserInfoService {
     }
 
     @Override
+    public String getAddressByIDNumber(String idNumber) {
+        return mmanUserInfoDao.getAddressByIDNumber(idNumber);
+    }
+
+    @Override
     public List<ContactInfo> getContactInfo(String phoneNum) {
         return mmanUserInfoDao.getContactInfo(phoneNum);
     }
