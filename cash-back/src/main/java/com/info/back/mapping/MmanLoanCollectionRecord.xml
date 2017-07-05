@@ -128,6 +128,9 @@
 			<!--<if test="fengKongLabel == 0">-->
 			<!--AND a.fengkong_ids is null-->
 			<!--</if>-->
+			<if test="collectionAdvice != null and fengKongLabel!= ''">
+				AND a.`status` = #{collectionAdvice}
+			</if>
 			<if test="fengKongLabel != null and fengKongLabel != ''">
 				AND a.fk_labels LIKE CONCAT("%",#{fengKongLabel},"%")
 			</if>

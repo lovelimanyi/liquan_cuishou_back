@@ -108,6 +108,15 @@
 							value="${params.collectionDateEnd }" />
 					</td>
 					<td>
+						催收建议:
+						<select name="collectionAdvice" >
+						<option value="" <c:if test="${'' eq params.collectionAdvice}">selected = "selected"</c:if>>全部</option>
+						<option value="1" <c:if test="${'1' eq params.collectionAdvice}">selected = "selected"</c:if>>审核通过</option>
+						<option value="2" <c:if test="${'2' eq params.collectionAdvice}">selected = "selected"</c:if>>审核拒绝</option>
+						<option value="3" <c:if test="${'3' eq params.collectionAdvice}">selected = "selected"</c:if>>无建议</option>
+						</select>
+					</td>
+					<td>
 						风控标签:
 						<select name="fengKongLabel" >
 							<option value="">全部</option>
