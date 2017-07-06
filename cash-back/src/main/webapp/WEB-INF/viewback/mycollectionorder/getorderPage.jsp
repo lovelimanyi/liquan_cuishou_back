@@ -23,7 +23,7 @@
 							审核 状 态:
 							<select id="status" name="status">
 							    <option value="">全部</option>
-								<option value="0" <c:if test="${params.status eq '0'}">selected = "selected"</c:if>>申请中</option>
+								<option value="1" <c:if test="${params.status eq '1'}">selected = "selected"</c:if>>申请中</option>
 								<option value="2" <c:if test="${params.status eq '2'}">selected = "selected"</c:if>> 审核通过 </option>
 								<option value="3" <c:if test="${params.status eq '3'}">selected = "selected"</c:if>> 拒绝</option>
 								<option value="5" <c:if test="${params.status eq '5'}">selected = "selected"</c:if>> 通过不计入</option>
@@ -89,11 +89,11 @@
 						</td>
 						<td>
 								<c:choose>
+									<c:when test="${order.status eq '1'}">申请中</c:when>
 									<c:when test="${order.status eq '2'}">通过</c:when>
 									<c:when test="${order.status eq '3'}">拒绝</c:when>
 									<c:when test="${order.status eq '5'}" >通过不计入</c:when>
 									<c:when test="${order.status eq '4'}" >失效</c:when>
-									<c:otherwise>申请 中</c:otherwise>
 								</c:choose>
 							</td>
 						<td align="center" width="50">

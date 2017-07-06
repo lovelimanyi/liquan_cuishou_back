@@ -418,10 +418,12 @@ public class MyCollectionOrderController extends BaseController {
 				model.addAttribute("collectionOrder", mmanLoanCollectionOrderOri);
 				MmanUserInfo userInfo = mmanUserInfoService.getUserInfoById(mmanLoanCollectionOrderOri.getUserId());
 				// add by yyf 根据身份证前6位 映射用户地址
-				if(StringUtils.isBlank(userInfo.getIdcardImgZ()) || StringUtils.isBlank(userInfo.getIdcardImgF())){
-					String idNumber = userInfo.getIdNumber().substring(0,6);
-					String presentAddress = mmanUserInfoService.getAddressByIDNumber(idNumber);
-					userInfo.setPresentAddress(presentAddress);
+				if(userInfo != null){
+					if(StringUtils.isBlank(userInfo.getIdcardImgZ()) || StringUtils.isBlank(userInfo.getIdcardImgF())){
+						String idNumber = userInfo.getIdNumber().substring(0,6);
+						String presentAddress = mmanUserInfoService.getAddressByIDNumber(idNumber);
+						userInfo.setPresentAddress(presentAddress);
+					}
 				}
 				//
 				model.addAttribute("userInfo", userInfo);

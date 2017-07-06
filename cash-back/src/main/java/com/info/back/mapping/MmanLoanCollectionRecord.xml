@@ -78,10 +78,10 @@
 			</if>
 			<!-- 催收时间 -->
 			<if test="collectionDateBegin != null and collectionDateBegin != ''">
-				AND DATE_FORMAT(re.collection_date,'%Y-%m-%d') &gt;= #{collectionDateBegin}
+				AND re.collection_date &gt;= #{collectionDateBegin}
 			</if>
 			<if test="collectionDateEnd != null and collectionDateEnd != ''">
-				AND DATE_FORMAT(re.collection_date,'%Y-%m-%d') &lt;= #{collectionDateEnd}
+				AND re.collection_date &lt;= #{collectionDateEnd}
 			</if>
 			<!--<if test="collectionDateBegin != null and collectionDateBegin != '' and collectionDateEnd != null and collectionDateEnd != ''">
 				AND DATE_FORMAT(re.collection_date,'%Y-%m-%d') &gt;= #{collectionDateBegin} AND DATE_FORMAT(re.collection_date,'%Y-%m-%d') &lt;= #{collectionDateEnd}
