@@ -48,16 +48,59 @@
 	<!-- 保存,保存不为NULL的字段 -->
 
 	<select id="findAll" resultMap="queryResultMap" parameterType="HashMap">
-		select
-		re.id,mo.loan_id as orderId,lo.realname as user_id,bu.group_level as collectionGroup,re.contact_type,re.contact_name,re.relation,re.contact_phone,
-		/*re.stress_level,*/re.order_state,re.collection_type,re.collection_date,/*re.collectionAmount,*/re.content,
-		re.create_date,/*re.update_date,*/re.remark,mo.current_overdue_level,bu.user_name as collectionPerson,ifnull(a.fengkong_ids,0) as fengKongLabel,
-		a.`status` as collectionAdvice,p.title as companyTitle
-		from
+		SELECT
+		re.id,
+		mo.loan_id AS orderId,
+		lo.realname AS user_id,
+		bu.group_level AS collectionGroup,
+		re.contact_type,
+		re.contact_name,
+		re.relation,
+		re.contact_phone,
+		re.order_state,
+		re.collection_type,
+		re.collection_date,
+		re.content,
+		re.create_date,
+		re.remark,
+		mo.current_overdue_level,
+		bu.user_name AS collectionPerson,
+		ifnull(a.fengkong_ids, 0) AS fengKongLabel,
+		a.`status` AS collectionAdvice,
+		p.title AS companyTitle
+		FROM
+		(
+		SELECT
+		id,
+		contact_type,
+		contact_name,
+		collection_id,
+		update_date,
+		order_id,
+		user_id,
+		relation,
+		contact_phone,
+		order_state,
+		collection_type,
+		collection_date,
+		content,
+		create_date,
+		remark
+		FROM
+		mman_loan_collection_record
+		<where>
+			<if test="collectionDateBegin != null and collectionDateBegin != ''">
+				AND collection_date &gt;= #{collectionDateBegin}
+			</if>
+			<if test="collectionDateEnd != null and collectionDateEnd != ''">
+				AND collection_date &lt;= #{collectionDateEnd}
+			</if>
+		</where>
+		ORDER BY
+		update_date DESC /*a.fk_labels as fengKongLabel*/
+		) AS re
 		<include refid="base_table"></include>
-		<include refid="base_where"></include>
-		order by re.update_date DESC
-		/*a.fk_labels as fengKongLabel*/
+
 	</select>
 
 	<select id="findAllCount" parameterType="HashMap" resultType="Integer">
@@ -77,18 +120,13 @@
 				AND bu.user_name = #{collectionName}
 			</if>
 			<!-- 催收时间 -->
-			<if test="collectionDateBegin != null and collectionDateBegin != ''">
-				AND re.collection_date &gt;= #{collectionDateBegin}
-			</if>
-			<if test="collectionDateEnd != null and collectionDateEnd != ''">
-				AND re.collection_date &lt;= #{collectionDateEnd}
-			</if>
+
 			<!--<if test="collectionDateBegin != null and collectionDateBegin != '' and collectionDateEnd != null and collectionDateEnd != ''">
 				AND DATE_FORMAT(re.collection_date,'%Y-%m-%d') &gt;= #{collectionDateBegin} AND DATE_FORMAT(re.collection_date,'%Y-%m-%d') &lt;= #{collectionDateEnd}
 			</if>-->
 			<!-- 催收类型 -->
 			<if test="collectionType != null and collectionType != ''">
-				AND re.collection_type = #{collectionType}
+				AND collection_type = #{collectionType}
 			</if>
 			<!-- 施压等级 -->
 			<!-- <if test="stressLevel != null and stressLevel != ''">
@@ -96,7 +134,7 @@
  			</if> -->
 			<!-- 催收状态 -->
 			<if test="collectionStatus != null and collectionStatus != ''">
-				AND re.order_state = #{collectionStatus}
+				AND order_state = #{collectionStatus}
 			</if>
 			<!-- 催收组(逾期等级) -->
 			<if test="overdueLevel != null and overdueLevel != ''">
@@ -104,7 +142,7 @@
 			</if>
 			<!-- 催收员只能查看自己的记录 -->
 			<if test="userRoleId != null and userRoleId != ''">
-				AND re.collection_id = #{userRoleId}
+				AND collection_id = #{userRoleId}
 			</if>
 			<!-- 委外经理能查看自己公司的记录 -->
 			<!-- <if test="outSourceCompanyId != null and outSourceCompanyId != ''">
@@ -137,7 +175,6 @@
 		</where>
 	</sql>
 	<sql id="base_table">
-		mman_loan_collection_record re
 		LEFT JOIN collection_advice a on a.collection_record_id = re.id
 		left join back_user bu on re.collection_id = bu.uuid
 		LEFT JOIN mman_loan_collection_company p on p.id = bu.company_id
