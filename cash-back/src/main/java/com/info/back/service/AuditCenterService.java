@@ -119,7 +119,7 @@ public class AuditCenterService implements IAuditCenterService {
                 auditCenter = auditCenterDao.findAuditId(auditIds[i]);
                 if(!auditCenter0.getType().equals(auditCenter.getType()) || !auditCenter.getStatus().equals(Constant.AUDIT_CHECKING)){
                     //申请类型不一致或审核状态非审核中-->返回
-                    result.setMsg("请选择申请类型一致且状态为审核中的");
+                    result.setMsg("请选择申请类型一致且状态为审核中的数据");
                     return result;
                 }
             }

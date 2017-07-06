@@ -468,9 +468,13 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
 										} else if (BackConstant.XJX_OVERDUE_LEVEL_M2_M3.equals(currentOverdueLevel)) {
 											mmanLoanCollectionOrderOri.setM4ApproveId(currentCollectionUserId);
 											mmanLoanCollectionOrderOri.setM4OperateStatus(BackConstant.OFF);
-										} else {
+										}else if (BackConstant.XJX_OVERDUE_LEVEL_M3P.equals(currentOverdueLevel)) {
 											mmanLoanCollectionOrderOri.setM5ApproveId(currentCollectionUserId);
 											mmanLoanCollectionOrderOri.setM5OperateStatus(BackConstant.OFF);
+										}
+										else {
+											mmanLoanCollectionOrderOri.setM6ApproveId(currentCollectionUserId);
+											mmanLoanCollectionOrderOri.setM6OperateStatus(BackConstant.OFF);
 										}
 										mmanLoanCollectionOrderOri.setCurrentOverdueLevel(currentOverdueLevel);
 										mmanLoanCollectionOrderOri.setLastCollectionUserId(mmanLoanCollectionOrderOri.getCurrentCollectionUserId());//上一催收员
