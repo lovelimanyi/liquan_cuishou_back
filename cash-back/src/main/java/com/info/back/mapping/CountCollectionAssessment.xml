@@ -442,7 +442,7 @@
 						   INNER JOIN mman_loan_collection_order ord ON log.loan_collection_order_id = ord.order_id
 						   INNER JOIN back_user usr ON log.current_collection_user_id = usr.uuid
 						   INNER JOIN mman_loan_collection_company cmp ON usr.company_id = cmp.id
-						   INNER JOIN sys_dict dct ON usr.group_level = dct.value
+						   INNER JOIN sys_dict dct ON log.current_collection_user_level = dct.value
 													  AND dct.type = 'collection_group'
 						   INNER JOIN sys_dict dct1 ON log.current_collection_order_level  = dct1.value
 													   AND dct1.type = 'xjx_overdue_level'
@@ -592,7 +592,7 @@
 						   INNER JOIN mman_loan_collection_order ord ON log.loan_collection_order_id = ord.order_id
 						   INNER JOIN back_user usr ON log.current_collection_user_id = usr.uuid
 						   INNER JOIN mman_loan_collection_company cmp ON usr.company_id = cmp.id
-						   INNER JOIN sys_dict dct ON usr.group_level = dct.value
+						   INNER JOIN sys_dict dct ON log.current_collection_user_level = dct.value
 													  AND dct.type = 'collection_group'
 						   INNER JOIN sys_dict dct1 ON log.current_collection_order_level  = dct1.value
 													   AND dct1.type = 'xjx_overdue_level'
@@ -664,7 +664,7 @@
 						   INNER JOIN mman_loan_collection_order ord ON log.loan_collection_order_id = ord.order_id
 						   INNER JOIN back_user usr ON log.current_collection_user_id = usr.uuid
 						   INNER JOIN mman_loan_collection_company cmp ON usr.company_id = cmp.id
-						   INNER JOIN sys_dict dct ON usr.group_level = dct.value
+						   INNER JOIN sys_dict dct ON log.current_collection_user_level = dct.value
 													  AND dct.type = 'collection_group'
 						   INNER JOIN sys_dict dct1 ON log.current_collection_order_level = dct1.value
 													   AND dct1.type = 'xjx_overdue_level'
