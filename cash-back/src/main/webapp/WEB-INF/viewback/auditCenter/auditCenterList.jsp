@@ -18,7 +18,7 @@
 						状态:
 						<select name="status" id="status">
 							<option value="">全部</option>
-							<option value='1'  <c:if test="${params.status eq '0'}">selected="selected"</c:if>>审核中</option>
+							<option value='1'  <c:if test="${params.status eq '1'}">selected="selected"</c:if>>审核中</option>
 							<option value='2' <c:if test="${params.status eq '2'}">selected="selected"</c:if>>审核通过</option>
 							<option value='3' <c:if test="${params.status eq '3'}">selected="selected"</c:if>>拒绝</option>
 							<option value='4' <c:if test="${params.status eq '4'}">selected="selected"</c:if>>失效</option>
