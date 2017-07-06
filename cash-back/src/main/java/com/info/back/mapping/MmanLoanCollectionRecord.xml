@@ -100,7 +100,7 @@
 		update_date DESC /*a.fk_labels as fengKongLabel*/
 		) AS re
 		<include refid="base_table"></include>
-
+		<include refid="base_where"></include>
 	</select>
 
 	<select id="findAllCount" parameterType="HashMap" resultType="Integer">

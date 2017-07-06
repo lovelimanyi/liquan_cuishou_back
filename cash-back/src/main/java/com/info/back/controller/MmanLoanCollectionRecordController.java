@@ -77,8 +77,8 @@ public class MmanLoanCollectionRecordController extends BaseController {
 
 			// 默认查看近一周的信息
 			if(params.get("collectionDateBegin") == null && params.get("collectionDateEnd") == null){
-				params.put("collectionDateBegin",DateUtil.getDateFormat(DateUtil.getBeforeOrAfter(new Date(),-15),"yyyy-MM-dd"));
-				params.put("collectionDateEnd", DateUtil.getDateFormat("yyyy-MM-dd"));
+				params.put("collectionDateBegin",DateUtil.getDateFormat(DateUtil.getBeforeOrAfter(new Date(),-7),"yyyy-MM-dd"));
+				params.put("collectionDateEnd", DateUtil.getDateFormat(DateUtil.getBeforeOrAfter(new Date(),1),"yyyy-MM-dd"));
 			}
 //			if(StringUtils.isEmpty(String.valueOf(params.get("overdueLevel"))) || params.get("overdueLevel") == null){
 //				params.put("overdueLevel", "0");
