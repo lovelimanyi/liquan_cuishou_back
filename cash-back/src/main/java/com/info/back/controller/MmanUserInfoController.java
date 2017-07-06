@@ -143,7 +143,7 @@ public class MmanUserInfoController extends BaseController{
                 String returnString = null;
                 try {
                     String result = WebClient.getInstance().postJsonData(PayContents.RONG360_REPORT_URL,  data,null);
-                    logger.info("result:"+result);
+//                    logger.info("result:"+result);
                     json = JSONObject.parseObject(result);
                     String type = json.getString("type");
 
