@@ -85,19 +85,19 @@
 				<if test="serviceCharge != null">
 					<![CDATA[service_charge = #{serviceCharge},]]>
 				</if>
-				<if test="loanStartTime != null and loanStartTime !=''">
+				<if test="loanStartTime != null">
 				  <![CDATA[loan_start_time = #{loanStartTime},]]>
 				</if>
-				<if test="loanEndTime != null and loanEndTime !=''">
+				<if test="loanEndTime != null">
 				  <![CDATA[loan_end_time = #{loanEndTime},]]>
 				</if>
 				<if test="loanStatus != null and loanStatus !=''">
 				  <![CDATA[loan_status = #{loanStatus},]]>
 				</if>
-				<if test="createTime != null and createTime !=''">
+				<if test="createTime != null">
 				  <![CDATA[create_time = #{createTime},]]>
 				</if>
-				<if test="updateTime != null and updateTime !=''">
+				<if test="updateTime != null">
 				  <![CDATA[update_time = #{updateTime},]]>
 				</if>
 				<if test="updateTime == null">
@@ -106,7 +106,7 @@
 				<if test="delFlag != null and delFlag !=''">
 				  <![CDATA[del_flag = #{delFlag},]]>
 				</if>
-				<if test="loanPenaltyTime != null and loanPenaltyTime !=''">
+				<if test="loanPenaltyTime != null">
 				  <![CDATA[loan_penalty_time = #{loanPenaltyTime},]]>
 				</if>
 				<if test="loanSysStatus != null and loanSysStatus !=''">
@@ -151,7 +151,7 @@
 				#{realgetInterest},
 				#{status},
 				#{createDate},
-		<if test="updateDate != null and updateDate !=''">
+		<if test="updateDate != null">
 			#{updateDate},
 		</if>
 		<if test="updateDate == null">
@@ -171,10 +171,10 @@
 			<if test="loanId != null and loanId !=''">
 			  <![CDATA[loan_id = #{loanId},]]>
 			</if>
-			<if test="receivableStartdate != null and receivableStartdate !=''">
+			<if test="receivableStartdate != null">
 			  <![CDATA[receivable_startdate = #{receivableStartdate},]]>
 			</if>
-			<if test="receivableDate != null and receivableDate !=''">
+			<if test="receivableDate != null">
 			  <![CDATA[receivable_date = #{receivableDate},]]>
 			</if>
 			<if test="receivableMoney != null">
@@ -201,10 +201,10 @@
 			<if test="status != null and status !=''">
 			  <![CDATA[status = #{status},]]>
 			</if>
-			<if test="createDate != null and createDate !=''">
+			<if test="createDate != null">
 			  <![CDATA[create_date = #{createDate},]]>
 			</if>
-			<if test="updateDate != null and updateDate !=''">
+			<if test="updateDate != null">
 			  <![CDATA[update_date = #{updateDate},]]>
 			</if>
 			<if test="updateDate == null">
@@ -273,7 +273,7 @@
 				#{realInterest},
 				#{returnType},
 				#{remark},
-		<if test="updateDate != null and updateDate !=''">
+		<if test="updateDate != null">
 			#{updateDate},
 		</if>
 		<if test="updateDate == null">
@@ -585,7 +585,7 @@
 			<if test="STATUS != null and STATUS !=''">
 			  status=#{STATUS},
 			</if>
-			<if test="updateDate != null and updateDate !=''">
+			<if test="updateDate != null">
 				<![CDATA[update_date = #{updateDate},]]>
 			</if>
 			real_money=#{REAL_MONEY} where 

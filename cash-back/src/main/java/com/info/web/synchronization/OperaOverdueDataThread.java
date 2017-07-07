@@ -9,7 +9,8 @@ import com.info.web.pojo.*;
 import com.info.web.synchronization.dao.IDataDao;
 import com.info.web.util.DateUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -22,7 +23,7 @@ import java.util.List;
  */
 public class OperaOverdueDataThread implements Runnable {
 
-	private static Logger loger = Logger.getLogger(OperaOverdueDataThread.class);
+	private static Logger loger = LoggerFactory.getLogger(OperaOverdueDataThread.class);
 	private String payId;
 	private IDataDao dataDao;
 	private ILocalDataDao localDataDao;
@@ -63,31 +64,41 @@ public class OperaOverdueDataThread implements Runnable {
 					loger.info("sync-borrowOrder:"+borrowOrder);
 					repaymentDetailList = this.dataDao.getAssetRepaymentDetail(map);
 					loger.info("sync-repaymentDetailList:"+repaymentDetailList);
+					loger.info("开始:"+borrowOrder);
 					if (checkLoan(loanId)) {
 						userInfo = this.dataDao.getUserInfo(map);
 						cardInfo = this.dataDao.getUserCardInfo(map);
 						userContactsList = this.dataDao.getUserContacts(map);
-
+						loger.info("loanId true:"+loanId);
 						if (null != userInfo && null != borrowOrder&& null != cardInfo&& null != repaymentDetailList) {
 							//保存用户借款表
+							loger.info("保存用户借款表 start:");
 							saveMmanUserLoan(borrowOrder,repayment);
+							loger.info("saveMmanUserLoan end:");
 							//保存还款表
 							saveCreditLoanPay(repayment);
+							loger.info("保存还款表");
 							//保存还款详情表
 							syncUtils.saveCreditLoanPayDetail(localDataDao,repayment,payId, repaymentDetailList);
+							loger.info("保存还款详情表");
 							//保存用户信息表--联系人表--银行卡
 							saveUserInfo(userId,userInfo,userContactsList,cardInfo);
 						}
 						this.taskJobMiddleService.dispatchforLoanId(loanId,userInfo.get("id_number").toString());
 						RedisUtil.delRedisKey(Constant.TYPE_OVERDUE_ + payId);
 					} else {
+						loger.info("loanId:"+loanId);
 						if (null != borrowOrder && null != repaymentDetailList) {
 							//更新用户借款表
+							loger.info("更新用户借款表");
 							syncUtils.updateMmanUserLoan(localDataDao,loanId, repayment,Constant.STATUS_OVERDUE_FOUR);
 							//更新还款表
+							loger.info("更新还款表");
 							syncUtils.updateCreditLoanPay(localDataDao,payId,repayment);
 							//保存还款详情表
+							loger.info("保存还款详情表");
 							syncUtils.saveCreditLoanPayDetail(localDataDao,repayment,payId, repaymentDetailList);
+							loger.info("更新订单表");
 							//更新订单表
 							syncUtils.updateMmanLoanCollectionOrder(localDataDao,loanId,repayment,Constant.STATUS_OVERDUE_ONE);
 						}
@@ -137,19 +148,29 @@ public class OperaOverdueDataThread implements Runnable {
 	 * */
 	private void saveCreditLoanPay(HashMap<String,Object> repaymentMap){
 		loger.info("start-saveCreditLoanPay:"+String.valueOf(repaymentMap.get("id")));
-		CreditLoanPay creditLoanPay = new CreditLoanPay();
-		creditLoanPay.setId(String.valueOf(repaymentMap.get("id")));
-		creditLoanPay.setLoanId(String.valueOf(repaymentMap.get("asset_order_id")));
-		creditLoanPay.setCreateDate(DateUtil.getDateTimeFormat(String.valueOf(repaymentMap.get("created_at")), "yyyy-MM-dd HH:mm:ss"));
-		creditLoanPay.setReceivableStartdate(DateUtil.getDateTimeFormat(String.valueOf(repaymentMap.get("credit_repayment_time")), "yyyy-MM-dd HH:mm:ss"));
-		creditLoanPay.setReceivableDate(DateUtil.getDateTimeFormat(String.valueOf(repaymentMap.get("repayment_time")), "yyyy-MM-dd HH:mm:ss"));//应还时间
-		creditLoanPay.setReceivableMoney(new BigDecimal(Integer.parseInt(String.valueOf(repaymentMap.get("repayment_amount")))/100.00));//应还金额
-		creditLoanPay.setRealMoney(new BigDecimal(Integer.parseInt(String.valueOf(repaymentMap.get("repaymented_amount")))/100.00));//实收(本金+服务费)
-		creditLoanPay.setStatus(syncUtils.getPayStatus(String.valueOf(repaymentMap.get("status")))); //还款状态
-		creditLoanPay.setUpdateDate(new Date());
-		creditLoanPay = syncUtils.operaRealPenlty(repaymentMap,creditLoanPay);
-		this.localDataDao.saveCreditLoanPay(creditLoanPay);
-		loger.info("end-saveCreditLoanPay:"+String.valueOf(repaymentMap.get("id")));
+		try{
+			CreditLoanPay creditLoanPay = new CreditLoanPay();
+			creditLoanPay.setId(String.valueOf(repaymentMap.get("id")));
+			creditLoanPay.setLoanId(String.valueOf(repaymentMap.get("asset_order_id")));
+			creditLoanPay.setCreateDate(DateUtil.getDateTimeFormat(String.valueOf(repaymentMap.get("created_at")), "yyyy-MM-dd HH:mm:ss"));
+			creditLoanPay.setReceivableStartdate(DateUtil.getDateTimeFormat(String.valueOf(repaymentMap.get("credit_repayment_time")), "yyyy-MM-dd HH:mm:ss"));
+//			System.out.println("=====================================================");
+//			System.out.println(repaymentMap.get("credit_repayment_time"));
+//			System.out.println(DateUtil.getDateTimeFormat(String.valueOf(repaymentMap.get("repayment_time")), "yyyy-MM-dd HH:mm:ss"));
+//			System.out.println("保存还款表 ：" + String.valueOf(repaymentMap.get("credit_repayment_time")));
+//			System.out.println("=====================================================");
+			creditLoanPay.setReceivableDate(DateUtil.getDateTimeFormat(String.valueOf(repaymentMap.get("repayment_time")), "yyyy-MM-dd HH:mm:ss"));//应还时间
+			creditLoanPay.setReceivableMoney(new BigDecimal(Integer.parseInt(String.valueOf(repaymentMap.get("repayment_amount")))/100.00));//应还金额
+			creditLoanPay.setRealMoney(new BigDecimal(Integer.parseInt(String.valueOf(repaymentMap.get("repaymented_amount")))/100.00));//实收(本金+服务费)
+			creditLoanPay.setStatus(syncUtils.getPayStatus(String.valueOf(repaymentMap.get("status")))); //还款状态
+			creditLoanPay.setUpdateDate(new Date());
+			creditLoanPay = syncUtils.operaRealPenlty(repaymentMap,creditLoanPay);
+			this.localDataDao.saveCreditLoanPay(creditLoanPay);
+			loger.info("end-saveCreditLoanPay:"+String.valueOf(repaymentMap.get("id")));
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+
 	}
 	/**
 	 * 保存用户信息

@@ -163,10 +163,10 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
 	public PageConfig<MmanLoanCollectionRecord> findPage(
 			HashMap<String, Object> params) {
 		params.put(Constant.NAME_SPACE, "MmanLoanCollectionRecord");
-		if(params.get("fengKongLabel") != null){
+		if(params.get("fengKongLabel") != null && !"".equals(params.get("fengKongLabel"))){
 			if(StringUtils.isNotBlank(params.get("fengKongLabel").toString()) &&  !"".equals((String)params.get("fengKongLabel"))){
 				FengKong fengKongLabel = fengKongService.getFengKongById(Integer.valueOf((String) params.get("fengKongLabel")));
-				params.put("fengKongLabel",fengKongLabel.getFkLabel());
+				params.put("fengKongLabel","%" + fengKongLabel.getFkLabel() + "%");
 			}
 		}
 		PageConfig<MmanLoanCollectionRecord> pageConfig = new PageConfig<MmanLoanCollectionRecord>();

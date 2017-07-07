@@ -49,58 +49,31 @@
 
 	<select id="findAll" resultMap="queryResultMap" parameterType="HashMap">
 		SELECT
-		re.id,
-		mo.loan_id AS orderId,
-		lo.realname AS user_id,
-		bu.group_level AS collectionGroup,
-		re.contact_type,
-		re.contact_name,
-		re.relation,
-		re.contact_phone,
-		re.order_state,
-		re.collection_type,
-		re.collection_date,
-		re.content,
-		re.create_date,
-		re.remark,
-		mo.current_overdue_level,
-		bu.user_name AS collectionPerson,
-		ifnull(a.fengkong_ids, 0) AS fengKongLabel,
-		a.`status` AS collectionAdvice,
-		p.title AS companyTitle
+			re.id,
+			mo.loan_id AS orderId,
+			lo.realname AS user_id,
+			bu.group_level AS collectionGroup,
+			re.contact_type,
+			re.contact_name,
+			re.relation,
+			re.contact_phone,
+			re.order_state,
+			re.collection_type,
+			re.collection_date,
+			re.content,
+			re.create_date,
+			re.remark,
+			mo.current_overdue_level,
+			bu.user_name AS collectionPerson,
+			p.title AS companyTitle,
+			d.fengKongLabel,
+			d.collectionAdvice,
+			d.collection_record_id
 		FROM
-		(
-		SELECT
-		id,
-		contact_type,
-		contact_name,
-		collection_id,
-		update_date,
-		order_id,
-		user_id,
-		relation,
-		contact_phone,
-		order_state,
-		collection_type,
-		collection_date,
-		content,
-		create_date,
-		remark
-		FROM
-		mman_loan_collection_record
-		<where>
-			<if test="collectionDateBegin != null and collectionDateBegin != ''">
-				AND collection_date &gt;= #{collectionDateBegin}
-			</if>
-			<if test="collectionDateEnd != null and collectionDateEnd != ''">
-				AND collection_date &lt;= #{collectionDateEnd}
-			</if>
-		</where>
-		ORDER BY
-		update_date DESC /*a.fk_labels as fengKongLabel*/
-		) AS re
 		<include refid="base_table"></include>
 		<include refid="base_where"></include>
+		ORDER BY
+			re.update_date DESC
 	</select>
 
 	<select id="findAllCount" parameterType="HashMap" resultType="Integer">
@@ -120,6 +93,12 @@
 				AND bu.user_name = #{collectionName}
 			</if>
 			<!-- 催收时间 -->
+			<if test="collectionDateBegin != null">
+				AND re.collection_date &gt;= #{collectionDateBegin}
+			</if>
+			<if test="collectionDateEnd != null">
+				AND re.collection_date &lt;= #{collectionDateEnd}
+			</if>
 
 			<!--<if test="collectionDateBegin != null and collectionDateBegin != '' and collectionDateEnd != null and collectionDateEnd != ''">
 				AND DATE_FORMAT(re.collection_date,'%Y-%m-%d') &gt;= #{collectionDateBegin} AND DATE_FORMAT(re.collection_date,'%Y-%m-%d') &lt;= #{collectionDateEnd}
@@ -167,20 +146,31 @@
 			<!--AND a.fengkong_ids is null-->
 			<!--</if>-->
 			<if test="collectionAdvice != null and fengKongLabel!= ''">
-				AND a.`status` = #{collectionAdvice}
+				AND d.`collectionAdvice` = #{collectionAdvice}
 			</if>
 			<if test="fengKongLabel != null and fengKongLabel != ''">
-				AND a.fk_labels LIKE CONCAT("%",#{fengKongLabel},"%")
+				AND d.`fengKongName` LIKE #{fengKongLabel}
 			</if>
 		</where>
 	</sql>
 	<sql id="base_table">
-		LEFT JOIN collection_advice a on a.collection_record_id = re.id
-		left join back_user bu on re.collection_id = bu.uuid
-		LEFT JOIN mman_loan_collection_company p on p.id = bu.company_id
-		left join mman_user_info lo on lo.id = re.user_id
-		left join mman_loan_collection_order mo on mo.id = re.order_id
-		left join back_user_company_permissions bp on re.user_id = bp.user_id
+				mman_loan_collection_record AS re
+		LEFT JOIN back_user bu ON re.collection_id = bu.uuid
+		LEFT JOIN mman_loan_collection_company p ON p.id = bu.company_id
+		LEFT JOIN mman_user_info lo ON lo.id = re.user_id
+		LEFT JOIN mman_loan_collection_order mo ON mo.id = re.order_id
+		LEFT JOIN back_user_company_permissions bp ON re.user_id = bp.user_id
+		LEFT JOIN (
+			SELECT
+				IFNULL(a.fengkong_ids, 0) AS fengKongLabel,
+				a.`fk_labels` AS fengKongName,
+				a.`status` AS collectionAdvice,
+				a.collection_record_id
+			FROM
+				collection_advice a
+			WHERE
+				`collection_record_id` IS NOT NULL
+		)   AS d ON re.id = d.collection_record_id
 	</sql>
 	<insert id="insert" parameterType="com.info.web.pojo.MmanLoanCollectionRecord">INSERT INTO mman_loan_collection_record
 		<trim prefix="(" suffix=")" suffixOverrides=",">
