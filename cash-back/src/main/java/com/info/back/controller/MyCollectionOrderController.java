@@ -536,18 +536,22 @@ public class MyCollectionOrderController extends BaseController {
 		JsonResult result = new JsonResult("-1", "代扣失败");
 		Map<String, String> params = this.getParameters(request);
 		BackUser backUser = (BackUser) request.getSession().getAttribute(Constant.BACK_USER);
-		try {
-			params.put("roleId",backUser.getRoleId());
-			params.put("operationUserId", backUser.getId().toString());
-			result = mmanLoanCollectionRecordService.xjxWithholding(params);
-		} catch (Exception e) {
-			logger.error("saveCompany error", e);
+		if(backUser != null){
+			try {
+				params.put("roleId",backUser.getRoleId());
+				params.put("operationUserId", backUser.getId().toString());
+				result = mmanLoanCollectionRecordService.xjxWithholding(params);
+			} catch (Exception e) {
+				logger.error("saveCompany error", e);
+			}
+			SpringUtils.renderDwzResult(response, "0".equals(result.getCode()),
+					result.getMsg(), DwzResult.CALLBACK_CLOSECURRENT,
+					params.get("parentId").toString());
+			model.addAttribute(MESSAGE, erroMsg);
+			model.addAttribute("params", params);
+		}else{
+			result.setMsg("登录已失效，请重新登录！");
 		}
-		SpringUtils.renderDwzResult(response, "0".equals(result.getCode()),
-				result.getMsg(), DwzResult.CALLBACK_CLOSECURRENT,
-				params.get("parentId").toString());
-		model.addAttribute(MESSAGE, erroMsg);
-		model.addAttribute("params", params);
 		return url;
 	}
 
