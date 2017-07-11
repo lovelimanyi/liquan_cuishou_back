@@ -194,9 +194,9 @@
 
 	<select id="getOrderCount" resultType="Integer" parameterType="HashMap" >
 		SELECT
-		count(*)
-		<include refid="base_table"></include>
-		<include refid="base_where_count"></include>
+		count(*) 
+		FROM mman_loan_collection_order a
+		WHERE  a.current_collection_user_id=#{roleUserId}
 	</select>
 	<sql id="base_table">
 		FROM mman_loan_collection_order a
@@ -273,7 +273,7 @@
 		</if>
 	</sql>
 
-	<sql id="base_where_count">
+	<!-- <sql id="base_where_count">
 		<where>
 			 a.current_collection_user_id=#{roleUserId}
 			<if test="CompanyPermissionsList != null and CompanyPermissionsList.size>0 " >
@@ -334,7 +334,7 @@
 		<if test="sortBy =null or sortBy==''">
 			ORDER BY a.top_important DESC, a.dispatch_time DESC, c.update_Date DESC
 		</if>
-	</sql>
+	</sql> -->
 	
 	<sql id="base_select">
 		    a.`id`,
