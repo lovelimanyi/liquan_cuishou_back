@@ -28,6 +28,10 @@ public interface IMmanLoanCollectionOrderService {
 	
 	
 	public PageConfig<OrderBaseResult> getPage(HashMap<String, Object> params);
+
+
+
+	public PageConfig<OrderBaseResult> getCollectionUserPage(HashMap<String, Object> params);
 	/**
 	 * 查询派单信息
 	 * @param queryManLoanCollectionOrder

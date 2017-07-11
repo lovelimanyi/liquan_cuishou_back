@@ -141,7 +141,12 @@ public class MyCollectionOrderController extends BaseController {
 				.getList(mmanLoanCollectionCompany);
 		// 分页的订单信息
 		PageConfig<OrderBaseResult> page = new PageConfig<OrderBaseResult>();
-		page = mmanLoanCollectionOrderService.getPage(params);
+		if(!BackConstant.COLLECTION_ROLE_ID.equals(backUser.getRoleId())){
+			page = mmanLoanCollectionOrderService.getPage(params);
+		}else{
+			params.put("roleUserId",backUser.getUuid());
+			page = mmanLoanCollectionOrderService.getCollectionUserPage(params);
+		}
 		model.addAttribute("ListMmanLoanCollectionCompany",
 				ListMmanLoanCollectionCompany);
 		model.addAttribute("page", page);

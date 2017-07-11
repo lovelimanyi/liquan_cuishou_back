@@ -183,25 +183,29 @@
 	<select id="getCollectionOrderList" resultType="com.info.web.pojo.OrderBaseResult" parameterType="HashMap" >
 		SELECT
             <include refid="base_select"></include>
-            FROM mman_loan_collection_order a
-            LEFT JOIN back_user b ON a.`current_collection_user_id` = b.uuid
-            LEFT JOIN credit_loan_pay c ON a.pay_id = c.id
-            LEFT JOIN mman_user_loan d ON a.loan_id = d.id
-            LEFT JOIN mman_loan_collection_company e ON b.`company_id`= e.id
-            LEFT JOIN back_user bu on bu.uuid = a.last_collection_user_id
+			<include refid="base_table"></include>
 			<include refid="base_where"></include>
 	</select>
 	<select id="getCollectionOrderCount" resultType="Integer" parameterType="HashMap" >
 		SELECT 
 			count(*)
-		FROM mman_loan_collection_order a
-			<!--LEFT JOIN back_user b ON a.`current_collection_user_id` = b.uuid
-			LEFT JOIN credit_loan_pay c ON a.pay_id = c.id
-			LEFT JOIN mman_user_loan d ON a.loan_id = d.id
-			LEFT JOIN mman_loan_collection_company e ON b.`company_id`= e.id
-			<include refid="base_where"></include>-->
+			FROM mman_loan_collection_order a
 	</select>
-	
+
+	<select id="getOrderCount" resultType="Integer" parameterType="HashMap" >
+		SELECT
+		count(*)
+		<include refid="base_table"></include>
+		<include refid="base_where_count"></include>
+	</select>
+	<sql id="base_table">
+		FROM mman_loan_collection_order a
+        LEFT JOIN back_user b ON a.`current_collection_user_id` = b.uuid
+        LEFT JOIN credit_loan_pay c ON a.pay_id = c.id
+        LEFT JOIN mman_user_loan d ON a.loan_id = d.id
+        LEFT JOIN mman_loan_collection_company e ON b.`company_id`= e.id
+        LEFT JOIN back_user bu on bu.uuid = a.last_collection_user_id
+	</sql>
 	<sql id="base_where">
 		<where>
 			1=1
@@ -214,6 +218,69 @@
 					<foreach collection="CompanyPermissionsList" close=")" item="items" open="(" separator=",">
 						#{items.companyId} 
 					</foreach>
+			</if>
+			<if test="collectionBeginTime!=null">
+				<![CDATA[	AND DATE_FORMAT(last_collection_time,'%Y-%m-%d') >=  #{collectionBeginTime}  ]]>
+			</if>
+			<if test="collectionEndTime !=null">
+				<![CDATA[	AND DATE_FORMAT(last_collection_time,'%Y-%m-%d') <=  #{collectionEndTime}  ]]>
+			</if>
+			<if test="dispatchBeginTime !=null">
+				<![CDATA[	AND DATE_FORMAT(dispatch_time,'%Y-%m-%d') >= #{dispatchBeginTime}  ]]>
+			</if>
+			<if test="dispatchEndTime !=null">
+				<![CDATA[	AND DATE_FORMAT(dispatch_time,'%Y-%m-%d')<=#{dispatchEndTime}  ]]>
+			</if>
+			<if test="overDueDaysBegin !=null and overDueDaysBegin!=''">
+				<![CDATA[ AND a.overdueDays>=#{overDueDaysBegin}  ]]>
+			</if>
+			<if test="overDueDaysEnd !=null and overDueDaysEnd !=''">
+				<![CDATA[ AND a.overdueDays<=#{overDueDaysEnd}  ]]>
+			</if>
+			<if test="loanRealName !=null and loanRealName!=''">
+				AND a.loan_user_name=#{loanRealName}
+			</if>
+			<if test="loanUserPhone !=null and loanUserPhone!= ''">
+				AND a.loan_user_phone=#{loanUserPhone}
+			</if>
+			<if test="collectionPhone !=null and collectionPhone!=''">
+				AND b.user_mobile=#{collectionPhone}
+			</if>
+			<if test="collectionRealName !=null and collectionRealName!=''">
+				AND b.user_name=#{collectionRealName}
+			</if>
+			<if test="loanId !=null and loanId!=''">
+				AND a.`loan_id`=#{loanId}
+			</if>
+			<if test="collectionGroup !=null and collectionGroup !=''">
+				AND b.group_level=#{collectionGroup}
+			</if>
+			<if test="companyId !=null and companyId!='' ">
+				AND b.company_id=#{companyId}
+			</if>
+			<if test="status !=null and status!=''">
+				AND a.status=#{status}
+			</if>
+			<if test="topImportant!=null and topImportant!=''">
+				AND a.top_important=#{topImportant}
+			</if>
+		</where>
+		<if test="sortBy !=null and sortBy!=''">
+			ORDER BY a.${sortBy}
+		</if>
+		<if test="sortBy =null or sortBy==''">
+			ORDER BY a.top_important DESC, a.dispatch_time DESC, c.update_Date DESC
+		</if>
+	</sql>
+
+	<sql id="base_where_count">
+		<where>
+			 a.current_collection_user_id=#{roleUserId}
+			<if test="CompanyPermissionsList != null and CompanyPermissionsList.size>0 " >
+				AND b.`company_id` in
+				<foreach collection="CompanyPermissionsList" close=")" item="items" open="(" separator=",">
+					#{items.companyId}
+				</foreach>
 			</if>
 			<if test="collectionBeginTime!=null">
 				<![CDATA[	AND DATE_FORMAT(last_collection_time,'%Y-%m-%d') >=  #{collectionBeginTime}  ]]>

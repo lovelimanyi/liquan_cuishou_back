@@ -9,6 +9,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.dianping.cat.common.EventInfo;
+import com.dianping.cat.utils.CatUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -65,28 +67,40 @@ public class MmanLoanCollectionOrderController extends BaseController{
 	
 	@RequestMapping("/getMmanLoanCollectionOrderPage")
 	public String getPage(HttpServletRequest request,HttpServletResponse response,Model model){
+		EventInfo info1 = new EventInfo();
+		info1.setEventType("Mman");//事物类型,默认normal
+		info1.setMessage("getMmanLoanCollectionOrderPage start");//消息
+		CatUtils.info(info1);
+		CatUtils.info("束带结发大树将军");
+		System.out.println("开始。。。");
 		try {
 			HashMap<String, Object> params = getParametersO(request);
 			BackUser backUser = (BackUser) request.getSession().getAttribute(Constant.BACK_USER);
-			List<BackUserCompanyPermissions> CompanyPermissionsList=backUserService.findCompanyPermissions(backUser.getId());
-			if(CompanyPermissionsList!=null&&CompanyPermissionsList.size()>0){//指定公司的订单
-				params.put("CompanyPermissionsList", CompanyPermissionsList);
-			}
-			//若组没有 ，则默认查询S1 组
+			if(backUser != null){
+				logger.info("backUser is not null");
+				List<BackUserCompanyPermissions> CompanyPermissionsList=backUserService.findCompanyPermissions(backUser.getId());
+				if(CompanyPermissionsList!=null&&CompanyPermissionsList.size() > 0){//指定公司的订单
+					params.put("CompanyPermissionsList", CompanyPermissionsList);
+				}
+				//若组没有 ，则默认查询S1 组
 //			if(null==params.get("collectionGroup") || StringUtils.isBlank(String.valueOf(params.get("collectionGroup")))){
 //				params.put("collectionGroup", "3");
 //			}
-			//查询公司列表
-			MmanLoanCollectionCompany mmanLoanCollectionCompany = new MmanLoanCollectionCompany();
-			PageConfig<OrderBaseResult> pageConfig = mmanLoanCollectionOrderService.getPage(params);
-			model.addAttribute("pm", pageConfig);
-			model.addAttribute("params", params);
-			model.addAttribute("ListMmanLoanCollectionCompany", mmanLoanCollectionCompanyService.getList(mmanLoanCollectionCompany));
-			model.addAttribute("dictMap",BackConstant.groupNameMap);
-			
+				//查询公司列表
+				MmanLoanCollectionCompany mmanLoanCollectionCompany = new MmanLoanCollectionCompany();
+				PageConfig<OrderBaseResult> pageConfig = mmanLoanCollectionOrderService.getPage(params);
+				model.addAttribute("pm", pageConfig);
+				model.addAttribute("params", params);
+				model.addAttribute("ListMmanLoanCollectionCompany", mmanLoanCollectionCompanyService.getList(mmanLoanCollectionCompany));
+				model.addAttribute("dictMap",BackConstant.groupNameMap);
+			}
+
 		} catch (Exception e) {
 			logger.error("getMmanLoanCollectionOrder error", e);
 		}
+		info1.setMessage("getMmanLoanCollectionOrderPage end");//消息
+		CatUtils.info(info1);
+
 		return "order/orderList";
 	}
 	

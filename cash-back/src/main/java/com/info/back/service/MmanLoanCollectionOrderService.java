@@ -96,6 +96,14 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
 	}
 
 	@Override
+	public PageConfig<OrderBaseResult> getCollectionUserPage(HashMap<String, Object> params) {
+		params.put(Constant.NAME_SPACE, "MmanLoanCollectionOrder");
+		PageConfig<OrderBaseResult> page = new PageConfig<OrderBaseResult>();
+		page = paginationDao.findPage("getCollectionOrderList", "getOrderCount", params, null);
+		return page;
+	}
+
+	@Override
 	public int findAllCount(HashMap<String, Object> params) {
 		return manLoanCollectionOrderDao.getOrderPageCount(params);
 	}
