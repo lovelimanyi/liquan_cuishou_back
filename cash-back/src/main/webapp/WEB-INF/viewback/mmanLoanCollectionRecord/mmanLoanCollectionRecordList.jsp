@@ -223,12 +223,12 @@
 							<td>
 								${record.orderId}
 							</td>
-							<td>
-								${record.collectionId}
-							</td>
 							<%--<td>
-								${record.userId}
+								${record.collectionId}
 							</td>--%>
+							<td>
+								${record.userId}
+							</td>
 							<%--<td >
 								<c:if test="${record.contactType == '1'}">紧急联系人</c:if>
 								<c:if test="${record.contactType == '2'}">通讯录联系人</c:if>
