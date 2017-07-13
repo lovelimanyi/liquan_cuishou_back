@@ -67,12 +67,6 @@ public class MmanLoanCollectionOrderController extends BaseController{
 	
 	@RequestMapping("/getMmanLoanCollectionOrderPage")
 	public String getPage(HttpServletRequest request,HttpServletResponse response,Model model){
-		EventInfo info1 = new EventInfo();
-		info1.setEventType("Mman");//事物类型,默认normal
-		info1.setMessage("getMmanLoanCollectionOrderPage start");//消息
-		CatUtils.info(info1);
-		CatUtils.info("束带结发大树将军");
-		System.out.println("开始。。。");
 		try {
 			HashMap<String, Object> params = getParametersO(request);
 			BackUser backUser = (BackUser) request.getSession().getAttribute(Constant.BACK_USER);
@@ -98,9 +92,6 @@ public class MmanLoanCollectionOrderController extends BaseController{
 		} catch (Exception e) {
 			logger.error("getMmanLoanCollectionOrder error", e);
 		}
-		info1.setMessage("getMmanLoanCollectionOrderPage end");//消息
-		CatUtils.info(info1);
-
 		return "order/orderList";
 	}
 	

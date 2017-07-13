@@ -194,9 +194,9 @@
 
 	<select id="getOrderCount" resultType="Integer" parameterType="HashMap" >
 		SELECT
-		count(*)
-		FROM mman_loan_collection_order a
-		WHERE  a.current_collection_user_id=#{roleUserId}
+			count(*)
+			FROM mman_loan_collection_order a
+		<!-- WHERE  a.current_collection_user_id=#{roleUserId} -->
 	</select>
 	<sql id="base_table">
 		FROM mman_loan_collection_order a

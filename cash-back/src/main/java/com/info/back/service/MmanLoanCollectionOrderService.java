@@ -34,7 +34,7 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
 	private IMmanLoanCollectionOrderDao manLoanCollectionOrderDao;
 	
 	@Autowired
-	private IPaginationDao paginationDao;
+	private IOrderPaginationDao orderPaginationDao;
 	
 	@Autowired
 	private IMmanUserInfoDao mmanUserInfoDao;
@@ -57,7 +57,7 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
 	@Override
 	public PageConfig<MmanLoanCollectionOrder> findPage(HashMap<String, Object> params) {
 		PageConfig<MmanLoanCollectionOrder> page = new PageConfig<MmanLoanCollectionOrder>();
-		page = paginationDao.findPage("getOrderPage", "getOrderPageCount", params, null);
+		page = orderPaginationDao.findPage("getOrderPage", "getOrderPageCount", params, null);
 		return page;
 	}
 	public List<MmanLoanCollectionOrder> findList(MmanLoanCollectionOrder queryManLoanCollectionOrder) {
@@ -91,7 +91,7 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
 	public PageConfig<OrderBaseResult> getPage(HashMap<String, Object> params) {
 		params.put(Constant.NAME_SPACE, "MmanLoanCollectionOrder");
 		PageConfig<OrderBaseResult> page = new PageConfig<OrderBaseResult>();
-		page = paginationDao.findPage("getCollectionOrderList", "getCollectionOrderCount", params, null);
+		page = orderPaginationDao.findPage("getCollectionOrderList", "getCollectionOrderCount", params, null);
 		return page;
 	}
 
@@ -99,7 +99,7 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
 	public PageConfig<OrderBaseResult> getCollectionUserPage(HashMap<String, Object> params) {
 		params.put(Constant.NAME_SPACE, "MmanLoanCollectionOrder");
 		PageConfig<OrderBaseResult> page = new PageConfig<OrderBaseResult>();
-		page = paginationDao.findPage("getCollectionOrderList", "getOrderCount", params, null);
+		page = orderPaginationDao.findPage("getCollectionOrderList", "getOrderCount", params, null);
 		return page;
 	}
 
@@ -149,7 +149,7 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
 	public PageConfig<OrderBaseResult> getMyPage(HashMap<String, Object> params) {
 		params.put(Constant.NAME_SPACE, "MmanLoanCollectionOrder");
 		PageConfig<OrderBaseResult> page = new PageConfig<OrderBaseResult>();
-		page = paginationDao.findPage("getCollectionMyOrderList", "getCollectionMyOrderCount", params, null);
+		page = orderPaginationDao.findPage("getCollectionMyOrderList", "getCollectionMyOrderCount", params, null);
 		return page;
 	}
 
