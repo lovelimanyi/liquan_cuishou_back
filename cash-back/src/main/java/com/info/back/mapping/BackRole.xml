@@ -109,7 +109,7 @@
 		ORDER BY bu.id
 	</select>
 	<!-- 根据角色ID得到角色权限树 -->
-	<select id="getTreeByRoleId" parameterType="long" resultType="BackTree">
+	<select id="getTreeByRoleId" parameterType="int" resultType="BackTree">
 		SELECT 
 		bm.id,
 		bm.module_name as title,
