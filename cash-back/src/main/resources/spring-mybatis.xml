@@ -18,14 +18,13 @@
 		<property name="url" value="${jdbc.url}"/>
 	 	<property name="username" value="${jdbc.username}"/>
 	 	<property name="password" value="${jdbc.password}"/> 
-		<property name="minIdle"><value>${jdbc.minPoolSize}</value></property>
-	    <property name="maxActive"><value>${jdbc.maxPoolSize}</value></property>
-	    <property name="maxWait"><value>${jdbc.maxWait}</value></property>
-	    <property name="initialSize"><value>${jdbc.initialPoolSize}</value></property>
-        <property name="maxPoolPreparedStatementPerConnectionSize"><value>${jdbc.maxPoolPreparedStatementPerConnectionSize}</value></property>
-        <property name="poolPreparedStatements"><value>${jdbc.poolPreparedStatements}</value></property>
-        <property name="timeBetweenEvictionRunsMillis"><value>${jdbc.timeBetweenEvictionRunsMillis}</value></property>
-        <!--<property name="testConnectionOnCheckin"><value>true</value></property>-->
+		<property name="minIdle" value="${jdbc.minPoolSize}"/>
+	    <property name="maxActive" value="${jdbc.maxPoolSize}"/>
+	    <property name="maxWait" value="${jdbc.maxWait}"/>
+	    <property name="initialSize" value="${jdbc.initialPoolSize}"/>
+        <property name="maxPoolPreparedStatementPerConnectionSize" value="${jdbc.maxPoolPreparedStatementPerConnectionSize}"/>
+        <property name="poolPreparedStatements" value="${jdbc.poolPreparedStatements}"/>
+        <property name="timeBetweenEvictionRunsMillis" value="${jdbc.timeBetweenEvictionRunsMillis}"/>
     </bean> 
     
     <bean id="dataSourcexjx" class="com.alibaba.druid.pool.DruidDataSource" >
@@ -33,15 +32,10 @@
 		<property name="url" value="${jdbc.urlxjx}"/>
 	 	<property name="username" value="${jdbc.usernamexjx}"/>
 	 	<property name="password" value="${jdbc.passwordxjx}"/> 
-		<property name="minIdle"><value>${jdbc.minPoolSizexjx}</value></property>
-	    <property name="maxActive"><value>${jdbc.maxPoolSizexjx}</value></property>
-	    <property name="maxWait"><value>${jdbc.maxWaitxjx}</value></property>
-	    <!--<property name="acquireIncrement"><value>1</value></property>
-	    <property name="maxStatements"><value>0</value></property>-->
-	    <property name="initialSize"><value>${jdbc.initialPoolSizexjx}</value></property>
-	    <!--<property name="idleConnectionTestPeriod"><value>${jdbc.idleConnectionTestPeriod}</value></property>
-	    <property name="acquireRetryAttempts"><value>30</value></property>
-	    <property name="testConnectionOnCheckin"><value>true</value></property>-->
+		<property name="minIdle" value="${jdbc.minPoolSizexjx}"/>
+	    <property name="maxActive" value="${jdbc.maxPoolSizexjx}"/>
+	    <property name="maxWait" value="${jdbc.maxWaitxjx}"/>
+	    <property name="initialSize" value="${jdbc.initialPoolSizexjx}"/>
     </bean> 
     
    <!-- 动态配置数据源 -->  
