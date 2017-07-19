@@ -62,7 +62,10 @@ public class OrderPaginationDao<T> extends BaseDao implements IOrderPaginationDa
 
 		} catch (Exception e) {
 			e.printStackTrace();
+			// 如果redis出现异常或挂掉，去数据库查询，保证系统正常运转
+			totalRecord = (Integer) getSqlSessionTemplate().selectOne(nameSpace + countSql, map);
 		}
+
 		PageConfig<T> pageConfig = new PageConfig<T>(totalRecord, numPerPage,
 				curPage);
 		if (pageConfig.getTotalResultSize() > 0) {
@@ -119,6 +122,8 @@ public class OrderPaginationDao<T> extends BaseDao implements IOrderPaginationDa
 
 		} catch (Exception e) {
 			e.printStackTrace();
+			// 如果redis出现异常或挂掉，去数据库查询，保证系统正常运转
+			totalRecord = (Integer) getSqlSessionTemplate().selectOne(nameSpace + countId, map);
 		}
 		PageConfig pageConfig = new PageConfig(totalRecord, numPerPage, curPage);
 		pageConfig.setTotalResultSize(totalRecord);
