@@ -71,7 +71,7 @@ public class MmanLoanCollectionOrderController extends BaseController{
 			HashMap<String, Object> params = getParametersO(request);
 			BackUser backUser = (BackUser) request.getSession().getAttribute(Constant.BACK_USER);
 			if(backUser != null){
-				logger.info("backUser is not null");
+//				logger.info("backUser is not null");
 				List<BackUserCompanyPermissions> CompanyPermissionsList=backUserService.findCompanyPermissions(backUser.getId());
 				if(CompanyPermissionsList!=null&&CompanyPermissionsList.size() > 0){//指定公司的订单
 					params.put("CompanyPermissionsList", CompanyPermissionsList);

@@ -298,9 +298,11 @@
             <artifactId>dom4j</artifactId>
         </dependency>
 
+        <!--druid-->
         <dependency>
-            <groupId>c3p0</groupId>
-            <artifactId>c3p0</artifactId>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid</artifactId>
+            <version>1.0.29</version>
         </dependency>
 
         <dependency>
