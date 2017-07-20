@@ -32,7 +32,7 @@
                     <encoding>UTF-8</encoding>
                     <compilerArguments>
                         <verbose />
-                        <bootclasspath>${java.home}/lib/rt.jar:${java.home}/lib/jce.jar</bootclasspath>
+                        <bootclasspath>${java.home}/lib/rt.jar;${java.home}/lib/jce.jar</bootclasspath>
                     </compilerArguments>
                 </configuration>
             </plugin>
@@ -269,6 +269,12 @@
 
             <dependency>
                 <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-nop</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
                 <artifactId>jcl-over-slf4j</artifactId>
                 <version>${slf4j.version}</version>
             </dependency>
@@ -488,12 +494,17 @@
                 <version>${activiti.engine.version}</version>
             </dependency>
 
+            <!--<dependency>-->
+                <!--<groupId>c3p0</groupId>-->
+                <!--<artifactId>c3p0</artifactId>-->
+                <!--<version>${c3p0.version}</version>-->
+            <!--</dependency>-->
+            <!--druid连接池-->
             <dependency>
-                <groupId>c3p0</groupId>
-                <artifactId>c3p0</artifactId>
-                <version>${c3p0.version}</version>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid</artifactId>
+                <version>1.0.29</version>
             </dependency>
-
 
         </dependencies>
     </dependencyManagement>
