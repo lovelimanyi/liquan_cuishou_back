@@ -494,18 +494,6 @@
                 <version>${activiti.engine.version}</version>
             </dependency>
 
-            <!--<dependency>-->
-                <!--<groupId>c3p0</groupId>-->
-                <!--<artifactId>c3p0</artifactId>-->
-                <!--<version>${c3p0.version}</version>-->
-            <!--</dependency>-->
-            <!--druid连接池-->
-            <dependency>
-                <groupId>com.alibaba</groupId>
-                <artifactId>druid</artifactId>
-                <version>1.0.29</version>
-            </dependency>
-
         </dependencies>
     </dependencyManagement>
 
