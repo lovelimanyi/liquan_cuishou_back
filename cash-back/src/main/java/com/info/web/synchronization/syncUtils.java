@@ -132,6 +132,7 @@ public class syncUtils {
 	 * @param status 订单状态 1 催收中，4 还款完成
 	 * */
 	public static MmanLoanCollectionOrder updateMmanLoanCollectionOrder(ILocalDataDao localDataDao,String loanId,HashMap<String, Object> repaymentMap,String status){
+		loger.error("start-updateMmanLoanCollectionOrder-loanId"+loanId);
 		HashMap<String,Object> map = new HashMap<String,Object>();
 		map.put("ORDER_ID", loanId);
 		map.put("USER_ID", repaymentMap.get("user_id"));
@@ -141,6 +142,8 @@ public class syncUtils {
 		map.put("STATUS",status);
 		map.put("updateDate",new Date());
 		localDataDao.updateOrderStatus(map);
+		loger.error("end-updateMmanLoanCollectionOrder-loanId"+loanId);
+		loger.error("end-updateMmanLoanCollectionOrder-order"+order);
 		return order;
 	}
 	/**
@@ -150,8 +153,11 @@ public class syncUtils {
 	 * */
 	public static void saveCreditLoanPayDetail(ILocalDataDao localDataDao,HashMap<String, Object> repayment,String payId,List<HashMap<String,Object>> repaymentDetailList){
 		loger.error("start-saveCreditLoanPayDetail-payId =" + payId);
+		loger.error("startDate-saveCreditLoanPayDetail:"+DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
+		loger.error("repaymentDetailList="+repaymentDetailList);
+
 		List<String> idList = null;
-		if(null!=repaymentDetailList && 0<repaymentDetailList.size()){//首先删除已有的记录，重新添加
+		if(null!=repaymentDetailList && 0<repaymentDetailList.size()){
 			HashMap<String,String> map = new HashMap<String,String>();
 			map.put("PAY_ID", payId);
 			idList = localDataDao.selectCreditLoanPayDetail(map);//查询目前插入的还款记录
@@ -187,6 +193,8 @@ public class syncUtils {
 				creditLoanPayDetail = syncUtils.operaRealPenltyDetail(repayment, repayDetail, payId,creditLoanPayDetail,localDataDao);
 				localDataDao.saveCreditLoanPayDetail(creditLoanPayDetail);
 				loger.error("end-saveCreditLoanPayDetail-payId =" + payId);
+				loger.error("endDate-saveCreditLoanPayDetail:"+DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
+				loger.error("creditLoanPayDetail="+creditLoanPayDetail);
 			}
 		}
 	}

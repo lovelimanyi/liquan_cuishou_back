@@ -51,6 +51,7 @@ public class OperaRepayDataThread implements Runnable {
             map.put("ID", payId);//还款id
             //获取app端还款信息
             HashMap<String,Object> repayment = this.dataDao.getAssetRepayment(map);
+            loger.error("repayment:"+repayment);
             String loanId = String.valueOf(repayment.get("asset_order_id"));//借款id
             map.put("ORDER_ID", loanId);//还款id
             if(null!=repayment){
@@ -67,10 +68,14 @@ public class OperaRepayDataThread implements Runnable {
                             syncUtils.updateMmanUserLoan(localDataDao,loanId,repayment,Constant.STATUS_OVERDUE_FIVE);
                             //更新还款表
                             syncUtils.updateCreditLoanPay(localDataDao,payId,repayment);
-                            //更新订单表-保存催收流转日志
-                            updateOrderAndLog(loanId,repayment);
                             //保存还款详情表
                             syncUtils.saveCreditLoanPayDetail(localDataDao,repayment,payId, repaymentDetailList);
+                            //更新订单表-保存催收流转日志
+                            loger.error("start-updateOrderAndLog-loanId:"+loanId);
+                            loger.error("startDate-updateOrderAndLog"+DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
+                            updateOrderAndLog(loanId,repayment);
+                            loger.error("end-updateOrderAndLog-loanId:"+loanId);
+
                         }
                         RedisUtil.delRedisKey(Constant.TYPE_REPAY_+payId);
                     }else{
@@ -96,7 +101,8 @@ public class OperaRepayDataThread implements Runnable {
             backUser = this.localDataDao.selectBackUser(umap);
         }
         if(null!=backUser){
-            loger.info("保存流转日志=借款loanID"+loanId+"执行start"+DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
+            loger.error("start-saveLoanChangeLog-loanId"+loanId);
+            loger.error("startDate-saveLoanChangeLog-loanId"+DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
             MmanLoanCollectionStatusChangeLog loanChangeLog = new MmanLoanCollectionStatusChangeLog();
             loanChangeLog.setId(IdGen.uuid());
             loanChangeLog.setLoanCollectionOrderId(order.getOrderId());
@@ -108,16 +114,15 @@ public class OperaRepayDataThread implements Runnable {
             loanChangeLog.setCompanyId(backUser.getCompanyId());
             loanChangeLog.setCurrentCollectionUserId(backUser.getUuid());
             loanChangeLog.setCurrentCollectionUserLevel(backUser.getGroupLevel());
-            loger.error("start-setsetCurrentCollectionOrderLevel="+loanId+"S1Flag="+order.getS1Flag());
             if(StringUtils.isNotBlank(order.getS1Flag())){
                 loanChangeLog.setCurrentCollectionOrderLevel(BackConstant.XJX_OVERDUE_LEVEL_S1);
             }else{
                 loanChangeLog.setCurrentCollectionOrderLevel(order.getCurrentOverdueLevel());
             }
-            loger.error("end-setsetCurrentCollectionOrderLevel="+loanId+"S1Flage="+order.getS1Flag());
-            loger.error("start-setsetCurrentCollectionOrderLevel="+loanId+"Level="+loanChangeLog.getCurrentCollectionOrderLevel());
             loanChangeLog.setCreateDate(new Date());
             this.localDataDao.saveLoanChangeLog(loanChangeLog);
+            loger.error("end-saveLoanChangeLog-loanId"+loanId);
+            loger.error("endDate-saveLoanChangeLog-loanId"+DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
         }
 
     }
