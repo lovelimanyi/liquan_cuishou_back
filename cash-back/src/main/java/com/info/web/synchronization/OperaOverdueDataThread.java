@@ -47,7 +47,7 @@ public class OperaOverdueDataThread implements Runnable {
 			map.put("ID", payId);//还款id
 			//还款信息--app端
 			HashMap<String,Object> repayment = this.dataDao.getAssetRepayment(map);
-			loger.info("sync-borrowOrder:"+repayment);
+			loger.info("sync-borrowOrders:"+repayment);
 			String loanId = String.valueOf(repayment.get("asset_order_id"));//借款id
 			String userId  = String.valueOf(repayment.get("user_id"));    	//用户id
 			map.put("ORDER_ID", loanId);
