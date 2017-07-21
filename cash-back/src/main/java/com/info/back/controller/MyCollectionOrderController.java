@@ -13,6 +13,7 @@ import com.info.web.util.CompareUtils;
 import com.info.web.util.DateUtil;
 import com.info.web.util.JSONUtil;
 import com.info.web.util.PageConfig;
+import com.liquan.oss.OSSUpload;
 import net.sf.json.JSONArray;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -30,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.net.URL;
 import java.util.*;
 
 /**
@@ -420,40 +422,51 @@ public class MyCollectionOrderController extends BaseController {
                             HttpServletResponse response, String orderId, Model model) {
         HashMap<String, Object> params = this.getParametersO(request);
         String url = "mycollectionorder/toApplyCsDetail";
-        if (StringUtils.isNotBlank(params.get("id") + "")) {
-            BackUser backUser = this.loginAdminUser(request);
-            //该条订单是否已审//			int count = auditCenterService.findAuditStatus(params);
+        try {
+            if (StringUtils.isNotBlank(params.get("id") + "")) {
+                BackUser backUser = this.loginAdminUser(request);
+                //该条订单是否已审//			int count = auditCenterService.findAuditStatus(params);
 //			if(count != 0 || !BackConstant.COLLECTION_ROLE_ID.toString().equals(backUser.getRoleId())){
-            MmanLoanCollectionOrder mmanLoanCollectionOrderOri = mmanLoanCollectionOrderService.getOrderById(params.get("id").toString());
-            if (mmanLoanCollectionOrderOri != null) {
-                MmanUserLoan userLoan = mmanUserLoanService.get(mmanLoanCollectionOrderOri.getLoanId());
-                model.addAttribute("userLoan", userLoan);
-            } else {
-                logger.error("mmanLoanCollectionOrderOri 为null 借款id:" + params.get("id").toString());
-            }
-            model.addAttribute("collectionOrder", mmanLoanCollectionOrderOri);
-            MmanUserInfo userInfo = mmanUserInfoService.getUserInfoById(mmanLoanCollectionOrderOri.getUserId());
-            // add by yyf 根据身份证前6位 映射用户地址
-            if (userInfo != null) {
-                if (StringUtils.isBlank(userInfo.getIdcardImgZ()) || StringUtils.isBlank(userInfo.getIdcardImgF())) {
-                    String idNumber = userInfo.getIdNumber().substring(0, 6);
-                    String presentAddress = mmanUserInfoService.getAddressByIDNumber(idNumber);
-                    userInfo.setPresentAddress(presentAddress);
+                MmanLoanCollectionOrder mmanLoanCollectionOrderOri = mmanLoanCollectionOrderService.getOrderById(params.get("id").toString());
+                if (mmanLoanCollectionOrderOri != null) {
+                    MmanUserLoan userLoan = mmanUserLoanService.get(mmanLoanCollectionOrderOri.getLoanId());
+                    model.addAttribute("userLoan", userLoan);
+                } else {
+                    logger.error("mmanLoanCollectionOrderOri 为null 借款id:" + params.get("id").toString());
                 }
-            }
-            //
-            model.addAttribute("userInfo", userInfo);
-            List<CreditLoanPayDetail> detailList = creditLoanPayDetailService
-                    .findPayDetail(mmanLoanCollectionOrderOri.getPayId());
-            BigDecimal payMonery = new BigDecimal(0);
-            if (detailList != null) {
-                for (CreditLoanPayDetail pay : detailList) {
-                    payMonery = payMonery.add(pay.getRealMoney()).add(
-                            pay.getRealPenlty());
+                model.addAttribute("collectionOrder", mmanLoanCollectionOrderOri);
+                MmanUserInfo userInfo = mmanUserInfoService.getUserInfoById(mmanLoanCollectionOrderOri.getUserId());
+                // add by yyf 根据身份证前6位 映射用户地址
+                if (userInfo != null) {
+                    if (StringUtils.isBlank(userInfo.getIdcardImgZ()) || StringUtils.isBlank(userInfo.getIdcardImgF())) {
+                        String idNumber = userInfo.getIdNumber().substring(0, 6);
+                        String presentAddress = mmanUserInfoService.getAddressByIDNumber(idNumber);
+                        userInfo.setPresentAddress(presentAddress);
+                    }
                 }
-            }
-            SysUserBankCard userCar = sysUserBankCardService
-                    .findUserId(mmanLoanCollectionOrderOri.getUserId());
+                // 从oss获取图片地址
+                OSSUpload ossUpload = new OSSUpload();
+                if (userInfo != null) {
+                    URL headImageUrl = ossUpload.sampleGetFileUrl("xjx-files", userInfo.getHeadPortrait(), 1000l * 3600l);
+                    URL frontImageUrl = ossUpload.sampleGetFileUrl("xjx-files", userInfo.getIdcardImgZ(), 1000l * 3600l);
+                    URL backImageUrl = ossUpload.sampleGetFileUrl("xjx-files", userInfo.getIdcardImgF(), 1000l * 3600l);
+                    userInfo.setHeadPortrait(headImageUrl.toString());
+                    userInfo.setIdcardImgZ(frontImageUrl.toString());
+                    userInfo.setIdcardImgF(backImageUrl.toString());
+                }
+
+                model.addAttribute("userInfo", userInfo);
+                List<CreditLoanPayDetail> detailList = creditLoanPayDetailService
+                        .findPayDetail(mmanLoanCollectionOrderOri.getPayId());
+                BigDecimal payMonery = new BigDecimal(0);
+                if (detailList != null) {
+                    for (CreditLoanPayDetail pay : detailList) {
+                        payMonery = payMonery.add(pay.getRealMoney()).add(
+                                pay.getRealPenlty());
+                    }
+                }
+                SysUserBankCard userCar = sysUserBankCardService
+                        .findUserId(mmanLoanCollectionOrderOri.getUserId());
                 /*String  Bank =userCar.getBankCard();
                 String Banktto=Bank.substring(4,15);
 				String Bankta= Bank.replace(Banktto, "***********");
@@ -463,16 +476,19 @@ public class MyCollectionOrderController extends BaseController {
 				model.addAttribute("Numbers",Number);//身份证号码加密处理
 				model.addAttribute("userBank", Bankta); //银行卡号处理
 	*/
-            model.addAttribute("userCar", userCar);// 已还金额
-            model.addAttribute("payMonery", payMonery);// 已还金额
-            model.addAttribute("detailList", detailList);
-            // 代扣记录
-            List<CollectionWithholdingRecord> withholdList = mmanLoanCollectionRecordService
-                    .findWithholdRecord(mmanLoanCollectionOrderOri.getId());
-            model.addAttribute("withholdList", withholdList);
-            model.addAttribute("domaiName", PayContents.XJX_DOMAINNAME_URL);
-            url = "mycollectionorder/myorderDetails";
+                model.addAttribute("userCar", userCar);// 已还金额
+                model.addAttribute("payMonery", payMonery);// 已还金额
+                model.addAttribute("detailList", detailList);
+                // 代扣记录
+                List<CollectionWithholdingRecord> withholdList = mmanLoanCollectionRecordService
+                        .findWithholdRecord(mmanLoanCollectionOrderOri.getId());
+                model.addAttribute("withholdList", withholdList);
+                model.addAttribute("domaiName", PayContents.XJX_DOMAINNAME_URL);
+                url = "mycollectionorder/myorderDetails";
 //			}
+            }
+        } catch (Exception e) {
+            logger.error("跳转到订单详情页error " + e);
         }
         params.put("type", '4'); //审核类型 4:催收详情审核
         model.addAttribute("params", params);
@@ -682,7 +698,7 @@ public class MyCollectionOrderController extends BaseController {
         model.addAttribute("params", params);
 
 		/*
-		 * SpringUtils.renderDwzResult(response, "0".equals(json.getCode()),
+         * SpringUtils.renderDwzResult(response, "0".equals(json.getCode()),
 		 * json.getMsg(), DwzResult.CALLBACK_CLOSECURRENT,
 		 * params.get("parentId").toString());
 		 */

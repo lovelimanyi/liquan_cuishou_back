@@ -310,7 +310,11 @@
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
 
-
+        <dependency>
+            <groupId>oss_op</groupId>
+            <artifactId>oss_op</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
 
     </dependencies>
 

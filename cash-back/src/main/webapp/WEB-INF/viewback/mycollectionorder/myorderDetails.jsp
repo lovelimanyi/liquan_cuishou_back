@@ -133,17 +133,17 @@
 								<td class="tdGround" style="height: 100px;">身份证图片:</td>
 								<td colspan="2">
 									<c:if test="${userInfo.idcardImgZ!=null}">
-										<a id="img1" href="${domaiName}/${userInfo.idcardImgZ}"><img src="${domaiName}/${userInfo.idcardImgZ}"/></a>
+										<a id="img1" href="${userInfo.idcardImgZ}"><img src="${userInfo.idcardImgZ}"/></a>
 									</c:if>
 									<c:if test="${userInfo.idcardImgF!=null}">
-										<a id="img2" href="${domaiName}/${userInfo.idcardImgF}"><img src="${domaiName}/${userInfo.idcardImgF}"/></a>
+										<a id="img2" href="${userInfo.idcardImgF}"><img src="${userInfo.idcardImgF}"/></a>
 									</c:if>
 
 								</td>
 								<td class="tdGround" style="height: 100px;">个人名片:</td>
 								<td colspan="2">
 									<c:if test="${userInfo.headPortrait!=null}">
-										<img src="${domaiName}/${userInfo.headPortrait}"/>
+										<img src="${userInfo.headPortrait}"/>
 									</c:if>
 								</td>
 							</tr>
