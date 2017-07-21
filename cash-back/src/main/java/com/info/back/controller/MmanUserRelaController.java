@@ -1,28 +1,20 @@
 package com.info.back.controller;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.info.back.service.IMmanLoanCollectionOrderService;
+import com.info.back.service.IMmanUserRelaService;
+import com.info.web.pojo.MmanLoanCollectionOrder;
+import com.info.web.pojo.MmanUserRela;
+import com.info.web.util.PageConfig;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.info.back.result.JsonResult;
-import com.info.back.service.IMmanLoanCollectionOrderService;
-import com.info.back.service.IMmanUserRelaService;
-import com.info.back.utils.DwzResult;
-import com.info.back.utils.SpringUtils;
-import com.info.web.pojo.MmanLoanCollectionOrder;
-import com.info.web.pojo.MmanUserRela;
-import com.info.web.pojo.OrderBaseResult;
-import com.info.web.pojo.SysDict;
-import com.info.web.util.PageConfig;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.List;
 
 @Controller
 @RequestMapping("mmanUserRela/")
