@@ -44,31 +44,31 @@ public class MmanUserRelaController extends BaseController {
 			MmanLoanCollectionOrder order = mmanLoanCollectionOrderService.getOrderById(orderId);
 			if(order != null){
 				params.put("userId", order.getUserId());
+				params.put("userId", order.getUserId());
+				int overdueDays = order.getOverdueDays();//逾期天数
+				params.put("overdueDays",overdueDays);
+				if(overdueDays <= 1){
+					erroMsg = "逾期2天方可申请查看通讯录";
+				}else if(overdueDays >= 2 && overdueDays <= 3){
+					params.put("num",2);
+					List<MmanUserRela> list = mmanUserRelaService.getList(params);
+					model.addAttribute("list", list);
+				}else if(overdueDays >= 4 && overdueDays <= 5){
+					params.put("num",5);
+					List<MmanUserRela> list = mmanUserRelaService.getList(params);
+					model.addAttribute("list", list);
+				}else if(overdueDays >= 6 && overdueDays <= 10){
+					params.put("num",15);
+					List<MmanUserRela> list = mmanUserRelaService.getList(params);
+					model.addAttribute("list", list);
+				}else{
+					PageConfig<MmanUserRela> pageConfig = mmanUserRelaService.findPage(params);
+					model.addAttribute("pm", pageConfig);
+				}
 			}else {
 				logger.error("借款人联系人异常，请核实，借款id: " + orderId);
 			}
-			params.put("userId", order.getUserId());
-			int overdueDays = order.getOverdueDays();//逾期天数
-			params.put("overdueDays",overdueDays);
-			
-			if(overdueDays <= 1){
-				erroMsg = "逾期2天方可申请查看通讯录";
-			}else if(overdueDays >= 2 && overdueDays <= 3){
-				params.put("num",2);
-				List<MmanUserRela> list = mmanUserRelaService.getList(params);
-				model.addAttribute("list", list);
-			}else if(overdueDays >= 4 && overdueDays <= 5){
-				params.put("num",5);
-				List<MmanUserRela> list = mmanUserRelaService.getList(params);
-				model.addAttribute("list", list);
-			}else if(overdueDays >= 6 && overdueDays <= 10){
-				params.put("num",15);
-				List<MmanUserRela> list = mmanUserRelaService.getList(params);
-				model.addAttribute("list", list);
-			}else{
-				PageConfig<MmanUserRela> pageConfig = mmanUserRelaService.findPage(params);
-				model.addAttribute("pm", pageConfig);
-			}
+
 			//备用查看通讯录规则
 //			if(overdueDays <= 1){
 //				erroMsg = "逾期2天方可申请查看通讯录";

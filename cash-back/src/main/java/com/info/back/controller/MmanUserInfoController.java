@@ -119,18 +119,22 @@ public class MmanUserInfoController extends BaseController{
                     model.addAttribute("gender", ur.getGender());
                     model.addAttribute("idNumber", ur.getIdNumber());
                     model.addAttribute("age",ur.getAge());
-                    model.addAttribute("report", ur.getReport_data().getReport());
-                    model.addAttribute("check_black_info", ur.getReport_data().getUser_info_check().getCheck_black_info());
-                    model.addAttribute("ebusiness_expense", ur.getReport_data().getEbusiness_expense());
-                    model.addAttribute("deliver_address", ur.getReport_data().getDeliver_address());
-                    model.addAttribute("behavior_check", ur.getReport_data().getBehavior_check());
-                    model.addAttribute("collection_contact", ur.getReport_data().getCollection_contact());
-                    model.addAttribute("contact_list", ur.getReport_data().getContact_list());
-                    model.addAttribute("contact_region", ur.getReport_data().getContact_region());
-                    model.addAttribute("cell_behavior", ur.getReport_data().getCell_behavior());
-                    model.addAttribute("main_service", ur.getReport_data().getMain_service());
-                    model.addAttribute("trip_info", ur.getReport_data().getTrip_info());
-                    model.addAttribute("check_search_info", ur.getReport_data().getUser_info_check().getCheck_search_info());
+                    if(ur.getReport_data() != null){
+                        model.addAttribute("report", ur.getReport_data().getReport());
+                        model.addAttribute("check_black_info", ur.getReport_data().getUser_info_check().getCheck_black_info());
+                        model.addAttribute("ebusiness_expense", ur.getReport_data().getEbusiness_expense());
+                        model.addAttribute("deliver_address", ur.getReport_data().getDeliver_address());
+                        model.addAttribute("behavior_check", ur.getReport_data().getBehavior_check());
+                        model.addAttribute("collection_contact", ur.getReport_data().getCollection_contact());
+                        model.addAttribute("contact_list", ur.getReport_data().getContact_list());
+                        model.addAttribute("contact_region", ur.getReport_data().getContact_region());
+                        model.addAttribute("cell_behavior", ur.getReport_data().getCell_behavior());
+                        model.addAttribute("main_service", ur.getReport_data().getMain_service());
+                        model.addAttribute("trip_info", ur.getReport_data().getTrip_info());
+                        model.addAttribute("check_search_info", ur.getReport_data().getUser_info_check().getCheck_search_info());
+                    }else {
+                        logger.error("ur.getReport_data() is null,userId : " + userInfo.getId());
+                    }
                     return null;
                 }
             }else{
