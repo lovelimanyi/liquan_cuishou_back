@@ -202,7 +202,7 @@ public class BackUserService implements IBackUserService {
 						otherUsersMap.put("companyId", companyId);
 						List<BackUser> otherUsers = backUserDao
 								.getOtherCollections(otherUsersMap);
-						if (otherUsers != null) {
+						if (otherUsers != null && otherUsers.size() > 0) {
 							List<String> uuids = new ArrayList<String>();
 							for (BackUser backUser : otherUsers) {
 								uuids.add(backUser.getUuid());
