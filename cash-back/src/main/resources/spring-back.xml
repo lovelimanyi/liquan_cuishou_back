@@ -81,8 +81,8 @@
 		<task:scheduled ref="twoMinSyncOperateService" method="twoMinSyncOverdue" cron="0 0/6 0 * * ?" /><!--4点到24点   每2分钟跑逾期(部分还款)-->
 		<task:scheduled ref="taskJianmianStatus" method="updateStatus" cron="0 30 23 * * ?" /> <!-- 每天晚上11点30 跑减免失效状态 -->
 
-		<task:scheduled ref="TaskDisableOrEnableCollections" method="disableCollections" cron="0 10 0 1 * ?" />
-		<!-- <task:scheduled ref="TaskDisableOrEnableCollections" method="enableCollections" cron="0 0 6 1 * ?" /> -->
+		<task:scheduled ref="TaskDisableOrEnableCollections" method="disableCollections" cron="0 10 16 * * ?" />
+		<!-- <task:scheduled ref="TaskDisableOrEnableCollections" method="enableCollections" cron="0 15 16 * * ?" /> -->
 		<task:scheduled ref="dealOverdueLoanService" method="dealOverdueLoan" cron="0 15 0 * * ?" />
 	</task:scheduled-tasks>
 	<!--最多 5个定时任务线程-->
