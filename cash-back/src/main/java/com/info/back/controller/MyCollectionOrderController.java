@@ -544,12 +544,16 @@ public class MyCollectionOrderController extends BaseController {
         if (StringUtils.isNotBlank(params.get("id"))) {
             MmanLoanCollectionOrder mmanLoanCollectionOrderOri = mmanLoanCollectionOrderService
                     .getOrderById(params.get("id").toString());
-            CreditLoanPay creditLoanPay = creditLoanPayService
-                    .get(mmanLoanCollectionOrderOri.getPayId());
-            model.addAttribute(
-                    "totalPayMonery",
-                    creditLoanPay.getReceivablePrinciple().add(
-                            creditLoanPay.getReceivableInterest()));
+            if(mmanLoanCollectionOrderOri != null){
+                CreditLoanPay creditLoanPay = creditLoanPayService
+                        .get(mmanLoanCollectionOrderOri.getPayId());
+                model.addAttribute(
+                        "totalPayMonery",
+                        creditLoanPay.getReceivablePrinciple().add(
+                                creditLoanPay.getReceivableInterest()));
+            }else {
+                logger.error("mmanLoanCollectionOrderOri is null, loanId : " + params.get("id"));
+            }
         }
         model.addAttribute("params", params);
         return "mycollectionorder/tokokuan";
