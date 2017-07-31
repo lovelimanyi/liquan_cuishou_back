@@ -13,7 +13,6 @@
 		<result column="orderId" jdbcType="VARCHAR" property="orderid" />
 		<!-- 借款编号-->
 		<result column="loan_id" property="loanId" jdbcType="VARCHAR" />
-		
 		<!-- 0:聚信立，1 催收建议 -->
 		<result column="type" property="type" jdbcType="VARCHAR" />
 		<!-- 状态 1 申请，1审核 2，拒绝  4失效-->
@@ -41,6 +40,26 @@
 
 		<result column="order_status" jdbcType="VARCHAR" property="orderStatus" />
 	</resultMap>
+	<sql id="sqlAuditCenterColumns">
+		ac.id,
+		ac.operation_user_id,
+		ac.loan_user_id,
+		ac.loan_id,
+		ac.pay_id,
+		ac.orderId,
+		ac.type,
+		ac.status,
+		ac.audittime,
+		ac.createtime,
+		ac.updatetime,
+		ac.note,
+		ac.remark,
+		ac.loan_penalty,
+		ac.loan_user_name,
+		ac.loan_user_phone,
+		ac.reduction_money,
+		ac.order_status
+	</sql>
 	
 	<select id="findAllCount"  parameterType="HashMap" resultType="Integer">
 		select count(1) FROM audit_center ac
@@ -392,8 +411,14 @@
 	<update id="updateStatus" parameterType="HashMap">
 		UPDATE audit_center  a SET a.`status` =#{status},a.`audittime`=NOW()  WHERE a.`id`=#{id}
 	</update>
-
+	<!-- 更新订单减免的状态status 0:申请中 2:通过 3:拒绝 4:失效 5:通过不计入考核 -->
 	<update id="updateAuditStatus" parameterType="HashMap">
-		UPDATE audit_center  a SET a.status =#{status},a.audittime=NOW(),a.updatetime=NOW()  WHERE a.id=#{auditId}
+		UPDATE audit_center ac SET ac.status =#{status},ac.audittime=NOW(),ac.updatetime=NOW() WHERE ac.id = #{auditId}
 	</update>
+	<!-- 获取减免状态是审核中的减免申请 -->
+	<select id="getAuditCheckingList" resultMap="queryResultMap" parameterType="HashMap">
+		SELECT  <include refid="sqlAuditCenterColumns" />
+		FROM audit_center ac
+		WHERE ac.type = #{type} AND ac.status = #{status}
+	</select>
 </mapper>
