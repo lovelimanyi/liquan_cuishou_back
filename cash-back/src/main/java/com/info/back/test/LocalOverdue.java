@@ -27,7 +27,7 @@ import java.util.List;
  * Created by Administrator on 2017/5/16 0016.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations={"file:src/config/applicationContext.xml"})
+@ContextConfiguration(locations={"file:src/main/resources/applicationContext.xml"})
 public class LocalOverdue {
     private static Logger loger = Logger.getLogger(LocalOverdue.class);
 
@@ -47,7 +47,7 @@ public class LocalOverdue {
 //        }
 
 
-        String payId="381506";
+        String payId="2126594";
         doOverDue(payId);
 
     }

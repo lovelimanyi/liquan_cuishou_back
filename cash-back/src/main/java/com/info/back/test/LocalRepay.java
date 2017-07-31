@@ -26,7 +26,7 @@ import java.util.List;
  * Created by Administrator on 2017/5/16 0016.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations={"file:src/config/applicationContext.xml"})
+@ContextConfiguration(locations={"file:src/main/resources/applicationContext.xml"})
 public class LocalRepay {
     private static Logger loger = Logger.getLogger(LocalRepay.class);
 
@@ -43,7 +43,7 @@ public class LocalRepay {
 //            doRepay(list[i]);
 //            System.out.println(list[i]);
 //        }
-        String payId = "1305450";
+        String payId = "2439270";
         doRepay(payId);
 
     }
