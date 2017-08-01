@@ -21,7 +21,7 @@ public class ThreadPoolDealOverdueLoan extends ThreadGroup {
 	
 	public static ThreadPoolDealOverdueLoan getInstance(){
 		if(null == pool)
-			pool = new ThreadPoolDealOverdueLoan(6); // 初始化线程池
+			pool = new ThreadPoolDealOverdueLoan(8); // 初始化线程池
 		return pool;
 	}
 	
