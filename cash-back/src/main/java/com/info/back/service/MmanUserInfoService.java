@@ -91,7 +91,6 @@ public class MmanUserInfoService implements IMmanUserInfoService {
                 String data = json.toString();
                 try {
                     String result = WebClient.getInstance().postJsonData(PayContents.JXL_HBASE_SERVER_URL,  data,null);
-                    System.out.println("result:"+result);
                     json = JSONObject.parseObject(result);
                     String type = json.getString("type");
                     String jsonString = json.getString("json");
