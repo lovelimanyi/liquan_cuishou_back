@@ -50,9 +50,9 @@
 	<select id="findAll" resultMap="queryResultMap" parameterType="HashMap">
 		SELECT
 			re.id,
-			mo.loan_id AS orderId,
+			mo.loan_id AS orderid,
 			lo.realname AS user_id,
-			bu.group_level AS collectionGroup,
+			bu.group_level AS collectiongroup,
 			re.contact_type,
 			re.contact_name,
 			re.relation,
@@ -64,10 +64,10 @@
 			re.create_date,
 			re.remark,
 			mo.current_overdue_level,
-			bu.user_name AS collectionPerson,
-			p.title AS companyTitle,
-			d.fengKongLabel,
-			d.collectionAdvice,
+			bu.user_name AS collectionperson,
+			p.title AS companytitle,
+			IFNULL(d.fengkong_ids, 0) AS fengkonglabel,
+			d. STATUS AS collectionadvice,
 			d.collection_record_id
 		FROM
 		<include refid="base_table"></include>
@@ -97,7 +97,7 @@
 				AND re.collection_date &gt;= #{collectionDateBegin}
 			</if>
 			<if test="collectionDateEnd != null">
-				AND re.collection_date &lt;= #{collectionDateEnd}
+				AND re.collection_date &lt;= DATE_ADD(#{collectionDateEnd}, INTERVAL 1 DAY)
 			</if>
 
 			<!--<if test="collectionDateBegin != null and collectionDateBegin != '' and collectionDateEnd != null and collectionDateEnd != ''">
@@ -149,7 +149,7 @@
 				AND d.`collectionAdvice` = #{collectionAdvice}
 			</if>
 			<if test="fengKongLabel != null and fengKongLabel != ''">
-				AND d.`fengKongName` LIKE #{fengKongLabel}
+				AND d.`fk_labels` LIKE #{fengKongLabel}
 			</if>
 		</where>
 	</sql>
@@ -160,17 +160,7 @@
 		LEFT JOIN mman_user_info lo ON lo.id = re.user_id
 		LEFT JOIN mman_loan_collection_order mo ON mo.id = re.order_id
 		LEFT JOIN back_user_company_permissions bp ON re.user_id = bp.user_id
-		LEFT JOIN (
-			SELECT
-				IFNULL(a.fengkong_ids, 0) AS fengKongLabel,
-				a.`fk_labels` AS fengKongName,
-				a.`status` AS collectionAdvice,
-				a.collection_record_id
-			FROM
-				collection_advice a
-			WHERE
-				`collection_record_id` IS NOT NULL
-		)   AS d ON re.id = d.collection_record_id
+		LEFT JOIN collection_advice d ON re.`id` = d.`collection_record_id`
 	</sql>
 	<insert id="insert" parameterType="com.info.web.pojo.MmanLoanCollectionRecord">INSERT INTO mman_loan_collection_record
 		<trim prefix="(" suffix=")" suffixOverrides=",">
