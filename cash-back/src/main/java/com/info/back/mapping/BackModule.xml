@@ -58,6 +58,7 @@
 <!--	根据父节点ID获得普通户的全部菜单-->
 	<select id="findUserAll" resultMap="BaseResultMap" parameterType="HashMap">
 			select
+            rm.id,
 			rm.module_name,
 			rm.module_url,
 			rm.module_describe,
