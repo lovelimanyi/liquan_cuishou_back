@@ -57,8 +57,11 @@
 	</select>
 <!--	根据父节点ID获得普通户的全部菜单-->
 	<select id="findUserAll" resultMap="BaseResultMap" parameterType="HashMap">
-			select 
-			*
+			select
+			rm.module_name,
+			rm.module_url,
+			rm.module_describe,
+			rm.module_sequence
 			<include refid="sql"/>
 			order by rm.module_sequence
 	</select>
