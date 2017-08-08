@@ -209,7 +209,7 @@
 	<sql id="base_where">
 		<where>
 			<if test="roleUserId!=null and roleUserId !=''">
-				AND a.current_collection_user_id =# {roleUserId}
+				AND a.current_collection_user_id = #{roleUserId}
 			</if>
 			
 			<if test="CompanyPermissionsList != null and CompanyPermissionsList.size>0 " >
