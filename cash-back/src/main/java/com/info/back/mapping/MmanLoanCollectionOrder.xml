@@ -90,7 +90,7 @@
 		<result column="reduction_money" jdbcType="DECIMAL" property="reductionMoney" />
 	</resultMap>
 	
-	<select id="getCollectionMyOrderList" resultType="com.info.web.pojo.OrderBaseResult" parameterType="HashMap" >
+	<!--<select id="getCollectionMyOrderList" resultType="com.info.web.pojo.OrderBaseResult" parameterType="HashMap" >
 			SELECT 
 			  a.`id`,
 			  a.`order_id` AS orderId,
@@ -178,7 +178,7 @@
 			<if test="sortBy =null or sortBy==''">
 				ORDER BY a.top_important DESC, a.dispatch_time DESC
 			</if>
-	</sql>
+	</sql>-->
 	
 	<select id="getCollectionOrderList" resultType="com.info.web.pojo.OrderBaseResult" parameterType="HashMap" >
 		SELECT
@@ -208,9 +208,8 @@
 	</sql>
 	<sql id="base_where">
 		<where>
-			1=1
 			<if test="roleUserId!=null and roleUserId !=''">
-				AND a.current_collection_user_id=#{roleUserId}
+				AND a.current_collection_user_id =# {roleUserId}
 			</if>
 			
 			<if test="CompanyPermissionsList != null and CompanyPermissionsList.size>0 " >
@@ -219,23 +218,23 @@
 						#{items.companyId} 
 					</foreach>
 			</if>
-			<if test="collectionBeginTime!=null">
+			<!--<if test="collectionBeginTime!=null">
 				<![CDATA[	AND DATE_FORMAT(last_collection_time,'%Y-%m-%d') >=  #{collectionBeginTime}  ]]>
 			</if>
 			<if test="collectionEndTime !=null">
 				<![CDATA[	AND DATE_FORMAT(last_collection_time,'%Y-%m-%d') <=  #{collectionEndTime}  ]]>
-			</if>
+			</if>-->
 			<if test="dispatchBeginTime !=null">
-				<![CDATA[	AND DATE_FORMAT(dispatch_time,'%Y-%m-%d') >= #{dispatchBeginTime}  ]]>
+				AND dispatch_time &gt;= #{dispatchBeginTime}
 			</if>
 			<if test="dispatchEndTime !=null">
-				<![CDATA[	AND DATE_FORMAT(dispatch_time,'%Y-%m-%d')<=#{dispatchEndTime}  ]]>
+				AND dispatch_time &lt;= DATE_ADD(#{dispatchEndTime}, INTERVAL 1 DAY)
 			</if>
 			<if test="overDueDaysBegin !=null and overDueDaysBegin!=''">
-				<![CDATA[ AND a.overdueDays>=#{overDueDaysBegin}  ]]>
+				<![CDATA[ AND a.overdueDays >= #{overDueDaysBegin}  ]]>
 			</if>
 			<if test="overDueDaysEnd !=null and overDueDaysEnd !=''">
-				<![CDATA[ AND a.overdueDays<=#{overDueDaysEnd}  ]]>
+				<![CDATA[ AND a.overdueDays <= #{overDueDaysEnd}  ]]>
 			</if>
 			<if test="loanRealName !=null and loanRealName!=''">
 				AND a.loan_user_name=#{loanRealName}

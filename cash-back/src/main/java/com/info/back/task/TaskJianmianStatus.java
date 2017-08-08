@@ -4,7 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import com.info.back.dao.IMmanLoanCollectionOrderDao;
+import com.info.constant.Constant;
 import com.info.web.pojo.AuditCenter;
+import com.info.web.pojo.MmanLoanCollectionOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,55 +17,40 @@ import org.springframework.util.CollectionUtils;
 public class TaskJianmianStatus {
 	protected Logger logger = LoggerFactory.getLogger(TaskJianmianStatus.class);
 	@Autowired
-	private IMmanLoanCollectionOrderDao iMmanLoanCollectionOrderDao;
+	private IMmanLoanCollectionOrderDao mmanLoanCollectionOrderDao;
 	@Autowired
 	private IAuditCenterDao auditCenterDao;
 	public void updateStatus() {
 		try {
-			logger.error(" 减免定时............." + DateUtil.getDateFormat(new Date(), "yyyy-MM-dd hh:mm:ss"));
-			List<AuditCenter> auditCenterlist = auditCenterDao.findgetList();
-			logger.info(" select list===========" + auditCenterlist.size());
-			for (int i = 0; i < auditCenterlist.size(); i++) {
-				AuditCenter auditCenter = auditCenterlist.get(i);
-				logger.info("order  auditCenter===========" + auditCenter);
-				Map<String, String> map1 = new HashMap<String, String>();
-				map1.put("loanId", auditCenter.getLoanId());
-				map1.put("status", "4");
-				auditCenterDao.updateSysStatus(map1);
-				HashMap<String, String> ordermap = new HashMap<String, String>();
-				ordermap.put("loanId", auditCenter.getLoanId());
-				ordermap.put("status", auditCenter.getOrderStatus());
-				ordermap.put("reductionMoney", "0");
-				iMmanLoanCollectionOrderDao.sveUpdateNotNull(ordermap);
+			logger.info("auditStatusInvalid" + DateUtil.getDateFormat(new Date(), "yyyy-MM-dd hh:mm:ss"));
+
+			Map<String, String> auditParams = new HashMap<>();
+			auditParams.put("type", Constant.AUDIT_TYPE_REDUCTION);
+			auditParams.put("status",Constant.AUDIT_CHECKING);
+
+			List<AuditCenter> auditCenterList = auditCenterDao.getAuditCheckingList(auditParams);
+			logger.error("auditStatusInvalidListSize:"+auditCenterList.size());
+			HashMap<String, Object> map = new HashMap<>();
+			AuditCenter auditCenter = null;
+			MmanLoanCollectionOrder order = null;
+			for (int i= 0;i<auditCenterList.size(); i++){
+				auditCenter = auditCenterList.get(i);
+				//更新审核status至4失效
+				map.put("auditId", auditCenter.getId());
+				map.put("status", Constant.AUDIT_INVALID);
+				auditCenterDao.updateAuditStatus(map);
+				//更新订单status： 如果订单此时未还款完成，则将订单置为减免前的状态。如果已还款完成，不更新订单stats
+				order = mmanLoanCollectionOrderDao.getOrderById(auditCenter.getOrderid());
+				if (!order.getStatus().equals(Constant.STATUS_OVERDUE_FOUR)){//订单此时未还款完成
+					map.put("orderId",auditCenter.getOrderid());
+					map.put("orderStatus",auditCenter.getOrderStatus());
+					mmanLoanCollectionOrderDao.updateReductionOrder(map);
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error("TaskJianmianStatus  updateStatus error:", e);
 		}
-		/**
-		 * 减免特殊处理
-		 */
-	    try {
-			logger.error(" 减免特殊订单处理............." + DateUtil.getDateFormat(new Date(), "yyyy-MM-dd hh:mm:ss"));
-			List<AuditCenter> list = auditCenterDao.selectGetList();
-			logger.info(" AuditCenter  list===========" + list.size());
-			if(!CollectionUtils.isEmpty(list)){
-				for (int j = 0; j < list.size(); j++) {
-					AuditCenter auditCenter = list.get(j);
-					logger.info("order  auditCenter===========" + auditCenter);
-					if(auditCenter!=null){
-						Map<String, String> map1 = new HashMap<String, String>();
-						map1.put("loanId", auditCenter.getLoanId());
-						map1.put("status", "4");
-						auditCenterDao.updateSysStatus(map1);
-					}else {
-						logger.info("order  auditCenter===========" + auditCenter);
-					}
-				}
-			}
-	    }catch (Exception e) {
-			logger.info("TaskJianmianStatus  auditCenter===========" + e);
-	   }
 	}
 }
 

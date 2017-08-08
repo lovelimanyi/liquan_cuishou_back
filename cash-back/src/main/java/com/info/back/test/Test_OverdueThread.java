@@ -28,7 +28,7 @@ import java.util.List;
  * Created by Administrator on 2017/5/8 0008.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations={"file:src/config/applicationContext.xml"})
+@ContextConfiguration(locations={"file:src/main/resources/applicationContext.xml"})
 public class Test_OverdueThread {
 
     private static Logger loger = Logger.getLogger(Test_OverdueThread.class);
@@ -42,7 +42,7 @@ public class Test_OverdueThread {
 
     @Test
     public void test() {
-        String payId = "493689";
+        String payId = "2061432";
         if (StringUtils.isNotBlank(payId)) {
             loger.error("sync-OperaOverdueDataThread:"+payId);
             HashMap<String,String> map = new HashMap<String,String>();
@@ -79,10 +79,10 @@ public class Test_OverdueThread {
                             //保存还款详情表
                             syncUtils.saveCreditLoanPayDetail(localDataDao,repayment,payId, repaymentDetailList);
                             //保存用户信息表--联系人表--银行卡
-                            saveUserInfo(userId,userInfo,userContactsList,cardInfo);
+//                            saveUserInfo(userId,userInfo,userContactsList,cardInfo);
                         }
                         this.taskJobMiddleService.dispatchforLoanId(loanId,userInfo.get("id_number").toString());
-                        RedisUtil.delRedisKey(Constant.TYPE_OVERDUE_ + payId);
+//                        RedisUtil.delRedisKey(Constant.TYPE_OVERDUE_ + payId);
                     } else {
                         if (null != borrowOrder && null != repaymentDetailList) {
                             //更新用户借款表
@@ -96,14 +96,14 @@ public class Test_OverdueThread {
                         }
 //						//验证是否减免
 //						syncUtils.checkReduction(repayment,localDataDao);
-                        RedisUtil.delRedisKey(Constant.TYPE_OVERDUE_ + payId);
+//                        RedisUtil.delRedisKey(Constant.TYPE_OVERDUE_ + payId);
                     }
                 } catch (Exception e0) {
                     loger.error("OperaOverdueDataThread-异常-loanId"+loanId);
                     e0.printStackTrace();
                 }
             }else{
-                RedisUtil.delRedisKey(Constant.TYPE_OVERDUE_ + payId);
+//                RedisUtil.delRedisKey(Constant.TYPE_OVERDUE_ + payId);
             }
         }
     }

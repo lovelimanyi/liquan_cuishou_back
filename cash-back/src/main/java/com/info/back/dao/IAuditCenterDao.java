@@ -35,5 +35,6 @@ public interface IAuditCenterDao {
 
     int getAuditChecking(HashMap<String, Object> params);
 
-
+	//获取减免审核status为0的减免
+	List<AuditCenter> getAuditCheckingList(Map<String, String> auditParams);
 }
