@@ -50,9 +50,9 @@
 	<select id="findAll" resultMap="queryResultMap" parameterType="HashMap">
 		SELECT
 			re.id,
-			mo.loan_id AS orderid,
-			lo.realname AS user_id,
-			bu.group_level AS collectiongroup,
+			mo.loan_id AS orderId,
+			lo.realname AS userId,
+			bu.group_level AS collectionGroup,
 			re.contact_type,
 			re.contact_name,
 			re.relation,
@@ -64,10 +64,10 @@
 			re.create_date,
 			re.remark,
 			mo.current_overdue_level,
-			bu.user_name AS collectionperson,
-			p.title AS companytitle,
-			IFNULL(d.fengkong_ids, 0) AS fengkonglabel,
-			d. STATUS AS collectionadvice,
+			bu.user_name AS collectionPerson,
+			p.title AS companyTitle,
+			IFNULL(d.fengkong_ids, 0) AS fengKongLabel,
+			d. STATUS AS collectionAdvice,
 			d.collection_record_id
 		FROM
 		<include refid="base_table"></include>
