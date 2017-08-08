@@ -67,7 +67,7 @@
 			bu.user_name AS collectionPerson,
 			p.title AS companyTitle,
 			IFNULL(d.fengkong_ids, 0) AS fengKongLabel,
-			d. STATUS AS collectionAdvice,
+			d.`status` AS collectionAdvice,
 			d.collection_record_id
 		FROM
 		<include refid="base_table"></include>
@@ -146,7 +146,7 @@
 			<!--AND a.fengkong_ids is null-->
 			<!--</if>-->
 			<if test="collectionAdvice != null and fengKongLabel!= ''">
-				AND d.`collectionAdvice` = #{collectionAdvice}
+				AND d.`status` = #{collectionAdvice}
 			</if>
 			<if test="fengKongLabel != null and fengKongLabel != ''">
 				AND d.`fk_labels` LIKE #{fengKongLabel}
