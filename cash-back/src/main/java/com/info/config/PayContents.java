@@ -14,5 +14,5 @@ public class PayContents {
     public static final String XJX_DOMAINNAME_URL=propertiesLoader.getProperty("XJX.domainname.url");	//现金侠域名
     public static final String COLLECTION_ADVISE_UPDATE_URL=propertiesLoader.getProperty("collection_advise_update_url");//现金侠风控催收建议推送地址
     public static final String XJX_JIANMIAN_URL=propertiesLoader.getProperty("XJX.jianmian.url");//现金侠减免推送地址
-    public static final String RONG360_REPORT_URL = propertiesLoader.getProperty("rong360.report.rul");//rong360聚信立报告地址
+    public static final String JXL_HBASE_SERVER_URL = propertiesLoader.getProperty("jxl.hbase.server.rul");//rong360聚信立报告地址
 }

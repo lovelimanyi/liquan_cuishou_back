@@ -220,12 +220,12 @@
 						#{items.companyId} 
 					</foreach>
 			</if>
-			<!--<if test="collectionBeginTime!=null">
+			<if test="collectionBeginTime!=null">
 				<![CDATA[	AND DATE_FORMAT(last_collection_time,'%Y-%m-%d') >=  #{collectionBeginTime}  ]]>
 			</if>
 			<if test="collectionEndTime !=null">
 				<![CDATA[	AND DATE_FORMAT(last_collection_time,'%Y-%m-%d') <=  #{collectionEndTime}  ]]>
-			</if>-->
+			</if>
 			<if test="dispatchBeginTime !=null">
 				AND dispatch_time &gt;= #{dispatchBeginTime}
 			</if>

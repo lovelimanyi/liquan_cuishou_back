@@ -1,52 +1,48 @@
 package com.info.back.vo.jxl;
 
 import java.util.List;
-
+/**
+ * 电商月消费
+ * @author yyf
+ *
+ * @version
+ */
 public class EbusinessExpense {
-	private float all_count;
-	private float all_amount;
-	private String trans_mth;
-	private List<String> all_category;
-	private String category;
+    //月份
+    private String trans_mth;
+    //全部消费金额
+    private float all_amount;
+    //全部消费次数
+    private Integer all_count;
+    //本月商品品类
+    private List<String> category;
 
-	public List<String> getAll_category() {
-		return all_category;
-	}
+    public String getTrans_mth() {
+        return trans_mth;
+    }
+    public void setTrans_mth(String trans_mth) {
+        this.trans_mth = trans_mth;
+    }
+    public float getAll_amount() {
+        return all_amount;
+    }
+    public void setAll_amount(float all_amount) {
+        this.all_amount = all_amount;
+    }
+    public float getAll_count() {
+        return all_count;
+    }
 
-	public void setAll_category(List<String> allCategory) {
-		all_category = allCategory;
-	}
+    public List<String> getCategory() {
+        return category;
+    }
 
-	public float getAll_count() {
-		return all_count;
-	}
+    public void setCategory(List<String> category) {
+        this.category = category;
+    }
 
-	public void setAll_count(float allCount) {
-		all_count = allCount;
-	}
+    public void setAll_count(Integer all_count) {
+        this.all_count = all_count;
 
-	public float getAll_amount() {
-		return all_amount;
-	}
-
-	public void setAll_amount(float allAmount) {
-		all_amount = allAmount;
-	}
-
-	public String getTrans_mth() {
-		return trans_mth;
-	}
-
-	public void setTrans_mth(String transMth) {
-		trans_mth = transMth;
-	}
-
-	public String getCategory() {
-		return category;
-	}
-
-	public void setCategory(String category) {
-		this.category = category;
-	}
-
+    }
 }
