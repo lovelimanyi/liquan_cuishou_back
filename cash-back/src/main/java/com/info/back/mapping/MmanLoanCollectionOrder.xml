@@ -88,6 +88,8 @@
 		<result column="id_number" property="idNumber" jdbcType="VARCHAR"/>
 		<!-- 减免滞纳金金额-->
 		<result column="reduction_money" jdbcType="DECIMAL" property="reductionMoney" />
+		<!--标记订单是否是2号派单-->
+		<result column="second_day_flag" property="secondDayFlag" jdbcType="VARCHAR" />
 	</resultMap>
 	
 	<!--<select id="getCollectionMyOrderList" resultType="com.info.web.pojo.OrderBaseResult" parameterType="HashMap" >
@@ -359,7 +361,8 @@
 			a.`top_important` as topImportant,
 			a.dispatch_name as dispatchName,
 			b.`user_name` as currUserName,
-			a.reduction_money as reductionMoney
+			a.reduction_money as reductionMoney,
+			a.second_day_flag
 	</sql>
 	<!-- 保存,保存不为NULL的字段 -->
 	<insert id="saveNotNull" parameterType="com.info.web.pojo.MmanLoanCollectionOrder">INSERT INTO mman_loan_collection_order 
@@ -551,15 +554,17 @@
 		t.s1_flag,
 	    t.csstatus ,
 		t.reduction_money,
-		t.id_number
+		t.id_number,
+		t.second_day_flag
 		FROM mman_loan_collection_order t
-		WHERE 1=1 
-	 	<if test="id !=null and id !=''">
-	 		and id = #{id}
-	 	</if> 
-	 	<if test="loanId !=null and loanId !=''">
-	 		and loan_id = #{loanId}
-	 	</if> 
+		<where>
+			<if test="id !=null and id !=''">
+				and id = #{id}
+			</if>
+			<if test="loanId !=null and loanId !=''">
+				and loan_id = #{loanId}
+			</if>
+		</where>
 	</select>
 	
 	
@@ -606,6 +611,7 @@
 			<if test="loanUserName!= null and loanUserName!=''">loan_user_name,</if> 
 			<if test="loanUserPhone!= null and loanUserPhone!=''">loan_user_phone,</if>
 			<if test="idNumber!= null and idNumber!=''">id_number,</if>
+			<if test="secondDayFlag!= null and secondDayFlag!=''">second_day_flag,</if>
 		</trim>  
 		<trim prefix="values (" suffix=")" suffixOverrides=","> 
 			<if test="id != null and id!=''">#{id,jdbcType=VARCHAR},</if>  
@@ -649,6 +655,7 @@
 			<if test="loanUserName!= null and loanUserName!=''">#{loanUserName},</if> 
 			<if test="loanUserPhone!= null and loanUserPhone!=''">#{loanUserPhone},</if>
 			<if test="idNumber!= null and idNumber!=''">#{idNumber},</if>
+			<if test="secondDayFlag!= null and secondDayFlag!=''">#{secondDayFlag},</if>
 		</trim> 
 	</insert>
 	

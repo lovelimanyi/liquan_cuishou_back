@@ -1,24 +1,5 @@
 package com.info.back.controller;
 
-import java.io.OutputStream;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import com.dianping.cat.common.EventInfo;
-import com.dianping.cat.utils.CatUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
-import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-
 import com.info.back.service.IBackUserService;
 import com.info.back.service.IMmanLoanCollectionCompanyService;
 import com.info.back.service.IMmanLoanCollectionOrderService;
@@ -26,14 +7,23 @@ import com.info.back.service.ISysDictService;
 import com.info.back.utils.BackConstant;
 import com.info.back.utils.ExcelUtil;
 import com.info.constant.Constant;
-import com.info.web.pojo.BackUser;
-import com.info.web.pojo.BackUserCompanyPermissions;
-import com.info.web.pojo.MmanLoanCollectionCompany;
-import com.info.web.pojo.OrderBaseResult;
-import com.info.web.pojo.SysDict;
+import com.info.web.pojo.*;
 import com.info.web.util.CompareUtils;
 import com.info.web.util.DateUtil;
 import com.info.web.util.PageConfig;
+import org.apache.log4j.Logger;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 @Controller
 @RequestMapping("/mmanLoanCollectionOrder")

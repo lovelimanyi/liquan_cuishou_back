@@ -34,7 +34,7 @@
 	<select id="findAll" resultMap="queryResultMap" parameterType="HashMap">
 		select
 			ml.id,mo.loan_id as loanCollectionOrderId,ml.before_status,ml.after_status,ml.type,ml.create_date,ml.operator_name,
-			ml.remark<!-- ,mc.title as company_id -->,bu.user_name as currentCollectionUserId,ml.current_collection_user_level,
+			ml.remark,mc.title as companyTitle,bu.user_name as currentCollectionUserId,ml.current_collection_user_level,
 			ml.current_collection_Order_Level
 		 from 
 		<include refid="base_table"></include>
@@ -72,6 +72,9 @@
 			<if test="userRoleId != null and userRoleId != ''">
 				AND ml.current_collection_user_id = #{userRoleId}
 			</if>
+			<if test="companyId != null and companyId != ''">
+				AND mc.id = #{companyId}
+			</if>
 		<!-- 委外经理能查看自己公司的记录 -->
 			<!-- <if test="outSourceCompanyId != null and outSourceCompanyId != ''">
 				AND mc.id = outSourceCompanyId
@@ -85,10 +88,13 @@
 			</if>
 			<!-- 按流转日志的创建时间查询流转日志记录 -->
 			<if test="beginTime != null and beginTime != ''">
-				AND DATE_FORMAT(ml.create_date,"%Y-%m-%d") &gt;= #{beginTime} 
+				AND ml.create_date &gt;= #{beginTime}
 			</if>
 			<if test="endTime != null and endTime != ''">
-				AND DATE_FORMAT(ml.create_date,"%Y-%m-%d") &lt;= #{endTime} 
+				AND ml.create_date &lt;= DATE_ADD(#{endTime},INTERVAL 1 DAY )
+			</if>
+			<if test="collectionGroup != null and collectionGroup != ''">
+				AND bu.group_level = #{collectionGroup}
 			</if>
 		<!-- 催收主管或者是经理可以查看全部记录 -->
 			<!-- <if test="noAdmin != null and noAdmin != ''">

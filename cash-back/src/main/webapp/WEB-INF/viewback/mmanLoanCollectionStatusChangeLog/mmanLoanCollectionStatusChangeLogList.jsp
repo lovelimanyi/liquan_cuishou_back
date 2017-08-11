@@ -19,17 +19,17 @@
 					</td>
 					<td>
 						操作员:
-						<input type="text" name="operatorName"
+						<input type="text" name="operatorName" id="operatorName"
 							value="${params.operatorName }" />
 					</td>
 					<td>
 						当前催收员:
-						<input type="text" name="collectionUser"
+						<input type="text" name="collectionUser" id="collectionUser"
 							value="${params.collectionUser }" />
 					</td>
 					<td>
 						借款编号:
-						<input type="text" name="loanCollectionOrderId"
+						<input type="text" name="loanCollectionOrderId" id="loanCollectionOrderId"
 							value="${params.loanCollectionOrderId }" />
 					</td>
 					<td>
@@ -49,6 +49,49 @@
 							<option value="100" <c:if test="${'100' eq params.type}">selected = "selected"</c:if>>催收完成</option> --%>
 						</select>
 					</td>
+				</tr>
+				<tr>
+					<c:choose>
+						<c:when test="${not empty params.CompanyPermissionsList}">
+							<td>催 收 公 司:
+								<select name="companyId" id="companyId">
+									<option value="">全部</option>
+									<c:forEach var="company" items="${ListMmanLoanCollectionCompany }">
+										<c:forEach var="companyViw" items="${params.CompanyPermissionsList}">
+											<c:if test="${companyViw.companyId eq company.id}">
+												<option value="${company.id }" <c:if test="${company.id eq params.companyId}">selected = "selected"</c:if>>
+														${company.title}
+												</option>
+											</c:if>
+										</c:forEach>
+									</c:forEach>
+								</select>
+							</td>
+						</c:when>
+						<c:otherwise>
+							<td>催 收 公 司:
+								<select name="companyId" id="companyId">
+									<option value="">全部</option>
+									<c:forEach var="company" items="${ListMmanLoanCollectionCompany }">
+										<option value="${company.id }" <c:if test="${company.id eq params.companyId}">selected = "selected"</c:if>>
+												${company.title}
+										</option>
+									</c:forEach>
+								</select>
+							</td>
+						</c:otherwise>
+					</c:choose>
+					<td>催&nbsp;&nbsp;&nbsp;&nbsp;收&nbsp;&nbsp;&nbsp;组:
+						<select name="collectionGroup" id="orderCollectionGroup">
+							<option value="">全部</option>
+							<c:forEach var="group" items="${dictMap }">
+								<option value="${group.key }" <c:if test="${group.key eq params.collectionGroup}">selected = "selected"</c:if>>
+										${group.value}
+								</option>
+							</c:forEach>
+
+						</select>
+					</td>
 					<td>
 						<div class="buttonActive">
 							<div class="buttonContent">
@@ -63,10 +106,10 @@
 		</div>
 	</div>
 	<div class="pageContent">
-		<%-- <jsp:include page="${BACK_URL}/rightSubList">
+		<jsp:include page="${BACK_URL}/rightSubList">
 			<jsp:param value="${params.myId}" name="parentId"/>
-		</jsp:include> --%>
-			<table class="table" style="width: 100%;" layoutH="85"
+		</jsp:include>
+			<table class="table" style="width: 100%;" layoutH="138"
 				nowrapTD="false">
 				<thead>
 					<tr>
@@ -85,9 +128,9 @@
 						<th align="center" width="50">
 							操作类型
 						</th>
-						<!-- <th align="center" width="100">
+						<th align="center" width="100">
 							催收公司
-						</th> -->
+						</th>
 						<th align="center" width="50">
 							催收组
 						</th>
@@ -118,56 +161,24 @@
 								${log.loanCollectionOrderId}
 							</td>
 							<td>
-								<%-- ${log.beforeStatus } --%>
-								<%-- <c:if test="${log.beforeStatus == 0}">待催收</c:if>
-								<c:if test="${log.beforeStatus == 1}">催收中</c:if>
-								<c:if test="${log.beforeStatus == 2}">承诺还款</c:if>
-								<c:if test="${log.beforeStatus == 3}">待催收</c:if>
-								<c:if test="${log.beforeStatus == 4}">催收成功</c:if> --%>
 								${orderStatusMap[log.beforeStatus] }
-								<%--<c:if test="${log.beforeStatus == 7}">减免审核成功</c:if>
-								<c:if test="${log.beforeStatus == 8}">减免审核拒绝</c:if>
-								<c:if test="${log.beforeStatus == 6}">减免申请中</c:if>--%>
 							</td>
 							<td>
-								<%-- ${log.afterStatus } --%>
-								<%-- <c:if test="${log.afterStatus == 0}">待催收</c:if>
-								<c:if test="${log.afterStatus == 1}">催收中</c:if>
-								<c:if test="${log.afterStatus == 2}">承诺还款</c:if>
-								<c:if test="${log.afterStatus == 3}">待催收</c:if>
-								<c:if test="${log.afterStatus == 4}">催收成功</c:if> --%>
 								${orderStatusMap[log.afterStatus] }
 							</td>
 							<td >
-								<%-- <c:if test="${log.type == '1'}">入催</c:if>
-								<c:if test="${log.type == '2'}">逾期等级转换</c:if>
-								<c:if test="${log.type == '3'}">转单</c:if>
-								<c:if test="${log.type == '4'}">委外</c:if>
-								<c:if test="${log.type == '5'}">催收完成</c:if> --%>
 								${collectionStatusMoveTypeMap[log.type] }
 							</td>
-							<%-- <td>
-								${log.companyId }
-							</td> --%>
+							 <td>
+								${log.companyTitle }
+							</td>
 							<td>
-								<%-- <c:if test="${log.currentCollectionUserLevel == '3' }">S1组</c:if>
-								<c:if test="${log.currentCollectionUserLevel == '4' }">S2组</c:if>
-								<c:if test="${log.currentCollectionUserLevel == '5' }">M1-M2组</c:if>
-								<c:if test="${log.currentCollectionUserLevel == '6' }">M2-M3组</c:if>
-								<c:if test="${log.currentCollectionUserLevel == '7' }">M3+组</c:if> --%>
-								<%-- ${log.currentCollectionUserLevel } --%>
 								${dictMap[log.currentCollectionUserLevel] }
 							</td>
 							<td>
 								${log.currentCollectionUserId }
 							</td>
 							<td>
-								<%-- <c:if test="${log.currentCollectionOrderLevel == '3' }">s1组</c:if>
-								<c:if test="${log.currentCollectionOrderLevel == '4' }">s2组</c:if>
-								<c:if test="${log.currentCollectionOrderLevel == '5' }">m1-m2组</c:if>
-								<c:if test="${log.currentCollectionOrderLevel == '6' }">m2-m3组</c:if>
-								<c:if test="${log.currentCollectionOrderLevel == '7' }">m3+组</c:if> --%>
-								<%-- ${log.currentCollectionOrderLevel } --%>
 								${dictMap[log.currentCollectionOrderLevel] }
 							</td>
 							<td>
@@ -187,4 +198,44 @@
 		<!-- 分页 -->
 		<%@ include file="../page.jsp"%>
 	</div>
+
+	<script type="text/javascript">
+		function getExcel(obj){
+            var href=$(obj).attr("href");
+		    var beginTime = $("#beginTime").val();
+		    if(beginTime != null && beginTime != ''){
+                href += "&beginTime="+beginTime;
+			}
+		    var endTime = $("#endTime").val();
+		    if(endTime != null && endTime != ''){
+		        href += "&endTime="+endTime;
+			}
+            var operatorName = $("#operatorName").val();
+		    if(operatorName != null && operatorName != ''){
+                href += "&operatorName="+operatorName;
+			}
+            var collectionUser = $("#collectionUser").val();
+            if(collectionUser != null && collectionUser != ''){
+                href += "&collectionUser="+collectionUser;
+            }
+            var loanCollectionOrderId = $("#loanCollectionOrderId").val();
+            if(loanCollectionOrderId != null && loanCollectionOrderId != ''){
+                href += "&loanCollectionOrderId="+loanCollectionOrderId;
+            }
+			var type = $("#type").val();
+            if(type != null && type != ''){
+                href += "&type="+type;
+            }
+            var companyId = $("#companyId").val();
+            if(companyId != null && companyId != ''){
+                href += "&companyId="+companyId;
+            }
+            var collectionGroup = $("#orderCollectionGroup").val();
+            if(collectionGroup != null && collectionGroup != ''){
+                href += "&collectionGroup="+collectionGroup;
+            }
+
+            $(obj).attr("href",href);
+		}
+	</script>
 </form>

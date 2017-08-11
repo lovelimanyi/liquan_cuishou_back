@@ -125,7 +125,6 @@ public class TaskJobMiddleService {
 		int yearNow = clrNow.get(Calendar.YEAR);  
 		int monthNow = clrNow.get(Calendar.MONTH) + 1;  
 		int dayNow = clrNow.get(Calendar.DAY_OF_MONTH);
-		
 		//和处理步骤对应的订单以及催收员列表
 		List<MmanLoanCollectionOrder> mmanLoanCollectionOrderNo111List = new ArrayList<MmanLoanCollectionOrder>();
 		List<MmanLoanCollectionPerson> mmanLoanCollectionPersonNo111List = new ArrayList<MmanLoanCollectionPerson>();
@@ -285,6 +284,12 @@ public class TaskJobMiddleService {
 									mmanLoanCollectionOrderOri.setOverdueDays(pday);
 									mmanLoanCollectionOrderOri.setIdNumber(idNumber);  // 借款人身份证
 									int monthDiff = (yearNow * 12 + monthNow) - (yearLoanEnd * 12 + monthLoanEnd);//跨月次数，monthDiff == 0的是今天派过的不能参与
+
+									// 受T+1规则影响，原月底最后一天的单子会在下月不经过M1-M2直接进入M2-M3组(这个不合理)，针对这种特殊情况加以处理。
+									if("1".equals(mmanLoanCollectionOrderOri.getSecondDayFlag())){
+										monthDiff = monthDiff - 1;
+									}
+
 									if (monthDiff == 0) {
 										//原订单不在条件内的只需更新逾期天数
 										manLoanCollectionOrderService.saveMmanLoanCollectionOrder(mmanLoanCollectionOrderOri);
@@ -506,6 +511,10 @@ public class TaskJobMiddleService {
 									mmanLoanCollectionOrderNo12.setJxlStatus(BackConstant.XJX_JXL_STATUS_REFUSE);
 									mmanLoanCollectionOrderNo12.setS1Flag("S1");
 									mmanLoanCollectionOrderNo12.setIdNumber(idNumber);  // 借款人身份证号码
+									// 如果是2号派单（上月最后一天应还的订单），做上标记以做特殊处理。
+									if(dayNow == 2){
+										mmanLoanCollectionOrderNo12.setSecondDayFlag("1");
+									}
 									mmanLoanCollectionOrderNo12List.add(mmanLoanCollectionOrderNo12);
 
 

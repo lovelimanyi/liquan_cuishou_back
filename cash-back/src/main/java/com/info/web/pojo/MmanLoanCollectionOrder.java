@@ -98,6 +98,8 @@ public class MmanLoanCollectionOrder {
 
     private String idNumber;  // 借款人身份证号码
 
+    private String secondDayFlag; // 标识订单是否是2号派单
+
 
     //用户信息
     private MmanUserInfo mmanUserInfo;
@@ -550,5 +552,11 @@ public class MmanLoanCollectionOrder {
         this.realMoney = realMoney;
     }
 
+    public String getSecondDayFlag() {
+        return secondDayFlag;
+    }
 
+    public void setSecondDayFlag(String secondDayFlag) {
+        this.secondDayFlag = secondDayFlag;
+    }
 }

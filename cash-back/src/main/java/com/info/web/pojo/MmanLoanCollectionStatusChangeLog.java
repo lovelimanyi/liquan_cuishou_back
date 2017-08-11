@@ -31,6 +31,8 @@ public class MmanLoanCollectionStatusChangeLog {
 	private String currentCollectionUserLevel;
 	//当前订单组的等级
 	private String currentCollectionOrderLevel;
+
+	private String companyTitle;
 	
 
 
@@ -130,6 +132,13 @@ public class MmanLoanCollectionStatusChangeLog {
 	public void setCurrentCollectionOrderLevel(String currentCollectionOrderLevel) {
 		this.currentCollectionOrderLevel = currentCollectionOrderLevel;
 	}
-	
 
+
+	public String getCompanyTitle() {
+		return companyTitle;
+	}
+
+	public void setCompanyTitle(String companyTitle) {
+		this.companyTitle = companyTitle;
+	}
 }

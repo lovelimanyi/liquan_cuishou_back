@@ -723,7 +723,7 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
 		if (installmentPayRecord != null) {
 			params.put("payMoney", String.valueOf(installmentPayRecord.getRepayMoney()));
 			params.put("id", installmentPayRecord.getLoanOrderId());
-			//调用代扣接口
+			// 调用代扣接口
 			result = this.xjxWithholding(params);
 			logger.info("调用代扣接口返回：{}", JSONUtil.beanToJson(result));
 			result.setCode("0");

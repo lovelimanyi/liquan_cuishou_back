@@ -20,7 +20,7 @@ public class TaskWithholdStatus {
 			if(recordList!=null && recordList.size() > 0){
 				collectionWithholdingRecordService.updateStatusFail();
 			}else{
-				logger.error("暂时不没有需要处理的代扣记录");
+				logger.error("暂时没有需要处理的代扣记录");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
