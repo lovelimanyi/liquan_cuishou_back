@@ -41,12 +41,6 @@
 							<option value="3" <c:if test="${'3' eq params.type}">selected = "selected"</c:if>>转单</option>
 							<option value="4" <c:if test="${'4' eq params.type}">selected = "selected"</c:if>>委外</option>
 							<option value="5" <c:if test="${'5' eq params.type}">selected = "selected"</c:if>>催收完成</option>
-							
-							<%-- <option value="6" <c:if test="${'6' eq params.type}">selected = "selected"</c:if>>取消委外</option>
-							<option value="7" <c:if test="${'7' eq params.type}">selected = "selected"</c:if>>委外成功</option>
-							<option value="8" <c:if test="${'8' eq params.type}">selected = "selected"</c:if>>月初分组</option>
-							<option value="9" <c:if test="${'9' eq params.type}">selected = "selected"</c:if>>回收</option>
-							<option value="100" <c:if test="${'100' eq params.type}">selected = "selected"</c:if>>催收完成</option> --%>
 						</select>
 					</td>
 				</tr>
