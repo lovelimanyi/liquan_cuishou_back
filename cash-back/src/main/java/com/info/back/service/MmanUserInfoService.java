@@ -99,6 +99,11 @@ public class MmanUserInfoService implements IMmanUserInfoService {
                         jsonString = GzipUtil.uncompress(Base64.decode(jsonString),"UTF-8");
                     }
                     JSONObject jsonDetail = JSONObject.parseObject(jsonString);
+                    if (jsonDetail == null){
+                        model.addAttribute(MESSAGE, "聚信立报告为空");
+                        returnUrl = "mycollectionorder/jxlReport";
+                        return returnUrl;
+                    }
                     if ("4".equals(type)){ //融360聚信立
                         Rong360Report rong360Report = JSONObject.toJavaObject(jsonDetail,Rong360Report.class);
                         //返回 融360聚信立报告页面
