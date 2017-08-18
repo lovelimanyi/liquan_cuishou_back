@@ -447,9 +447,22 @@ public class MyCollectionOrderController extends BaseController {
                 // 从oss获取图片地址
                 OSSUpload ossUpload = new OSSUpload();
                 if (userInfo != null) {
-                    URL headImageUrl = ossUpload.sampleGetFileUrl("xjx-files", userInfo.getHeadPortrait(), 1000l * 3600l);
-                    URL frontImageUrl = ossUpload.sampleGetFileUrl("xjx-files", userInfo.getIdcardImgZ(), 1000l * 3600l);
-                    URL backImageUrl = ossUpload.sampleGetFileUrl("xjx-files", userInfo.getIdcardImgF(), 1000l * 3600l);
+                    String userHeadUrl = userInfo.getHeadPortrait();
+                    String userFrontImgUrl = userInfo.getIdcardImgZ();
+                    String userBackImgUrl = userInfo.getIdcardImgF();
+
+                    if(userHeadUrl != null && userHeadUrl.startsWith("/")){
+                        userHeadUrl =  userHeadUrl.substring(1);
+                    }
+                    if(userFrontImgUrl != null && userFrontImgUrl.startsWith("/")){
+                        userFrontImgUrl =  userFrontImgUrl.substring(1);
+                    }
+                    if(userBackImgUrl != null && userBackImgUrl.startsWith("/")){
+                        userBackImgUrl =  userBackImgUrl.substring(1);
+                    }
+                    URL headImageUrl = ossUpload.sampleGetFileUrl("xjx-files", userHeadUrl, 1000l * 3600l);
+                    URL frontImageUrl = ossUpload.sampleGetFileUrl("xjx-files", userFrontImgUrl, 1000l * 3600l);
+                    URL backImageUrl = ossUpload.sampleGetFileUrl("xjx-files", userBackImgUrl, 1000l * 3600l);
                     userInfo.setHeadPortrait(headImageUrl.toString());
                     userInfo.setIdcardImgZ(frontImageUrl.toString());
                     userInfo.setIdcardImgF(backImageUrl.toString());
