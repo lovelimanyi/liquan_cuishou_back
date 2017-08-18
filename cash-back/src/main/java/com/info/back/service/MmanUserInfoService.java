@@ -7,6 +7,7 @@ import com.info.back.vo.Base64;
 import com.info.back.vo.GzipUtil;
 import com.info.back.vo.jxl.*;
 import com.info.back.vo.jxl2.JxlUserReport;
+import com.info.back.vo.jxl_360.Rong360Report;
 import com.info.back.vo.jxl_jdq.JdqReport;
 import com.info.back.vo.jxl_jlm.JlmReport;
 import com.info.config.PayContents;
@@ -82,7 +83,7 @@ public class MmanUserInfoService implements IMmanUserInfoService {
                                 jxl1.getReport_data().getCell_behavior(),jxl1.getReport_data().getMain_service(),
                                 jxl1.getReport_data().getTrip_info(),jxl1.getReport_data().getUser_info_check().getCheck_search_info());
                     }
-                 }
+                }
                 //返回 现金侠原始聚信立报告页面
                 returnUrl = "mycollectionorder/jxlReport";
             }else { //从Hbase中查出来解析： 融360聚信立；借了吗聚信立；借点钱聚信立；分期管家聚信立
@@ -99,9 +100,12 @@ public class MmanUserInfoService implements IMmanUserInfoService {
                     }
                     JSONObject jsonDetail = JSONObject.parseObject(jsonString);
                     if ("4".equals(type)){ //融360聚信立
-                        String rong360Url = jsonDetail.getString("download_url");
-                        model.addAttribute("rong360Url",rong360Url);
+                        Rong360Report rong360Report = JSONObject.toJavaObject(jsonDetail,Rong360Report.class);
                         //返回 融360聚信立报告页面
+                        model.addAttribute("inputInfo",rong360Report.getInput_info());
+                        model.addAttribute("basicInfo",rong360Report.getBasic_info());
+                        model.addAttribute("emergencyAnalysis",rong360Report.getEmergency_analysis());
+                        model.addAttribute("callLog",rong360Report.getCall_log());
                         returnUrl = "mycollectionorder/rong360Report";
                     }else if ("6".equals(type) || "5".equals(type)){ //借了吗，分期管家聚信立
                         JlmReport jlmReport = JSONObject.toJavaObject(jsonDetail,JlmReport.class);
@@ -127,7 +131,7 @@ public class MmanUserInfoService implements IMmanUserInfoService {
                     model.addAttribute(MESSAGE, "Hbase聚信立请求超时！");
                     returnUrl = "mycollectionorder/jxlReport";
                 }
-        }
+            }
             model.addAttribute("name",userInfo.getRealname());
             model.addAttribute("gender",userInfo.getUserSex());
             model.addAttribute("idNumber",userInfo.getIdNumber());

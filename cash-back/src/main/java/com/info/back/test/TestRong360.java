@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.info.back.utils.WebClient;
 import com.info.back.vo.Base64;
 import com.info.back.vo.GzipUtil;
+import com.info.back.vo.jxl_360.Rong360Report;
 import com.info.back.vo.jxl_jdq.JdqReport;
 import com.info.back.vo.jxl_jlm.JlmReport;
 import com.info.config.PayContents;
@@ -31,12 +32,13 @@ public class TestRong360 {
         //借了吗type=6
 //        json.put("userid", "5183319");
         //融360 type=4
-        json.put("userid", "5287531");
+//        json.put("userid", "5287531");
         //借点钱 type=3
 //        json.put("userid", "5301097");
         //现金侠2
-//        json.put("userid","1000013")
+//        json.put("userid","1000013");
 
+        json.put("userid","4306914");
 
 
         String data = json.toString();
@@ -52,8 +54,8 @@ public class TestRong360 {
             }
             JSONObject jsonDetail = JSONObject.parseObject(jsonString);
             if ("4".equals(type)){
-                String rong360Url = jsonDetail.getString("download_url");
-                System.out.println(rong360Url);
+                Rong360Report rong360Report = JSONObject.toJavaObject(jsonDetail,Rong360Report.class);
+                System.out.println(rong360Report);
             }else if ("6".equals(type)){
                 JlmReport jlmReport = JSONObject.toJavaObject(jsonDetail,JlmReport.class);
                 System.out.println(jlmReport);
