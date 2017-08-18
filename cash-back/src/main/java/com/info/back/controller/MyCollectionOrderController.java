@@ -451,6 +451,7 @@ public class MyCollectionOrderController extends BaseController {
                     String userFrontImgUrl = userInfo.getIdcardImgZ();
                     String userBackImgUrl = userInfo.getIdcardImgF();
 
+                    // 针对老用户特殊处理
                     if(userHeadUrl != null && userHeadUrl.startsWith("/")){
                         userHeadUrl =  userHeadUrl.substring(1);
                     }
