@@ -47,4 +47,6 @@ public interface ISysDictService {
 	public List<SysDict> getStatus(String type);
 	
 	public List<SysDict> findDictByType(String type);
+	
+	List<SysDict> getOtherStatus(HashMap<String, Object> params);
 }
