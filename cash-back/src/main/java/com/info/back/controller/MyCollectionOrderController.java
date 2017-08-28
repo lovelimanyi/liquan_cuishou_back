@@ -307,8 +307,8 @@ public class MyCollectionOrderController extends BaseController {
                 if(baseOrder.getOverdueDays() > 10){
                     statulist = sysDictService.getStatus("xjx_collection_advise");
                 }else {
-                    params.put("type", "xjx_collection_advise");
-                    params.put("refuseLable", "拒绝");
+                    // params.put("type", "xjx_collection_advise");
+                    // params.put("refuseLable", "拒绝");
                     statulist = sysDictService.getOtherStatus(params);
                 }
             } else {
