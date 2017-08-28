@@ -44,5 +44,6 @@ public interface ISysDictDao {
 	 */
 	public List<SysDict> getStatus(String type);
 
+    List<SysDict> getOtherStatus (HashMap<String, Object> params);
 	
 }
