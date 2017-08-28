@@ -146,7 +146,6 @@
 	<delete id="del" parameterType="com.info.web.pojo.SysDict">DELETE FROM sys_dict WHERE id = #{id,jdbcType=VARCHAR}</delete>
 	<!--查询催收建议不是拒绝类型的催收建议-->
 	<select id="getOtherStatus" parameterType="HashMap" resultType="com.info.web.pojo.SysDict">
-
 		select id,label,`value` from sys_dict where type = #{type} AND label <![CDATA[ <> ]]> #{refuseLable}  ORDER BY `value` DESC
 	</select>
 </mapper>

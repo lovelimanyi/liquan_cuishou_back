@@ -35,6 +35,7 @@ public interface ISysDictDao {
 	 */
 	int delete(String id);
 
+
 	 List<SysDict> findDictByType(String type);
 	
 	/**

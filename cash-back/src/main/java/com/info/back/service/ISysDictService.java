@@ -23,7 +23,7 @@ public interface ISysDictService {
 	 JsonResult saveSysDict(Map<String, String> params);
 	/**
 	 * 根据id查询数据字典
-	 * @param compayId
+	 * @param
 	 * @return
 	 */
 	 SysDict get(String id);
@@ -35,7 +35,7 @@ public interface ISysDictService {
 	 JsonResult updateSysDict(Map<String, String> params);
 	/**
 	 * 逻辑删除数据字典
-	 * @param sysDictId
+	 * @param
 	 * @return
 	 */
 	 JsonResult deleteSysDict(String id);

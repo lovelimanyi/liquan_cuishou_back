@@ -38,7 +38,6 @@ public class SysDictService implements ISysDictService {
 
 	@Override
 	public JsonResult saveSysDict(Map<String, String> params) {
-		
 		JsonResult result=new JsonResult("-1","添加数据字典失败");
 		SysDict sysDict = new SysDict();
 		if(params.get("parentId")==null || params.get("parentId")==""){
