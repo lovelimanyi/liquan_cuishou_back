@@ -66,24 +66,7 @@ public class MmanUserInfoService implements IMmanUserInfoService {
             String jxlDetail = userInfo.getJxlDetail();
             //如果jxlDetail不为空，则从数据库中查出来解析，如果为空，则从Hbase中查出来解析
             if (StringUtils.isNotBlank(jxlDetail)){ //原始现金侠的聚信立报告-分为两种：从数据库中查出来解析
-                if (jxlDetail.startsWith("{\"report\"")){ //原始现金侠第二种聚信立报告
-                    JxlUserReport jxl2= JSONObject.parseObject(jxlDetail,JxlUserReport.class);
-                    com.info.back.vo.jxl2.Report report = jxl2.getReport();
-                    addModelAttribute(model,report, jxl2.getUser_info_check().getCheck_black_info(),jxl2.getEbusiness_expense(),
-                            jxl2.getDeliver_address(),jxl2.getBehavior_check(),jxl2.getCollection_contact(),
-                            jxl2.getContact_list(),jxl2.getContact_region(),jxl2.getCell_behavior(),jxl2.getMain_service(),
-                            jxl2.getTrip_info(),jxl2.getUser_info_check().getCheck_search_info());
-                }else { //原始现金侠第一种聚信立报告
-                    UserReport jxl1 = JSONObject.parseObject(jxlDetail, UserReport.class);
-                    if(jxl1.getReport_data() != null){
-                        addModelAttribute(model,jxl1.getReport_data().getReport(),jxl1.getReport_data().getUser_info_check().getCheck_black_info(),
-                                jxl1.getReport_data().getEbusiness_expense(),jxl1.getReport_data().getDeliver_address(),
-                                jxl1.getReport_data().getBehavior_check(),jxl1.getReport_data().getCollection_contact(),
-                                jxl1.getReport_data().getContact_list(),jxl1.getReport_data().getContact_region(),
-                                jxl1.getReport_data().getCell_behavior(),jxl1.getReport_data().getMain_service(),
-                                jxl1.getReport_data().getTrip_info(),jxl1.getReport_data().getUser_info_check().getCheck_search_info());
-                    }
-                }
+                handleCashmanJxl(jxlDetail,model);
                 //返回 现金侠原始聚信立报告页面
                 returnUrl = "mycollectionorder/jxlReport";
             }else { //从Hbase中查出来解析： 融360聚信立；借了吗聚信立；借点钱聚信立；分期管家聚信立
@@ -128,6 +111,10 @@ public class MmanUserInfoService implements IMmanUserInfoService {
                         model.addAttribute("datasource",jdqReport.getDatasource());
                         //返回 借点钱聚信立报告页面
                         returnUrl = "mycollectionorder/jdqReport";
+                    }else if("1".equals(type)){
+                        handleCashmanJxl(jsonString,model);
+                        //返回 现金侠原始聚信立报告页面
+                        returnUrl = "mycollectionorder/jxlReport";
                     }else {
                         //其他情况暂时先返回原始聚信立报告页面
                         returnUrl = "mycollectionorder/jxlReport";
@@ -143,6 +130,29 @@ public class MmanUserInfoService implements IMmanUserInfoService {
             model.addAttribute("age",userInfo.getUserAge());
         }
         return returnUrl;
+    }
+    /**
+     * 现金侠聚信立报告的两种解析
+     */
+    private void handleCashmanJxl(String jxlDetail, Model model) {
+        if (jxlDetail.startsWith("{\"report\"")) { //原始现金侠第二种聚信立报告
+            JxlUserReport jxl2 = JSONObject.parseObject(jxlDetail, JxlUserReport.class);
+            com.info.back.vo.jxl2.Report report = jxl2.getReport();
+            addModelAttribute(model, report, jxl2.getUser_info_check().getCheck_black_info(), jxl2.getEbusiness_expense(),
+                    jxl2.getDeliver_address(), jxl2.getBehavior_check(), jxl2.getCollection_contact(),
+                    jxl2.getContact_list(), jxl2.getContact_region(), jxl2.getCell_behavior(), jxl2.getMain_service(),
+                    jxl2.getTrip_info(), jxl2.getUser_info_check().getCheck_search_info());
+        } else { //原始现金侠第一种聚信立报告
+            UserReport jxl1 = JSONObject.parseObject(jxlDetail, UserReport.class);
+            if (jxl1.getReport_data() != null) {
+                addModelAttribute(model, jxl1.getReport_data().getReport(), jxl1.getReport_data().getUser_info_check().getCheck_black_info(),
+                        jxl1.getReport_data().getEbusiness_expense(), jxl1.getReport_data().getDeliver_address(),
+                        jxl1.getReport_data().getBehavior_check(), jxl1.getReport_data().getCollection_contact(),
+                        jxl1.getReport_data().getContact_list(), jxl1.getReport_data().getContact_region(),
+                        jxl1.getReport_data().getCell_behavior(), jxl1.getReport_data().getMain_service(),
+                        jxl1.getReport_data().getTrip_info(), jxl1.getReport_data().getUser_info_check().getCheck_search_info());
+            }
+        }
     }
 
     /**
