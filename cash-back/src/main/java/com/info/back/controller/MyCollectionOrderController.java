@@ -263,6 +263,7 @@ public class MyCollectionOrderController extends BaseController {
                                         HttpServletResponse response, Model model) {
         HashMap<String, Object> params = this.getParametersO(request);
         String orderId = null;
+        List<SysDict> statulist = null;
         try {
             if ("other".equals(params.get("type"))) {
                 logger.error("CollectionRecordAndAdvice=" + params.get("id").toString());
@@ -302,6 +303,14 @@ public class MyCollectionOrderController extends BaseController {
                 params.put("loanUserName", baseOrder.getRealName());
                 params.put("loanMoney", baseOrder.getLoanMoney());
                 params.put("loanPenlty", baseOrder.getLoanPenlty());
+                // 逾期10天以内订单催收建议不允许拒绝
+                if(baseOrder.getOverdueDays() > 10){
+                    statulist = sysDictService.getStatus("xjx_collection_advise");
+                }else {
+                    params.put("type", "xjx_collection_advise");
+                    params.put("refuseLable", "拒绝");
+                    statulist = sysDictService.getOtherStatus(params);
+                }
             } else {
                 logger.error("baseOrder is null, orderId : " + orderId);
             }
@@ -311,8 +320,6 @@ public class MyCollectionOrderController extends BaseController {
         params.put("id", orderId);
         List<SysDict> dictlist = sysDictService.getStatus("xjx_stress_level ");
         model.addAttribute("dictlist", dictlist);// 用于搜索框保留值
-        List<SysDict> statulist = sysDictService
-                .getStatus("xjx_collection_advise");
         List<FengKong> fengKongList = fengKongService.getFengKongList();
         model.addAttribute("statulist", statulist);
         model.addAttribute("fengKongList", fengKongList);
