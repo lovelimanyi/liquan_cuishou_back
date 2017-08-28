@@ -112,4 +112,11 @@ public class SysDictService implements ISysDictService {
 		return sysDictDao.findDictByType(type);
 	}
 
+	@Override
+	public List<SysDict> getOtherStatus(HashMap<String, Object> params) {
+		params.put("type","xjx_collection_advise");
+		params.put("refuseLable","拒绝");
+		return sysDictDao.getOtherStatus(params);
+	}
+
 }

@@ -1,7 +1,6 @@
 package com.info.back.dao;
 
-import java.util.List;
-import java.util.Map;
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.stereotype.Repository;
@@ -43,6 +42,9 @@ public interface ISysDictDao {
 	 * @return
 	 */
 	public List<SysDict> getStatus(String type);
+
+
+	List<SysDict> getOtherStatus (HashMap<String, Object> params);
 
 	
 }
