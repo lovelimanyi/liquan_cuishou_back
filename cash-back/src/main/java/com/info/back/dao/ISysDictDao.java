@@ -34,14 +34,15 @@ public interface ISysDictDao {
 	 * @return
 	 */
 	int delete(String id);
-	public List<SysDict> findDictByType(String type);
+
+	 List<SysDict> findDictByType(String type);
 	
 	/**
 	 * 根据传入的类型查询该类型所有的状态
 	 * @param type
 	 * @return
 	 */
-	public List<SysDict> getStatus(String type);
+	 List<SysDict> getStatus(String type);
 
 
 	List<SysDict> getOtherStatus (HashMap<String, Object> params);

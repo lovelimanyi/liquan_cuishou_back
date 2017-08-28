@@ -107,6 +107,7 @@ public class SysDictService implements ISysDictService {
 	public List<SysDict> getStatus(String type) {
 		return sysDictDao.getStatus(type);
 	}
+
 	@Override
 	public List<SysDict> findDictByType(String type) {
 		return sysDictDao.findDictByType(type);
