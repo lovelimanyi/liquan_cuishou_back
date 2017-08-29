@@ -265,17 +265,6 @@
                 });
             });
 
-            /*$(function () {
-                $("#status").bind("change",function () {
-                        var collectionRemark = $("#status").val();
-                        console.log(collectionRemark);
-                        if(collectionRemark === 2){
-                            $("#collectionAdviceRemark").addClass("required");
-                        }
-                    }
-				)
-            })*/
-
 			function selectModelChange() {
                 var collectionRemark = $("#collectionStatus option:checked").val();
                 console.log(collectionRemark);
@@ -297,16 +286,7 @@
                     }
                 }
             }
-            
-//            function checkConent() {
-//                if($("#collectionAdviceRemark").hasClass("required")){
-//                    var content = $("#collectionAdviceRemark").val();
-//                    var len = content.replace(/[^\x00-\xff]/g, "aa").length;  // //读取转换得到长度，中文转换成2个长度，英文空格忽视算1个长度
-//                    if(len < 15){
-//                        alertMsg.error("请填写不少于15字催收建议描述！");
-//                    }
-//                }
-//            }
+
 		</script>
 	</body>
 </html>
