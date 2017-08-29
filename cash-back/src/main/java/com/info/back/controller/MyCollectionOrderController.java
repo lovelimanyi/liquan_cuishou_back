@@ -360,11 +360,11 @@ public class MyCollectionOrderController extends BaseController {
 //		System.out.println("订单状态=【===========================】"+mmanLoanCollectionOrderOri.getStatus());
 //		if(!"4".equals(mmanLoanCollectionOrderOri.getStatus())){
         try {
-            Object status =  params.get("status");
-            Object content = params.get("collectionAdviceRemark");
-            if("2".equals(status)){
+            String status = params.get("status");
+            String content = params.get("collectionRemark");
+            if("2".equals(status) && StringLengthUtil.getLength(content) < 15){
                 result.setCode("-1");
-                result.setMsg("添加催收记录和催收建议失败");
+                result.setMsg("添加催收记录和催收建议失败:催收建议拒绝，请填写不少于15字催收建议描述！");
             }else {
                 result = mmanLoanCollectionRecordService.saveCollection(params,
                         backUser);
