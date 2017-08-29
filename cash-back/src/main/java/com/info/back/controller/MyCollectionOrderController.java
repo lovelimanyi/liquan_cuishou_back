@@ -263,6 +263,7 @@ public class MyCollectionOrderController extends BaseController {
                                         HttpServletResponse response, Model model) {
         HashMap<String, Object> params = this.getParametersO(request);
         String orderId = null;
+        List<SysDict> statulist = null;
         try {
             if ("other".equals(params.get("type"))) {
                 logger.error("CollectionRecordAndAdvice=" + params.get("id").toString());
@@ -317,8 +318,6 @@ public class MyCollectionOrderController extends BaseController {
         params.put("id", orderId);
         List<SysDict> dictlist = sysDictService.getStatus("xjx_stress_level ");
         model.addAttribute("dictlist", dictlist);// 用于搜索框保留值
-        List<SysDict> statulist = sysDictService
-                .getStatus("xjx_collection_advise");
         List<FengKong> fengKongList = fengKongService.getFengKongList();
         model.addAttribute("statulist", statulist);
         model.addAttribute("fengKongList", fengKongList);
