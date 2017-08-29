@@ -151,6 +151,18 @@ public class MyCollectionOrderController extends BaseController {
         }
         model.addAttribute("ListMmanLoanCollectionCompany",
                 ListMmanLoanCollectionCompany);
+
+        if(page != null && page.getItems().size() > 0){
+            for (OrderBaseResult order:page.getItems()) {
+                String phoneNumber = "".equals(order.getPhoneNumber()) ? null : order.getPhoneNumber();
+                String idNumber = "".equals(order.getIdCard()) ? null : order.getIdCard();
+                if(BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getCollectionStatus())){
+                    order.setPhoneNumber(MaskCodeUtil.getMaskCode(phoneNumber));
+                    order.setIdCard(MaskCodeUtil.getMaskCode(idNumber));
+                }
+            }
+        }
+
         model.addAttribute("page", page);
         model.addAttribute("params", params);
         model.addAttribute("userGropLeval", backUser.getRoleId());
@@ -200,6 +212,7 @@ public class MyCollectionOrderController extends BaseController {
                     total = totalPageNum / size;
                 }
             }
+
             OutputStream os = response.getOutputStream();
             response.reset();// 清空输出流
             ExcelUtil.setFileDownloadHeader(request, response, "我的催收订单.xlsx");
@@ -263,6 +276,7 @@ public class MyCollectionOrderController extends BaseController {
                                         HttpServletResponse response, Model model) {
         HashMap<String, Object> params = this.getParametersO(request);
         String orderId = null;
+        List<SysDict> statulist = null;
         try {
             if ("other".equals(params.get("type"))) {
                 logger.error("CollectionRecordAndAdvice=" + params.get("id").toString());
@@ -302,6 +316,12 @@ public class MyCollectionOrderController extends BaseController {
                 params.put("loanUserName", baseOrder.getRealName());
                 params.put("loanMoney", baseOrder.getLoanMoney());
                 params.put("loanPenlty", baseOrder.getLoanPenlty());
+                // 逾期6天以内订单催收建议不允许拒绝
+                if(baseOrder.getOverdueDays() > 5){
+                    statulist = sysDictService.getStatus("xjx_collection_advise");
+                }else {
+                    statulist = sysDictService.getOtherStatus(params);
+                }
             } else {
                 logger.error("baseOrder is null, orderId : " + orderId);
             }
@@ -311,8 +331,6 @@ public class MyCollectionOrderController extends BaseController {
         params.put("id", orderId);
         List<SysDict> dictlist = sysDictService.getStatus("xjx_stress_level ");
         model.addAttribute("dictlist", dictlist);// 用于搜索框保留值
-        List<SysDict> statulist = sysDictService
-                .getStatus("xjx_collection_advise");
         List<FengKong> fengKongList = fengKongService.getFengKongList();
         model.addAttribute("statulist", statulist);
         model.addAttribute("fengKongList", fengKongList);
@@ -342,19 +360,26 @@ public class MyCollectionOrderController extends BaseController {
 //		System.out.println("订单状态=【===========================】"+mmanLoanCollectionOrderOri.getStatus());
 //		if(!"4".equals(mmanLoanCollectionOrderOri.getStatus())){
         try {
-            result = mmanLoanCollectionRecordService.saveCollection(params,
-                    backUser);
-            if (result.isSuccessed()
-                    && StringUtils.isNotBlank(params.get("stressLevel"))) {
-                HashMap<String, Object> topMap = new HashMap<String, Object>();
-                topMap.put("id", params.get("id") + "");
-                topMap.put("topLevel", params.get("stressLevel"));
-                mmanLoanCollectionOrderService.saveTopOrder(topMap);
+            Object status =  params.get("status");
+            Object content = params.get("collectionAdviceRemark");
+            if("2".equals(status)){
+                result.setCode("-1");
+                result.setMsg("添加催收记录和催收建议失败");
+            }else {
+                result = mmanLoanCollectionRecordService.saveCollection(params,
+                        backUser);
+                if (result.isSuccessed()
+                        && StringUtils.isNotBlank(params.get("stressLevel"))) {
+                    HashMap<String, Object> topMap = new HashMap<String, Object>();
+                    topMap.put("id", params.get("id") + "");
+                    topMap.put("topLevel", params.get("stressLevel"));
+                    mmanLoanCollectionOrderService.saveTopOrder(topMap);
+                }
+                params.put("backUserId", backUser.getId().toString());
+                params.put("userName", backUser.getUserName());
+                params.put("collectionRecordId", recordId);
+                result = fengKongService.saveCollectionAdvice(params);
             }
-            params.put("backUserId", backUser.getId().toString());
-            params.put("userName", backUser.getUserName());
-            params.put("collectionRecordId", recordId);
-            result = fengKongService.saveCollectionAdvice(params);
         } catch (Exception e) {
             logger.error(" error", e);
         }
@@ -434,7 +459,6 @@ public class MyCollectionOrderController extends BaseController {
                 } else {
                     logger.error("mmanLoanCollectionOrderOri 为null 借款id:" + params.get("id").toString());
                 }
-                model.addAttribute("collectionOrder", mmanLoanCollectionOrderOri);
                 MmanUserInfo userInfo = mmanUserInfoService.getUserInfoById(mmanLoanCollectionOrderOri.getUserId());
                 // add by yyf 根据身份证前6位 映射用户地址
                 if (userInfo != null) {
@@ -468,8 +492,6 @@ public class MyCollectionOrderController extends BaseController {
                     userInfo.setIdcardImgZ(frontImageUrl.toString());
                     userInfo.setIdcardImgF(backImageUrl.toString());
                 }
-
-                model.addAttribute("userInfo", userInfo);
                 List<CreditLoanPayDetail> detailList = creditLoanPayDetailService
                         .findPayDetail(mmanLoanCollectionOrderOri.getPayId());
                 BigDecimal payMonery = new BigDecimal(0);
@@ -479,23 +501,25 @@ public class MyCollectionOrderController extends BaseController {
                                 pay.getRealPenlty());
                     }
                 }
-                SysUserBankCard userCar = sysUserBankCardService
-                        .findUserId(mmanLoanCollectionOrderOri.getUserId());
-                /*String  Bank =userCar.getBankCard();
-                String Banktto=Bank.substring(4,15);
-				String Bankta= Bank.replace(Banktto, "***********");
-				String idNumber=userInfo.getIdNumber();
-				String Numbers =idNumber.substring(4,14);
-				String Number =idNumber.replace(Numbers, "**********");
-				model.addAttribute("Numbers",Number);//身份证号码加密处理
-				model.addAttribute("userBank", Bankta); //银行卡号处理
-	*/
-                model.addAttribute("userCar", userCar);// 已还金额
+                // 银行卡
+                SysUserBankCard userCar = sysUserBankCardService.findUserId(mmanLoanCollectionOrderOri.getUserId());
+                // 代扣记录
+                List<CollectionWithholdingRecord> withholdList = mmanLoanCollectionRecordService.findWithholdRecord(mmanLoanCollectionOrderOri.getId());
+
+                if(BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(mmanLoanCollectionOrderOri.getStatus())){
+                    userInfo.setIdNumber(MaskCodeUtil.getMaskCode(userInfo.getIdNumber()));
+                    userInfo.setUserPhone(MaskCodeUtil.getMaskCode(userInfo.getUserPhone()));
+                    userCar.setBankCard(MaskCodeUtil.getMaskCode(userCar.getBankCard()));
+                    for (CollectionWithholdingRecord withholdingRecord:withholdList) {
+                        withholdingRecord.setLoanUserPhone(MaskCodeUtil.getMaskCode(withholdingRecord.getLoanUserPhone()));
+                    }
+                }
+
+                model.addAttribute("collectionOrder", mmanLoanCollectionOrderOri);
+                model.addAttribute("userInfo", userInfo);
+                model.addAttribute("userCar", userCar);// 银行卡
                 model.addAttribute("payMonery", payMonery);// 已还金额
                 model.addAttribute("detailList", detailList);
-                // 代扣记录
-                List<CollectionWithholdingRecord> withholdList = mmanLoanCollectionRecordService
-                        .findWithholdRecord(mmanLoanCollectionOrderOri.getId());
                 model.addAttribute("withholdList", withholdList);
                 model.addAttribute("domaiName", PayContents.XJX_DOMAINNAME_URL);
                 url = "mycollectionorder/myorderDetails";
@@ -627,6 +651,7 @@ public class MyCollectionOrderController extends BaseController {
                         && !"0".equals(params.get("groupStatus"))) {
                     model.addAttribute("message", "只能相同组之间转派。请选择同组的数据");
                 }
+
             } else {
                 model.addAttribute("message", "请选择要转派的订单");
             }
@@ -721,23 +746,6 @@ public class MyCollectionOrderController extends BaseController {
 		 * params.get("parentId").toString());
 		 */
         return null;
-    }
-
-    /**
-     * 转派订单
-     *
-     * @param request
-     * @param response
-     * @param model
-     * @return
-     */
-    @RequestMapping("zhuanpai")
-    @ResponseBody
-    public Map<String, Object> zhuanpai(HttpServletRequest request,
-                                        HttpServletResponse response, Model model) {
-        Map<String, Object> map = new HashMap<String, Object>();
-
-        return map;
     }
 
     /**

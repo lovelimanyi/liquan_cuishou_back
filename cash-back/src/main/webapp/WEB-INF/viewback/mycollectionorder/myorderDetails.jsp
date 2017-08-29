@@ -243,7 +243,7 @@
 			<table class="detailB" width="100%">
 				<tr>
 					<th align="center">创建时间</th>
-					<th align="left">借款人姓名</th>
+					<th align="center">借款人姓名</th>
 					<th align="center">借款人电话</th>
 					<th align="center">催收状态</th>
 					<th align="center">欠款金额</th>

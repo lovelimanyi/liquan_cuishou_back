@@ -6,6 +6,7 @@ import com.info.back.service.IMmanLoanCollectionOrderService;
 import com.info.back.service.ISysDictService;
 import com.info.back.utils.BackConstant;
 import com.info.back.utils.ExcelUtil;
+import com.info.back.utils.MaskCodeUtil;
 import com.info.constant.Constant;
 import com.info.web.pojo.*;
 import com.info.web.util.CompareUtils;
@@ -73,6 +74,18 @@ public class MmanLoanCollectionOrderController extends BaseController{
 				//查询公司列表
 				MmanLoanCollectionCompany mmanLoanCollectionCompany = new MmanLoanCollectionCompany();
 				PageConfig<OrderBaseResult> pageConfig = mmanLoanCollectionOrderService.getPage(params);
+
+				if(pageConfig != null && pageConfig.getItems().size() > 0){
+					for (OrderBaseResult order:pageConfig.getItems()) {
+						String phoneNumber = order.getPhoneNumber();
+						String idNumber = order.getIdCard();
+						if(BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getCollectionStatus())){
+							order.setPhoneNumber(MaskCodeUtil.getMaskCode(phoneNumber));
+							order.setIdCard(MaskCodeUtil.getMaskCode(idNumber));
+						}
+					}
+				}
+
 				model.addAttribute("pm", pageConfig);
 				model.addAttribute("params", params);
 				model.addAttribute("ListMmanLoanCollectionCompany", mmanLoanCollectionCompanyService.getList(mmanLoanCollectionCompany));
@@ -84,7 +97,7 @@ public class MmanLoanCollectionOrderController extends BaseController{
 		}
 		return "order/orderList";
 	}
-	
+
 	/**
      * 总订单导出
      * @param request
@@ -139,8 +152,13 @@ public class MmanLoanCollectionOrderController extends BaseController{
 					conList[1]=r.getCompanyTile();
 					conList[2]=dictMap.get(r.getCollectionGroup()+"");
 					conList[3]=r.getRealName();
-					conList[4]=r.getIdCard();
-					conList[5]=r.getPhoneNumber();
+					if(BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(r.getCollectionStatus())){
+						conList[4] = MaskCodeUtil.getMaskCode(r.getIdCard());
+						conList[5] = MaskCodeUtil.getMaskCode(r.getPhoneNumber());
+					}else {
+						conList[4]=r.getIdCard();
+						conList[5]=r.getPhoneNumber();
+					}
 					conList[6]=r.getLoanMoney()==null?"0":r.getLoanMoney()+"";
 					conList[7]=r.getOverdueDays()+"";
 					conList[8]=r.getLoanPenlty()+"";
