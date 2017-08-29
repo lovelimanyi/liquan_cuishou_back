@@ -267,7 +267,6 @@
 
 			function selectModelChange() {
                 var collectionRemark = $("#collectionStatus option:checked").val();
-                console.log(collectionRemark);
                 if(collectionRemark == 2){
                     $("#collectionAdviceRemark").addClass("required");
                     $("#collectionAdviceRemark").attr("placeholder","请填写不少于15字的催收建议描述！");
