@@ -14,8 +14,7 @@
 	<body>
 		<div class="pageContent">
 
-			<form id="frm" method="post" enctype="multipart/form-data" action="collectionOrder/addRecordAndAdvice" onsubmit="return
-			validateCallback(this, dialogAjaxDone);"
+			<form id="frm" method="post" enctype="multipart/form-data" action="collectionOrder/addRecordAndAdvice" onsubmit="return validateCallback(this, dialogAjaxDone);"
 				class="pageForm required-validate">
 				<input type="hidden" name="parentId" value="${params.parentId}" />
 				<input type="hidden" name="id" id="id" value="${params.id }">
@@ -195,7 +194,7 @@
 								</label>
 							</dt>
 							<dd>
-								<textarea onblur="checkLength();" name="content" rows="5" cols="80" maxlength="100" id="collectionAdviceRemark"></textarea>
+								<textarea onblur="checkLength();" name="collectionRemark" rows="5" cols="80" maxlength="500" id="collectionAdviceRemark"></textarea>
 							</dd>
 						</dl>
 						<div class="divider"></div>
@@ -281,10 +280,10 @@
                 var collectionRemark = $("#collectionStatus option:checked").val();
                 console.log(collectionRemark);
                 if(collectionRemark == 2){
-                    $("#collectionAdviceRemark").addClass("required accept");
+                    $("#collectionAdviceRemark").addClass("required");
                     $("#collectionAdviceRemark").attr("placeholder","请填写不少于15字的催收建议描述！");
                 }else {
-                    $("#collectionAdviceRemark").removeClass("required accept");
+                    $("#collectionAdviceRemark").removeClass("required");
                     $("#collectionAdviceRemark").removeAttr("placeholder","请填写不少于15字的催收建议描述！");
 				}
             }
