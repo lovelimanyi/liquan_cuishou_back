@@ -88,7 +88,6 @@ public class FengKongService implements IFengKongService {
             MmanLoanCollectionOrder mmanLoanCollectionOrder = mmanLoanCollectionOrderDao.getOrderById(orderId);
 
             CollectionAdvice collectionAdvice = new CollectionAdvice();
-
             collectionAdvice.setId(IdGen.uuid());
             collectionAdvice.setOrderId(params.get("id"));
             collectionAdvice.setLoanId(mmanLoanCollectionOrder.getLoanId());
@@ -103,6 +102,7 @@ public class FengKongService implements IFengKongService {
             collectionAdvice.setCreateDate(new Date());
             collectionAdvice.setCollectionRecordId(params.get("collectionRecordId"));
             collectionAdvice.setStatus(params.get("status"));
+            collectionAdvice.setCollectionAdviceRemark(params.get("collectionRemark"));
             if (fengKongDao.insertCollectionAdvice(collectionAdvice) > 0) {
                 result.setCode("0");
                 result.setMsg("添加成功");

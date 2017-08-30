@@ -31,7 +31,7 @@ public class TestAutoDispatch {
 			System.err.println("===================testdispachForLoanId start" + loadId);
 			MmanLoanCollectionOrder order = mmanLoanCollectionOrderService.getOrderByLoanId(loadId);
 			if(order != null){
-					taskJobMiddleService.dispatchforLoanId(loadId,order.getIdNumber());
+					taskJobMiddleService.dispatchforLoanId(loadId,null);
 			}else {
 				System.out.println("借款订单对象为空，借款id = " + loadId);
 			}

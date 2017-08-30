@@ -211,6 +211,9 @@
 						<th align="center" width="180">
 							催收内容
 						</th>
+						<th align="center" width="180">
+							催收建议备注
+						</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -295,6 +298,9 @@
                                 </td>--%>
 							<td>
 								${record.content }
+							</td>
+							<td>
+								${record.collectionAdviceRemark }
 							</td>
 						</tr>
 					</c:forEach>

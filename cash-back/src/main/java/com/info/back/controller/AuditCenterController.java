@@ -9,7 +9,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.info.back.service.*;
-import com.info.web.pojo.MmanLoanCollectionCompany;
+import com.info.back.utils.MaskCodeUtil;
+import com.info.web.pojo.*;
 import com.info.web.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,9 +24,6 @@ import com.info.back.utils.BackConstant;
 import com.info.back.utils.DwzResult;
 import com.info.back.utils.SpringUtils;
 import com.info.constant.Constant;
-import com.info.web.pojo.AuditCenter;
-import com.info.web.pojo.BackUser;
-import com.info.web.pojo.SysDict;
 import com.info.web.util.PageConfig;
 
 /**
@@ -160,6 +158,16 @@ public class AuditCenterController extends BaseController{
 			HashMap<String, Object> params = getParametersO(request);
 			params.put("noAdmin", Constant.ADMINISTRATOR_ID);
 			PageConfig<AuditCenter> pageConfig = auditCenterService.findAllPage(params);
+
+			if(pageConfig != null && pageConfig.getItems().size() > 0){
+				for (AuditCenter auditCenter:pageConfig.getItems()) {
+					String phoneNumber = auditCenter.getLoanUserPhone();
+					if("2".equals(auditCenter.getStatus())){
+						auditCenter.setLoanUserPhone(MaskCodeUtil.getMaskCode(phoneNumber));
+					}
+				}
+			}
+
 			model.addAttribute("pm", pageConfig);
 			model.addAttribute("params", params);// 用于搜索框保留值
 		} catch (Exception e) {

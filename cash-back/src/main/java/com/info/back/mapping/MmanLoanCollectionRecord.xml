@@ -44,6 +44,8 @@
 		<result column="status" property="collectionAdvice" jdbcType="VARCHAR"></result>
 		<!--公司名称-->
 		<result column="title" property="companyTitle" jdbcType="VARCHAR"></result>
+		<!--催收建议备注-->
+		<result column="collection_advice_remark" property="collectionAdviceRemark" jdbcType="VARCHAR"></result>
 	</resultMap>
 	<!-- 保存,保存不为NULL的字段 -->
 
@@ -68,7 +70,8 @@
 			p.title AS companyTitle,
 			IFNULL(d.fengkong_ids, 0) AS fengKongLabel,
 			d.`status` AS collectionAdvice,
-			d.collection_record_id
+			d.collection_record_id,
+			d.collection_advice_remark
 		FROM
 		<include refid="base_table"></include>
 		<include refid="base_where"></include>

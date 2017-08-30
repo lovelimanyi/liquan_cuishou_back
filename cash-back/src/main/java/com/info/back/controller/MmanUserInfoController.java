@@ -41,12 +41,15 @@ public class MmanUserInfoController extends BaseController {
         String url=null;
         try {
             HashMap<String, Object> params = getParametersO(request);
+            MmanLoanCollectionOrder order =  null;
             if(StringUtils.isNotBlank(params.get("id")+"")){
-                MmanLoanCollectionOrder order = mmanLoanCollectionOrderService.getOrderById(params.get("id").toString());
-                if(order != null){
-                    int overdueDay = order.getOverdueDays();
-                    String userId = order.getUserId();
-                    BackUser backUser=this.loginAdminUser(request);
+               order = mmanLoanCollectionOrderService.getOrderById(params.get("id").toString());
+            }
+            if(order != null){
+                int overdueDay = order.getOverdueDays();
+                String userId = order.getUserId();
+                BackUser backUser=this.loginAdminUser(request);
+                if(!BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())){
                     if((BackConstant.COLLECTION_ROLE_ID.toString().equals(backUser.getRoleId()) && "2".equals(order.getJxlStatus()))|| !BackConstant.COLLECTION_ROLE_ID.toString().equals(backUser.getRoleId())){
                         url = mmanUserInfoService.handleJxl(model,userId);
                     }else {
@@ -59,13 +62,16 @@ public class MmanUserInfoController extends BaseController {
                             url="mycollectionorder/tapplyJxlRepor";
                         }
                     }
-                }else{
+                }else {
+                    model.addAttribute(MESSAGE, "催收成功订单不允许查看聚信里报告！");
+                }
+            }else{
                     logger.error("该订单异常，请核实，订单号：" + params.get("id"));
                 }
-            }
             model.addAttribute("params", params);
         } catch (Exception e) {
             logger.error("jxlException", e);
+            e.printStackTrace();
             model.addAttribute(MESSAGE, "聚信立异常");
         }
         return url;

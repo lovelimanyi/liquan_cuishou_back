@@ -1,18 +1,13 @@
 package com.info.back.service;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-
+import com.info.back.dao.IBackConfigParamsDao;
+import com.info.web.pojo.BackConfigParams;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.info.back.dao.IBackConfigParamsDao;
-import com.info.constant.RedisContants;
-import com.info.web.pojo.BackConfigParams;
-import com.info.web.util.JedisDataClient;
+import java.util.HashMap;
+import java.util.List;
 
 @Service
 public class BackConfigParamsService implements IBackConfigParamsService {

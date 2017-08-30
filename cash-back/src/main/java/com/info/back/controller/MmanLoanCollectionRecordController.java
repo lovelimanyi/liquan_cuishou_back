@@ -6,11 +6,13 @@ import com.info.back.service.IMmanLoanCollectionRecordService;
 import com.info.back.service.ISysDictService;
 import com.info.back.utils.BackConstant;
 import com.info.back.utils.DwzResult;
+import com.info.back.utils.MaskCodeUtil;
 import com.info.back.utils.SpringUtils;
 import com.info.constant.Constant;
 import com.info.web.pojo.BackUser;
 import com.info.web.pojo.BackUserCompanyPermissions;
 import com.info.web.pojo.MmanLoanCollectionRecord;
+import com.info.web.pojo.OrderBaseResult;
 import com.info.web.util.DateUtil;
 import com.info.web.util.PageConfig;
 import org.apache.commons.lang3.StringUtils;
@@ -101,6 +103,16 @@ public class MmanLoanCollectionRecordController extends BaseController {
 
 			PageConfig<MmanLoanCollectionRecord> pageConfig = mmanLoanCollectionRecordService
 					.findPage(params);
+
+			if(pageConfig != null && pageConfig.getItems().size() > 0){
+				for (MmanLoanCollectionRecord record:pageConfig.getItems()) {
+					String phoneNumber = record.getContactPhone();
+					if(BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(record.getOrderState())){
+						record.setContactPhone(MaskCodeUtil.getMaskCode(phoneNumber));
+					}
+				}
+			}
+
 			model.addAttribute("pm", pageConfig);
 //			model.addAttribute("record", 1);
 			model.addAttribute("params", params);// 用于搜索框保留值
@@ -117,6 +129,7 @@ public class MmanLoanCollectionRecordController extends BaseController {
 			model.addAttribute("labels",BackConstant.fengKongLabels);  // 用于前台页面风控标签下拉框（选中效果）
 		} catch (Exception e) {
 			logger.error("getMmanLoanCollectionRecordPage error", e);
+			e.printStackTrace();
 		}
 		return "mmanLoanCollectionRecord/mmanLoanCollectionRecordList";
 	}

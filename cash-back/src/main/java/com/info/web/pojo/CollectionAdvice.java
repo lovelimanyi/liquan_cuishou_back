@@ -31,6 +31,16 @@ public class CollectionAdvice {
 	private String status;
 	// 催收记录id
 	private String collectionRecordId;
+	// 催收建议备注(催收建议拒绝时为必填)
+	private String collectionAdviceRemark;
+
+	public String getCollectionAdviceRemark() {
+		return collectionAdviceRemark;
+	}
+
+	public void setCollectionAdviceRemark(String collectionAdviceRemark) {
+		this.collectionAdviceRemark = collectionAdviceRemark;
+	}
 
 	public String getCollectionRecordId() {
 		return collectionRecordId;
