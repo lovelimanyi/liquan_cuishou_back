@@ -129,6 +129,7 @@ public class MmanLoanCollectionRecordController extends BaseController {
 			model.addAttribute("labels",BackConstant.fengKongLabels);  // 用于前台页面风控标签下拉框（选中效果）
 		} catch (Exception e) {
 			logger.error("getMmanLoanCollectionRecordPage error", e);
+			e.printStackTrace();
 		}
 		return "mmanLoanCollectionRecord/mmanLoanCollectionRecordList";
 	}
