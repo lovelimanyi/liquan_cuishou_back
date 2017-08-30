@@ -300,7 +300,7 @@
 								${record.content }
 							</td>
 							<td>
-									${record.collectionAdviceRemark }
+								${record.collectionAdviceRemark }
 							</td>
 						</tr>
 					</c:forEach>

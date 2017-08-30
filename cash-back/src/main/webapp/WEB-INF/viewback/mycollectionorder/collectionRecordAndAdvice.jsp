@@ -274,7 +274,7 @@
                     $("#collectionAdviceRemark").removeClass("required");
                     $("#collectionAdviceRemark").removeAttr("placeholder","请填写不少于15字的催收建议描述！");
 				}
-            }
+            };
 
 			function checkLength() {
 			    if($("#collectionAdviceRemark").hasClass("required")){
@@ -284,7 +284,7 @@
                         alertMsg.error("请填写不少于15字催收建议描述！");
                     }
                 }
-            }
+            };
 
 		</script>
 	</body>
