@@ -362,7 +362,7 @@ public class MyCollectionOrderController extends BaseController {
         try {
             String status = params.get("status");
             String content = params.get("collectionRemark");
-            if("2".equals(status) && StringLengthUtil.getLength(content) < 16){
+            if("2".equals(status) && StringLengthUtil.getLength(content) < 15){
                 result.setCode("-1");
                 result.setMsg("添加催收记录和催收建议失败:催收建议拒绝，请填写不少于15字催收建议描述！");
             }else {

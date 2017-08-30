@@ -162,7 +162,7 @@ public class AuditCenterController extends BaseController{
 			if(pageConfig != null && pageConfig.getItems().size() > 0){
 				for (AuditCenter auditCenter:pageConfig.getItems()) {
 					String phoneNumber = auditCenter.getLoanUserPhone();
-					if(BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(auditCenter.getCollectionStatus())){
+					if("2".equals(auditCenter.getStatus())){
 						auditCenter.setLoanUserPhone(MaskCodeUtil.getMaskCode(phoneNumber));
 					}
 				}
