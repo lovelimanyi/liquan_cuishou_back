@@ -14,39 +14,40 @@ public interface ISysDictService {
 	 * @param params
 	 * @return
 	 */
-	public PageConfig<SysDict> findPage(HashMap<String, Object> params);
+	 PageConfig<SysDict> findPage(HashMap<String, Object> params);
 	/**
 	 * 添加数据字典
 	 * @param params
 	 * @return
 	 */
-	public JsonResult saveSysDict(Map<String, String> params);
+	 JsonResult saveSysDict(Map<String, String> params);
 	/**
 	 * 根据id查询数据字典
-	 * @param compayId
+	 * @param
 	 * @return
 	 */
-	public SysDict get(String id);
+	 SysDict get(String id);
 	/**
 	 * 修改数据字典
 	 * @param params
 	 * @return
 	 */
-	public JsonResult updateSysDict(Map<String, String> params);
+	 JsonResult updateSysDict(Map<String, String> params);
 	/**
 	 * 逻辑删除数据字典
-	 * @param sysDictId
+	 * @param
 	 * @return
 	 */
-	public JsonResult deleteSysDict(String id);
+	 JsonResult deleteSysDict(String id);
 	/**
 	 * 根据传入的类型查询该类型所有的状态
 	 * @param type
 	 * @return
 	 */
-	public List<SysDict> getStatus(String type);
+	 List<SysDict> getStatus(String type);
 	
-	public List<SysDict> findDictByType(String type);
-	
+	 List<SysDict> findDictByType(String type);
+
 	List<SysDict> getOtherStatus(HashMap<String, Object> params);
+
 }

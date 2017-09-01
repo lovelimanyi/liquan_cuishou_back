@@ -12,7 +12,7 @@ import com.info.back.service.IBackUserService;
 import com.info.web.pojo.BackUserRole;
 
 @RunWith(SpringJUnit4ClassRunner.class) 
-@ContextConfiguration(locations={"file:src/config/applicationContext.xml"})
+@ContextConfiguration(locations={"file:src/main/resources/applicationContext.xml"})
 public class TestUserRole {
 
 	@Autowired

@@ -47,12 +47,18 @@ public class MmanLoanCollectionRecord {
 	private String remark;
 
 
-
-
 	private String companyTitle; // 公司名称
 	private String collectionAdvice; //催收建议
 	private String fengKongLabel; //风控标签
+	private String collectionAdviceRemark; // 催收建议备注
 
+	public String getCollectionAdviceRemark() {
+		return collectionAdviceRemark;
+	}
+
+	public void setCollectionAdviceRemark(String collectionAdviceRemark) {
+		this.collectionAdviceRemark = collectionAdviceRemark;
+	}
 	public String getCompanyTitle() {
 		return companyTitle;
 	}

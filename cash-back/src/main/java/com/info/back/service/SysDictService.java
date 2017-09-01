@@ -38,7 +38,6 @@ public class SysDictService implements ISysDictService {
 
 	@Override
 	public JsonResult saveSysDict(Map<String, String> params) {
-		
 		JsonResult result=new JsonResult("-1","添加数据字典失败");
 		SysDict sysDict = new SysDict();
 		if(params.get("parentId")==null || params.get("parentId")==""){
@@ -107,14 +106,17 @@ public class SysDictService implements ISysDictService {
 	public List<SysDict> getStatus(String type) {
 		return sysDictDao.getStatus(type);
 	}
+
 	@Override
 	public List<SysDict> findDictByType(String type) {
 		return sysDictDao.findDictByType(type);
 	}
-    @Override
+
+	@Override
 	public List<SysDict> getOtherStatus(HashMap<String, Object> params) {
 		params.put("type","xjx_collection_advise");
 		params.put("refuseLable","拒绝");
 		return sysDictDao.getOtherStatus(params);
 	}
+
 }

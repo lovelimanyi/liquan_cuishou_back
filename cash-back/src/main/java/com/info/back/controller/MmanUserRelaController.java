@@ -2,6 +2,7 @@ package com.info.back.controller;
 
 import com.info.back.service.IMmanLoanCollectionOrderService;
 import com.info.back.service.IMmanUserRelaService;
+import com.info.back.utils.BackConstant;
 import com.info.web.pojo.MmanLoanCollectionOrder;
 import com.info.web.pojo.MmanUserRela;
 import com.info.web.util.PageConfig;
@@ -39,23 +40,27 @@ public class MmanUserRelaController extends BaseController {
 				params.put("userId", order.getUserId());
 				int overdueDays = order.getOverdueDays();//逾期天数
 				params.put("overdueDays",overdueDays);
-				if(overdueDays <= 1){
-					erroMsg = "逾期2天方可申请查看通讯录";
-				}else if(overdueDays >= 2 && overdueDays <= 3){
-					params.put("num",2);
-					List<MmanUserRela> list = mmanUserRelaService.getList(params);
-					model.addAttribute("list", list);
-				}else if(overdueDays >= 4 && overdueDays <= 5){
-					params.put("num",5);
-					List<MmanUserRela> list = mmanUserRelaService.getList(params);
-					model.addAttribute("list", list);
-				}else if(overdueDays >= 6 && overdueDays <= 10){
-					params.put("num",15);
-					List<MmanUserRela> list = mmanUserRelaService.getList(params);
-					model.addAttribute("list", list);
-				}else{
-					PageConfig<MmanUserRela> pageConfig = mmanUserRelaService.findPage(params);
-					model.addAttribute("pm", pageConfig);
+				if(!BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())){
+					if(overdueDays <= 1){
+						erroMsg = "逾期2天方可申请查看通讯录";
+					}else if(overdueDays >= 2 && overdueDays <= 3){
+						params.put("num",2);
+						List<MmanUserRela> list = mmanUserRelaService.getList(params);
+						model.addAttribute("list", list);
+					}else if(overdueDays >= 4 && overdueDays <= 5){
+						params.put("num",5);
+						List<MmanUserRela> list = mmanUserRelaService.getList(params);
+						model.addAttribute("list", list);
+					}else if(overdueDays >= 6 && overdueDays <= 10){
+						params.put("num",15);
+						List<MmanUserRela> list = mmanUserRelaService.getList(params);
+						model.addAttribute("list", list);
+					}else{
+						PageConfig<MmanUserRela> pageConfig = mmanUserRelaService.findPage(params);
+						model.addAttribute("pm", pageConfig);
+					}
+				}else {
+					erroMsg = "催收成功订单不允许查看通讯录！";
 				}
 			}else {
 				logger.error("借款人联系人异常，请核实，借款id: " + orderId);
@@ -82,6 +87,8 @@ public class MmanUserRelaController extends BaseController {
 		model.addAttribute(MESSAGE, erroMsg);
 		return "mycollectionorder/mmanUserRelaList";
 	}
+
+
 	@RequestMapping("getMmanUserRelaCountPage")
 	public String getMmanUserRelaCountPage(HttpServletRequest request,HttpServletResponse response, Model model){
 		//String erroMsg = null;

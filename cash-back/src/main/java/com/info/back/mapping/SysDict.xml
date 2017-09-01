@@ -84,7 +84,7 @@
 	
 	<!-- 查询所有的状态(id和状态名) -->
 	<select id="getStatus" resultType="com.info.web.pojo.SysDict" parameterType="String">
-		select id,label,value from sys_dict where type = #{type} ORDER BY `value` DESC
+		select id,label,`value` from sys_dict where type = #{type} ORDER BY `value` DESC
 	</select>
 		
 	<!-- 保存,保存不为NULL的字段 -->
@@ -139,8 +139,7 @@
 			del_flag='1'
 		</set> WHERE id = #{id,jdbcType=VARCHAR}
 	</update>
-	
-	
+
 	<!-- 根据主键获取单条记录 -->
 	<select id="get" resultMap="queryResultMap" parameterType="com.info.web.pojo.SysDict">SELECT t.id , t.value , t.label , t.type , t.description , t.sort , t.parent_id , t.create_by , t.create_date , t.update_by , t.update_date , t.remarks , t.del_flag FROM sys_dict t WHERE id = #{id,jdbcType=VARCHAR}</select>
 	<!-- 根据主键删除记录 -->

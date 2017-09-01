@@ -70,8 +70,10 @@
 	</update>
 
 	<insert id="insertCollectionAdvice" parameterType="com.info.web.pojo.CollectionAdvice">
-		INSERT INTO collection_advice (id,order_id,loan_id,pay_id,user_id,back_user_id,loan_user_name,loan_user_phone,user_name,fengkong_ids,fk_labels,create_date,status,collection_record_id)
-		VALUES(#{id},#{orderId},#{loanId},#{payId},#{userId},#{backUserId},#{loanUserName},#{loanUserPhone},#{userName},#{fengkongIds},#{fkLabels},#{createDate},#{status},#{collectionRecordId})
+		INSERT INTO collection_advice
+		(id,order_id,loan_id,pay_id,user_id,back_user_id,loan_user_name,loan_user_phone,user_name,fengkong_ids,fk_labels,create_date,status,collection_record_id,collection_advice_remark)
+		VALUES(#{id},#{orderId},#{loanId},#{payId},#{userId},#{backUserId},#{loanUserName},#{loanUserPhone},#{userName},#{fengkongIds},#{fkLabels},#{createDate},#{status},
+		#{collectionRecordId},#{collectionAdviceRemark})
 
 	</insert>
 	<select id="getFengKongByLabel" parameterType="com.info.web.pojo.FengKong" resultType="int">

@@ -178,12 +178,23 @@
 								</label>
 							</dt>
 							<dd>
-								<select name="status">
+								<select name="status" id="collectionStatus" onchange="selectModelChange();">
 									<!-- <option value="">无建议</option> -->
 									<c:forEach var="dct" items="${statulist}" varStatus="status">
 										<option value="${dct.value}">${dct.label}</option>
 									</c:forEach>
 								</select>
+							</dd>
+						</dl>
+						<div class="divider"></div>
+						<dl >
+							<dt style="width: 80px;">
+								<label>
+									催收建议备注:
+								</label>
+							</dt>
+							<dd>
+								<textarea onblur="checkLength();" name="collectionRemark" rows="5" cols="80" maxlength="500" id="collectionAdviceRemark"></textarea>
 							</dd>
 						</dl>
 						<div class="divider"></div>
@@ -253,6 +264,27 @@
                     }})
                 });
             });
+
+			function selectModelChange() {
+                var collectionRemark = $("#collectionStatus option:checked").val();
+                if(collectionRemark == 2){
+                    $("#collectionAdviceRemark").addClass("required");
+                    $("#collectionAdviceRemark").attr("placeholder","请填写不少于15字的催收建议描述！");
+                }else {
+                    $("#collectionAdviceRemark").removeClass("required");
+                    $("#collectionAdviceRemark").removeAttr("placeholder","请填写不少于15字的催收建议描述！");
+				}
+            };
+
+			function checkLength() {
+			    if($("#collectionAdviceRemark").hasClass("required")){
+                    var content = $("#collectionAdviceRemark").val();
+                    var len = content.replace(/[^\x00-\xff]/g, "aa").length;  // //读取转换得到长度，中文转换成2个长度，英文空格忽视算1个长度
+                    if(len < 15){
+                        alertMsg.error("请填写不少于15字催收建议描述！");
+                    }
+                }
+            };
 
 		</script>
 	</body>
