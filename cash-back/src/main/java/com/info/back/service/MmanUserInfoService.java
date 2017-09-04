@@ -2,15 +2,18 @@ package com.info.back.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.info.back.dao.IMmanUserInfoDao;
+import com.info.back.utils.HttpUtils;
 import com.info.back.utils.WebClient;
 import com.info.back.vo.Base64;
 import com.info.back.vo.GzipUtil;
+import com.info.back.vo.JxlResponse;
 import com.info.back.vo.jxl.*;
 import com.info.back.vo.jxl2.JxlUserReport;
 import com.info.back.vo.jxl_360.Rong360Report;
 import com.info.back.vo.jxl_jdq.JdqReport;
 import com.info.back.vo.jxl_jlm.JlmReport;
 import com.info.config.PayContents;
+import com.info.constant.Constant;
 import com.info.web.pojo.ContactInfo;
 import com.info.web.pojo.MmanUserInfo;
 import org.apache.commons.lang.StringUtils;
@@ -61,74 +64,55 @@ public class MmanUserInfoService implements IMmanUserInfoService {
     @Override
     public String handleJxl(Model model, String userId) {
         MmanUserInfo userInfo = mmanUserInfoDao.get(userId);
+        String phone = userInfo.getUserPhone();
+        String url = PayContents.JXL_OSS_SERVER_URL+phone;
         String returnUrl = "";
-        if (userInfo != null){
-            String jxlDetail = userInfo.getJxlDetail();
-            //如果jxlDetail不为空，则从数据库中查出来解析，如果为空，则从Hbase中查出来解析
-            if (StringUtils.isNotBlank(jxlDetail)){ //原始现金侠的聚信立报告-分为两种：从数据库中查出来解析
-                handleCashmanJxl(jxlDetail,model);
-                //返回 现金侠原始聚信立报告页面
-                returnUrl = "mycollectionorder/jxlReport";
-            }else { //从Hbase中查出来解析： 融360聚信立；借了吗聚信立；借点钱聚信立；分期管家聚信立
-                JSONObject json = new JSONObject();
-                json.put("userid", userId);
-                String data = json.toString();
-                try {
-                    String result = WebClient.getInstance().postJsonData(PayContents.JXL_HBASE_SERVER_URL,  data,null);
-                    json = JSONObject.parseObject(result);
-                    String type = json.getString("type");
-                    String jsonString = json.getString("json");
-                    if (StringUtils.isBlank(jsonString)){
-                        model.addAttribute(MESSAGE, "聚信立报告为空");
-                        returnUrl = "mycollectionorder/jxlReport";
-                        return returnUrl;
-                    }
-                    if ("3".equals(type)){
-                        jsonString = GzipUtil.uncompress(Base64.decode(jsonString),"UTF-8");
-                    }
-                    JSONObject jsonDetail = JSONObject.parseObject(jsonString);
-                    if ("4".equals(type)){ //融360聚信立
-                        Rong360Report rong360Report = JSONObject.toJavaObject(jsonDetail,Rong360Report.class);
-                        //返回 融360聚信立报告页面
-                        model.addAttribute("inputInfo",rong360Report.getInput_info());
-                        model.addAttribute("basicInfo",rong360Report.getBasic_info());
-                        model.addAttribute("emergencyAnalysis",rong360Report.getEmergency_analysis());
-                        model.addAttribute("callLog",rong360Report.getCall_log());
-                        returnUrl = "mycollectionorder/rong360Report";
-                    }else if ("6".equals(type) || "5".equals(type)){ //借了吗，分期管家聚信立
-                        JlmReport jlmReport = JSONObject.toJavaObject(jsonDetail,JlmReport.class);
-                        model.addAttribute("calls",jlmReport.getCalls());
-                        model.addAttribute("transactions",jlmReport.getTransactions());
-                        model.addAttribute("basic",jlmReport.getBasic());
-                        //返回 借了吗或分期管家聚信立报告页面
-                        returnUrl = "mycollectionorder/jlmReport";
-                    }else if ("3".equals(type)){ //借点钱聚信立
-                        JdqReport jdqReport = JSONObject.toJavaObject(jsonDetail,JdqReport.class);
-                        model.addAttribute("calls",jdqReport.getCalls());
-                        model.addAttribute("transactions",jdqReport.getTransactions());
-                        model.addAttribute("basic",jdqReport.getBasic());
-                        model.addAttribute("smses",jdqReport.getSmses());
-                        model.addAttribute("datasource",jdqReport.getDatasource());
-                        //返回 借点钱聚信立报告页面
-                        returnUrl = "mycollectionorder/jdqReport";
-                    }else if("1".equals(type)){
-                        handleCashmanJxl(jsonString,model);
-                        //返回 现金侠原始聚信立报告页面
-                        returnUrl = "mycollectionorder/jxlReport";
-                    }else {
-                        //其他情况暂时先返回原始聚信立报告页面
-                        returnUrl = "mycollectionorder/jxlReport";
-                    }
-                }catch (Exception e){
-                    model.addAttribute(MESSAGE, "Hbase聚信立请求超时！");
+        try {
+            JxlResponse jxlResponse = HttpUtils.get(url,null);
+            if (jxlResponse != null){
+                String jxlType = jxlResponse.getJxlType();
+                String result = jxlResponse.getJxlData();
+                JSONObject jsonDetail = JSONObject.parseObject(result);
+                if (jxlType.equals(Constant.JLM_DEATIL) || jxlType.equals(Constant.FQGJ_DETAIL)){
+                    JlmReport jlmReport = JSONObject.toJavaObject(jsonDetail,JlmReport.class);
+                    model.addAttribute("calls",jlmReport.getCalls());
+                    model.addAttribute("transactions",jlmReport.getTransactions());
+                    model.addAttribute("basic",jlmReport.getBasic());
+                    //返回 借了吗或分期管家聚信立报告页面
+                    returnUrl = "mycollectionorder/jlmReport";
+                }else if (jxlType.equals(Constant.R360_DETAIL)){
+                    Rong360Report rong360Report = JSONObject.toJavaObject(jsonDetail,Rong360Report.class);
+                    //返回 融360聚信立报告页面
+                    model.addAttribute("inputInfo",rong360Report.getInput_info());
+                    model.addAttribute("basicInfo",rong360Report.getBasic_info());
+                    model.addAttribute("emergencyAnalysis",rong360Report.getEmergency_analysis());
+                    model.addAttribute("callLog",rong360Report.getCall_log());
+                    returnUrl = "mycollectionorder/rong360Report";
+                }else if(jxlType.equals(Constant.JXL_DETAIL)){
+                    handleCashmanJxl(result,model);
+                    returnUrl = "mycollectionorder/jxlReport";
+                }else if(jxlType.equals(Constant.JDQ_DETAIL)){
+                    JdqReport jdqReport = JSONObject.toJavaObject(jsonDetail,JdqReport.class);
+                    model.addAttribute("calls",jdqReport.getCalls());
+                    model.addAttribute("transactions",jdqReport.getTransactions());
+                    model.addAttribute("basic",jdqReport.getBasic());
+                    model.addAttribute("smses",jdqReport.getSmses());
+                    model.addAttribute("datasource",jdqReport.getDatasource());
+                    //返回 借点钱聚信立报告页面
+                    returnUrl = "mycollectionorder/jdqReport";
+                }else {
+                    //其他情况暂时先返回原始聚信立报告页面
                     returnUrl = "mycollectionorder/jxlReport";
                 }
             }
-            model.addAttribute("name",userInfo.getRealname());
-            model.addAttribute("gender",userInfo.getUserSex());
-            model.addAttribute("idNumber",userInfo.getIdNumber());
-            model.addAttribute("age",userInfo.getUserAge());
+        }catch (Exception e){
+            model.addAttribute(MESSAGE, "Hbase聚信立请求超时！");
+            returnUrl = "mycollectionorder/jxlReport";
         }
+        model.addAttribute("name",userInfo.getRealname());
+        model.addAttribute("gender",userInfo.getUserSex());
+        model.addAttribute("idNumber",userInfo.getIdNumber());
+        model.addAttribute("age",userInfo.getUserAge());
         return returnUrl;
     }
     /**
