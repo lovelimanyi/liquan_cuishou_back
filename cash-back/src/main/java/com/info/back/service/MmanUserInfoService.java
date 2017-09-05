@@ -104,9 +104,12 @@ public class MmanUserInfoService implements IMmanUserInfoService {
                     //其他情况暂时先返回原始聚信立报告页面
                     returnUrl = "mycollectionorder/jxlReport";
                 }
+            }else {
+                model.addAttribute(MESSAGE, "暂无此客户的聚信立报告！");
+                returnUrl = "mycollectionorder/jxlReport";
             }
         }catch (Exception e){
-            model.addAttribute(MESSAGE, "Hbase聚信立请求超时！");
+            model.addAttribute(MESSAGE, "聚信立请求超时！");
             returnUrl = "mycollectionorder/jxlReport";
         }
         model.addAttribute("name",userInfo.getRealname());
