@@ -1,9 +1,10 @@
 package com.info.back.service;
 
+import com.info.web.pojo.CollectionWithholdingRecord;
+
 import java.util.HashMap;
 import java.util.List;
-
-import com.info.web.pojo.CollectionWithholdingRecord;
+import java.util.Map;
 
 public interface ICollectionWithholdingRecordService {
 	/**
@@ -11,17 +12,17 @@ public interface ICollectionWithholdingRecordService {
 	 * @param 
 	 * @return
 	 */
-	public boolean updateStatusFail();
+	 boolean updateStatusFail();
 
-	public List<CollectionWithholdingRecord> findTowHoursList();
+	 List<CollectionWithholdingRecord> findTowHoursList();
 
 	/**
 	 * 分期记录 时间段内是否可代扣
 	 */
-	public void updateWithholdStatus();
+	 void updateWithholdStatus(Map<String, Object> map);
 
 	/**
 	 * 分期记录 时间段内是否逾期
 	 */
-	public void updateOverdueStatus();
+	 void updateOverdueStatus();
 }

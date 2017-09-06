@@ -64,21 +64,22 @@
 		<![CDATA[ update collection_withholding_record r	 set status=2 where  r.`create_date`<=DATE_SUB(NOW(), INTERVAL 2 HOUR)  AND r.`status`='0' ]]>
 	</update>
 
-	<update id="updateWithholdStatus" >
-		<![CDATA[
-			UPDATE installment_pay_record ipr
-			SET operation_status = '0'
-			WHERE
-				ipr.repay_status IS NULL
-			AND DATE_FORMAT(now(), '%Y-%m-%d') >= DATE_FORMAT(
-				date_add(
-					ipr.repay_time,
-					INTERVAL - 6 DAY
-				),
-				'%Y-%m-%d'
-			)
-			AND DATE_FORMAT(now(), '%Y-%m-%d') <= DATE_FORMAT(ipr.repay_time, '%Y-%m-%d')
-		]]>
+	<update id="updateWithholdStatus" parameterType="Map">
+		<!--<![CDATA[-->
+			<!--UPDATE installment_pay_record ipr-->
+			<!--SET operation_status = '0'-->
+			<!--WHERE-->
+				<!--ipr.repay_status IS NULL-->
+			<!--AND DATE_FORMAT(now(), '%Y-%m-%d') >= DATE_FORMAT(-->
+				<!--date_add(-->
+					<!--ipr.repay_time,-->
+					<!--INTERVAL - 6 DAY-->
+				<!--),-->
+				<!--'%Y-%m-%d'-->
+			<!--)-->
+			<!--AND DATE_FORMAT(now(), '%Y-%m-%d') <= DATE_FORMAT(ipr.repay_time, '%Y-%m-%d')-->
+		<!--]]>-->
+		UPDATE collection_withholding_record SET `status` = #{status},`update_date` = #{updateDate} WHERE id = #{id}
 	</update>
 
 	<update id="updateOverdueStatus" >

@@ -2,6 +2,7 @@ package com.info.back.dao;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Repository;
 
@@ -9,18 +10,18 @@ import com.info.web.pojo.CollectionWithholdingRecord;
 @Repository
 public interface ICollectionWithholdingRecordDao {
 
-	public void insert(CollectionWithholdingRecord withholdingRecord);
+	 void insert(CollectionWithholdingRecord withholdingRecord);
 
-	public List<CollectionWithholdingRecord> findOrderList(String id);
+	 List<CollectionWithholdingRecord> findOrderList(String id);
 
-	public int updateStatusFail();
+	 int updateStatusFail();
 
-	public List<CollectionWithholdingRecord> findTowHoursList();
+	 List<CollectionWithholdingRecord> findTowHoursList();
 
-	public int findCurrDayWithhold(HashMap<String, String> dayMap);
+	 int findCurrDayWithhold(HashMap<String, String> dayMap);
 
-	public void updateWithholdStatus();
+	 void updateWithholdStatus(Map<String, Object> map);
 
-	public void updateOverdueStatus();
+	 void updateOverdueStatus();
 
 }

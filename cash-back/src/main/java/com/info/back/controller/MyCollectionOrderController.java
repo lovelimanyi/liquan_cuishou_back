@@ -1,5 +1,6 @@
 package com.info.back.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.info.back.dao.IMmanLoanCollectionRecordDao;
 import com.info.back.dao.ISmsUserDao;
 import com.info.back.dao.ITemplateSmsDao;
@@ -18,18 +19,22 @@ import net.sf.json.JSONArray;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.mapdb.Atomic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.util.*;
@@ -56,8 +61,6 @@ public class MyCollectionOrderController extends BaseController {
     // 用户信息
     @Autowired
     private IMmanUserInfoService mmanUserInfoService;
-    @Autowired
-    private IBackModuleService backModuleService;
     @Autowired
     private IMmanLoanCollectionStatusChangeLogService mmanLoanCollectionStatusChangeLogService;
     @Autowired
@@ -86,10 +89,6 @@ public class MyCollectionOrderController extends BaseController {
     private ISmsUserDao iSmsUserDao;
     @Autowired
     private IMman_loan_collection_orderdeductionService collection_orderdeductionService;
-
-    @Autowired
-    private TemplateSmsService service;
-
     @Autowired
     private ICountCollectionAssessmentService countCollectionAssessmentService;
 
@@ -98,10 +97,7 @@ public class MyCollectionOrderController extends BaseController {
     @Autowired
     private IFengKongService fengKongService;
     @Autowired
-    private ICreditLoanPayService CreditLoanPayService;
-
-    @Autowired
-    private IMmanLoanCollectionRecordDao mmanLoanCollectionRecordDao;
+    private ICollectionWithholdingRecordService collectionWithholdingRecordService;
 
     /**
      * 我的订单初始化加载查询
@@ -629,7 +625,107 @@ public class MyCollectionOrderController extends BaseController {
             result.setMsg("登录已失效，请重新登录！");
         }
         return url;
+
     }
+
+    /**
+     * 异步处理（更新代扣结果）,回调接口，用于告知代扣处理结果
+     */
+    @RequestMapping(value = "withhold-callback",method = RequestMethod.GET)
+    public void dealWithholdResult(@RequestBody String message){
+        JSONObject obj = JSONObject.parseObject(message);
+        String uuid = (String)obj.get("data");
+        String code = (String)obj.get("code");
+        HashMap<String,Object> map = new HashMap<>();
+        map.put("id",uuid);
+        if("".equals(code)){
+            map.put("status",1); // 代扣成功
+//            MmanLoanCollectionOrder mmanLoanCollectionOrderNow = new MmanLoanCollectionOrder();
+//            mmanLoanCollectionOrderNow.setLoanId(jos.get("id") == null ? null : jos.get("id").toString());
+//            mmanLoanCollectionOrderService.updateRecord(mmanLoanCollectionOrderNow);
+        }else {
+            map.put("status",2); // 代扣失败
+        }
+        map.put("updateDate",new Date());
+        collectionWithholdingRecordService.updateWithholdStatus(map);   // 更新代扣记录状态
+    }
+//        if(StringUtils.isNotEmpty(result)){
+//            JSONObject jos = new JSONObject().getJSONObject(result);
+//            CollectionWithholdingRecord WithholdingRecord = new CollectionWithholdingRecord();
+//            WithholdingRecord.setId(jos.get("id") == null ? null : jos.get("id").toString());
+//            if(!"-100".equals(jos.get("code"))){
+//                WithholdingRecord.setStatus(1); // 代扣成功
+//                MmanLoanCollectionOrder mmanLoanCollectionOrderNow = new MmanLoanCollectionOrder();
+//                mmanLoanCollectionOrderNow.setLoanId(jos.get("id") == null ? null : jos.get("id").toString());
+//                mmanLoanCollectionOrderService.updateRecord(mmanLoanCollectionOrderNow);
+//            }else {
+//                WithholdingRecord.setStatus(2); // 代扣失败
+//            }
+//            WithholdingRecord.setUpdateDate(new Date());
+//            collectionWithholdingRecordService.updateWithholdStatus();   // 更新代扣状态
+
+            //扣款成功要更新操作人，由于代扣成功时会有接口更新订单、借款、还款、详情等数据，所以这里千万不能更新mmanLoanCollectionOrderOri，因为这里的订单状态还是原始状态！！！
+//            MmanLoanCollectionOrder mmanLoanCollectionOrderNow = new MmanLoanCollectionOrder();
+//            mmanLoanCollectionOrderNow.setId(mmanLoanCollectionOrderOri.getId());
+//            mmanLoanCollectionOrderNow.setOperatorName(params.get("userName"));
+//            mmanLoanCollectionOrderNow.setS1Flag(mmanLoanCollectionOrderOri.getS1Flag());
+//            if (BackConstant.XJX_COLLECTION_ORDER_STATE_WAIT.equals(mmanLoanCollectionOrderOri.getStatus())) {
+//                mmanLoanCollectionOrderNow.setStatus(BackConstant.XJX_COLLECTION_ORDER_STATE_ING);
+//            }
+//            mmanLoanCollectionOrderService.updateRecord(mmanLoanCollectionOrderNow);
+
+
+
+
+        /*
+        if (result != null && !"".equals(result)) {
+            JSONObject jos = new JSONObject().getJSONObject(result);
+            if (!"-100".equals(jos.get("code"))) {
+                CollectionWithholdingRecord WithholdingRecord = new CollectionWithholdingRecord();
+                MmanUserInfo userInfo = mmanUserInfoDao.get(mmanLoanCollectionOrderOri.getUserId());
+                WithholdingRecord.setLoanUserId(userInfo.getId());
+                WithholdingRecord.setId(uuid);
+                WithholdingRecord.setLoanUserName(userInfo.getRealname());
+                WithholdingRecord.setLoanUserPhone(userInfo.getUserPhone());
+                WithholdingRecord.setOrderId(mmanLoanCollectionOrderOri.getId());
+                WithholdingRecord.setCreateDate(new Date());
+
+                WithholdingRecord.setArrearsMoney(DecimalFormatUtil.df2Points.format(creditLoanPay.getReceivableMoney()));
+                WithholdingRecord.setHasalsoMoney(creditLoanPay.getRealMoney().toString());
+                WithholdingRecord.setOperationUserId(params.get("operationUserId"));
+                WithholdingRecord.setDeductionsMoney(payMonery);
+                WithholdingRecord.setOrderStatus(mmanLoanCollectionOrderOri.getStatus());
+                if ("0".equals(jos.get("code")) || "100".equals(jos.get("code"))) {
+                    //扣款成功要更新操作人，由于代扣成功时会有接口更新订单、借款、还款、详情等数据，所以这里千万不能更新mmanLoanCollectionOrderOri，因为这里的订单状态还是原始状态！！！
+                    MmanLoanCollectionOrder mmanLoanCollectionOrderNow = new MmanLoanCollectionOrder();
+                    mmanLoanCollectionOrderNow.setId(mmanLoanCollectionOrderOri.getId());
+                    mmanLoanCollectionOrderNow.setOperatorName(params.get("userName"));
+                    mmanLoanCollectionOrderNow.setS1Flag(mmanLoanCollectionOrderOri.getS1Flag());
+                    if (BackConstant.XJX_COLLECTION_ORDER_STATE_WAIT.equals(mmanLoanCollectionOrderOri.getStatus())) {
+                        mmanLoanCollectionOrderNow.setStatus(BackConstant.XJX_COLLECTION_ORDER_STATE_ING);
+                    }
+                    mmanLoanCollectionOrderService.updateRecord(mmanLoanCollectionOrderNow);
+                    if ("0".equals(jos.get("code"))) {
+                        WithholdingRecord.setStatus(1);
+                    } else {
+                        WithholdingRecord.setStatus(0);
+                    }
+                    reslut.setMsg("申请代扣成功");
+                    reslut.setCode("0");
+                } else {
+                    reslut.setMsg(jos.getString("msg"));
+                    WithholdingRecord.setStatus(2);
+                }
+
+                //添加一条扣款记录
+                collectionWithholdingRecordDao.insert(WithholdingRecord);
+            } else {
+                reslut.setMsg("申请代扣失败,失败编码-100");
+            }
+            logger.error("现金侠代扣返回：" + result);
+        }
+        */
+
 
     /**
      * 跳转转派页面
