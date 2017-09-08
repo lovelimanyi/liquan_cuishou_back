@@ -1,7 +1,6 @@
 package com.info.back.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.info.back.dao.IMmanLoanCollectionRecordDao;
 import com.info.back.dao.ISmsUserDao;
 import com.info.back.dao.ITemplateSmsDao;
 import com.info.back.result.JsonResult;
@@ -19,7 +18,6 @@ import net.sf.json.JSONArray;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.mapdb.Atomic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +32,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.util.*;
@@ -148,11 +145,11 @@ public class MyCollectionOrderController extends BaseController {
         model.addAttribute("ListMmanLoanCollectionCompany",
                 ListMmanLoanCollectionCompany);
 
-        if(page != null && page.getItems().size() > 0){
-            for (OrderBaseResult order:page.getItems()) {
+        if (page != null && page.getItems().size() > 0) {
+            for (OrderBaseResult order : page.getItems()) {
                 String phoneNumber = "".equals(order.getPhoneNumber()) ? null : order.getPhoneNumber();
                 String idNumber = "".equals(order.getIdCard()) ? null : order.getIdCard();
-                if(BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getCollectionStatus())){
+                if (BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getCollectionStatus())) {
                     order.setPhoneNumber(MaskCodeUtil.getMaskCode(phoneNumber));
                     order.setIdCard(MaskCodeUtil.getMaskCode(idNumber));
                 }
@@ -313,9 +310,9 @@ public class MyCollectionOrderController extends BaseController {
                 params.put("loanMoney", baseOrder.getLoanMoney());
                 params.put("loanPenlty", baseOrder.getLoanPenlty());
                 // 逾期6天以内订单催收建议不允许拒绝
-                if(baseOrder.getOverdueDays() > 10){
+                if (baseOrder.getOverdueDays() > 7) {
                     statulist = sysDictService.getStatus("xjx_collection_advise");
-                }else {
+                } else {
                     statulist = sysDictService.getOtherStatus(params);
                 }
             } else {
@@ -358,10 +355,10 @@ public class MyCollectionOrderController extends BaseController {
         try {
             String status = params.get("status");
             String content = params.get("collectionRemark");
-            if("2".equals(status) && StringLengthUtil.getLength(content) < 15){
+            if ("2".equals(status) && StringLengthUtil.getLength(content) < 15) {
                 result.setCode("-1");
                 result.setMsg("添加催收记录和催收建议失败:催收建议拒绝，请填写不少于15字催收建议描述！");
-            }else {
+            } else {
                 result = mmanLoanCollectionRecordService.saveCollection(params,
                         backUser);
                 if (result.isSuccessed()
@@ -472,14 +469,14 @@ public class MyCollectionOrderController extends BaseController {
                     String userBackImgUrl = userInfo.getIdcardImgF();
 
                     // 针对老用户特殊处理
-                    if(userHeadUrl != null && userHeadUrl.startsWith("/")){
-                        userHeadUrl =  userHeadUrl.substring(1);
+                    if (userHeadUrl != null && userHeadUrl.startsWith("/")) {
+                        userHeadUrl = userHeadUrl.substring(1);
                     }
-                    if(userFrontImgUrl != null && userFrontImgUrl.startsWith("/")){
-                        userFrontImgUrl =  userFrontImgUrl.substring(1);
+                    if (userFrontImgUrl != null && userFrontImgUrl.startsWith("/")) {
+                        userFrontImgUrl = userFrontImgUrl.substring(1);
                     }
-                    if(userBackImgUrl != null && userBackImgUrl.startsWith("/")){
-                        userBackImgUrl =  userBackImgUrl.substring(1);
+                    if (userBackImgUrl != null && userBackImgUrl.startsWith("/")) {
+                        userBackImgUrl = userBackImgUrl.substring(1);
                     }
                     URL headImageUrl = ossUpload.sampleGetFileUrl("xjx-files", userHeadUrl, 1000l * 3600l);
                     URL frontImageUrl = ossUpload.sampleGetFileUrl("xjx-files", userFrontImgUrl, 1000l * 3600l);
@@ -502,11 +499,11 @@ public class MyCollectionOrderController extends BaseController {
                 // 代扣记录
                 List<CollectionWithholdingRecord> withholdList = mmanLoanCollectionRecordService.findWithholdRecord(mmanLoanCollectionOrderOri.getId());
 
-                if(BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(mmanLoanCollectionOrderOri.getStatus())){
+                if (BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(mmanLoanCollectionOrderOri.getStatus())) {
                     userInfo.setIdNumber(MaskCodeUtil.getMaskCode(userInfo.getIdNumber()));
                     userInfo.setUserPhone(MaskCodeUtil.getMaskCode(userInfo.getUserPhone()));
                     userCar.setBankCard(MaskCodeUtil.getMaskCode(userCar.getBankCard()));
-                    for (CollectionWithholdingRecord withholdingRecord:withholdList) {
+                    for (CollectionWithholdingRecord withholdingRecord : withholdList) {
                         withholdingRecord.setLoanUserPhone(MaskCodeUtil.getMaskCode(withholdingRecord.getLoanUserPhone()));
                     }
                 }
@@ -573,19 +570,18 @@ public class MyCollectionOrderController extends BaseController {
     @RequestMapping("tokokuan")
     public String tokokuan(HttpServletRequest request,
                            HttpServletResponse response, Model model) {
-        JsonResult jsonResult = new JsonResult("-1", "请求失败");
         Map<String, String> params = this.getParameters(request);
         if (StringUtils.isNotBlank(params.get("id"))) {
             MmanLoanCollectionOrder mmanLoanCollectionOrderOri = mmanLoanCollectionOrderService
                     .getOrderById(params.get("id").toString());
-           if(mmanLoanCollectionOrderOri != null){
+            if (mmanLoanCollectionOrderOri != null) {
                 CreditLoanPay creditLoanPay = creditLoanPayService
                         .get(mmanLoanCollectionOrderOri.getPayId());
                 model.addAttribute(
                         "totalPayMonery",
                         creditLoanPay.getReceivablePrinciple().add(
                                 creditLoanPay.getReceivableInterest()));
-            }else {
+            } else {
                 logger.error("mmanLoanCollectionOrderOri is null, loanId : " + params.get("id"));
             }
         }
@@ -631,23 +627,30 @@ public class MyCollectionOrderController extends BaseController {
     /**
      * 异步处理（更新代扣结果）,回调接口，用于告知代扣处理结果
      */
-    @RequestMapping(value = "withhold-callback",method = RequestMethod.GET)
-    public void dealWithholdResult(@RequestBody String message){
+    @ResponseBody
+    @RequestMapping(value = "withhold-callback", method = RequestMethod.POST)
+    public JSONObject dealWithholdResult(@RequestBody String message) {
         JSONObject obj = JSONObject.parseObject(message);
-        String uuid = (String)obj.get("data");
-        String code = (String)obj.get("code");
-        HashMap<String,Object> map = new HashMap<>();
-        map.put("id",uuid);
-        if("".equals(code)){
-            map.put("status",1); // 代扣成功
+        String uuid = (String) obj.get("data");
+        String code = (String) obj.get("result");
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("id", uuid);
+        if ("true".equals(code)) {
+            map.put("status", 1); // 代扣成功
 //            MmanLoanCollectionOrder mmanLoanCollectionOrderNow = new MmanLoanCollectionOrder();
 //            mmanLoanCollectionOrderNow.setLoanId(jos.get("id") == null ? null : jos.get("id").toString());
 //            mmanLoanCollectionOrderService.updateRecord(mmanLoanCollectionOrderNow);
-        }else {
-            map.put("status",2); // 代扣失败
+        } else {
+            map.put("status", 2); // 代扣失败
         }
-        map.put("updateDate",new Date());
-        collectionWithholdingRecordService.updateWithholdStatus(map);   // 更新代扣记录状态
+        map.put("updateDate", new Date());
+        int count = collectionWithholdingRecordService.updateWithholdStatus(map);// 更新代扣记录状态
+        if (count > 0) {
+            obj.put("0", "更新成功！");
+        } else {
+            obj.put("1", "更新失败！");
+        }
+        return obj;
     }
 //        if(StringUtils.isNotEmpty(result)){
 //            JSONObject jos = new JSONObject().getJSONObject(result);
@@ -664,7 +667,7 @@ public class MyCollectionOrderController extends BaseController {
 //            WithholdingRecord.setUpdateDate(new Date());
 //            collectionWithholdingRecordService.updateWithholdStatus();   // 更新代扣状态
 
-            //扣款成功要更新操作人，由于代扣成功时会有接口更新订单、借款、还款、详情等数据，所以这里千万不能更新mmanLoanCollectionOrderOri，因为这里的订单状态还是原始状态！！！
+    //扣款成功要更新操作人，由于代扣成功时会有接口更新订单、借款、还款、详情等数据，所以这里千万不能更新mmanLoanCollectionOrderOri，因为这里的订单状态还是原始状态！！！
 //            MmanLoanCollectionOrder mmanLoanCollectionOrderNow = new MmanLoanCollectionOrder();
 //            mmanLoanCollectionOrderNow.setId(mmanLoanCollectionOrderOri.getId());
 //            mmanLoanCollectionOrderNow.setOperatorName(params.get("userName"));
