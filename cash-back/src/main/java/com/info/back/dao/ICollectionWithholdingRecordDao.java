@@ -20,7 +20,7 @@ public interface ICollectionWithholdingRecordDao {
 
 	 int findCurrDayWithhold(HashMap<String, String> dayMap);
 
-	 void updateWithholdStatus(Map<String, Object> map);
+	 int updateWithholdStatus(Map<String, Object> map);
 
 	 void updateOverdueStatus();
 

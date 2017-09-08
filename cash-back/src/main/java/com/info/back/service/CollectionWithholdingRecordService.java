@@ -26,8 +26,8 @@ public class CollectionWithholdingRecordService implements ICollectionWithholdin
     }
 
     @Override
-    public void updateWithholdStatus(Map<String,Object> map) {
-        collectionWithholdingRecordDao.updateWithholdStatus(map);
+    public int updateWithholdStatus(Map<String,Object> map) {
+       return collectionWithholdingRecordDao.updateWithholdStatus(map);
     }
 
     @Override

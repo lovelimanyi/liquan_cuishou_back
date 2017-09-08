@@ -19,7 +19,7 @@ public interface ICollectionWithholdingRecordService {
 	/**
 	 * 分期记录 时间段内是否可代扣
 	 */
-	 void updateWithholdStatus(Map<String, Object> map);
+	 int updateWithholdStatus(Map<String, Object> map);
 
 	/**
 	 * 分期记录 时间段内是否逾期
