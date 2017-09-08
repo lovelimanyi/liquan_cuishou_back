@@ -629,8 +629,8 @@ public class MyCollectionOrderController extends BaseController {
      */
     @ResponseBody
     @RequestMapping(value = "withhold-callback", method = RequestMethod.POST)
-    public JSONObject dealWithholdResult(@RequestBody String message) {
-        JSONObject obj = JSONObject.parseObject(message);
+    public JSONObject dealWithholdResult(@RequestBody String text) {
+        JSONObject obj = JSONObject.parseObject(text);
         String uuid = (String) obj.get("data");
         String code = (String) obj.get("result");
         HashMap<String, Object> map = new HashMap<>();
