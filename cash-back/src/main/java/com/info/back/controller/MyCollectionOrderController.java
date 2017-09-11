@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -627,15 +626,15 @@ public class MyCollectionOrderController extends BaseController {
     /**
      * 异步处理（更新代扣结果）,回调接口，用于告知代扣处理结果
      */
-    @ResponseBody
-    @RequestMapping(value = "withhold-callback", method = RequestMethod.POST)
-    public JSONObject dealWithholdResult(String text) {
+    @RequestMapping(value = "withhold-callback")
+    public void dealWithholdResult(String text) {
+        System.out.println("=============== 接收到代扣回调请求参数 +++++++++++++++++ " + text);
         JSONObject obj = JSONObject.parseObject(text);
         String uuid = (String) obj.get("uuid");
-        String code = (String) obj.get("result");
+        boolean code = (boolean) obj.get("result");
         HashMap<String, Object> map = new HashMap<>();
         map.put("id", uuid);
-        if ("true".equals(code)) {
+        if (code) {
             map.put("status", 1); // 代扣成功
 //            MmanLoanCollectionOrder mmanLoanCollectionOrderNow = new MmanLoanCollectionOrder();
 //            mmanLoanCollectionOrderNow.setLoanId(jos.get("id") == null ? null : jos.get("id").toString());
@@ -650,7 +649,6 @@ public class MyCollectionOrderController extends BaseController {
         } else {
             obj.put("1", "更新失败！");
         }
-        return obj;
     }
 //        if(StringUtils.isNotEmpty(result)){
 //            JSONObject jos = new JSONObject().getJSONObject(result);

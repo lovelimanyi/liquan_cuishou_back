@@ -56,6 +56,7 @@
 				<value>/collectionOrder/addcuishou</value>
 				<value>/collectionOrder/kokuan</value>
 				<value>/collectionOrder/sendMsg</value>
+				<value>/collectionOrder/withhold-callback</value>
 			</list>
 		</property>
 	</bean>
