@@ -7,17 +7,13 @@ import java.util.List;
 import java.util.Map;
 
 import com.info.back.dao.*;
+import com.info.web.pojo.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
-import com.info.web.pojo.CreditLoanPay;
-import com.info.web.pojo.MmanLoanCollectionOrder;
-import com.info.web.pojo.MmanUserInfo;
-import com.info.web.pojo.MmanUserLoan;
-import com.info.web.pojo.OrderBaseResult;
 import com.info.web.util.CompareUtils;
 import com.info.web.util.PageConfig;
 import com.info.back.result.JsonResult;
@@ -201,6 +197,16 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
 	@Override
 	public MmanLoanCollectionOrder getOrderByLoanId(String loanId) {
 		return manLoanCollectionOrderDao.getOrderByLoanId(loanId);
+	}
+
+	@Override
+	public OrderInfo getStopOrderInfoById(String id) {
+		return manLoanCollectionOrderDao.getStopOrderInfoById(id);
+	}
+
+	@Override
+	public int deleteOrderInfoAndLoanInfoByloanId(String loanId) {
+		return manLoanCollectionOrderDao.deleteOrderInfoAndLoanInfoByloanId(loanId);
 	}
 
 }

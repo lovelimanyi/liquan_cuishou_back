@@ -19,6 +19,7 @@
 				<input type="hidden" name="parentId" value="${params.parentId}" />
 				<input type="hidden" name="id" value="${params.id }">
 				<input type="hidden" name="orderId" value="${info.orderId }">
+				<%--<input type="hidden" name="userId" value="${info.userId }">--%>
 				<div class="pageFormContent" layoutH="56">
 					<dl>
 						<dt style="width: 80px;">

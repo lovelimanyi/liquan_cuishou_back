@@ -32,4 +32,6 @@ public interface IMmanLoanCollectionStatusChangeLogDao {
 	Integer findSystemUpToS2Log(HashMap<String, String> params);
 
 	int findAllCount(HashMap<String, Object> params);
+
+	int deleteLogByOrderId(String orderId);
 }

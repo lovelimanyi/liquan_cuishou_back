@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.info.web.pojo.OrderBaseResult;
+import com.info.web.pojo.OrderInfo;
 import org.springframework.stereotype.Repository;
 
 import com.info.web.pojo.MmanLoanCollectionOrder;
@@ -14,67 +15,67 @@ import com.info.web.pojo.MmanUserLoan;
 public interface IMmanLoanCollectionOrderDao {
 	
 	
-	public List<MmanLoanCollectionOrder> getOrderList(MmanLoanCollectionOrder mmanLoanCollectionOrder);
+	List<MmanLoanCollectionOrder> getOrderList(MmanLoanCollectionOrder mmanLoanCollectionOrder);
 
 	
 	
-	public List<MmanLoanCollectionOrder> findList(MmanLoanCollectionOrder queryParam);
+	List<MmanLoanCollectionOrder> findList(MmanLoanCollectionOrder queryParam);
 	
-	public void insertCollectionOrder(MmanLoanCollectionOrder queryParam);
+	void insertCollectionOrder(MmanLoanCollectionOrder queryParam);
 	
 	
-	public void updateCollectionOrder(MmanLoanCollectionOrder queryParam);
+	void updateCollectionOrder(MmanLoanCollectionOrder queryParam);
 
 
 
-	public int getOrderPageCount(HashMap<String, Object> params);
+	int getOrderPageCount(HashMap<String, Object> params);
 
 
 
-	public MmanLoanCollectionOrder getOrderById(String id);
+	MmanLoanCollectionOrder getOrderById(String id);
 
 	/**
 	 * 标记订单
 	 * @param params
 	 * @return
 	 */
-	public int updateTopOrder(Map<String, Object> params);
+	int updateTopOrder(Map<String, Object> params);
 
 
-	public void updateAuditStatus(HashMap<String, String> params);
+	void updateAuditStatus(HashMap<String, String> params);
 
 	/**
 	 * 根据订单id查询一条订单记录
 	 * @param orderId
 	 * @return
 	 */
-	public MmanLoanCollectionOrder getOrderWithId(String orderId);
+	MmanLoanCollectionOrder getOrderWithId(String orderId);
 	
 	
 	/**
 	 * 
 	 */
-	public int UpdateServiceOrder(Map<String, Object> params);
+	int UpdateServiceOrder(Map<String, Object> params);
 	/**
 	 * 
 	 * 减免状态更新
 	 * @param collectionOrder
 	 * @return
 	 */
-	public int updateJmStatus(MmanLoanCollectionOrder collectionOrder);
+	int updateJmStatus(MmanLoanCollectionOrder collectionOrder);
 
 	/**
 	 *  审核更新状态
 	 * @param params
 	 */
-	public void sveUpdateJmStatus(HashMap<String, String> params);
+	void sveUpdateJmStatus(HashMap<String, String> params);
 
 
 	/**
 	 * 查询催收成功订单
 	 */
 
-	public  List<MmanLoanCollectionOrder> getSelectList();
+	List<MmanLoanCollectionOrder> getSelectList();
 
 
 	void updateReductionMoney( HashMap<String, Object> order);
@@ -94,8 +95,12 @@ public interface IMmanLoanCollectionOrderDao {
 
     void updateReductionOrder(HashMap<String, Object> map);
 
-	public String getLatestLoanByUserPhoneAndLoanEndTime(HashMap<String,Object> params);
+	String getLatestLoanByUserPhoneAndLoanEndTime(HashMap<String,Object> params);
 
 	MmanLoanCollectionOrder getOrderByLoanId(String loanId);
+
+	OrderInfo getStopOrderInfoById(String id);
+
+	int deleteOrderInfoAndLoanInfoByloanId(String orderId);
 
 }
