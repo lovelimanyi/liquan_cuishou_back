@@ -77,8 +77,8 @@
  	 <bean id="sqlSessionTemplates" class="org.mybatis.spring.SqlSessionTemplate">   
        <constructor-arg index="0" ref="sqlSessionFactorySlave" />   
  	</bean>    
- 	
-    <!-- 配置事务管理器 -->  
+
+    <!-- 配置事务管理器 -->
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">  
         <property name="dataSource" ref="dataSource" />  
     </bean>  
@@ -102,7 +102,8 @@
             <tx:method name="batch*" propagation="REQUIRED" />  
             <tx:method name="modify*" propagation="REQUIRED" />  
             <tx:method name="update*" propagation="REQUIRED" />  
-            <tx:method name="delete*" propagation="REQUIRED" />  
+            <tx:method name="delete*" propagation="REQUIRED" />
+            <tx:method name="xjxWithhold*" propagation="REQUIRED" />
             <tx:method name="find*" propagation="SUPPORTS" />  
             <tx:method name="query" propagation="SUPPORTS" />  
             <tx:method name="search*" propagation="SUPPORTS" />  
