@@ -208,30 +208,35 @@ public class MmanLoanCollectionOrderController extends BaseController {
         String loanId = (String)params.get("loanId");
         String userId = (String)params.get("userId");
         String orderId = (String)params.get("orderId");
+        MmanLoanCollectionOrder order = mmanLoanCollectionOrderService.getOrderByLoanId(loanId);
         try{
-            BackUser backUser = (BackUser) request.getSession().getAttribute(Constant.BACK_USER);
-            if (BackConstant.SURPER_MANAGER_ROLE_ID.toString().equals(backUser.getRoleId()) || BackConstant.MANAGER_ROLE_ID.toString().equals(backUser.getRoleId())) {
-                StopCollectionOrderInfo orderInfo = new StopCollectionOrderInfo();
-                orderInfo.setIpAddress(IpAddressUtil.getIpAddr(request));
-                orderInfo.setUserId(userId);
-                orderInfo.setLoanId(loanId);
-                orderInfo.setOperatorId(backUser.getUuid());
-                orderInfo.setCreateTime(new Date());
-                int res = stopCollectionOrderInfoService.save(orderInfo);
-                if(res > 0){
-                    // 删除订单表/借款表相关数据(标记删除)
-                    int count = mmanLoanCollectionOrderService.deleteOrderInfoAndLoanInfoByloanId(loanId);
-                    // 删除流转日志表记录
-                    mmanLoanCollectionStatusChangeLogService.deleteLogByOrderId(orderId);
-                    result.setCode("0");
-                    result.setMsg("停催成功！");
-                }else {
+            if(!BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())){
+                BackUser backUser = (BackUser) request.getSession().getAttribute(Constant.BACK_USER);
+                if (BackConstant.SURPER_MANAGER_ROLE_ID.toString().equals(backUser.getRoleId()) || BackConstant.MANAGER_ROLE_ID.toString().equals(backUser.getRoleId())) {
+                    StopCollectionOrderInfo orderInfo = new StopCollectionOrderInfo();
+                    orderInfo.setIpAddress(IpAddressUtil.getIpAddr(request));
+                    orderInfo.setUserId(userId);
+                    orderInfo.setLoanId(loanId);
+                    orderInfo.setOperatorId(backUser.getUuid());
+                    orderInfo.setCreateTime(new Date());
+                    int res = stopCollectionOrderInfoService.save(orderInfo);
+                    if(res > 0){
+                        // 删除订单表/借款表相关数据(标记删除)
+                        int count = mmanLoanCollectionOrderService.deleteOrderInfoAndLoanInfoByloanId(loanId);
+                        // 删除流转日志表记录
+                        mmanLoanCollectionStatusChangeLogService.deleteLogByOrderId(orderId);
+                        result.setCode("0");
+                        result.setMsg("停催成功！");
+                    }else {
+                        result.setCode("-1");
+                        result.setMsg("停催失败！");
+                    }
+                } else {
                     result.setCode("-1");
-                    result.setMsg("停催失败！");
+                    result.setMsg("您无权进行该操作！！");
                 }
-            } else {
-                result.setCode("-1");
-                result.setMsg("您无权进行该操作！！");
+            }else {
+                result = new JsonResult("-1", "催收完成订单不允许停催！");
             }
         }catch (Exception e){
             e.printStackTrace();
