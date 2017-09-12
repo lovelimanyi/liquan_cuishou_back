@@ -23,7 +23,7 @@ public class MmanUserLoan {
 	private String loanPenaltyRate;
 	// 借款服务费
 	private BigDecimal serviceCharge;
-	//本金+服务费
+	// 本金+服务费
 	private BigDecimal paidMoney;
 
 	public BigDecimal getPaidMoney() {

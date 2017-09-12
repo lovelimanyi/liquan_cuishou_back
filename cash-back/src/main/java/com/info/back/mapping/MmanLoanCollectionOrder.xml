@@ -210,6 +210,9 @@
 	</sql>
 	<sql id="base_where">
 		<where>
+
+			a.`status` != '-1'
+
 			<if test="roleUserId!=null and roleUserId !=''">
 				AND a.current_collection_user_id = #{roleUserId}
 			</if>
@@ -362,7 +365,8 @@
 			a.dispatch_name as dispatchName,
 			b.`user_name` as currUserName,
 			a.reduction_money as reductionMoney,
-			a.second_day_flag
+			a.second_day_flag,
+			a.dispatch_name AS dispatchName
 	</sql>
 	<!-- 保存,保存不为NULL的字段 -->
 	<insert id="saveNotNull" parameterType="com.info.web.pojo.MmanLoanCollectionOrder">INSERT INTO mman_loan_collection_order 
@@ -845,4 +849,12 @@
 	<select id="getOrderByLoanId" parameterType="String" resultMap="queryResultMap">
 		SELECT loan_id,id_number FROM mman_loan_collection_order WHERE loan_id = #{loanId}
 	</select>
+	<select id="getStopOrderInfoById" parameterType="String" resultType="com.info.web.pojo.OrderInfo">
+		SELECT o.loan_id AS loanId,o.loan_user_name AS loanUserName,l.user_id AS userId,o.order_id AS orderId,o.loan_user_phone AS loanUserPhone,l.loan_money AS
+		loanMoney,l.loan_start_time AS loanStartTime,l.loan_end_time AS loanEndTime,o.overDuedays AS overDuedays,l.loan_penalty AS loanPenalty from mman_loan_collection_order o
+		INNER JOIN mman_user_loan l on l.id = o.loan_id WHERE o.id = #{id}
+	</select>
+	<update id="deleteOrderInfoAndLoanInfoByloanId" parameterType="String">
+		UPDATE mman_loan_collection_order o INNER JOIN mman_user_loan l on l.id = o.loan_id SET o.`status` = '-1',l.`loan_status` = '-1' WHERE o.loan_id = #{loanId}
+	</update>
 </mapper>

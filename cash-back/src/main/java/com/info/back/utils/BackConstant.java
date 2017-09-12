@@ -50,6 +50,7 @@ public class BackConstant {
 	public final static String XJX_OVERDUE_LEVEL_S1_OR_S2 = "34";// 现金侠逾期等级或催收组S1或S2，这个仅用于条件查询
 
 
+	public final static Integer SURPER_MANAGER_ROLE_ID=10001;
 
 	public final static Integer COLLECTION_ROLE_ID=10021;//催收员的角色ID
 
@@ -57,7 +58,7 @@ public class BackConstant {
 
 	public final static Integer COLLECTION_MANAGE_ROLE_ID=10025;//催收主管角色ID
 
-	public final static Integer MANAGER_ROLE_ID=10026;//经理角色ID
+	public final static Integer MANAGER_ROLE_ID=10019;//经理角色ID
 
 	public final static String XJX_COLLECTION_ORDER_STATE_SUCCESS = "4";// 现金侠催收状态催收成功
 

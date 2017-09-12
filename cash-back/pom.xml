@@ -315,7 +315,24 @@
             <artifactId>oss_op</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/net.sourceforge.jexcelapi/jxl -->
+        <dependency>
+            <groupId>net.sourceforge.jexcelapi</groupId>
+            <artifactId>jxl</artifactId>
+            <version>2.6.12</version>
+        </dependency>
+        <dependency>
+            <groupId>com.xjx</groupId>
+            <artifactId>mqclient</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>mqtt-client</artifactId>
+                    <groupId>org.fusesource.mqtt-client</groupId>
+                </exclusion>
+            </exclusions>
 
+        </dependency>
     </dependencies>
 
     <build>

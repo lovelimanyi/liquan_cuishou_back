@@ -1,13 +1,14 @@
 package com.info.back.service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.info.back.result.JsonResult;
 import com.info.web.pojo.MmanLoanCollectionOrder;
 import com.info.web.pojo.OrderBaseResult;
+import com.info.web.pojo.OrderInfo;
 import com.info.web.util.PageConfig;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public interface IMmanLoanCollectionOrderService {
 	
@@ -16,7 +17,7 @@ public interface IMmanLoanCollectionOrderService {
 	 * @param mmanLoanCollectionOrder
 	 * @return
 	 */
-	public List<MmanLoanCollectionOrder> getOrderList(MmanLoanCollectionOrder mmanLoanCollectionOrder);
+	 List<MmanLoanCollectionOrder> getOrderList(MmanLoanCollectionOrder mmanLoanCollectionOrder);
 	
 	
 	/**
@@ -24,20 +25,20 @@ public interface IMmanLoanCollectionOrderService {
 	 * @param params
 	 * @return
 	 */
-	public PageConfig<MmanLoanCollectionOrder> findPage(HashMap<String, Object> params);
+	 PageConfig<MmanLoanCollectionOrder> findPage(HashMap<String, Object> params);
 	
 	
-	public PageConfig<OrderBaseResult> getPage(HashMap<String, Object> params);
+	 PageConfig<OrderBaseResult> getPage(HashMap<String, Object> params);
 
 
 
-	public PageConfig<OrderBaseResult> getCollectionUserPage(HashMap<String, Object> params);
+	 PageConfig<OrderBaseResult> getCollectionUserPage(HashMap<String, Object> params);
 	/**
 	 * 查询派单信息
 	 * @param queryManLoanCollectionOrder
 	 * @return
 	 */
-	public List<MmanLoanCollectionOrder> findList(MmanLoanCollectionOrder queryManLoanCollectionOrder);
+	 List<MmanLoanCollectionOrder> findList(MmanLoanCollectionOrder queryManLoanCollectionOrder);
 	
 	
 	/**
@@ -45,47 +46,47 @@ public interface IMmanLoanCollectionOrderService {
 	 * @param order
 	 * 备注：若order.id为空，则新增，否则 更新
 	 */
-	public void saveMmanLoanCollectionOrder(MmanLoanCollectionOrder order);
+	 void saveMmanLoanCollectionOrder(MmanLoanCollectionOrder order);
 
 	/**
 	 * 统计订单数量
 	 * @param params
 	 * @return
 	 */
-	public int findAllCount(HashMap<String, Object> params);
+	 int findAllCount(HashMap<String, Object> params);
 
 
-	public void updateRecord(MmanLoanCollectionOrder mmanLoanCollectionOrder);
+	 void updateRecord(MmanLoanCollectionOrder mmanLoanCollectionOrder);
 
-	public MmanLoanCollectionOrder getOrderById(String id);
+	 MmanLoanCollectionOrder getOrderById(String id);
 	
 	/**
 	 * 标记订单重要程度
 	 * @param params
 	 * @return
 	 */
-	public JsonResult saveTopOrder(Map<String, Object> params);
+	 JsonResult saveTopOrder(Map<String, Object> params);
 	
     /**
      * 根据orderId查询一条记录
      * @param orderId
      * @return
      */
-	public MmanLoanCollectionOrder getOrderWithId(String orderId);
+	 MmanLoanCollectionOrder getOrderWithId(String orderId);
 
 	/**
 	 * 查询我的订单
 	 * @param params
 	 * @return
 	 */
-	public PageConfig<OrderBaseResult> getMyPage(HashMap<String, Object> params);
+	 PageConfig<OrderBaseResult> getMyPage(HashMap<String, Object> params);
 	/**
 	 *ccc
 	 *     减免状态更新
-	 * @param loan
+	 * @param collectionOrder
 	 * @return
 	 */
-	public int updateJmStatus(MmanLoanCollectionOrder collectionOrder);
+	 int updateJmStatus(MmanLoanCollectionOrder collectionOrder);
 
 	/**
 	 * 根据userId获取订单
@@ -117,4 +118,14 @@ public interface IMmanLoanCollectionOrderService {
 	 * @return
 	 */
 	MmanLoanCollectionOrder getOrderByLoanId(String loanId);
+
+	/**
+	 * 根据id查询订单信息
+	 * @param id
+	 * @return
+	 */
+	OrderInfo getStopOrderInfoById(String id );
+
+
+	int deleteOrderInfoAndLoanInfoByloanId(String loanId);
 }

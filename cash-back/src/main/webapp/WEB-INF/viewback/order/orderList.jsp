@@ -162,6 +162,9 @@
 					<th align="center" width="50">
 						当前催收员
 					</th>
+					<th align="center" width="50">
+						派单人
+					</th>
 				</tr>
 				</thead>
 				<tbody >
@@ -183,25 +186,25 @@
 							${dictMap[order.collectionGroup]}
 						</td>
 						<td align="center" width="50">
-							 ${order.realName}
+							${order.realName}
 						</td>
 						<td align="center" width="50">
-							 ${order.phoneNumber}
+							${order.phoneNumber}
 						</td>
 						<td align="center" width="50">
-							 ${order.idCard}
+							${order.idCard}
 						</td>
 						<td align="center" width="50">
-							 ${order.loanMoney}
+							${order.loanMoney}
 						</td>
 						<td align="center" width="50">
-							 ${order.overdueDays}
+							${order.overdueDays}
 						</td>
 						<td align="center" width="50">
-							 ${order.loanPenlty}
+							${order.loanPenlty}
 						</td>
 						<td align="center" width="50">
-							 ${order.reductionMoney}
+							${order.reductionMoney}
 						</td>
 						<td align="center" width="50">
 							<c:choose>
@@ -217,7 +220,7 @@
 							</c:choose>
 						</td>
 						<td align="center" width="50">
-							 <fmt:formatDate value="${order.loanEndTime}" pattern="yyyy-MM-dd"/> 
+							<fmt:formatDate value="${order.loanEndTime}" pattern="yyyy-MM-dd"/>
 						</td>
 						<!--<td align="center" width="50">
 							 还款状态（3，4，5，6，7对应S1，S2，M1-M2，M2-M3，M3+对应1-10,11-30（1），1个月-2个月，2个月-3个月，3个月+）
@@ -228,18 +231,21 @@
 							<c:if test="${order.returnStatus == '7'}">M3+</c:if>--%>
 						</td>-->
 						<td align="center" width="50">
-							 ${order.returnMoney}
+							${order.returnMoney}
 						</td>
 						<td align="center" width="50">
 							<c:if test="${order.returnMoney>0.0}">
 							 	<fmt:formatDate value="${order.currentReturnDay}" pattern="yyyy-MM-dd HH:mm:ss"/> 
-							 </c:if>
+							</c:if>
 						</td>
 						<td align="center" width="50">
 						 	<fmt:formatDate value="${order.dispatchTime}" pattern="yyyy-MM-dd HH:mm:ss"/> 
 						</td>
 						<td align="center" width="50">
-							 ${order.currUserName}
+							${order.currUserName}
+						</td>
+						<td align="center" width="50">
+							${order.dispatchName}
 						</td>
 					</tr>
 				</c:forEach>
