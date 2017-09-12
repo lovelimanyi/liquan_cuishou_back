@@ -34,13 +34,6 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
 	
 	@Autowired
 	private IMmanUserInfoDao mmanUserInfoDao;
-	
-    @Autowired
-    private IMmanLoanCollectionOrderDao collectionOrderDao;
-    @Autowired
-    private IMmanUserLoanService iMmanUserLoanService;
-    @Autowired
-    private IMmanUserLoanDao iMmanUserLoanDao;
     @Autowired
 	private ICreditLoanPayDao creditLoanPayDao;
     @Autowired
@@ -207,6 +200,11 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
 	@Override
 	public int deleteOrderInfoAndLoanInfoByloanId(String loanId) {
 		return manLoanCollectionOrderDao.deleteOrderInfoAndLoanInfoByloanId(loanId);
+	}
+
+	@Override
+	public MmanLoanCollectionOrder getOrderloanId(String loanId) {
+		return manLoanCollectionOrderDao.getOrderloanId(loanId);
 	}
 
 }

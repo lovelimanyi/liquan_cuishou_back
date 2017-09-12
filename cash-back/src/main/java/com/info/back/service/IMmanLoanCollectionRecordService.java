@@ -17,7 +17,7 @@ public interface IMmanLoanCollectionRecordService {
 	 * @param params
 	 * @return
 	 */
-	public PageConfig<MmanLoanCollectionRecord> findPage(
+	 PageConfig<MmanLoanCollectionRecord> findPage(
 			HashMap<String, Object> params);
 
 	/**
@@ -25,7 +25,7 @@ public interface IMmanLoanCollectionRecordService {
 	 * 
 	 * @return 查询到的催收记录对象
 	 */
-	public MmanLoanCollectionRecord getOne(HashMap<String, Object> params);
+	 MmanLoanCollectionRecord getOne(HashMap<String, Object> params);
 
 	/**
 	 * 添加一条催收记录
@@ -33,7 +33,7 @@ public interface IMmanLoanCollectionRecordService {
 	 * @param record
 	 *            要添加的记录对象
 	 */
-	public void insert(MmanLoanCollectionRecord record);
+	 void insert(MmanLoanCollectionRecord record);
 
 	/**
 	 * 更新一条催收记录
@@ -41,21 +41,21 @@ public interface IMmanLoanCollectionRecordService {
 	 * @param record
 	 *            要更新的记录对象
 	 */
-	public void update(MmanLoanCollectionRecord record);
+	 void update(MmanLoanCollectionRecord record);
 
 	/**
 	 * 根据订单号查询历史
 	 * 
 	 * @return
 	 */
-	public List<MmanLoanCollectionRecord> findListRecord(String OrderId);
+	 List<MmanLoanCollectionRecord> findListRecord(String OrderId);
 
-	public void assignCollectionOrderToRelatedGroup(
+	 void assignCollectionOrderToRelatedGroup(
 			List<MmanLoanCollectionOrder> mmanLoanCollectionOrderList,
 			List<MmanLoanCollectionPerson> mmanLoanCollectionPersonList,
 			Date date);
  
-	public JsonResult saveCollection(Map<String, String> params,
+	 JsonResult saveCollection(Map<String, String> params,
 			BackUser backUser);
 
 	/**
@@ -64,7 +64,7 @@ public interface IMmanLoanCollectionRecordService {
 	 * @param params
 	 * @return
 	 */
-	public JsonResult xjxWithholding(Map<String, String> params);
+	 JsonResult xjxWithholding(Map<String, String> params);
 
 	/**
 	 * 转派
@@ -73,7 +73,7 @@ public interface IMmanLoanCollectionRecordService {
 	 * @param mmanLoanCollectionOrder
 	 * @return
 	 */
-	public JsonResult batchDispatch(BackUser user,
+	 JsonResult batchDispatch(BackUser user,
 			MmanLoanCollectionOrder mmanLoanCollectionOrder);
 
 	/**
@@ -82,7 +82,7 @@ public interface IMmanLoanCollectionRecordService {
 	 * @param id
 	 * @return
 	 */
-	public List<CollectionWithholdingRecord> findWithholdRecord(String id);
+	 List<CollectionWithholdingRecord> findWithholdRecord(String id);
 
 	/**
 	 *  创建分期还款业务
@@ -90,7 +90,7 @@ public interface IMmanLoanCollectionRecordService {
 	 * @param mmanLoanCollectionOrderOri
      * @return
      */
-	public JsonResult insertInstallmentPayRecord(List<InstallmentPayInfoVo> list,MmanLoanCollectionOrder mmanLoanCollectionOrderOri);
+	 JsonResult insertInstallmentPayRecord(List<InstallmentPayInfoVo> list,MmanLoanCollectionOrder mmanLoanCollectionOrderOri);
 
 
 	/**
@@ -98,12 +98,12 @@ public interface IMmanLoanCollectionRecordService {
 	 * @param id
 	 * @return
      */
-	public List<InstallmentPayRecord> findInstallmentList(String id);
+	 List<InstallmentPayRecord> findInstallmentList(String id);
 
 	/**
 	 * 处理分期付款
 	 * @param params
 	 * @return
      */
-	public JsonResult fqWithholding(Map<String, String> params);
+	 JsonResult fqWithholding(Map<String, String> params);
 }

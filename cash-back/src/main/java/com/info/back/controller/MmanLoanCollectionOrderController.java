@@ -208,8 +208,8 @@ public class MmanLoanCollectionOrderController extends BaseController {
         String loanId = (String)params.get("loanId");
         String userId = (String)params.get("userId");
         String orderId = (String)params.get("orderId");
-        MmanLoanCollectionOrder order = mmanLoanCollectionOrderService.getOrderByLoanId(loanId);
         try{
+            MmanLoanCollectionOrder order = mmanLoanCollectionOrderService.getOrderloanId(loanId);
             if(!BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())){
                 BackUser backUser = (BackUser) request.getSession().getAttribute(Constant.BACK_USER);
                 if (BackConstant.SURPER_MANAGER_ROLE_ID.toString().equals(backUser.getRoleId()) || BackConstant.MANAGER_ROLE_ID.toString().equals(backUser.getRoleId())) {
