@@ -189,6 +189,12 @@ public class MmanLoanCollectionOrderController extends BaseController {
         }
     }
 
+    /**
+     * 跳转到停催页面
+     * @param request
+     * @param model
+     * @return
+     */
     @RequestMapping("gotoStop-collection")
     public String toStopCollection(HttpServletRequest request, Model model) {
         HashMap<String, Object> params = getParametersO(request);
@@ -201,6 +207,13 @@ public class MmanLoanCollectionOrderController extends BaseController {
         return "order/confirmStopCollection";
     }
 
+    /**
+     * 停催操作
+     * @param request
+     * @param response
+     * @param model
+     * @return
+     */
     @RequestMapping("stop-collection")
     public JsonResult stopCollection(HttpServletRequest request,HttpServletResponse response,Model model) {
         JsonResult result = new JsonResult("-1", "停催失败！");
