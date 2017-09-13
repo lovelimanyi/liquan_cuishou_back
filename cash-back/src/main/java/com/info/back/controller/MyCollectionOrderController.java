@@ -1,6 +1,6 @@
 package com.info.back.controller;
 
-import com.info.back.dao.IMmanLoanCollectionRecordDao;
+import com.alibaba.fastjson.JSONObject;
 import com.info.back.dao.ISmsUserDao;
 import com.info.back.dao.ITemplateSmsDao;
 import com.info.back.result.JsonResult;
@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.Cookie;
@@ -57,8 +58,6 @@ public class MyCollectionOrderController extends BaseController {
     @Autowired
     private IMmanUserInfoService mmanUserInfoService;
     @Autowired
-    private IBackModuleService backModuleService;
-    @Autowired
     private IMmanLoanCollectionStatusChangeLogService mmanLoanCollectionStatusChangeLogService;
     @Autowired
     private IMmanLoanCollectionRecordService mmanLoanCollectionRecordService;
@@ -86,10 +85,6 @@ public class MyCollectionOrderController extends BaseController {
     private ISmsUserDao iSmsUserDao;
     @Autowired
     private IMman_loan_collection_orderdeductionService collection_orderdeductionService;
-
-    @Autowired
-    private TemplateSmsService service;
-
     @Autowired
     private ICountCollectionAssessmentService countCollectionAssessmentService;
 
@@ -98,10 +93,7 @@ public class MyCollectionOrderController extends BaseController {
     @Autowired
     private IFengKongService fengKongService;
     @Autowired
-    private ICreditLoanPayService CreditLoanPayService;
-
-    @Autowired
-    private IMmanLoanCollectionRecordDao mmanLoanCollectionRecordDao;
+    private ICollectionWithholdingRecordService collectionWithholdingRecordService;
 
     /**
      * 我的订单初始化加载查询
@@ -152,11 +144,11 @@ public class MyCollectionOrderController extends BaseController {
         model.addAttribute("ListMmanLoanCollectionCompany",
                 ListMmanLoanCollectionCompany);
 
-        if(page != null && page.getItems().size() > 0){
-            for (OrderBaseResult order:page.getItems()) {
+        if (page != null && page.getItems().size() > 0) {
+            for (OrderBaseResult order : page.getItems()) {
                 String phoneNumber = "".equals(order.getPhoneNumber()) ? null : order.getPhoneNumber();
                 String idNumber = "".equals(order.getIdCard()) ? null : order.getIdCard();
-                if(BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getCollectionStatus())){
+                if (BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getCollectionStatus())) {
                     order.setPhoneNumber(MaskCodeUtil.getMaskCode(phoneNumber));
                     order.setIdCard(MaskCodeUtil.getMaskCode(idNumber));
                 }
@@ -317,9 +309,9 @@ public class MyCollectionOrderController extends BaseController {
                 params.put("loanMoney", baseOrder.getLoanMoney());
                 params.put("loanPenlty", baseOrder.getLoanPenlty());
                 // 逾期6天以内订单催收建议不允许拒绝
-                if(baseOrder.getOverdueDays() > 7){
+                if (baseOrder.getOverdueDays() > 7) {
                     statulist = sysDictService.getStatus("xjx_collection_advise");
-                }else {
+                } else {
                     statulist = sysDictService.getOtherStatus(params);
                 }
             } else {
@@ -362,10 +354,10 @@ public class MyCollectionOrderController extends BaseController {
         try {
             String status = params.get("status");
             String content = params.get("collectionRemark");
-            if("2".equals(status) && StringLengthUtil.getLength(content) < 15){
+            if ("2".equals(status) && StringLengthUtil.getLength(content) < 15) {
                 result.setCode("-1");
                 result.setMsg("添加催收记录和催收建议失败:催收建议拒绝，请填写不少于15字催收建议描述！");
-            }else {
+            } else {
                 result = mmanLoanCollectionRecordService.saveCollection(params,
                         backUser);
                 if (result.isSuccessed()
@@ -476,14 +468,14 @@ public class MyCollectionOrderController extends BaseController {
                     String userBackImgUrl = userInfo.getIdcardImgF();
 
                     // 针对老用户特殊处理
-                    if(userHeadUrl != null && userHeadUrl.startsWith("/")){
-                        userHeadUrl =  userHeadUrl.substring(1);
+                    if (userHeadUrl != null && userHeadUrl.startsWith("/")) {
+                        userHeadUrl = userHeadUrl.substring(1);
                     }
-                    if(userFrontImgUrl != null && userFrontImgUrl.startsWith("/")){
-                        userFrontImgUrl =  userFrontImgUrl.substring(1);
+                    if (userFrontImgUrl != null && userFrontImgUrl.startsWith("/")) {
+                        userFrontImgUrl = userFrontImgUrl.substring(1);
                     }
-                    if(userBackImgUrl != null && userBackImgUrl.startsWith("/")){
-                        userBackImgUrl =  userBackImgUrl.substring(1);
+                    if (userBackImgUrl != null && userBackImgUrl.startsWith("/")) {
+                        userBackImgUrl = userBackImgUrl.substring(1);
                     }
                     URL headImageUrl = ossUpload.sampleGetFileUrl("xjx-files", userHeadUrl, 1000l * 3600l);
                     URL frontImageUrl = ossUpload.sampleGetFileUrl("xjx-files", userFrontImgUrl, 1000l * 3600l);
@@ -506,11 +498,11 @@ public class MyCollectionOrderController extends BaseController {
                 // 代扣记录
                 List<CollectionWithholdingRecord> withholdList = mmanLoanCollectionRecordService.findWithholdRecord(mmanLoanCollectionOrderOri.getId());
 
-                if(BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(mmanLoanCollectionOrderOri.getStatus())){
+                if (BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(mmanLoanCollectionOrderOri.getStatus())) {
                     userInfo.setIdNumber(MaskCodeUtil.getMaskCode(userInfo.getIdNumber()));
                     userInfo.setUserPhone(MaskCodeUtil.getMaskCode(userInfo.getUserPhone()));
                     userCar.setBankCard(MaskCodeUtil.getMaskCode(userCar.getBankCard()));
-                    for (CollectionWithholdingRecord withholdingRecord:withholdList) {
+                    for (CollectionWithholdingRecord withholdingRecord : withholdList) {
                         withholdingRecord.setLoanUserPhone(MaskCodeUtil.getMaskCode(withholdingRecord.getLoanUserPhone()));
                     }
                 }
@@ -577,19 +569,18 @@ public class MyCollectionOrderController extends BaseController {
     @RequestMapping("tokokuan")
     public String tokokuan(HttpServletRequest request,
                            HttpServletResponse response, Model model) {
-        JsonResult jsonResult = new JsonResult("-1", "请求失败");
         Map<String, String> params = this.getParameters(request);
         if (StringUtils.isNotBlank(params.get("id"))) {
             MmanLoanCollectionOrder mmanLoanCollectionOrderOri = mmanLoanCollectionOrderService
                     .getOrderById(params.get("id").toString());
-           if(mmanLoanCollectionOrderOri != null){
+            if (mmanLoanCollectionOrderOri != null) {
                 CreditLoanPay creditLoanPay = creditLoanPayService
                         .get(mmanLoanCollectionOrderOri.getPayId());
                 model.addAttribute(
                         "totalPayMonery",
                         creditLoanPay.getReceivablePrinciple().add(
                                 creditLoanPay.getReceivableInterest()));
-            }else {
+            } else {
                 logger.error("mmanLoanCollectionOrderOri is null, loanId : " + params.get("id"));
             }
         }
@@ -629,7 +620,34 @@ public class MyCollectionOrderController extends BaseController {
             result.setMsg("登录已失效，请重新登录！");
         }
         return url;
+
     }
+
+    /**
+     * 异步处理（更新代扣结果）,回调接口，用于告知代扣处理结果
+     */
+    @RequestMapping(value = "withhold-callback")
+    public void dealWithholdResult(String text) {
+        System.out.println("=============== 接收到代扣回调请求参数 +++++++++++++++++ " + text);
+        JSONObject obj = JSONObject.parseObject(text);
+        String uuid = (String) obj.get("uuid");
+        boolean code = (boolean) obj.get("result");
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("id", uuid);
+        if (code) {
+            map.put("status", 1); // 代扣成功
+        } else {
+            map.put("status", 2); // 代扣失败
+        }
+        map.put("updateDate", new Date());
+        int count = collectionWithholdingRecordService.updateWithholdStatus(map);// 更新代扣记录状态
+        if (count > 0) {
+            obj.put("0", "更新成功！");
+        } else {
+            obj.put("1", "更新失败！");
+        }
+    }
+
 
     /**
      * 跳转转派页面

@@ -71,6 +71,7 @@ public class CollectionService implements ICollectionService{
 	@Override
 	public JsonResult insert(Collection collection) {
 		JsonResult result=new JsonResult("-1","添加催员失败");
+		collection.setUserName(collection.getUserName().trim());  // 对催收员真实姓名去空格处理，防止添加催收员时无意中输入空格，查询时按催收员查询找不到对应信息
 		Integer id=collectionDao.insert(collection);
 		if(id>0){//赋予催收员角色
 			HashMap<String ,Object> params=new HashMap<String, Object>();

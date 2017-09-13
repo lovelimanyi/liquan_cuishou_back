@@ -51,6 +51,11 @@ public class MmanLoanCollectionStatusChangeLogService implements
 	public int getAllCount(HashMap<String, Object> params) {
 		return mmanLoanCollectionStatusChangeLogDao.findAllCount(params);
 	}
-	
+
+	@Override
+	public int deleteLogByOrderId(String orderId) {
+		return mmanLoanCollectionStatusChangeLogDao.deleteLogByOrderId(orderId);
+	}
+
 
 }

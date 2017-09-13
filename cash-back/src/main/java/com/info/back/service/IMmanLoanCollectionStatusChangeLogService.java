@@ -31,4 +31,11 @@ public interface IMmanLoanCollectionStatusChangeLogService {
 
 
 	int getAllCount(HashMap<String,Object> params);
+
+	/**
+	 * 根据orderId删除流转日志
+	 * @param orderId
+	 * @return
+	 */
+	int deleteLogByOrderId(String orderId);
 }

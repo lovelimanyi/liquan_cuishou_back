@@ -208,5 +208,7 @@
 	<select id="findOrderSingle" resultType="Integer" parameterType="HashMap">
 		SELECT COUNT(1) FROM mman_loan_collection_status_change_log l WHERE l.`current_collection_user_id`=#{currentCollectionUserId} AND l.`loan_collection_order_id`=#{orderId} AND l.`type`='3' 
 	</select>
-	 
+	<delete id="deleteLogByOrderId" parameterType="String">
+		DELETE FROM mman_loan_collection_status_change_log WHERE loan_collection_order_id = #{orderId}
+	</delete>
 </mapper>

@@ -1,6 +1,8 @@
 package com.info.back.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,8 +26,8 @@ public class CollectionWithholdingRecordService implements ICollectionWithholdin
     }
 
     @Override
-    public void updateWithholdStatus() {
-        collectionWithholdingRecordDao.updateWithholdStatus();
+    public int updateWithholdStatus(Map<String,Object> map) {
+       return collectionWithholdingRecordDao.updateWithholdStatus(map);
     }
 
     @Override
