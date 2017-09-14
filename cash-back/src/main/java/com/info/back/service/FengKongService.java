@@ -113,4 +113,9 @@ public class FengKongService implements IFengKongService {
         return result;
     }
 
+    @Override
+    public int saveAdvice(CollectionAdvice advice) {
+        return fengKongDao.insertAdvice(advice);
+    }
+
 }

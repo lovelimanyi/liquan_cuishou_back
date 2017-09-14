@@ -1,5 +1,6 @@
 package com.info.back.controller;
 
+import com.info.back.dao.IFengKongDao;
 import com.info.back.result.JsonResult;
 import com.info.back.service.*;
 import com.info.back.utils.*;
@@ -40,6 +41,8 @@ public class MmanLoanCollectionOrderController extends BaseController {
     private IStopCollectionOrderInfoService stopCollectionOrderInfoService;
     @Autowired
     private IMmanLoanCollectionStatusChangeLogService mmanLoanCollectionStatusChangeLogService;
+    @Autowired
+    private IFengKongService fengKongService;
 
     @RequestMapping("/technologyOrderList")
     public String technologyOrderList(HttpServletRequest request, HttpServletResponse response, Model model) {
@@ -238,6 +241,18 @@ public class MmanLoanCollectionOrderController extends BaseController {
                         int count = mmanLoanCollectionOrderService.deleteOrderInfoAndLoanInfoByloanId(loanId);
                         // 删除流转日志表记录
                         mmanLoanCollectionStatusChangeLogService.deleteLogByOrderId(orderId);
+                        // 催收建议表添加一条催收拒绝催收建议
+                        CollectionAdvice advice = new CollectionAdvice();
+                        advice.setCollectionAdviceRemark("停催添加催收建议");
+                        if(StringUtils.isNotEmpty(userId)){
+                            advice.setBackUserId(Integer.valueOf(userId));
+                        }
+                        advice.setCreateDate(new Date());
+                        advice.setId(IdGen.uuid());
+                        advice.setLoanId(loanId);
+                        advice.setOrderId(orderId);
+                        advice.setStatus("2");
+                        fengKongService.saveAdvice(advice);
                         result.setCode("0");
                         result.setMsg("停催成功！");
                     }else {
