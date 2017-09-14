@@ -2,6 +2,7 @@ package com.info.back.dao;
 
 import java.util.List;
 
+import com.info.web.pojo.Collection;
 import com.info.web.pojo.CollectionAdvice;
 import org.springframework.stereotype.Repository;
 
@@ -12,7 +13,7 @@ public interface IFengKongDao {
 
 	/**
 	 * 查询可用的风控标签列表
-	 * @param 
+	 * @param
 	 * @return
 	 */
 	List<FengKong> getFengKongList();
@@ -43,4 +44,11 @@ public interface IFengKongDao {
 	 * @return
 	 */
 	int getFengKongByLabel(FengKong fengKong);
+
+	/**
+	 * 添加催收建议
+	 * @param advice
+	 * @return
+	 */
+	int insertAdvice(CollectionAdvice advice);
 }

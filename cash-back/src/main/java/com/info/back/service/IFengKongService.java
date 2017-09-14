@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.info.back.result.JsonResult;
+import com.info.web.pojo.CollectionAdvice;
 import com.info.web.pojo.FengKong;
 import com.info.web.util.PageConfig;
 
@@ -46,4 +47,11 @@ public interface IFengKongService {
 	 * @return
 	 */
     JsonResult saveCollectionAdvice(Map<String, String> params);
+
+	/**
+	 *
+	 * @param advice
+	 * @return
+	 */
+	int saveAdvice(CollectionAdvice advice);
 }

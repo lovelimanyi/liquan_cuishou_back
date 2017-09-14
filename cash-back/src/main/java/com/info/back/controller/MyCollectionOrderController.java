@@ -627,6 +627,7 @@ public class MyCollectionOrderController extends BaseController {
      * 异步处理（更新代扣结果）,回调接口，用于告知代扣处理结果
      */
     @RequestMapping(value = "withhold-callback")
+    @ResponseBody
     public void dealWithholdResult(String text) {
         System.out.println("=============== 接收到代扣回调请求参数 +++++++++++++++++ " + text);
         JSONObject obj = JSONObject.parseObject(text);
