@@ -568,7 +568,7 @@
 		</table>
 		<c:if test="${not empty message}">
 		<script type="text/javascript">
-            alertMsg.error("${message}");
+            alertMsg.info("${message}");
 		</script>
 	</c:if>
 	</div>
