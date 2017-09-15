@@ -90,6 +90,9 @@ public class BackConstant {
 
 	public static final Map<String,Object> fengKongLabels = new HashMap<String,Object>();  //  风控标签
 
+//	public static final String CUISHOU_WITHHOLD_CHANNEL_CASHMAN = "1";   // 催收代扣渠道-现金侠后台
+
+	public static final String CUISHOU_WITHHOLD_CHANNEL_PAYMENTCENTER = "2";   // 催收代扣渠道-支付中心
 
 	static{
 		groupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_S1,"S1");

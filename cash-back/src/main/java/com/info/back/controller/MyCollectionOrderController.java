@@ -624,7 +624,7 @@ public class MyCollectionOrderController extends BaseController {
     }
 
     /**
-     * 异步处理（更新代扣结果）,回调接口，用于告知代扣处理结果
+     * 异步处理（更新代扣结果）,回调接口，用于告知代扣处理结果(代扣走支付中心)
      */
     @RequestMapping(value = "withhold-callback")
     @ResponseBody
