@@ -602,39 +602,91 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
 								String uuid = IdGen.uuid();
 								String sign = MD5coding.MD5(AESUtil.encrypt(mmanLoanCollectionOrderOri.getUserId() + mmanLoanCollectionOrderOri.getPayId() + actualPayMonery + uuid, PayContents.XJX_WITHHOLDING_NOTIFY_KEY));
 
-								WithholdParam withhold = new WithholdParam();
-								withhold.setMoney(BigDecimal.valueOf(actualPayMonery)); // 扣款金额
-								withhold.setRepaymentId(mmanLoanCollectionOrderOri.getPayId()); // 还款id
-								withhold.setUuid(uuid); // uuid
-								withhold.setUserId(mmanLoanCollectionOrderOri.getUserId()); // 用户id
-								withhold.setSign(sign);
-								String json = JSONUtil.beanToJson(withhold);
-								MqMessage msg = new MqMessage();
-								msg.setMessage(json);
-								mqClient.sendMessage(msg);
+								//2、发送请求
+								String withholdPostUrl = PayContents.XJX_WITHHOLDING_NOTIFY_URL + "/" + mmanLoanCollectionOrderOri.getUserId() + "/" + mmanLoanCollectionOrderOri.getPayId() + "/" + actualPayMonery + "/" + uuid + "/" + sign;
+								logger.error("现金侠代扣请求地址：" + withholdPostUrl);
+								String xjxWithholdingStr = HttpUtil.getHttpMess(withholdPostUrl, "", "POST", "UTF-8");
+								//3、解析响应结果封装到Java Bean
+								if (xjxWithholdingStr != null && !"".equals(xjxWithholdingStr)) {
+									JSONObject jos = new JSONObject().fromObject(xjxWithholdingStr);
+									if (!"-100".equals(jos.get("code"))) {
+										CollectionWithholdingRecord WithholdingRecord = new CollectionWithholdingRecord();
+										MmanUserInfo userInfo = mmanUserInfoDao.get(mmanLoanCollectionOrderOri.getUserId());
+										WithholdingRecord.setLoanUserId(userInfo.getId());
+										WithholdingRecord.setId(uuid);
+										WithholdingRecord.setLoanUserName(userInfo.getRealname());
+										WithholdingRecord.setLoanUserPhone(userInfo.getUserPhone());
+										WithholdingRecord.setOrderId(mmanLoanCollectionOrderOri.getId());
+										WithholdingRecord.setCreateDate(new Date());
 
-								//插入一条代扣记录
-								CollectionWithholdingRecord WithholdingRecord = new CollectionWithholdingRecord();
-								MmanUserInfo userInfo = mmanUserInfoDao.get(mmanLoanCollectionOrderOri.getUserId());
-								if(userInfo != null){
-									WithholdingRecord.setLoanUserId(userInfo.getId());
-									WithholdingRecord.setLoanUserName(userInfo.getRealname());
-									WithholdingRecord.setLoanUserPhone(userInfo.getUserPhone());
-								}else {
-									logger.error("userInfo is null,userId = " + mmanLoanCollectionOrderOri.getUserId());
+										WithholdingRecord.setArrearsMoney(DecimalFormatUtil.df2Points.format(creditLoanPay.getReceivableMoney()));
+										WithholdingRecord.setHasalsoMoney(creditLoanPay.getRealMoney().toString());
+										WithholdingRecord.setOperationUserId(params.get("operationUserId"));
+										WithholdingRecord.setDeductionsMoney(payMonery);
+										WithholdingRecord.setOrderStatus(mmanLoanCollectionOrderOri.getStatus());
+										if ("0".equals(jos.get("code")) || "100".equals(jos.get("code"))) {
+											//扣款成功要更新操作人，由于代扣成功时会有接口更新订单、借款、还款、详情等数据，所以这里千万不能更新mmanLoanCollectionOrderOri，因为这里的订单状态还是原始状态！！！
+											MmanLoanCollectionOrder mmanLoanCollectionOrderNow = new MmanLoanCollectionOrder();
+											mmanLoanCollectionOrderNow.setId(mmanLoanCollectionOrderOri.getId());
+											mmanLoanCollectionOrderNow.setOperatorName(params.get("userName"));
+											mmanLoanCollectionOrderNow.setS1Flag(mmanLoanCollectionOrderOri.getS1Flag());
+											if (BackConstant.XJX_COLLECTION_ORDER_STATE_WAIT.equals(mmanLoanCollectionOrderOri.getStatus())) {
+												mmanLoanCollectionOrderNow.setStatus(BackConstant.XJX_COLLECTION_ORDER_STATE_ING);
+											}
+											mmanLoanCollectionOrderService.updateRecord(mmanLoanCollectionOrderNow);
+											if ("0".equals(jos.get("code"))) {
+												WithholdingRecord.setStatus(1);
+											} else {
+												WithholdingRecord.setStatus(0);
+											}
+											reslut.setMsg("申请代扣成功");
+											reslut.setCode("0");
+										} else {
+											reslut.setMsg(jos.getString("msg"));
+											WithholdingRecord.setStatus(2);
+										}
+
+										//添加一条扣款记录
+										collectionWithholdingRecordDao.insert(WithholdingRecord);
+									} else {
+										reslut.setMsg("申请代扣失败,失败编码-100");
+									}
+									logger.error("现金侠代扣返回：" + xjxWithholdingStr);
 								}
 
-								WithholdingRecord.setId(uuid);
-								WithholdingRecord.setOrderId(mmanLoanCollectionOrderOri.getId());
-								WithholdingRecord.setCreateDate(new Date());
-								WithholdingRecord.setArrearsMoney(DecimalFormatUtil.df2Points.format(creditLoanPay.getReceivableMoney())); // 欠款金额
-								WithholdingRecord.setHasalsoMoney(creditLoanPay.getRealMoney().toString()); // 当前已还金额
-								WithholdingRecord.setOperationUserId(params.get("operationUserId"));
-								WithholdingRecord.setDeductionsMoney(payMonery);  // 扣款金额
-								WithholdingRecord.setOrderStatus(mmanLoanCollectionOrderOri.getStatus());  // 当前订单状态
-								collectionWithholdingRecordDao.insert(WithholdingRecord);
-								reslut.setCode("0");
-								reslut.setMsg("代扣请求发送成功，请5分钟后查看处理结果！");
+//								WithholdParam withhold = new WithholdParam();
+//								withhold.setMoney(BigDecimal.valueOf(actualPayMonery)); // 扣款金额
+//								withhold.setRepaymentId(mmanLoanCollectionOrderOri.getPayId()); // 还款id
+//								withhold.setUuid(uuid); // uuid
+//								withhold.setUserId(mmanLoanCollectionOrderOri.getUserId()); // 用户id
+//								withhold.setSign(sign);
+//								String json = JSONUtil.beanToJson(withhold);
+//								MqMessage msg = new MqMessage();
+//								msg.setMessage(json);
+//								mqClient.sendMessage(msg);
+//
+//								//插入一条代扣记录
+//								CollectionWithholdingRecord WithholdingRecord = new CollectionWithholdingRecord();
+//								MmanUserInfo userInfo = mmanUserInfoDao.get(mmanLoanCollectionOrderOri.getUserId());
+//								if(userInfo != null){
+//									WithholdingRecord.setLoanUserId(userInfo.getId());
+//									WithholdingRecord.setLoanUserName(userInfo.getRealname());
+//									WithholdingRecord.setLoanUserPhone(userInfo.getUserPhone());
+//								}else {
+//									logger.error("userInfo is null,userId = " + mmanLoanCollectionOrderOri.getUserId());
+//								}
+//
+//								WithholdingRecord.setId(uuid);
+//								WithholdingRecord.setOrderId(mmanLoanCollectionOrderOri.getId());
+//								WithholdingRecord.setCreateDate(new Date());
+//								WithholdingRecord.setArrearsMoney(DecimalFormatUtil.df2Points.format(creditLoanPay.getReceivableMoney())); // 欠款金额
+//								WithholdingRecord.setHasalsoMoney(creditLoanPay.getRealMoney().toString()); // 当前已还金额
+//								WithholdingRecord.setOperationUserId(params.get("operationUserId"));
+//								WithholdingRecord.setDeductionsMoney(payMonery);  // 扣款金额
+//								WithholdingRecord.setOrderStatus(mmanLoanCollectionOrderOri.getStatus());  // 当前订单状态
+//								collectionWithholdingRecordDao.insert(WithholdingRecord);
+//								reslut.setCode("0");
+//								reslut.setMsg("代扣请求发送成功，请5分钟后查看处理结果！");
 							} else {
 								reslut.setMsg("每笔订单每天代扣次数不能超过五次");
 							}
