@@ -561,14 +561,12 @@ public class MyCollectionOrderController extends BaseController {
      * 跳转扣款页面
      *
      * @param request
-     * @param response
      * @param model
      * @return
      */
 
     @RequestMapping("tokokuan")
-    public String tokokuan(HttpServletRequest request,
-                           HttpServletResponse response, Model model) {
+    public String tokokuan(HttpServletRequest request, Model model) {
         Map<String, String> params = this.getParameters(request);
         if (StringUtils.isNotBlank(params.get("id"))) {
             MmanLoanCollectionOrder mmanLoanCollectionOrderOri = mmanLoanCollectionOrderService
@@ -624,7 +622,7 @@ public class MyCollectionOrderController extends BaseController {
     }
 
     /**
-     * 异步处理（更新代扣结果）,回调接口，用于告知代扣处理结果
+     * 异步处理（更新代扣结果）,回调接口，用于告知代扣处理结果(代扣走支付中心)
      */
     @RequestMapping(value = "withhold-callback")
     @ResponseBody

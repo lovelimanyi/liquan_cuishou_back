@@ -16,7 +16,7 @@ public class Constant {
 	/** 后台session名 */
 	public static final String BACK_USER = "BACK_USER";
 	/** 后台超级管理员主键ID，该用户不用进行权限判断 */
-	public static final Integer ADMINISTRATOR_ID = 10000;	
+	public static final Integer ADMINISTRATOR_ID = 10000;
 	/** 后台催收经理主键ID 该用户不用进行权限判断**/
 	public static final String ROLE_ID = "10019";
 	/** 当前页数 */
@@ -97,16 +97,16 @@ public class Constant {
 	/** 代扣 redis-key*/
 	public static final String TYPE_WITHHOLD_ = "WITHHOLD_";
 	/**借款状态（3:续期''4''-逾期,''5''-还款结束）            order: 4:催收成功 5：续期  0 催收成功*/
-	public static final String STATUS_OVERDUE_THREE = "3"; 
-	
-	public static final String STATUS_OVERDUE_FOUR = "4"; 
-	
-	public static final String STATUS_OVERDUE_FIVE = "5"; 
-	
+	public static final String STATUS_OVERDUE_THREE = "3";
+
+	public static final String STATUS_OVERDUE_FOUR = "4";
+
+	public static final String STATUS_OVERDUE_FIVE = "5";
+
 	public static final String STATUS_OVERDUE_TWO = "2";
-	
+
 	public static final String STATUS_OVERDUE_ONE = "1";
-	
+
 	public static final String STATUS_OVERDUE_ZERO = "0";
 	/** 借款状态  订单表的status    0待催收  1催收中  2承诺还款  3待催收(委外) 4催收完成  5续期  6减免审核中  7减免审核通过  8减免审核拒绝   */
 	public static final String STATUS_OVERDUE_SIX = "6";
@@ -114,9 +114,9 @@ public class Constant {
 	public static final String STATUS_OVERDUE_EIGHT = "8";
 
 	public static final String OPERATOR_NAME = "系统";
-	
+
 	public static final String PAY_MENT_SUCCESS = "还款成功催收员:";
-	
+
 	public static final int CREDITLOANPAY_OVERDUEA = 3;// 逾期1到10天S1
 	public static final int CREDITLOANPAY_OVERDUEB = 4;// 逾期11到30天S2
 	public static final int CREDITLOANPAY_OVERDUEC = 5;// 逾期31到60天M1-M2
@@ -124,7 +124,7 @@ public class Constant {
 	public static final int CREDITLOANPAY_OVERDUEE = 7;// 逾期大于90天 M3+
 	public static final int CREDITLOANPAY_OVERDUE_UNCOMPLETE = 8;// 续期（该状态催收员不能操作）
 	public static final int CREDITLOANPAY_COMPLETE = 2;// 已还款
-	
+
 	//极速现金侠借、还款状态
 	/**
 	 * 还款中【续期】（催收遇到此状态说明在极速现金侠后台已置为续期）
@@ -146,6 +146,18 @@ public class Constant {
 	 * 逾期已还款
 	 */
 	public static final String STATUS_YQYHK = "34";
-	
+
 	public static final String S_FLAG = "S1";
+
+	/**
+	 * 聚信立类型
+	 */
+ 	public static final String JXL_DETAIL = "jxl_detail"; //聚信立
+	public static final String JDQ_DETAIL = "jdq_detail"; //借点钱
+	public static final String R360_DETAIL = "r360_detail"; //融360
+	public static final String JLM_DEATIL = "jlm_detail"; //借了吗
+	public static final String FQGJ_DETAIL = "fqgj_detail"; //分期管家
+
+
+
 }

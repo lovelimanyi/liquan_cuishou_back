@@ -92,4 +92,9 @@
 			AND DATE_FORMAT(ipr.repay_time, '%Y-%m-%d') < DATE_FORMAT(now(), '%Y-%m-%d')
 		]]>
 	</update>
+	<select id="getLatestWithholdRecord"  parameterType="String" resultMap="BaseResultMap">
+		SELECT w.`loan_user_name`,w.`loan_user_phone`,w.`status`,w.`order_status`,w.`create_date`,w.`update_date` FROM
+		collection_withholding_record w WHERE w.`operation_user_id`=#{operationUserId}
+		ORDER BY w.`create_date` DESC limit 1
+	</select>
 </mapper>

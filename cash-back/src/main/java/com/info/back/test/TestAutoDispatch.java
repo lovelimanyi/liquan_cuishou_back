@@ -27,12 +27,12 @@ public class TestAutoDispatch {
 	@Test
 	public void testdispachForLoanId() {
 
-		String loadIds="5680839";
+		String loadIds="5680648";
 		for (String loadId : loadIds.split(",")) {
 			System.err.println("===================testdispachForLoanId start" + loadId);
 //			MmanLoanCollectionOrder order = mmanLoanCollectionOrderService.getOrderByLoanId(loadId);
 //			if(order != null){
-//					taskJobMiddleService.dispatchforLoanId(loadId,null);
+					taskJobMiddleService.dispatchforLoanId(loadId,null);
 //			}else {
 //				System.out.println("借款订单对象为空，借款id = " + loadId);
 //			}
