@@ -697,7 +697,7 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
                             reslut.setMsg("代扣金额不能大于" + creditLoanPay.getReceivablePrinciple().add(creditLoanPay.getReceivableInterest()));
                         }
                     } else {
-                        reslut.setMsg("代扣过于频繁,请稍等(两笔代扣时间间隔为2分钟)");
+                        reslut.setMsg("连续2次代扣时间不可小于2分钟，请稍后再试！");
                     }
                 } else {
                     reslut.setMsg("续期订单或催收完成订单不允许代扣！！");
