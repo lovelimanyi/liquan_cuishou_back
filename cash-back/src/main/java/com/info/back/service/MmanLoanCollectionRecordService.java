@@ -571,10 +571,10 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
         JsonResult reslut = new JsonResult("-1", "申请代扣款失败");
         try {
             if (mmanLoanCollectionOrderOri != null) {
-                List<CollectionWithholdingRecord> recordList = collectionWithholdingRecordDao.findOrderList(params.get("id").toString());
+                CollectionWithholdingRecord recordList = collectionWithholdingRecordDao.getLatestWithholdRecord(params.get("operationUserId").toString());
                 if (!BackConstant.XJX_COLLECTION_ORDER_STATE_PAYING.equals(mmanLoanCollectionOrderOri.getStatus()) && !BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals
                         (mmanLoanCollectionOrderOri.getStatus())) {
-                    if (CollectionUtils.isEmpty(recordList) || new Date().getTime() > getCreateTimePlus(recordList)) {
+                    if (BackConstant.SURPER_MANAGER_ROLE_ID.equals(Integer.valueOf(params.get("roleId"))) || new Date().getTime() > getCreateTimePlus(recordList)) {
                         CreditLoanPay creditLoanPay = creditLoanPayService.get(mmanLoanCollectionOrderOri.getPayId());
                         String payMonery = params.get("payMoney");//扣款金额
                         BigDecimal koPayMonery = BigDecimal.ZERO;
@@ -697,7 +697,7 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
                             reslut.setMsg("代扣金额不能大于" + creditLoanPay.getReceivablePrinciple().add(creditLoanPay.getReceivableInterest()));
                         }
                     } else {
-                        reslut.setMsg("代扣过于频繁,请稍等(间隔时间为5分钟)");
+                        reslut.setMsg("代扣过于频繁,请稍等(两笔代扣时间间隔为2分钟)");
                     }
                 } else {
                     reslut.setMsg("续期订单或催收完成订单不允许代扣！！");
@@ -712,9 +712,9 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
         return reslut;
     }
 
-    private long getCreateTimePlus(List<CollectionWithholdingRecord> recordList) {
-        long createTime = recordList.get(0).getCreateDate().getTime();//最新一条代扣时间
-        return createTime + 5 * 60 * 1000; //新增5分钟
+    private long getCreateTimePlus(CollectionWithholdingRecord recordList) {
+        long createTime = recordList.getCreateDate().getTime();//最新一条代扣时间
+        return createTime + 2 * 60 * 1000; //新增2分钟
     }
 
     @Override

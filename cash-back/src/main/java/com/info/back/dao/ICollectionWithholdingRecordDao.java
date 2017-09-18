@@ -24,4 +24,9 @@ public interface ICollectionWithholdingRecordDao {
 
 	 void updateOverdueStatus();
 
+	/**
+	 * 根据催收员id查询其最新一条代扣记录
+	 * @return
+	 */
+	CollectionWithholdingRecord getLatestWithholdRecord(String operationUserId);
 }

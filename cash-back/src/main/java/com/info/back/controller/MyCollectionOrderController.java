@@ -561,14 +561,12 @@ public class MyCollectionOrderController extends BaseController {
      * 跳转扣款页面
      *
      * @param request
-     * @param response
      * @param model
      * @return
      */
 
     @RequestMapping("tokokuan")
-    public String tokokuan(HttpServletRequest request,
-                           HttpServletResponse response, Model model) {
+    public String tokokuan(HttpServletRequest request, Model model) {
         Map<String, String> params = this.getParameters(request);
         if (StringUtils.isNotBlank(params.get("id"))) {
             MmanLoanCollectionOrder mmanLoanCollectionOrderOri = mmanLoanCollectionOrderService
