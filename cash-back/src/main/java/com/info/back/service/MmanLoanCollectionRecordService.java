@@ -571,10 +571,10 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
         JsonResult reslut = new JsonResult("-1", "申请代扣款失败");
         try {
             if (mmanLoanCollectionOrderOri != null) {
-                CollectionWithholdingRecord recordList = collectionWithholdingRecordDao.getLatestWithholdRecord(params.get("operationUserId").toString());
+                CollectionWithholdingRecord record = collectionWithholdingRecordDao.getLatestWithholdRecord(params.get("operationUserId").toString());
                 if (!BackConstant.XJX_COLLECTION_ORDER_STATE_PAYING.equals(mmanLoanCollectionOrderOri.getStatus()) && !BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals
                         (mmanLoanCollectionOrderOri.getStatus())) {
-                    if (BackConstant.SURPER_MANAGER_ROLE_ID.equals(Integer.valueOf(params.get("roleId"))) || new Date().getTime() > getCreateTimePlus(recordList)) {
+                    if (BackConstant.SURPER_MANAGER_ROLE_ID.equals(Integer.valueOf(params.get("roleId"))) || record == null || new Date().getTime() > getCreateTimePlus(record)) {
                         CreditLoanPay creditLoanPay = creditLoanPayService.get(mmanLoanCollectionOrderOri.getPayId());
                         String payMonery = params.get("payMoney");//扣款金额
                         BigDecimal koPayMonery = BigDecimal.ZERO;
@@ -712,8 +712,13 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
         return reslut;
     }
 
-    private long getCreateTimePlus(CollectionWithholdingRecord recordList) {
-        long createTime = recordList.getCreateDate().getTime();//最新一条代扣时间
+    private long getCreateTimePlus(CollectionWithholdingRecord record) {
+        long createTime = 0;
+        if(record == null){
+            createTime = new Date().getTime();
+        }else {
+            createTime = record.getCreateDate().getTime();//最新一条代扣时间
+        }
         return createTime + 2 * 60 * 1000; //新增2分钟
     }
 
