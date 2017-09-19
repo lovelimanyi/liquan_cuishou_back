@@ -5,7 +5,6 @@ import com.info.back.utils.BackConstant;
 import com.info.back.utils.IdGen;
 import com.info.constant.Constant;
 import com.info.web.pojo.*;
-import com.info.web.synchronization.RedisUtil;
 import com.info.web.synchronization.dao.IDataDao;
 import com.info.web.synchronization.syncUtils;
 import com.info.web.util.DateUtil;
@@ -18,7 +17,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -34,19 +32,21 @@ public class LocalRepay {
     private IDataDao dataDao;
     @Autowired
     private ILocalDataDao localDataDao;
-
+// 同步还款完成订单
     @Test
     public void test() {
-//        String payId = "268072,1027289,1342420,1336985,1678738,1637904,1679989,1638836";
-//        String[] list = payId.split(",");
-//        for (int i=0;i<list.length;i++){
-//            doRepay(list[i]);
-//            System.out.println(list[i]);
-//        }
-        String payId = "2439270";
-        doRepay(payId);
+        //还款id
+        String payId= "3284306";
+        String[] list = payId.split(",");
 
+        for (int i=0;i<list.length;i++){
+            doRepay(list[i]);
+            System.out.println(list[i]);
+        }
     }
+
+
+
     public void doRepay(String payId){
         if (StringUtils.isNotBlank(payId)) {
             loger.error("sync-OperaRepayDataThread:" + payId);
@@ -66,16 +66,17 @@ public class LocalRepay {
                     //获取app端还款详情信息
                     repaymentDetailList = this.dataDao.getAssetRepaymentDetail(map);
 //                    if (null != borrowOrder && null != repaymentDetailList) {
-                     if (null != repaymentDetailList) {
-                            //更新借款表
-                            updateMmanUserLoan(loanId, repayment, Constant.STATUS_OVERDUE_FIVE);
-                            //更新还款表
-                            updateCreditLoanPay(payId, repayment);
-                            //更新订单表-保存催收流转日志
-                            updateOrderAndLog(loanId, repayment);
-                            //保存还款详情表
-                            saveCreditLoanPayDetail(repayment, payId, repaymentDetailList);
-                        }
+                    if (null != repaymentDetailList) {
+                        //更新借款表
+                        updateMmanUserLoan(loanId, repayment, Constant.STATUS_OVERDUE_FIVE);
+                        //更新还款表
+                        updateCreditLoanPay(payId, repayment);
+                        //保存还款详情表
+                        saveCreditLoanPayDetail(repayment, payId, repaymentDetailList);
+                        //更新订单表-保存催收流转日志
+                        updateOrderAndLog(loanId, repayment);
+
+                    }
 //                    }
                 } catch (Exception e0) {
                     e0.printStackTrace();
@@ -89,6 +90,8 @@ public class LocalRepay {
         mmanUserLoan.setId(loanId);//借款id
         mmanUserLoan.setLoanPenalty(new BigDecimal(Integer.parseInt(String.valueOf(repaymentMap.get("plan_late_fee")))/100));//滞纳金
         mmanUserLoan.setLoanStatus(status);//借款状态
+        mmanUserLoan.setLoanEndTime(DateUtil.getDateTimeFormat(String.valueOf(repaymentMap.get("repayment_time")), "yyyy-MM-dd HH:mm:ss"));
+        mmanUserLoan.setLoanStartTime(DateUtil.getDateTimeFormat(String.valueOf(repaymentMap.get("credit_repayment_time")), "yyyy-MM-dd HH:mm:ss"));
         mmanUserLoan.setUpdateTime(DateUtil.getDateTimeFormat(String.valueOf(repaymentMap.get("repayment_real_time")), "yyyy-MM-dd HH:mm:ss"));
         localDataDao.updateMmanUserLoan(mmanUserLoan);
     }
@@ -113,44 +116,41 @@ public class LocalRepay {
     }
     public void saveCreditLoanPayDetail(HashMap<String, Object> repayment,String payId,List<HashMap<String,Object>> repaymentDetailList){
         loger.error("start-saveCreditLoanPayDetail-payId =" + payId);
-        List<String> idList = null;
         if(null!=repaymentDetailList && 0<repaymentDetailList.size()){//首先删除已有的记录，重新添加
             HashMap<String,String> map = new HashMap<String,String>();
             map.put("PAY_ID", payId);
-            idList = localDataDao.selectCreditLoanPayDetail(map);//查询目前插入的还款记录
+            localDataDao.delCreditLoanPayDetail(map);
         }
         CreditLoanPayDetail creditLoanPayDetail =null;
         for(int i=0;i<repaymentDetailList.size();i++){
             HashMap<String,Object> repayDetail = repaymentDetailList.get(i);
             String detailId = String.valueOf(repayDetail.get("id"));
-            if(checkDetailId(idList, detailId)){
-                //减免罚息    如果还款类型为6，还款状态2.则更新还款表的 减免金额
-                syncUtils.ReductionMoney(repayDetail,payId,localDataDao);
+            //减免罚息    如果还款类型为6，还款状态2.则更新还款表的 减免金额
+            syncUtils.ReductionMoney(repayDetail,payId,localDataDao);
 
-                creditLoanPayDetail = new CreditLoanPayDetail();
-                creditLoanPayDetail.setId(detailId);
-                creditLoanPayDetail.setPayId(payId);
-                creditLoanPayDetail.setCreateDate(DateUtil.getDateTimeFormat(String.valueOf(repayDetail.get("created_at")), "yyyy-MM-dd HH:mm:ss"));
-                creditLoanPayDetail.setUpdateDate(DateUtil.getDateTimeFormat(String.valueOf(repayDetail.get("created_at")), "yyyy-MM-dd HH:mm:ss"));
-                creditLoanPayDetail.setReturnType(String.valueOf(repayDetail.get("repayment_type")));
-                creditLoanPayDetail.setRemark(String.valueOf(repayDetail.get("remark")));
-                HashMap<String,String> resultMap = checkOrderByS1(repayDetail,localDataDao);
-                if(null!=resultMap){
-                    String flag = null;
-                    try{
-                        flag = resultMap.get("sFlag");
-                    }catch(Exception e){
+            creditLoanPayDetail = new CreditLoanPayDetail();
+            creditLoanPayDetail.setId(detailId);
+            creditLoanPayDetail.setPayId(payId);
+            creditLoanPayDetail.setCreateDate(DateUtil.getDateTimeFormat(String.valueOf(repayDetail.get("created_at")), "yyyy-MM-dd HH:mm:ss"));
+            creditLoanPayDetail.setUpdateDate(DateUtil.getDateTimeFormat(String.valueOf(repayDetail.get("created_at")), "yyyy-MM-dd HH:mm:ss"));
+            creditLoanPayDetail.setReturnType(String.valueOf(repayDetail.get("repayment_type")));
+            creditLoanPayDetail.setRemark(String.valueOf(repayDetail.get("remark")));
+            HashMap<String,String> resultMap = checkOrderByS1(repayDetail,localDataDao);
+            if(null!=resultMap){
+                String flag = null;
+                try{
+                    flag = resultMap.get("sFlag");
+                }catch(Exception e){
 
-                    }
-                    if(StringUtils.isNotBlank(flag)){
-                        creditLoanPayDetail.setS1Flag(Constant.S_FLAG);
-                    }
-                    creditLoanPayDetail.setCurrentCollectionUserId(resultMap.get("currentUserId"));
                 }
-                creditLoanPayDetail = syncUtils.operaRealPenltyDetail(repayment, repayDetail, payId,creditLoanPayDetail,localDataDao);
-                localDataDao.saveCreditLoanPayDetail(creditLoanPayDetail);
-                loger.error("end-saveCreditLoanPayDetail-payId =" + payId);
+                if(StringUtils.isNotBlank(flag)){
+                    creditLoanPayDetail.setS1Flag(Constant.S_FLAG);
+                }
+                creditLoanPayDetail.setCurrentCollectionUserId(resultMap.get("currentUserId"));
             }
+            creditLoanPayDetail = syncUtils.operaRealPenltyDetail(repayment, repayDetail, payId,creditLoanPayDetail,localDataDao);
+            localDataDao.saveCreditLoanPayDetail(creditLoanPayDetail);
+            loger.error("end-saveCreditLoanPayDetail-payId =" + payId);
         }
     }
     /**
