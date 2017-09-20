@@ -597,6 +597,15 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
                             }
                             logger.error("当前次数count:" + count);
                             if (count < 5) {
+                                // 判断该笔订单是否有还款中待处理的数据(redis中是否存在对应key)
+                                String payId = mmanLoanCollectionOrderOri.getPayId();
+                                String overdueKeys = JedisDataClient.get(Constant.TYPE_OVERDUE_ + payId);
+                                String repayKeys = JedisDataClient.get(Constant.TYPE_REPAY_ + payId);
+                                if(StringUtils.isNotEmpty(overdueKeys) || StringUtils.isNotEmpty(repayKeys)){
+                                    reslut.setMsg("该用户正在还款处理中,请稍后查看");
+                                    reslut.setCode("-1");
+                                    return reslut;
+                                }
                                 long actualPayMonery = koPayMonery.multiply(new BigDecimal(100)).longValue();
                                 String uuid = IdGen.uuid();
                                 String sign = MD5coding.MD5(AESUtil.encrypt(mmanLoanCollectionOrderOri.getUserId() + mmanLoanCollectionOrderOri.getPayId() + actualPayMonery + uuid, PayContents.XJX_WITHHOLDING_NOTIFY_KEY));
