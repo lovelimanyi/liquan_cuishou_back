@@ -1,9 +1,7 @@
 package com.info.back.test;
 
-import com.info.back.service.IBackUserService;
-import com.info.back.service.IMmanUserInfoService;
-import com.info.back.service.IMmanUserLoanService;
-import com.info.back.service.TaskJobMiddleService;
+import com.info.back.service.*;
+import com.info.web.pojo.MmanLoanCollectionOrder;
 import com.info.web.pojo.MmanUserInfo;
 import com.info.web.pojo.MmanUserLoan;
 import org.junit.Test;
@@ -23,23 +21,19 @@ public class TestAutoDispatch {
 	IBackUserService backUserService;
 
 	@Autowired
-	private IMmanUserInfoService mmanUserInfoService;
-
-	@Autowired
-	private IMmanUserLoanService mmanUserLoanService;
+	private IMmanLoanCollectionOrderService mmanLoanCollectionOrderService;
 
 	@Test
 	public void testdispachForLoanId() {
 
-		String loadIds="2894512";
+		String loadIds="3198727";
 		for (String loadId : loadIds.split(",")) {
 			System.err.println("===================testdispachForLoanId start" + loadId);
-			MmanUserLoan mmanUserLoan = mmanUserLoanService.get(loadId);
-			MmanUserInfo userInfo = mmanUserInfoService.getUserInfoById(mmanUserLoan.getUserId());
-			if(userInfo != null){
-					taskJobMiddleService.dispatchforLoanId(loadId,userInfo.getIdNumber());
+			MmanLoanCollectionOrder order = mmanLoanCollectionOrderService.getOrderByLoanId(loadId);
+			if(order != null){
+					taskJobMiddleService.dispatchforLoanId(loadId,order.getIdNumber());
 			}else {
-				System.out.println("借款人信息对象为空，借款id = " + loadId);
+				System.out.println("借款订单对象为空，借款id = " + loadId);
 			}
 
 			System.err.println("===================testdispachForLoanId end");

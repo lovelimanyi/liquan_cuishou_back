@@ -68,7 +68,8 @@ public class JedisDataClient {
 		Jedis jedis = null;
 		if (poolMaster != null) {
 			jedis = poolMaster.getResource();
-			jedis.auth("xjxcuishou001");
+//			jedis.auth("xjxcuishou001");
+			jedis.auth(RedisConfigConstant.getConstant("redisPassword").trim());
 		}
 		return jedis;
 	}

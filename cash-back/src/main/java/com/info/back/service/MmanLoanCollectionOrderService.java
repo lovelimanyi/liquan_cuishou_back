@@ -190,4 +190,9 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
 		return params;
 	}
 
+	@Override
+	public MmanLoanCollectionOrder getOrderByLoanId(String loanId) {
+		return manLoanCollectionOrderDao.getOrderByLoanId(loanId);
+	}
+
 }

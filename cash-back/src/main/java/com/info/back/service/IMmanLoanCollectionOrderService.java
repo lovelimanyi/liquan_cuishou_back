@@ -106,4 +106,11 @@ public interface IMmanLoanCollectionOrderService {
 	 *//*
 	
 	public void sveUpdateJmStatus(HashMap<String, String> params);*/
+
+	/**
+	 * 根据借款id查询订单
+	 * @param loanId
+	 * @return
+	 */
+	MmanLoanCollectionOrder getOrderByLoanId(String loanId);
 }

@@ -3,6 +3,7 @@ package com.info.back.service;
 import com.info.back.dao.IMmanUserLoanDao;
 import com.info.back.service.TaskJobMiddleService;
 import com.info.back.utils.BackConstant;
+import com.info.web.pojo.MmanLoanCollectionOrder;
 import com.info.web.pojo.MmanUserInfo;
 import com.info.web.pojo.MmanUserLoan;
 import com.info.web.util.DateUtil;
@@ -28,7 +29,7 @@ public class DealOverdueLoanService {
     @Autowired
 	private IBackUserService backUserService;
     @Autowired
-	private IMmanUserInfoService mmanUserInfoService;
+	private IMmanLoanCollectionOrderService manLoanCollectionOrderService;
 
 
     public void dealOverdueLoan() {
@@ -41,9 +42,9 @@ public class DealOverdueLoanService {
         for (MmanUserLoan loan : overdueList) {
         	synchronized(this)
         	{
-				MmanUserInfo userInfo = mmanUserInfoService.getUserInfoById(loan.getUserId());
-				if(userInfo != null){
-					DealOverdueLoanThread dealOverdueOrderThread = new DealOverdueLoanThread(loan.getId(),taskJobMiddleService,userInfo.getIdNumber());
+				MmanLoanCollectionOrder order = manLoanCollectionOrderService.getOrderByLoanId(loan.getId());
+				if(order != null){
+					DealOverdueLoanThread dealOverdueOrderThread = new DealOverdueLoanThread(loan.getId(),taskJobMiddleService,order.getIdNumber());
 					pool.execute(dealOverdueOrderThread);
 				}
         	}

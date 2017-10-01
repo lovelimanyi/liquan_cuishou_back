@@ -36,4 +36,11 @@ public interface IFengKongDao {
 	int insert(FengKong fengKong);
 
 	int insertCollectionAdvice(CollectionAdvice collectionAdvice);
+
+	/**
+	 * 根据风控标签查询该标签是否存在
+	 * @param fengKong
+	 * @return
+	 */
+	int getFengKongByLabel(FengKong fengKong);
 }

@@ -769,5 +769,7 @@
 	<select id="getLatestLoanByUserPhoneAndLoanEndTime" parameterType="HashMap" resultType="String">
 		select l.id from mman_loan_collection_order o LEFT JOIN mman_user_loan l on l.id = o.loan_id where loan_user_phone = #{userPhone} AND l.loan_end_time = #{loanEndTime}
 	</select>
-
+	<select id="getOrderByLoanId" parameterType="String" resultMap="queryResultMap">
+		SELECT loan_id,id_number FROM mman_loan_collection_order WHERE loan_id = #{loanId}
+	</select>
 </mapper>

@@ -67,8 +67,8 @@ public class TaskJobMiddleService {
 		
 		if (null!=overdueList && overdueList.size()>0) {
 			for (MmanUserLoan mmanUserLoanOri : overdueList) {
-				MmanUserInfo userInfo = mmanUserInfoService.getUserInfoById(mmanUserLoanOri.getUserId());
-				dispatchforLoanId(mmanUserLoanOri.getId(),userInfo.getIdNumber());
+				MmanLoanCollectionOrder order = manLoanCollectionOrderService.getOrderByLoanId(mmanUserLoanOri.getId());
+				dispatchforLoanId(mmanUserLoanOri.getId(),order.getIdNumber());
 			}
 		}
 		
@@ -619,7 +619,7 @@ public class TaskJobMiddleService {
 
 									//1.3.2 S1中逾期天数 大于11的已存在未完成订单，分组升级为S2(逾期T+1推送)
 									if (((BackConstant.XJX_OVERDUE_LEVEL_S1.equals(mmanLoanCollectionOrderOri.getCurrentOverdueLevel())) || (BackConstant.XJX_OVERDUE_LEVEL_S2.equals(mmanLoanCollectionOrderOri.getCurrentOverdueLevel())))
-											&& pday > 11 && !checkLog(mmanLoanCollectionOrderOri.getOrderId())
+											&& pday > 10 && !checkLog(mmanLoanCollectionOrderOri.getOrderId())
 											&& !BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(mmanLoanCollectionOrderOri.getStatus())
 											&& !BackConstant.XJX_COLLECTION_ORDER_STATE_PAYING.equals(mmanLoanCollectionOrderOri.getStatus())) {
 

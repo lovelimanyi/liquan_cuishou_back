@@ -96,4 +96,6 @@ public interface IMmanLoanCollectionOrderDao {
 
 	public String getLatestLoanByUserPhoneAndLoanEndTime(HashMap<String,Object> params);
 
+	MmanLoanCollectionOrder getOrderByLoanId(String loanId);
+
 }

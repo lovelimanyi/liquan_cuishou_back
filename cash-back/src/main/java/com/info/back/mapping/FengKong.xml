@@ -74,5 +74,8 @@
 		VALUES(#{id},#{orderId},#{loanId},#{payId},#{userId},#{backUserId},#{loanUserName},#{loanUserPhone},#{userName},#{fengkongIds},#{fkLabels},#{createDate},#{status},#{collectionRecordId})
 
 	</insert>
+	<select id="getFengKongByLabel" parameterType="com.info.web.pojo.FengKong" resultType="int">
+		SELECT count(1) FROM fengkong_label WHERE fk_label = #{fkLabel}
+	</select>
 
 </mapper>
