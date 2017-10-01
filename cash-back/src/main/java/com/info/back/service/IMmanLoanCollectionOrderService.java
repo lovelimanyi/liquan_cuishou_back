@@ -128,4 +128,6 @@ public interface IMmanLoanCollectionOrderService {
 
 
 	int deleteOrderInfoAndLoanInfoByloanId(String loanId);
+
+	MmanLoanCollectionOrder getOrderloanId(String loanId);
 }
