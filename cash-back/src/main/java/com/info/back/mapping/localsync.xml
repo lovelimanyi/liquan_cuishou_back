@@ -196,7 +196,7 @@
 			  <![CDATA[realget_interest = #{realgetInterest},]]>
 			</if>
 			<if test="reductionMoney != null">
-			    reduction_money = reduction_money + #{reductionMoney},
+			    reduction_money = #{reductionMoney},
 			</if>
 			<if test="status != null and status !=''">
 			  <![CDATA[status = #{status},]]>
