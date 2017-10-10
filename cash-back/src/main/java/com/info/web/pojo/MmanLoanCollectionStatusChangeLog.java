@@ -33,6 +33,8 @@ public class MmanLoanCollectionStatusChangeLog {
 	private String currentCollectionOrderLevel;
 
 	private String companyTitle;
+	// 借款用户id
+	private String userId;
 	
 
 
@@ -140,5 +142,13 @@ public class MmanLoanCollectionStatusChangeLog {
 
 	public void setCompanyTitle(String companyTitle) {
 		this.companyTitle = companyTitle;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 }

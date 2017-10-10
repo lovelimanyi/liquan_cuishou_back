@@ -92,7 +92,7 @@ public class CollectionService implements ICollectionService{
 			if(collection!=null){
 				int orderCount=collectionDao.findOrderCollection(collection.getUuid());//统计催员手上未完成的订单
 				if(orderCount<=0){
-					//标记用户为删除
+					// 标记用户为删除
 					orderCount=collectionDao.updateDeleteCoection(collection.getUuid());
 					if(orderCount>0){
 						List<String> UUIdlist=new ArrayList<String>(); 

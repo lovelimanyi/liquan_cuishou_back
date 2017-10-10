@@ -1,9 +1,6 @@
 package com.info.back.utils;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.info.web.pojo.SysDict;
 
@@ -93,6 +90,15 @@ public class BackConstant {
 //	public static final String CUISHOU_WITHHOLD_CHANNEL_CASHMAN = "1";   // 催收代扣渠道-现金侠后台
 
 	public static final String CUISHOU_WITHHOLD_CHANNEL_PAYMENTCENTER = "2";   // 催收代扣渠道-支付中心
+
+	public static final List<String> managers = new ArrayList<>();
+
+	static {
+		managers.add("administrator");
+		managers.add("CNT13151650682");
+		managers.add("13681929452");
+		managers.add("15396889919");
+	}
 
 	static{
 		groupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_S1,"S1");

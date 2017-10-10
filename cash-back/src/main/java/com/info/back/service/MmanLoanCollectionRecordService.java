@@ -494,6 +494,11 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
                                         mmanLoanCollectionOrderOri.setJxlStatus(BackConstant.XJX_JXL_STATUS_REFUSE);
                                         Date now = new Date();
                                         mmanLoanCollectionOrderOri.setUpdateDate(now);
+                                        if("S1".equals(mmanLoanCollectionOrderOri.getS1Flag())){
+                                            mmanLoanCollectionStatusChangeLog.setCurrentCollectionOrderLevel(BackConstant.XJX_OVERDUE_LEVEL_S1);
+                                        }else {
+                                            mmanLoanCollectionStatusChangeLog.setCurrentCollectionOrderLevel(mmanLoanCollectionOrderOri.getCurrentOverdueLevel());
+                                        }
                                         mmanLoanCollectionOrderDao.updateCollectionOrder(mmanLoanCollectionOrderOri);
                                         //添加转派记录
                                         mmanLoanCollectionStatusChangeLog.setLoanCollectionOrderId(mmanLoanCollectionOrderOri.getOrderId());
@@ -505,7 +510,6 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
                                         mmanLoanCollectionStatusChangeLog.setId(IdGen.uuid());
                                         mmanLoanCollectionStatusChangeLog.setCreateDate(now);
                                         mmanLoanCollectionStatusChangeLog.setCurrentCollectionUserId(buc.getUuid());   //订单转派后的催收人
-                                        mmanLoanCollectionStatusChangeLog.setCurrentCollectionOrderLevel(mmanLoanCollectionOrderOri.getCurrentOverdueLevel());
                                         mmanLoanCollectionStatusChangeLog.setCurrentCollectionUserLevel(buc.getGroupLevel());
                                         mmanLoanCollectionStatusChangeLogDao.insert(mmanLoanCollectionStatusChangeLog);
                                         successCount++;

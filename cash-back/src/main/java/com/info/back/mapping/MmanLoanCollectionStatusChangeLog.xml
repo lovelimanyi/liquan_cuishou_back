@@ -33,7 +33,7 @@
 	
 	<select id="findAll" resultMap="queryResultMap" parameterType="HashMap">
 		select
-			ml.id,mo.loan_id as loanCollectionOrderId,ml.before_status,ml.after_status,ml.type,ml.create_date,ml.operator_name,
+			ml.id,mo.user_id AS userId,mo.loan_id as loanCollectionOrderId,ml.before_status,ml.after_status,ml.type,ml.create_date,ml.operator_name,
 			ml.remark,mc.title as companyTitle,bu.user_name as currentCollectionUserId,ml.current_collection_user_level,
 			ml.current_collection_Order_Level
 		 from 
