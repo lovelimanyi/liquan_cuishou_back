@@ -50,7 +50,7 @@
 							class="required alphanumeric textInput valid" type="password"
 							size="30" />
 					</p>
-					<div class="divider"></div>
+						<p> <font style="color: #cd0a0a">温馨提示：</font><font style="color: #00be00">只有超级管理员和指定账号有权限修改密码,如需修改密码,请联系相关人员,谢谢!</font> </p>
 				</div>
 				<div class="formBar">
 					<ul>
