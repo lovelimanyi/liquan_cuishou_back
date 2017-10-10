@@ -111,7 +111,7 @@ public class MmanLoanCollectionStatusChangeLogController extends BaseController 
 	 * @param model
 	 * @return
 	 */
-			@RequestMapping("/execlToStatusChangeLog")
+	@RequestMapping("/execlToStatusChangeLog")
 	public void reportManage(HttpServletResponse response,HttpServletRequest request, Model model) {
 		HashMap<String, Object> params = getParametersO(request);
 		System.out.println("map==========="+params.size());
@@ -143,7 +143,7 @@ public class MmanLoanCollectionStatusChangeLogController extends BaseController 
 			ExcelUtil.setFileDownloadHeader(request, response, "催收流转日志.xlsx");
 			response.setContentType("application/msexcel");// 定义输出类型
 			SXSSFWorkbook workbook = new SXSSFWorkbook(10000);
-			String[] titles = {"借款编号", "操作前状态", "操作后状态","操作类型","催收公司","催收组","当前催收员","订单组","创建时间","操作人","操作备注"};
+			String[] titles = {"借款编号","用户id","操作前状态", "操作后状态","操作类型","催收公司","催收组","当前催收员","订单组","创建时间","操作人","操作备注"};
 			List<SysDict> dictlist=sysDictService.getStatus("collection_group");
 			HashMap<String, String> dictMap=BackConstant.orderState(dictlist);
 			List<SysDict> statulist=sysDictService.getStatus("xjx_collection_order_state");
@@ -160,16 +160,17 @@ public class MmanLoanCollectionStatusChangeLogController extends BaseController 
 				for (MmanLoanCollectionStatusChangeLog r : list) {
 					String[] conList = new String[titles.length];
 					conList[0] = r.getLoanCollectionOrderId();
-					conList[1] = orderStatusMap.get(r.getBeforeStatus()) == null ? "" : orderStatusMap.get(r.getBeforeStatus()) + "";
-					conList[2] = orderStatusMap.get(r.getAfterStatus())  == null ? "" : orderStatusMap.get(r.getAfterStatus()) + "";
-					conList[3] = StatuMap.get(r.getType());
-					conList[4] = r.getCompanyTitle() == null ? "" : r.getCompanyTitle();
-					conList[5] = dictMap.get(r.getCurrentCollectionUserLevel() + "");
-					conList[6] = r.getCurrentCollectionUserId() == null ? "" : r.getCurrentCollectionUserId();
-					conList[7] = dictMap.get(r.getCurrentCollectionOrderLevel()+"");
-					conList[8] = r.getCreateDate() == null ? "" : DateUtil.getDateFormat(r.getCreateDate(),"yyyy-MM-dd HH:mm:ss");
-					conList[9] = r.getOperatorName() == null ? "" : r.getOperatorName();
-					conList[10] = r.getRemark() == null ? "" : r.getRemark();
+					conList[1] = r.getUserId();
+					conList[2] = orderStatusMap.get(r.getBeforeStatus()) == null ? "" : orderStatusMap.get(r.getBeforeStatus()) + "";
+					conList[3] = orderStatusMap.get(r.getAfterStatus())  == null ? "" : orderStatusMap.get(r.getAfterStatus()) + "";
+					conList[4] = StatuMap.get(r.getType());
+					conList[5] = r.getCompanyTitle() == null ? "" : r.getCompanyTitle();
+					conList[6] = dictMap.get(r.getCurrentCollectionUserLevel() + "");
+					conList[7] = r.getCurrentCollectionUserId() == null ? "" : r.getCurrentCollectionUserId();
+					conList[8] = dictMap.get(r.getCurrentCollectionOrderLevel()+"");
+					conList[9] = r.getCreateDate() == null ? "" : DateUtil.getDateFormat(r.getCreateDate(),"yyyy-MM-dd HH:mm:ss");
+					conList[10] = r.getOperatorName() == null ? "" : r.getOperatorName();
+					conList[11] = r.getRemark() == null ? "" : r.getRemark();
 					contents.add(conList);
 				}
 				ExcelUtil.buildExcel(workbook, "催收流转日志", titles, contents, i, total, os);

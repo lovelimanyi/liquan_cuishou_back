@@ -131,16 +131,17 @@
 			  c.title AS companyName,
 			  a. STATUS AS userStatus,
 			  a.user_account AS realName,
-			  IFNULL(d.loanMoney, 0) AS loanMoney
+	  		  IFNULL(d.orderCount, 0) AS orderCount
 			  FROM
 			  back_user a
 			  LEFT JOIN mman_loan_collection_company c ON a.company_id = c.id
 			  LEFT JOIN (
 			  SELECT
 			  mco.`current_collection_user_id`,
-			  SUM(
-			  mul.`loan_money` + mul.`loan_penalty`
-			  ) AS loanMoney
+	  		  count(mul.id) as orderCount
+	  		  /*
+	  		  SUM(mul.`loan_money` + mul.`loan_penalty`) AS loanMoney
+	  		  */
 			  FROM
 			  (
 			  SELECT
@@ -157,7 +158,7 @@
 			  mco.`current_collection_user_id`
 			  ) AS d ON d.current_collection_user_id = a.uuid
 			  WHERE
-			  c.`status` = 1
+			  c.`status` = '1'
 			  AND EXISTS (
 			  SELECT
 			  1
@@ -183,8 +184,10 @@
 		<if test="notUser != null and notUser != ''">
 			AND a.id not in(#{notUser})
 		</if>
-		
-		ORDER BY loanMoney ASC;
+		/*
+	  	ORDER BY loanMoney ASC;
+	  	*/
+		ORDER BY orderCount ASC;
 	</select>
 	
 	
