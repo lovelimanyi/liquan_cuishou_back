@@ -5,6 +5,7 @@ import com.xjx.mqclient.service.MqClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +18,7 @@ import javax.sql.DataSource;
 public class MqClientUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(MqClientUtils.class);
     @Autowired
+    @Qualifier("dataSourcecs")
     private DataSource dataSource;
 
     @Bean
