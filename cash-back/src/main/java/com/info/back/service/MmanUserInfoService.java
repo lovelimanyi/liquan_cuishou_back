@@ -68,6 +68,14 @@ public class MmanUserInfoService implements IMmanUserInfoService {
         String url = PayContents.JXL_OSS_SERVER_URL+phone;
         String returnUrl = "";
         try {
+            String jxlDetail = userInfo.getJxlDetail();
+            //如果jxlDetail不为空，则从数据库中查出来解析，如果为空，则从Hbase中查出来解析
+            if (StringUtils.isNotBlank(jxlDetail)){ //原始现金侠的聚信立报告-分为两种：从数据库中查出来解析
+                handleCashmanJxl(jxlDetail,model);
+                //返回 现金侠原始聚信立报告页面
+                returnUrl = "mycollectionorderlReport";
+                return returnUrl;
+            }
             JxlResponse jxlResponse = HttpUtils.get(url,null);
             if (jxlResponse != null){
                 String jxlType = jxlResponse.getJxlType();
