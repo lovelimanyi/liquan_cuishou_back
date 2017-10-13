@@ -238,27 +238,22 @@ public class UserController extends BaseController {
 
                 String originalNewPassword = params.get("newPassword").toString();
                 String newPassword = MD5coding.getInstance().code(originalNewPassword);
-                // 只针对指定账号开放修改密码权限
-                if(!BackConstant.managers.contains(backUser.getUserAccount())){
-                    errorMsg = "您无权进行该操作,请联系管理员!";
-                }else {
-                    if (backUser.getUserPassword().equals(newPassword)) {
-                        errorMsg = "新密码和原密码不能相同!";
-                    } else if (!originalNewPassword.matches("^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{6,16}")) {
-                        errorMsg = "密码必须包含大写字母、小写字母、数字三项并且长度在6-16位之间!";
-                    } else {
-                        // 修改密码
-                        BackUser backUser2 = new BackUser();
-                        backUser2.setId(id);
-                        backUser2.setUserPassword(newPassword);
-                        backUserService.updatePwdById(backUser2);
-                        bool = true;
-                    }
+                if (backUser.getUserPassword().equals(newPassword)) {
+                    errorMsg = "新密码和原密码不能相同!";
+                } else if (!originalNewPassword.matches("^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{6,16}")) {
+                    errorMsg = "密码必须包含大写字母、小写字母、数字三项并且长度在6-16位之间!";
+                } else {
+                    // 修改密码
+                    BackUser backUser2 = new BackUser();
+                    backUser2.setId(id);
+                    backUser2.setUserPassword(newPassword);
+                    backUserService.updatePwdById(backUser2);
+                    bool = true;
                 }
-                SpringUtils.renderDwzResult(response, bool, bool ? "操作成功"
-                        : "操作失败，" + errorMsg, DwzResult.CALLBACK_CLOSECURRENT);
-                target = null;
             }
+            SpringUtils.renderDwzResult(response, bool, bool ? "操作成功"
+                    : "操作失败，" + errorMsg, DwzResult.CALLBACK_CLOSECURRENT);
+            target = null;
         } catch (Exception e) {
             logger.error("updateUserPassWord error ", e);
         }

@@ -93,13 +93,6 @@ public class BackConstant {
 
 	public static final List<String> managers = new ArrayList<>();
 
-	static {
-		managers.add("administrator");
-		managers.add("CNT13151650682");
-		managers.add("13681929452");
-		managers.add("15396889919");
-	}
-
 	static{
 		groupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_S1,"S1");
 		groupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_S2,"S2");
