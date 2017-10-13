@@ -238,6 +238,7 @@ public class UserController extends BaseController {
 
                 String originalNewPassword = params.get("newPassword").toString();
                 String newPassword = MD5coding.getInstance().code(originalNewPassword);
+
                 if (backUser.getUserPassword().equals(newPassword)) {
                     errorMsg = "新密码和原密码不能相同!";
                 } else if (!originalNewPassword.matches("^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{6,16}")) {
@@ -250,10 +251,11 @@ public class UserController extends BaseController {
                     backUserService.updatePwdById(backUser2);
                     bool = true;
                 }
+
+                SpringUtils.renderDwzResult(response, bool, bool ? "操作成功"
+                        : "操作失败，" + errorMsg, DwzResult.CALLBACK_CLOSECURRENT);
+                target = null;
             }
-            SpringUtils.renderDwzResult(response, bool, bool ? "操作成功"
-                    : "操作失败，" + errorMsg, DwzResult.CALLBACK_CLOSECURRENT);
-            target = null;
         } catch (Exception e) {
             logger.error("updateUserPassWord error ", e);
         }
