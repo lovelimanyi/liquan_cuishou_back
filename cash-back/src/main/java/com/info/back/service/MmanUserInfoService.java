@@ -73,7 +73,7 @@ public class MmanUserInfoService implements IMmanUserInfoService {
             if (StringUtils.isNotBlank(jxlDetail)){ //原始现金侠的聚信立报告-分为两种：从数据库中查出来解析
                 handleCashmanJxl(jxlDetail,model);
                 //返回 现金侠原始聚信立报告页面
-                returnUrl = "mycollectionorderlReport";
+                returnUrl = "mycollectionorder/jxlReport";
                 return returnUrl;
             }
             JxlResponse jxlResponse = HttpUtils.get(url,null);
