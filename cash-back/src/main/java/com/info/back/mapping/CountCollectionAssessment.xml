@@ -999,14 +999,23 @@
 		]]>
 	</select>
 
-	<delete id="deleteManageList" parameterType="HashMap">
-		<![CDATA[
-			DELETE
-			FROM
-			count_collection_manage
-			WHERE
-			DATE_FORMAT(count_date, '%Y-%m-%d') >= DATE_FORMAT(#{begDate}, '%Y-%m-%d')
-			AND DATE_FORMAT(count_date, '%Y-%m-%d') <= DATE_FORMAT(#{endDate}, '%Y-%m-%d');
-		]]>
+	<!-- 删除考核统计记录 -->
+	<delete id="deleteAssessmentList" parameterType="HashMap">
+		DELETE
+		FROM
+			count_collection_assessment
+		WHERE
+		DATE_FORMAT(count_date, '%Y-%m-%d') &gt;= DATE_FORMAT(#{begDate}, '%Y-%m-%d')
+		AND DATE_FORMAT(count_date, '%Y-%m-%d') &lt; DATE_FORMAT(#{endDate}, '%Y-%m-%d');
+
+	</delete>
+
+	<!-- 删除订单统计记录 -->
+	<delete id="deleteCountCollectionOrder" parameterType="HashMap">
+		DELETE
+		FROM
+		count_collection_order
+		WHERE
+		DATE_FORMAT(count_date, '%Y-%m-%d') = DATE_FORMAT(#{currDate}, '%Y-%m-%d');
 	</delete>
 </mapper>

@@ -21,6 +21,7 @@ public class AlertMsgService implements IAlertMsgService {
 	private ISysAlertMsgDao sysAlertMsgDao;
 	@Autowired
 	private IPaginationDao paginationDao;
+	@Override
 	public void insert(SysAlertMsg sysAlertMsg) {
 		sysAlertMsg.setId(IdGen.uuid());
 		sysAlertMsg.setCreateDate(new Date());

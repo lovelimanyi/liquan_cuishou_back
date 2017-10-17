@@ -2,8 +2,7 @@ package com.info.back.service;
 
 import java.util.HashMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +21,7 @@ public class MmanLoanCollectionRuleService implements IMmanLoanCollectionRuleSer
 	@Autowired
 	private IMmanLoanCollectionRuleDao mmanLoanCollectionRuleDao;
 	
-	private static Logger logger = LoggerFactory.getLogger(MmanLoanCollectionRuleService.class);
+	private static Logger logger = Logger.getLogger(MmanLoanCollectionRuleService.class);
 	@Override
 	public PageConfig<MmanLoanCollectionRule> findPage(HashMap<String, Object> params) {
 		params.put(Constant.NAME_SPACE, "MmanLoanCollectionRule");

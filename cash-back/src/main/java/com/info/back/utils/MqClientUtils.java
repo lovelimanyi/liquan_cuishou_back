@@ -2,8 +2,8 @@ package com.info.back.utils;
 
 import com.info.config.MqConstant;
 import com.xjx.mqclient.service.MqClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -16,7 +16,7 @@ import javax.sql.DataSource;
  */
 @Component
 public class MqClientUtils {
-    private static final Logger LOGGER = LoggerFactory.getLogger(MqClientUtils.class);
+    private static final Logger logger = Logger.getLogger(MqClientUtils.class);
     @Autowired
     @Qualifier("dataSourcecs")
     private DataSource dataSource;
@@ -29,7 +29,7 @@ public class MqClientUtils {
                     MqConstant.MQ_IS_CREATETABLE);
             mq.start();
         } catch (Exception e) {
-            LOGGER.error("mq启动初始化异常",e);
+            logger.error("mq启动初始化异常",e);
         }
         return mq;
     }

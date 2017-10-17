@@ -10,8 +10,8 @@ import com.info.web.pojo.CollectionAdvice;
 import com.info.web.pojo.FengKong;
 import com.info.web.pojo.MmanLoanCollectionOrder;
 import com.info.web.util.PageConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +22,7 @@ import java.util.Map;
 
 @Service
 public class FengKongService implements IFengKongService {
-    private static Logger logger = LoggerFactory.getLogger(FengKongService.class);
+    private static Logger logger = Logger.getLogger(FengKongService.class);
 
     @Autowired
     private IPaginationDao<FengKong> paginationDao;
