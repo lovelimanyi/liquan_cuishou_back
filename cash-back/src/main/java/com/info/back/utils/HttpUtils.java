@@ -13,22 +13,39 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
+import org.springframework.util.Base64Utils;
 import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class HttpUtils {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(HttpUtils.class);
+    private static final Logger logger = Logger.getLogger(HttpUtils.class);
+    /**
+     * Basic Auth认证头信息
+     * @return authHeader
+     */
+    private static String getAuthHeader(){
+//        HashMap<String, String> map = SysCacheUtils.getConfigParams("GET_JXL");
+//        String key = map.get("JXL_GET_AUTH_NAME");
+//        String pwd = map.get("JXL_GET_AUTH_PWD");
+//        String auth = "xjx_application_client_dev"+":"+"xjx_dev";
+        String auth = "xjx_application_client"+":"+"xjx_123456";
+        byte[] encodedAuth = Base64Utils.encode(auth.getBytes(Charset.forName("US-ASCII")));
+        String authHeader = "Basic " + new String(encodedAuth);
+        return authHeader;
+    }
+
     // 聚信立get
     public static JxlResponse get(String url, Map<String, Object> params) {
+        String phone =url.substring(url.length()-11,url.length());
         CloseableHttpClient httpClient = HttpClients.createDefault();
         //超时设置
         RequestConfig requestConfig = getRequestConfig();
@@ -37,13 +54,20 @@ public class HttpUtils {
             String requestParams = parseParams(params);
             String extraUrl = url + (StringUtils.isEmpty(requestParams) ? "" : "?" + requestParams);
             HttpGet get = new HttpGet(extraUrl);
+            if (url.contains("https://risk-internal.xianjinxia.com/api/storage/v1/report/")){
+                get.addHeader("Authorization",getAuthHeader());
+            }
             get.setConfig(requestConfig);
             response = httpClient.execute(get);
+            String tuid = response.getFirstHeader("X-TUID")==null?null:response.getFirstHeader("X-TUID").getValue();
+            String subtype = response.getFirstHeader("X-SUBTYPE")==null?null:response.getFirstHeader("X-SUBTYPE").getValue();
+            logger.info(phone+"phone-jxlGetJsonData-tuid=" + tuid + ",subtype=" + subtype);
             HttpEntity entity = response.getEntity();
-            String type= response.getFirstHeader("X-SUBTYPE").getValue();
-            if (StringUtils.isNoneBlank(type)){
+//            logger.info(phone+"phone-JxlData="+EntityUtils.toString(entity));
+//            String type= response.getFirstHeader("X-SUBTYPE").getValue();
+            if (StringUtils.isNoneBlank(subtype)){
                 JxlResponse jxlResponse = new JxlResponse();
-                jxlResponse.setJxlType(type);
+                jxlResponse.setJxlType(subtype);
                 jxlResponse.setJxlData(EntityUtils.toString(entity));
                 return jxlResponse;
             }
@@ -52,7 +76,7 @@ public class HttpUtils {
             return null;
 
         } catch (Exception e) {
-            LOGGER.error("访问链接异常[GET] url=" + url, e);
+            logger.error("访问链接异常[GET] url=" + url, e);
             return null;
         } finally {
             if(response != null) {
@@ -74,12 +98,14 @@ public class HttpUtils {
             String requestParams = parseParams(params);
             String extraUrl = url + (StringUtils.isEmpty(requestParams) ? "" : "?" + requestParams);
             HttpGet get = new HttpGet(extraUrl);
+            String authHeader = getAuthHeader();
+            get.addHeader("Authorization",authHeader);
             get.setConfig(requestConfig);
             response = httpClient.execute(get);
             HttpEntity entity = response.getEntity();
             return EntityUtils.toString(entity);
         } catch (Exception e) {
-            LOGGER.error("访问链接异常[GET] url=" + url, e);
+            logger.error("访问链接异常[GET] url=" + url, e);
             return null;
         } finally {
             if(response != null) {
@@ -106,7 +132,7 @@ public class HttpUtils {
             HttpEntity responseEntity = response.getEntity();
             return EntityUtils.toString(responseEntity);
         } catch (Exception e) {
-            LOGGER.error("访问链接异常[POST] url=" + url, e);
+            logger.error("访问链接异常[POST] url=" + url, e);
             return null;
         } finally {
             if(response != null) {
@@ -132,7 +158,7 @@ public class HttpUtils {
             HttpEntity responseEntity = response.getEntity();
             return EntityUtils.toString(responseEntity);
         } catch (Exception e) {
-            LOGGER.error("访问链接异常[POST] url=" + url, e);
+            logger.error("访问链接异常[POST] url=" + url, e);
             return null;
         } finally {
             if(response != null) {
