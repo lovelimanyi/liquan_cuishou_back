@@ -56,7 +56,9 @@ public class MmanUserInfoService implements IMmanUserInfoService {
     public List<ContactInfo> getContactInfo(String phoneNum) {
         return mmanUserInfoDao.getContactInfo(phoneNum);
     }
-
+    
+    @Autowired
+    private IChannelSwitchingDao channelSwitchingDao;
 
     /**
      * 解析聚信立报告
@@ -65,7 +67,8 @@ public class MmanUserInfoService implements IMmanUserInfoService {
     public String handleJxl(Model model, String userId) {
         MmanUserInfo userInfo = mmanUserInfoDao.get(userId);
         String phone = userInfo.getUserPhone();
-        String url = PayContents.JXL_OSS_SERVER_URL+phone;
+        String ossUrl = channelSwitchingDao.getChannelValue("jxl_oss_url").getChannelValue();
+        String url = ossUrl+phone;
         String returnUrl = "";
         try {
             String jxlDetail = userInfo.getJxlDetail();
