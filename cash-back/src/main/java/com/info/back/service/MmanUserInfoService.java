@@ -1,18 +1,15 @@
 package com.info.back.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.info.back.dao.IChannelSwitchingDao;
 import com.info.back.dao.IMmanUserInfoDao;
 import com.info.back.utils.HttpUtils;
-import com.info.back.utils.WebClient;
-import com.info.back.vo.Base64;
-import com.info.back.vo.GzipUtil;
 import com.info.back.vo.JxlResponse;
 import com.info.back.vo.jxl.*;
 import com.info.back.vo.jxl2.JxlUserReport;
 import com.info.back.vo.jxl_360.Rong360Report;
 import com.info.back.vo.jxl_jdq.JdqReport;
 import com.info.back.vo.jxl_jlm.JlmReport;
-import com.info.config.PayContents;
 import com.info.constant.Constant;
 import com.info.web.pojo.ContactInfo;
 import com.info.web.pojo.MmanUserInfo;
