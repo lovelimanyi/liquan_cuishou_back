@@ -26,7 +26,7 @@
 	</resultMap>
 	<sql id="findAllSql">
 			from back_user u left join mman_loan_collection_company c on u.company_id = c.id 
-			where 1=1 <!-- status=1 -->
+			where u.`status` != 2 <!-- status=1 -->
 			<if test="id != null and id !=''">
 				and u.id = #{id}
 			</if>
