@@ -245,7 +245,7 @@ public class JedisDataClient {
 	 * 向List尾部加入数据，放入缓存，如果key不存在，创建该对象
 	 * 
 	 * @param key
-	 * @param value
+	 * @param
 	 * @throws Exception
 	 */
 	public static void setList(String key, List<String> list, int... times)
@@ -274,9 +274,9 @@ public class JedisDataClient {
 	 * 向List尾部加入单个数据，放入缓存，如果key不存在，创建该对象
 	 * 
 	 * @param key
-	 * @param value
-	 * @param type
-	 *            0:第一次插入,
+	 * @param
+	 * @param
+	 *            :第一次插入,
 	 * @throws Exception
 	 */
 	public static void setList(String key, String listValue) throws Exception {
@@ -481,7 +481,7 @@ public class JedisDataClient {
 	/**
 	 * 从redis取所有的key
 	 * 
-	 * @param key
+	 * @param
 	 * @return
 	 * @throws Exception
 	 */
@@ -494,7 +494,7 @@ public class JedisDataClient {
 			StringBuffer sb = new StringBuffer();
 			while (it.hasNext()) {
 				String key = it.next();
-				System.out.println("key=" + key);
+//				System.out.println("key=" + key);
 			}
 			return sb.toString();
 		} finally {
@@ -504,7 +504,7 @@ public class JedisDataClient {
 	/**
 	 * 从redis取所有的key
 	 * 
-	 * @param key
+	 * @param
 	 * @return
 	 * @throws Exception
 	 */
@@ -517,7 +517,7 @@ public class JedisDataClient {
 			Iterator<String> it = keys.iterator();
 			while (it.hasNext()) {
 				String key = it.next();
-				System.out.println("key=" + key);
+//				System.out.println("key=" + key);
 				keyList.add(key);
 			}
 			return keyList;
@@ -564,7 +564,7 @@ public class JedisDataClient {
 			Iterator<String> it = keys.iterator();
 			while (it.hasNext()) {
 				String key = it.next();
-				System.out.println("key=" + key);
+				log.info("key = " + key);
 				jedisMaster.del(key);
 			}
 		} finally {
