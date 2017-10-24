@@ -113,7 +113,7 @@ public class DataService implements IDataService {
 			if(null!=keyList && 0<keyList.size()){
 				for(String string : keyList){
 					if(StringUtils.isNotBlank(string)){
-						loger.info("redis-key:"+string);
+//						loger.info("redis-key:"+string);
 						if(JedisDataClient.exists(string)){
 //							if(!JedisDataClient.get(string).equals(LOCK_FLAG)){
 //								JedisDataClient.set(string, LOCK_FLAG);

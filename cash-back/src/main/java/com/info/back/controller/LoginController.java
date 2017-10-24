@@ -6,6 +6,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.info.back.utils.BackConstant;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,7 +107,7 @@ public class LoginController extends BaseController {
 			if (validateSubmit(request, response)) {
 				params.put("status", BackUser.STATUS_USE);
 				BackUser backUser = backUserService.findOneUser(params);
-				if (backUser != null) {
+				if (backUser != null && !BackConstant.BACK_USER_STATUS.equals(backUser.getUserStatus().toString())) {
 					if (backUser.getUserPassword().equals(MD5coding.getInstance().code(String.valueOf(params.get("userPassword"))))) {
 						request.getSession(true).setAttribute(Constant.BACK_USER, backUser);
 						request.getSession(true).setMaxInactiveInterval(1800);

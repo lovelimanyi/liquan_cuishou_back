@@ -14,10 +14,8 @@ import com.info.web.util.encrypt.MD5coding;
 import com.xjx.mqclient.pojo.MqMessage;
 import com.xjx.mqclient.service.MqClient;
 import net.sf.json.JSONObject;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,8 +27,7 @@ import java.util.*;
 
 @Service
 public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecordService {
-
-    protected Logger logger = LoggerFactory.getLogger(getClass());
+    private static Logger logger = Logger.getLogger(MmanLoanCollectionRecordService.class);
 
     @Autowired
     private IMmanLoanCollectionRecordDao mmanLoanCollectionRecordDao;
@@ -594,12 +591,10 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
                             dayMap.put("currDate", DateUtil.getDateFormat(new Date(), "yyyy-MM-dd"));
                             //查询当天定单代扣次数
                             int count = collectionWithholdingRecordDao.findCurrDayWithhold(dayMap);
-                            logger.error("当前roleId: " + String.valueOf(params.get("roleId")));
                             //超级管理员，催收经理 不受权限控制
                             if (Constant.ROLE_ID.equals(String.valueOf(params.get("roleId"))) || "10001".equals(String.valueOf(params.get("roleId")))) {
                                 count = 0;
                             }
-                            logger.error("当前次数count:" + count);
                             if (count < 5) {
                                 // 判断该笔订单是否有还款中待处理的数据(redis中是否存在对应key)
                                 String payId = mmanLoanCollectionOrderOri.getPayId();
@@ -616,7 +611,7 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
                                 ChannelSwitching withholdChannel = channelSwitchingDao.getChannelValue("cuishou_withhold_channel");
                                 // 根据渠道区分代扣请求发送地方
                                 if (BackConstant.CUISHOU_WITHHOLD_CHANNEL_PAYMENTCENTER.equals(withholdChannel.getChannelValue())) {
-                                    logger.error("订单:" + params.get("id").toString() + "通过支付中心发起代扣...");
+                                    logger.info("订单: " + params.get("id").toString() + " 通过支付中心发起代扣...");
                                     WithholdParam withhold = new WithholdParam();
                                     withhold.setMoney(BigDecimal.valueOf(actualPayMonery)); // 扣款金额
                                     withhold.setRepaymentId(mmanLoanCollectionOrderOri.getPayId()); // 还款id
@@ -650,7 +645,7 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
                                     reslut.setCode("0");
                                     reslut.setMsg("代扣请求发送成功，请5分钟后查看处理结果！");
                                 } else {
-                                    logger.error("订单:" + params.get("id").toString() + "通过请求现金侠后台发起代扣...");
+                                    logger.info("订单: " + params.get("id").toString() + " 通过请求现金侠后台发起代扣...");
                                     //2、发送请求
                                     String withholdPostUrl = PayContents.XJX_WITHHOLDING_NOTIFY_URL + "/" + mmanLoanCollectionOrderOri.getUserId() + "/" + mmanLoanCollectionOrderOri.getPayId() + "/" + actualPayMonery + "/" + uuid + "/" + sign;
                                     logger.error("现金侠代扣请求地址：" + withholdPostUrl);
@@ -789,7 +784,6 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
             params.put("id", installmentPayRecord.getLoanOrderId());
             // 调用代扣接口
             result = this.xjxWithholding(params);
-            logger.info("调用代扣接口返回：{}", JSONUtil.beanToJson(result));
             result.setCode("0");
             if (result != null && "0".equals(result.getCode())) {
                 iInstallmentPayRecordDao.updateInstallmentStatusById(params.get("installmentId").toString());

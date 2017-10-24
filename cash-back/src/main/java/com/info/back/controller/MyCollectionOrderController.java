@@ -17,14 +17,12 @@ import com.liquan.oss.OSSUpload;
 import net.sf.json.JSONArray;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.Cookie;
@@ -44,8 +42,7 @@ import java.util.*;
 @RequestMapping("collectionOrder/")
 public class MyCollectionOrderController extends BaseController {
 
-    private static Logger logger = LoggerFactory
-            .getLogger(MyCollectionOrderController.class);
+    private static Logger logger = Logger.getLogger(MyCollectionOrderController.class);
 
     // 公司
     @Autowired

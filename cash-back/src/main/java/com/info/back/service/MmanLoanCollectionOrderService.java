@@ -8,13 +8,12 @@ import java.util.Map;
 
 import com.info.back.dao.*;
 import com.info.web.pojo.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
-import com.info.web.util.CompareUtils;
 import com.info.web.util.PageConfig;
 import com.info.back.result.JsonResult;
 import com.info.back.utils.IdGen;
@@ -22,7 +21,7 @@ import com.info.constant.Constant;
 
 @Service
 public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderService{
-	protected Logger logger = LoggerFactory.getLogger(MmanLoanCollectionOrderService.class);
+	protected Logger logger = Logger.getLogger(MmanLoanCollectionOrderService.class);
 	@Autowired
 	private IMmanLoanCollectionOrderDao mmanLoanCollectionOrderDao;
 	

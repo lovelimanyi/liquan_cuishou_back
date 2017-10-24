@@ -114,4 +114,15 @@
 		count_collection_manage c 
 		WHERE id = #{id}
 	</select>
+	<!-- 删除考核统计记录 -->
+	<delete id="deleteManageList" parameterType="HashMap">
+		<![CDATA[
+			DELETE
+			FROM
+			count_collection_manage
+			WHERE
+			DATE_FORMAT(count_date, '%Y-%m-%d') >= date_add(curdate(), interval - day(curdate()) + 1 day)
+			AND DATE_FORMAT(count_date, '%Y-%m-%d') <= curdate();
+		]]>
+	</delete>
 </mapper>
