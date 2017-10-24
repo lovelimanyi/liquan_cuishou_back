@@ -50,11 +50,9 @@ public class TaskJobStatistics {
                     return;
                 }
                 // 考核统计
-                countCollectionAssessmentService.deleteAssessmentList(params);
                 countCollectionAssessmentService.countCallAssessment(params);
                 logger.info("考核统计执行完成,完成时间 :" + DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
                 // 管理统计
-                countCollectionManageService.deleteManageList(params);
                 countCollectionManageService.countCallManage(params);
                 logger.info("管理统计执行完成,完成时间 :" + DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
             }
@@ -68,23 +66,10 @@ public class TaskJobStatistics {
      * 催记统计
      */
     public void callCountCollection() {
-        logger.warn("=====================CJ-=====================");
+        logger.info("催记统计开始.....");
         Date date = new Date();
-        Calendar today = Calendar.getInstance();
-        int currentHour = today.get(Calendar.HOUR_OF_DAY);
-        int day = today.get(Calendar.DAY_OF_MONTH);
-        HashMap<String, Object> params = new HashMap<String, Object>();
-        if (currentHour < 1){
-            params.put("begDate", DateUtil.getDateFormat(DateUtil.getBeforeOrAfter(date, -1), "yyyy-MM-dd"));
-        }else {
-            if(day != 1){
-                params.put("begDate", DateUtil.getDateFormat("yyyy-MM-dd"));
-            }else {
-                logger.info("1号统计暂停执行......" + DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
-                return;
-            }
-        }
-        countCollectionAssessmentService.deleteCountCollectionOrder(params);
+        HashMap<String,Object> params = new HashMap<String,Object>();
+        params.put("begDate", DateUtil.getDateFormat(DateUtil.getBeforeOrAfter(date,-1),"yyyy-MM-dd"));
         countCollectionAssessmentService.countCallOrder(params);
         logger.info("催记统计执行完成,完成时间 :" + DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
     }

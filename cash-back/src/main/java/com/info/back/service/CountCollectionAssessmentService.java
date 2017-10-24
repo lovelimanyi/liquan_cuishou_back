@@ -8,18 +8,18 @@ import com.info.web.pojo.CountCollectionAssessment;
 import com.info.web.util.DateUtil;
 import com.info.web.util.PageConfig;
 import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 @Service
 public class CountCollectionAssessmentService implements ICountCollectionAssessmentService {
-	private static Logger logger = LoggerFactory.getLogger(CountCollectionAssessmentService.class);
+	private static Logger logger = Logger.getLogger(CountCollectionAssessmentService.class);
 	@Autowired
 	private ICountCollectionAssessmentDao countCollectionAssessmentDao;
 	@Autowired
@@ -170,7 +170,9 @@ public class CountCollectionAssessmentService implements ICountCollectionAssessm
 	public void countCallAssessment(HashMap<String, Object> params) {
 		String begDate = String.valueOf(params.get("begDate"));
 		String endDate = String.valueOf(params.get("endDate"));
-		logger.info("begDate: {} | endDate: {}",begDate,endDate);
+		logger.info("删除考核统计数据.....");
+		countCollectionAssessmentDao.deleteAssessmentList(params);
+		logger.info("删除考核统计数据完成!!");
 		int count = 0;
 		try {
 			count = DateUtil.daysBetween(DateUtil.formatDate(begDate,"yyyy-MM-dd"), DateUtil.formatDate(endDate,"yyyy-MM-dd"));
@@ -185,6 +187,7 @@ public class CountCollectionAssessmentService implements ICountCollectionAssessm
 				countCollectionAssessmentDao.insertExamineList(examineList);
 			}
 		}
+		logger.info("考核统计完成 " + new Date().toLocaleString());
 	}
 
 	@Override
@@ -196,7 +199,6 @@ public class CountCollectionAssessmentService implements ICountCollectionAssessm
 	@Override
 	public void countCallOrder(HashMap<String, Object> params) {
 		String nowDate = String.valueOf(params.get("begDate"));
-		logger.info("nowDate: {} ",nowDate);
 		params.put("currDate",DateUtil.getDateTimeFormat(nowDate,"yyyy-MM-dd"));
 		List<CountCollectionAssessment> collectionList = countCollectionAssessmentDao.queryCollectionList(params);
 

@@ -762,7 +762,7 @@
 							left join credit_loan_pay p on p.id = o.pay_id
 							WHERE
 								DATE_FORMAT(l.create_date, '%Y-%m-%d') >= date_add(curdate(), interval - day(curdate()) + 1 day)
-							and	DATE_FORMAT(l.create_date, '%Y-%m-%d') <= date_sub(curdate(),interval 1 day)
+							and	DATE_FORMAT(l.create_date, '%Y-%m-%d') <= curdate()
 							and l.type != 5
 							order by l.create_date desc
 						) a1 GROUP BY a1.loan_collection_order_id
@@ -785,7 +785,7 @@
 								select l2.* from(
 									select * from mman_loan_collection_status_change_log l where l.current_collection_Order_Level = 4
 									and DATE_FORMAT(l.create_date, '%Y-%m-%d') >= date_add(curdate(), interval - day(curdate()) + 1 day)
-									and	DATE_FORMAT(l.create_date, '%Y-%m-%d') <= date_sub(curdate(),interval 1 day)
+									and	DATE_FORMAT(l.create_date, '%Y-%m-%d') <= curdate()
 									group by l.loan_collection_order_id
 								) l1
 								inner join (
@@ -793,7 +793,7 @@
 									select * from (
 										select * from mman_loan_collection_status_change_log l where l.current_collection_Order_Level = 3
 										and DATE_FORMAT(l.create_date, '%Y-%m-%d') >= date_add(curdate(), interval - day(curdate()) + 1 day)
-										and	DATE_FORMAT(l.create_date, '%Y-%m-%d') <= date_sub(curdate(),interval 1 day)
+										and	DATE_FORMAT(l.create_date, '%Y-%m-%d') <= curdate()
 										and l.type != 5 order by l.create_date desc
 									) ll
 									group by ll.loan_collection_order_id
@@ -804,7 +804,7 @@
 							LEFT JOIN back_user bu ON bu.uuid = a2.current_collection_user_id
 							WHERE
 								DATE_FORMAT(a2.create_date, '%Y-%m-%d') >= date_add(curdate(), interval - day(curdate()) + 1 day)
-							and	DATE_FORMAT(a2.create_date, '%Y-%m-%d') <= date_sub(curdate(),interval 1 day)
+							and	DATE_FORMAT(a2.create_date, '%Y-%m-%d') <= curdate()
 							and a2.type != 5
 							order by a2.create_date desc
 						) a3 GROUP BY a3.loan_collection_order_id
@@ -856,7 +856,7 @@
 								left join credit_loan_pay p on p.id = o.pay_id
 								WHERE
 									DATE_FORMAT(l.create_date, '%Y-%m-%d') >= date_add(curdate(), interval - day(curdate()) + 1 day)
-								and	DATE_FORMAT(l.create_date, '%Y-%m-%d') <= date_sub(curdate(),interval 1 day)
+								and	DATE_FORMAT(l.create_date, '%Y-%m-%d') <= curdate()
 			-- 					and l.type != 5
 			-- 					order by l.create_date desc
 							) a1 GROUP BY a1.loan_collection_order_id
@@ -887,7 +887,7 @@
 							  left join audit_center ac ON ac.loan_id = o.loan_id and (ac. STATUS = 5 OR ac. STATUS = 2)
 								WHERE
 									DATE_FORMAT(l.create_date, '%Y-%m-%d') >= date_add(curdate(), interval - day(curdate()) + 1 day)
-								and	DATE_FORMAT(l.create_date, '%Y-%m-%d') <= date_sub(curdate(),interval 1 day)
+								and	DATE_FORMAT(l.create_date, '%Y-%m-%d') <= curdate()
 								and l.type = 5
 						) l2 on l1.loan_collection_order_id = l2.loan_collection_order_id
 					) l3
@@ -1005,8 +1005,8 @@
 		FROM
 			count_collection_assessment
 		WHERE
-		DATE_FORMAT(count_date, '%Y-%m-%d') &gt;= DATE_FORMAT(#{begDate}, '%Y-%m-%d')
-		AND DATE_FORMAT(count_date, '%Y-%m-%d') &lt; DATE_FORMAT(#{endDate}, '%Y-%m-%d');
+		DATE_FORMAT(count_date, '%Y-%m-%d') &gt;= #{begDate}
+		AND DATE_FORMAT(count_date, '%Y-%m-%d') &lt;= #{endDate};
 
 	</delete>
 

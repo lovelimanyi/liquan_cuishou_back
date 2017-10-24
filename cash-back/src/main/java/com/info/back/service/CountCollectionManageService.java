@@ -11,8 +11,7 @@ import com.info.web.pojo.CountCashBusiness;
 import com.info.web.synchronization.dao.IPaginationXjxDao;
 import com.info.web.util.DateUtil;
 import org.apache.commons.collections.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +29,7 @@ import com.info.web.util.PageConfig;
  */
 @Service
 public class CountCollectionManageService implements ICountCollectionManageService {
-    private static Logger logger = LoggerFactory.getLogger(CountCollectionManageService.class);
+    private static Logger logger = Logger.getLogger(CountCollectionManageService.class);
     @Autowired
     private ICountCollectionManageDao countCollectionManageDao;
     @Autowired
@@ -215,9 +214,11 @@ public class CountCollectionManageService implements ICountCollectionManageServi
     @Override
     public void countCallManage(HashMap<String, Object> params) {
 //		countCollectionManageDao.callManage(params);
-        params.put("begDate", DateUtil.getDayFirst());
-        params.put("endDate", new Date());
+//        params.put("begDate", DateUtil.getDayFirst());
+//        params.put("endDate", new Date());
+        logger.info("删除管理统计数据............");
         countCollectionManageDao.deleteManageList(params);
+        logger.info("删除管理统计数据完成!!!");
 //		Date date = new Date();
 //		int count = 0;
 //		try {
@@ -229,10 +230,11 @@ public class CountCollectionManageService implements ICountCollectionManageServi
 //		for (int i = count; i>=0 ; i--){
 //			params.put("currDate",DateUtil.getBeforeOrAfter(date,-i));
         List<CountCollectionAssessment> manageList = countCollectionAssessmentDao.queryManageList(params);
-        logger.info("管理统计报表manageList = {}", manageList != null ? manageList.size() : null);
+        logger.info("管理统计报表manageList = {}" +  manageList != null ? manageList.size() : null);
         if (CollectionUtils.isNotEmpty(manageList)) {
             countCollectionAssessmentDao.insertManageList(manageList);
         }
+        logger.info("管理统计执行完成!!!");
 //		}
     }
 

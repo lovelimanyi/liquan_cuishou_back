@@ -121,8 +121,8 @@
 			FROM
 			count_collection_manage
 			WHERE
-			DATE_FORMAT(count_date, '%Y-%m-%d') >= DATE_FORMAT(#{begDate}, '%Y-%m-%d')
-			AND DATE_FORMAT(count_date, '%Y-%m-%d') < DATE_FORMAT(#{endDate}, '%Y-%m-%d');
+			DATE_FORMAT(count_date, '%Y-%m-%d') >= date_add(curdate(), interval - day(curdate()) + 1 day)
+			AND DATE_FORMAT(count_date, '%Y-%m-%d') <= curdate();
 		]]>
 	</delete>
 </mapper>
