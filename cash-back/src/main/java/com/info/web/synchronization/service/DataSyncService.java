@@ -41,7 +41,7 @@ public class DataSyncService {
 	public void syncOverdueDate(){
 		loger.error("定时处理逾期数据..."+new Date());
 		try {
-			loger.info("获取所有的redis数据");
+//			loger.info("获取所有的redis数据");
 			HashMap<String,List<String>> hashMap =  getRedisAllData();
 			if(null!=hashMap){
 				try{
