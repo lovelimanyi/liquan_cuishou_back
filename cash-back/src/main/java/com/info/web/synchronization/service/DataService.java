@@ -44,7 +44,7 @@ public class DataService implements IDataService {
 			e1.printStackTrace();
 		}*/
 		
-		loger.info("获取数据 syncDate");
+//		loger.info("获取数据 syncDate");
 //		while(true){
 			try {
 				loger.info("获取所有的redis数据");
