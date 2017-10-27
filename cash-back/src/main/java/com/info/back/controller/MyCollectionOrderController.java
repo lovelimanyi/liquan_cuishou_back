@@ -268,15 +268,15 @@ public class MyCollectionOrderController extends BaseController {
         List<SysDict> statulist = null;
         try {
             if ("other".equals(params.get("type"))) {
-                logger.error("CollectionRecordAndAdvice=" + params.get("id").toString());
+//                logger.error("CollectionRecordAndAdvice=" + params.get("id").toString());
                 String ids = params.get("id").toString();
                 String[] list = ids.split(",");
                 String userRelaId = null;
                 if (list.length > 1) {
                     userRelaId = list[0];
                     orderId = list[1];
-                    logger.error("CollectionRecordAndAdvice-userRelaId=" + list[0]);
-                    logger.error("CollectionRecordAndAdvice-orderId=" + list[1]);
+//                    logger.error("CollectionRecordAndAdvice-userRelaId=" + list[0]);
+//                    logger.error("CollectionRecordAndAdvice-orderId=" + list[1]);
                 } else {
                     logger.error("前台参数异常，list = " + list);
                 }
@@ -624,7 +624,7 @@ public class MyCollectionOrderController extends BaseController {
     @RequestMapping(value = "withhold-callback")
     @ResponseBody
     public void dealWithholdResult(String text) {
-        System.out.println("=============== 接收到代扣回调请求参数 +++++++++++++++++ " + text);
+        logger.info("接收到代扣回调请求参数 " + text);
         JSONObject obj = JSONObject.parseObject(text);
         String uuid = (String) obj.get("uuid");
         boolean code = (boolean) obj.get("result");
