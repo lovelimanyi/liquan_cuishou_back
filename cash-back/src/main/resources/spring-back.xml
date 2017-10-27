@@ -84,7 +84,7 @@
 
 		<task:scheduled ref="TaskDisableOrEnableCollections" method="disableCollections" cron="0 10 0 1 * ?" />
 		<!-- <task:scheduled ref="TaskDisableOrEnableCollections" method="enableCollections" cron="0 0 6 1 * ?" /> -->
-		<task:scheduled ref="dealOverdueLoanService" method="dealOverdueLoan" cron="0 35 16 * * ?" />
+		<task:scheduled ref="dealOverdueLoanService" method="dealOverdueLoan" cron="0 10 0 * * ?" />
 	</task:scheduled-tasks>
 	<!--最多 5个定时任务线程-->
 	<task:scheduler id="myScheduler" pool-size="5"/>
