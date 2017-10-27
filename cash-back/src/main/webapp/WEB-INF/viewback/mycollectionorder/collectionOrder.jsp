@@ -86,7 +86,7 @@
 							</select>
 					</td>
 					<td>
-							订单排序:
+							订 单 排 序:
 							<select id="sortBy" name="sortBy">
 								<option value="" <c:if test="${params.sortBy eq ''}">selected = "selected"</c:if>>初始排序</option>
 								<option value="overdueDays ASC" <c:if test="${params.sortBy eq 'overdueDays ASC'}">selected = "selected"</c:if>>逾期天数升序</option>
@@ -115,7 +115,7 @@
 							</select>
 					</td>
 					<td>
-						新 老 客 户:
+						新 老 用 户:
 						<select id="customerType" name="customerType">
 							<option value="" <c:if test="${params.customerType eq ''}">selected = "selected"</c:if>>全部</option>
 							<option value="0" <c:if test="${params.customerType eq '0'}">selected = "selected"</c:if>>新用户</option>

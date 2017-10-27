@@ -87,7 +87,7 @@
 						</select>
 					</td>
 					<td>
-						新 老 客 户:
+						新 老 用 户:
 						<select id="customerType" name="customerType">
 							<option value="" <c:if test="${params.customerType eq ''}">selected = "selected"</c:if>>全部</option>
 							<option value="0" <c:if test="${params.customerType eq '0'}">selected = "selected"</c:if>>新用户</option>
