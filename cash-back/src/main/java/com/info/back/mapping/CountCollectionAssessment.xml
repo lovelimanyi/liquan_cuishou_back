@@ -95,6 +95,7 @@
 	     <if test="personId != null and personId != ''">
 	       and c.person_id = #{personId}
 	     </if>
+
 	  </where>
 	</sql>
 
@@ -104,6 +105,9 @@
 		from 
 		count_collection_assessment c
 		<include refid="where"></include>
+		<if test="orderBy != null and orderBy != null">
+			ORDER BY c.${orderBy}
+		</if>
 	</select>
 	
 	<select id="findAllCount" parameterType="HashMap" resultType="Integer">
@@ -148,6 +152,9 @@
 		from count_collection_assessment c
 		<include refid="where"></include>
 		group by c.person_id,c.order_group_id,c.company_id,c.group_id
+		<if test="orderBy != null and orderBy != ''">
+			ORDER by c.${orderBy}
+		</if>
 	</select>
 	<select id="findAllCountByGroup" resultType="Integer" parameterType="HashMap">
 		select count(1) from (select count(1) as count_num,c.order_group_id

@@ -271,15 +271,15 @@ public class MyCollectionOrderController extends BaseController {
         List<SysDict> statulist = null;
         try {
             if ("other".equals(params.get("type"))) {
-                logger.error("CollectionRecordAndAdvice=" + params.get("id").toString());
+//                logger.error("CollectionRecordAndAdvice=" + params.get("id").toString());
                 String ids = params.get("id").toString();
                 String[] list = ids.split(",");
                 String userRelaId = null;
                 if (list.length > 1) {
                     userRelaId = list[0];
                     orderId = list[1];
-                    logger.error("CollectionRecordAndAdvice-userRelaId=" + list[0]);
-                    logger.error("CollectionRecordAndAdvice-orderId=" + list[1]);
+//                    logger.error("CollectionRecordAndAdvice-userRelaId=" + list[0]);
+//                    logger.error("CollectionRecordAndAdvice-orderId=" + list[1]);
                 } else {
                     logger.error("前台参数异常，list = " + list);
                 }

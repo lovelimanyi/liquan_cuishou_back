@@ -87,6 +87,14 @@
 						</select>
 					</td>
 					<td>
+						新 老 客 户:
+						<select id="customerType" name="customerType">
+							<option value="" <c:if test="${params.customerType eq ''}">selected = "selected"</c:if>>全部</option>
+							<option value="0" <c:if test="${params.customerType eq '0'}">selected = "selected"</c:if>>新用户</option>
+							<option value="1" <c:if test="${params.customerType eq '1'}">selected = "selected"</c:if>>老用户</option>
+						</select>
+					</td>
+					<td>
 						<div class="buttonActive">
 							<div class="buttonContent">
 								<button type="submit">
@@ -146,6 +154,9 @@
 					</th>
 					<th align="center" width="50">
 						催收状态
+					</th>
+					<th align="center" width="50">
+						用户类型
 					</th>
 					<th align="center" width="50">
 						应还时间
@@ -217,6 +228,13 @@
 								<c:when test="${order.collectionStatus eq '6'}">减免申请</c:when>
 								<c:when test="${order.collectionStatus eq '7'}">减免审核成功</c:when>
 								<c:when test="${order.collectionStatus eq '8'}">减免审核拒绝</c:when>
+							</c:choose>
+						</td>
+						<td align="center" width="50">
+							<c:choose>
+								<c:when test="${order.customerType eq null}">数据缺失</c:when>
+								<c:when test="${order.customerType eq '0'}">新用户</c:when>
+								<c:when test="${order.customerType eq '1'}">老用户</c:when>
 							</c:choose>
 						</td>
 						<td align="center" width="50">

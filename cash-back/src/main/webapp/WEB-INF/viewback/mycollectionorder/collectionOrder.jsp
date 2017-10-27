@@ -16,6 +16,16 @@
 					<td>借  款 编 号: <input type="text" id="loanId" name="loanId" value="${params.loanId}"/></td>
 					<td>借款人姓名: <input type="text" id="loanRealName" name="loanRealName" value="${params.loanRealName}"/></td>
 					<td>借款人手机: <input type="text" id="loanUserPhone" name="loanUserPhone" value="${params.loanUserPhone}"/></td>
+					<td>跟进等级:
+						<select name="topImportant" id="topImportant">
+							<option value="">全部</option>
+							<c:forEach var="company" items="${levellist }">
+								<option value="${company.value }" <c:if test="${company.value eq params.topImportant}">selected = "selected"</c:if>>
+										${company.label}
+								</option>
+							</c:forEach>
+						</select>
+					</td>
 				</tr>
 				<tr>
 					<td>
@@ -31,22 +41,10 @@
 						 <input type="text" id="dispatchEndTime" name="dispatchEndTime" value="${params.dispatchEndTime}" class="date textInput readonly" datefmt="yyyy-MM-dd"  readonly="readonly"/>
 					</td>
 					<td>逾 期 天 数: <input type="text" id="overDueDaysBegin" name="overDueDaysBegin" value="${params.overDueDaysBegin}"/>至<input type="text" id="overDueDaysEnd" name="overDueDaysEnd" value="${params.overDueDaysEnd}"/></td>
-				</tr>
-				<tr>
-					<td>跟进等级:
-						<select name="topImportant" id="topImportant">
-								<option value="">全部</option>
-								<c:forEach var="company" items="${levellist }">
-									<option value="${company.value }" <c:if test="${company.value eq params.topImportant}">selected = "selected"</c:if>>
-											${company.label}
-									</option>
-								</c:forEach>
-						</select>
-					</td>
 					<c:if test="${userGropLeval ne '10021'}">
 						<c:choose>
 							<c:when test="${not empty params.CompanyPermissionsList}">
-								<td>催 收 公 司: 
+								<td>催 收 公 司:
 									<select name="companyId" id="companyId">
 										<option value="">全部</option>
 										<c:forEach var="company" items="${ListMmanLoanCollectionCompany }">
@@ -62,20 +60,22 @@
 								</td>
 							</c:when>
 							<c:otherwise>
-								<td>催 收 公 司: 
-								<select name="companyId" id="companyId">
-									<option value="">全部</option>
-									<c:forEach var="company" items="${ListMmanLoanCollectionCompany }">
-										<option value="${company.id }" <c:if test="${company.id eq params.companyId}">selected = "selected"</c:if>>
-												${company.title}
-										</option>
-									</c:forEach>
-								</select>
-						</td>
+								<td>催 收 公 司:
+									<select name="companyId" id="companyId">
+										<option value="">全部</option>
+										<c:forEach var="company" items="${ListMmanLoanCollectionCompany }">
+											<option value="${company.id }" <c:if test="${company.id eq params.companyId}">selected = "selected"</c:if>>
+													${company.title}
+											</option>
+										</c:forEach>
+									</select>
+								</td>
 							</c:otherwise>
 						</c:choose>
 					</c:if>
-					<td>催&nbsp;&nbsp;&nbsp;&nbsp;收&nbsp;&nbsp;&nbsp;组: 
+				</tr>
+				<tr>
+					<td>催&nbsp;&nbsp;&nbsp;&nbsp;收&nbsp;&nbsp;&nbsp;组:
 							<select name="collectionGroup" id="collectionGroup">								
 								<c:forEach var="group" items="${dictMap }">
 									<option value="${group.key }" <c:if test="${group.key eq params.collectionGroup}">selected = "selected"</c:if>>
@@ -114,7 +114,14 @@
 								<option value="8" <c:if test="${params.status eq '8'}">selected = "selected"</c:if>> 减免审核拒绝 </option>
 							</select>
 					</td>
-					
+					<td>
+						新 老 客 户:
+						<select id="customerType" name="customerType">
+							<option value="" <c:if test="${params.customerType eq ''}">selected = "selected"</c:if>>全部</option>
+							<option value="0" <c:if test="${params.customerType eq '0'}">selected = "selected"</c:if>>新用户</option>
+							<option value="1" <c:if test="${params.customerType eq '1'}">selected = "selected"</c:if>>老用户</option>
+						</select>
+					</td>
 					<td>
 						<div class="buttonActive">
 							<div class="buttonContent">
@@ -178,9 +185,12 @@
 					<th align="center" width="50">
 						催收组
 					</th>
+					<th align="center" width="50">
+						用户类型
+					</th>
 					<th align="center" width="80">
 						应还时间
-					</th>
+					</th >
 					<th align="center" width="70">
 						派单时间
 					</th>
@@ -252,6 +262,13 @@
 						</td>
 						<td align="center" width="50">
 							 ${dictMap[order.collectionGroup]}
+						</td>
+						<td align="center" width="50">
+							<c:choose>
+								<c:when test="${order.customerType eq null}">数据缺失</c:when>
+								<c:when test="${order.customerType eq '0'}">新用户</c:when>
+								<c:when test="${order.customerType eq '1'}">老用户</c:when>
+							</c:choose>
 						</td>
 						<td align="center" width="50">
 							  <fmt:formatDate value="${order.loanEndTime}" pattern="yyyy-MM-dd"/> 

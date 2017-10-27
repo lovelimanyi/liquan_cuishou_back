@@ -91,7 +91,9 @@ public class BackConstant {
 
 	public static final String CUISHOU_WITHHOLD_CHANNEL_PAYMENTCENTER = "2";   // 催收代扣渠道-支付中心
 
-	public static final List<String> managers = new ArrayList<>();
+	public static final Integer CUSTOMER_TYPE_OLD = 1;  // 用户类型  0 新用户    1 老用户
+
+	public final static String XJX_LOAN_STATUS_RETURN_SUCCESS = "5";    // 借款表还款完成
 
 	static{
 		groupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_S1,"S1");

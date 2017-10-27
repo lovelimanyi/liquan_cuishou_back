@@ -91,6 +91,9 @@
 		from 
 		count_collection_manage c
 		<include refid="where"></include>
+		<if test="orderBy != null and orderBy != ''">
+			ORDER BY c.${orderBy}
+		</if>
 	</select>
 	
 	<select id="findAllCount" parameterType="HashMap" resultType="Integer">
