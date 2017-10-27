@@ -42,7 +42,7 @@ public class Test_OverdueThread {
 
     @Test
     public void test() {
-        String payId = "2061432";
+        String payId = "5611818";
         if (StringUtils.isNotBlank(payId)) {
             loger.error("sync-OperaOverdueDataThread:"+payId);
             HashMap<String,String> map = new HashMap<String,String>();
@@ -73,7 +73,7 @@ public class Test_OverdueThread {
 
                         if (null != userInfo && null != borrowOrder&& null != cardInfo&& null != repaymentDetailList) {
                             //保存用户借款表
-                            saveMmanUserLoan(borrowOrder,repayment);
+                            saveMmanUserLoan(borrowOrder,repayment,userInfo);
                             //保存还款表
                             saveCreditLoanPay(repayment);
                             //保存还款详情表
@@ -113,7 +113,7 @@ public class Test_OverdueThread {
      * @param repaymentMap  还款信息
      * @param borrowOrder  借款信息
      * */
-    public  void saveMmanUserLoan(HashMap<String,Object> borrowOrder,HashMap<String,Object> repaymentMap){
+    public  void saveMmanUserLoan(HashMap<String,Object> borrowOrder,HashMap<String,Object> repaymentMap,HashMap<String,Object> userInfo){
         loger.info("start-saveMmanUserLoan:"+String.valueOf(borrowOrder.get("id")));
         MmanUserLoan mmanUserLoan = new MmanUserLoan();
         mmanUserLoan.setId(String.valueOf(borrowOrder.get("id")));
@@ -131,6 +131,7 @@ public class Test_OverdueThread {
         mmanUserLoan.setLoanStatus(Constant.STATUS_OVERDUE_FOUR);//4：逾期
         mmanUserLoan.setCreateTime(new Date());
         mmanUserLoan.setDelFlag("0");//0正常1：删除
+//        mmanUserLoan.setCustomerType(Integer.valueOf(userInfo.get("customer_type") == null ? "0" : userInfo.get("customer_type").toString()));   // 标识新老用户 0 新用户  1 老用户
         this.localDataDao.saveMmanUserLoan(mmanUserLoan);
         loger.info("end-saveMmanUserLoan:"+String.valueOf(borrowOrder.get("id")));
     }

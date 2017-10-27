@@ -36,7 +36,7 @@ public class LocalRepay {
     @Test
     public void test() {
         //还款id
-        String payId= "3284306";
+        String payId= "2341279";
         String[] list = payId.split(",");
 
         for (int i=0;i<list.length;i++){
