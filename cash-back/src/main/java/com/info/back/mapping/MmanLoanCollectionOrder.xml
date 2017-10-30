@@ -242,31 +242,34 @@
 				<![CDATA[ AND a.overdueDays <= #{overDueDaysEnd}  ]]>
 			</if>
 			<if test="loanRealName !=null and loanRealName!=''">
-				AND a.loan_user_name=#{loanRealName}
+				AND a.loan_user_name = #{loanRealName}
 			</if>
 			<if test="loanUserPhone !=null and loanUserPhone!= ''">
-				AND a.loan_user_phone=#{loanUserPhone}
+				AND a.loan_user_phone = #{loanUserPhone}
 			</if>
 			<if test="collectionPhone !=null and collectionPhone!=''">
-				AND b.user_mobile=#{collectionPhone}
+				AND b.user_mobile = #{collectionPhone}
 			</if>
 			<if test="collectionRealName !=null and collectionRealName!=''">
-				AND b.user_name=#{collectionRealName}
+				AND b.user_name = #{collectionRealName}
 			</if>
 			<if test="loanId !=null and loanId!=''">
-				AND a.`loan_id`=#{loanId}
+				AND a.`loan_id` = #{loanId}
 			</if>
 			<if test="collectionGroup !=null and collectionGroup !=''">
-				AND b.group_level=#{collectionGroup}
+				AND b.group_level = #{collectionGroup}
 			</if>
 			<if test="companyId !=null and companyId!='' ">
-				AND b.company_id=#{companyId}
+				AND b.company_id = #{companyId}
 			</if>
 			<if test="status !=null and status!=''">
-				AND a.status=#{status}
+				AND a.status = #{status}
 			</if>
 			<if test="topImportant!=null and topImportant!=''">
-				AND a.top_important=#{topImportant}
+				AND a.top_important = #{topImportant}
+			</if>
+			<if test="customerType != null and customerType != ''">
+				AND d.customer_type = #{customerType}
 			</if>
 		</where>
 		<if test="sortBy !=null and sortBy!=''">
@@ -366,7 +369,8 @@
 			b.`user_name` as currUserName,
 			a.reduction_money as reductionMoney,
 			a.second_day_flag,
-			a.dispatch_name AS dispatchName
+			a.dispatch_name AS dispatchName,
+			d.customer_type AS customerType
 	</sql>
 	<!-- 保存,保存不为NULL的字段 -->
 	<insert id="saveNotNull" parameterType="com.info.web.pojo.MmanLoanCollectionOrder">INSERT INTO mman_loan_collection_order 

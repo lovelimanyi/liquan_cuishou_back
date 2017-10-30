@@ -9,8 +9,7 @@ import com.info.web.pojo.*;
 import com.info.web.synchronization.dao.IDataDao;
 import com.info.web.util.DateUtil;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -23,7 +22,7 @@ import java.util.List;
  */
 public class OperaOverdueDataThread implements Runnable {
 
-	private static Logger loger = LoggerFactory.getLogger(OperaOverdueDataThread.class);
+	private static Logger loger = Logger.getLogger(OperaOverdueDataThread.class);
 	private String payId;
 	private IDataDao dataDao;
 	private ILocalDataDao localDataDao;
@@ -73,7 +72,7 @@ public class OperaOverdueDataThread implements Runnable {
 						if (null != userInfo && null != borrowOrder&& null != cardInfo&& null != repaymentDetailList) {
 							//保存用户借款表
 							loger.info("保存用户借款表 start:");
-							saveMmanUserLoan(borrowOrder,repayment);
+							saveMmanUserLoan(borrowOrder,repayment,userInfo);
 							loger.info("saveMmanUserLoan end:");
 							//保存还款表
 							saveCreditLoanPay(repayment);
@@ -121,7 +120,7 @@ public class OperaOverdueDataThread implements Runnable {
 	 * @param repaymentMap  还款信息
 	 * @param borrowOrder  借款信息
 	 * */
-	public  void saveMmanUserLoan(HashMap<String,Object> borrowOrder,HashMap<String,Object> repaymentMap){
+	public  void saveMmanUserLoan(HashMap<String,Object> borrowOrder,HashMap<String,Object> repaymentMap,HashMap<String,Object> userInfo){
 		loger.info("start-saveMmanUserLoan:"+String.valueOf(borrowOrder.get("id")));
 		MmanUserLoan mmanUserLoan = new MmanUserLoan();
 		mmanUserLoan.setId(String.valueOf(borrowOrder.get("id")));
@@ -139,6 +138,7 @@ public class OperaOverdueDataThread implements Runnable {
 		mmanUserLoan.setLoanStatus(Constant.STATUS_OVERDUE_FOUR);//4：逾期
 		mmanUserLoan.setCreateTime(new Date());
 		mmanUserLoan.setDelFlag("0");//0正常1：删除
+		mmanUserLoan.setCustomerType(Integer.valueOf(userInfo.get("customer_type") == null ? "0" : userInfo.get("customer_type").toString()));   // 标识新老用户 0 新用户  1 老用户
 		this.localDataDao.saveMmanUserLoan(mmanUserLoan);
 		loger.info("end-saveMmanUserLoan:"+String.valueOf(borrowOrder.get("id")));
 	}

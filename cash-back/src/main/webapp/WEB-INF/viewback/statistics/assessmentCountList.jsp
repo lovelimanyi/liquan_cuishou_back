@@ -74,6 +74,18 @@
 						</c:if>
 					</c:if>
 					<td>
+						排序:
+						<select name="orderBy">
+							<option value="" <c:if test="${params.orderBy eq ''}">selected="selected"</c:if>>默认排序</option>
+							<option value="repayment_reta ASC" <c:if test="${params.orderBy eq 'repayment_reta ASC'}">selected="selected"</c:if>>按本金催回率升序</option>
+							<option value="repayment_reta DESC" <c:if test="${params.orderBy eq 'repayment_reta DESC'}">selected="selected"</c:if>>按本金催回率降序</option>
+							<option value="penalty_repayment_reta ASC" <c:if test="${params.orderBy eq 'penalty_repayment_reta ASC'}">selected="selected"</c:if>>按滞纳金催回率升序</option>
+							<option value="penalty_repayment_reta DESC" <c:if test="${params.orderBy eq 'penalty_repayment_reta DESC'}">selected="selected"</c:if>>按滞纳金催回率降序</option>
+							<option value="repayment_order_rate ASC" <c:if test="${params.orderBy eq 'repayment_order_rate ASC'}">selected="selected"</c:if>>按订单催回率升序</option>
+							<option value="repayment_order_rate DESC" <c:if test="${params.orderBy eq 'repayment_order_rate DESC'}">selected="selected"</c:if>>按订单催回率降序</option>
+						</select>
+					</td>
+					<td>
 						<div class="buttonActive">
 							<div class="buttonContent">
 								<button type="submit">

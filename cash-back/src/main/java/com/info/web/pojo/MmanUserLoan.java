@@ -4,188 +4,199 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
-  用户借款表
-*/
+ * 用户借款表
+ */
 public class MmanUserLoan {
-	// 
-	private String id;
-	// 借款用户id
-	private String userId;
-	// 借款订单号或借款编号
-	private String loanPyId;
-	// 借款金额，元
-	private BigDecimal loanMoney;
-	// 借款利率（如10）
-	private String loanRate;
-	// 罚息金额
-	private BigDecimal loanPenalty;
-	// 罚息率(如10，按天算)
-	private String loanPenaltyRate;
-	// 借款服务费
-	private BigDecimal serviceCharge;
-	// 本金+服务费
-	private BigDecimal paidMoney;
+    //
+    private String id;
+    // 借款用户id
+    private String userId;
+    // 借款订单号或借款编号
+    private String loanPyId;
+    // 借款金额，元
+    private BigDecimal loanMoney;
+    // 借款利率（如10）
+    private String loanRate;
+    // 罚息金额
+    private BigDecimal loanPenalty;
+    // 罚息率(如10，按天算)
+    private String loanPenaltyRate;
+    // 借款服务费
+    private BigDecimal serviceCharge;
+    // 本金+服务费
+    private BigDecimal paidMoney;
+    // 放款时间（借款起始时间）
+    private Date loanStartTime;
+    // 应还时间（借款结束时间）
+    private Date loanEndTime;
+    // 借款状态（'4'-逾期,'5'-还款结束）
+    private String loanStatus;
+    // 创建时间
+    private Date createTime;
+    // 更新时间
+    private Date updateTime;
+    // 删除标记（'1'-已删除，'0'正常）
+    private String delFlag;
+    // 这里不用
+    private String loanPenaltyTime;
+    // 这里不用
+    private String loanSysStatus;
+    // 这里不用
+    private String loanSysRemark;
+    // 新老客户(0 新用户   2 老用户)
+    private Integer customerType;
 
-	public BigDecimal getPaidMoney() {
-		return paidMoney;
-	}
 
-	public void setPaidMoney(BigDecimal paidMoney) {
-		this.paidMoney = paidMoney;
-	}
 
-	public BigDecimal getServiceCharge() {
-		return serviceCharge;
-	}
+    public BigDecimal getPaidMoney() {
+        return paidMoney;
+    }
 
-	public void setServiceCharge(BigDecimal serviceCharge) {
-		this.serviceCharge = serviceCharge;
-	}
-	// 放款时间（借款起始时间）
-	private Date loanStartTime;
-	// 应还时间（借款结束时间）
-	private Date loanEndTime;
-	// 借款状态（'4'-逾期,'5'-还款结束）
-	private String loanStatus;
-	// 创建时间
-	private Date createTime;
-	// 更新时间
-	private Date updateTime;
-	// 删除标记（'1'-已删除，'0'正常）
-	private String delFlag;
-	// 这里不用
-	private String loanPenaltyTime;
-	// 这里不用
-	private String loanSysStatus;
-	// 这里不用
-	private String loanSysRemark;
+    public void setPaidMoney(BigDecimal paidMoney) {
+        this.paidMoney = paidMoney;
+    }
 
-	public void setId(String id){
-		this.id = id;
-	}
+    public BigDecimal getServiceCharge() {
+        return serviceCharge;
+    }
 
-	public String getId(){
-		return this.id;
-	}
+    public void setServiceCharge(BigDecimal serviceCharge) {
+        this.serviceCharge = serviceCharge;
+    }
 
-	public void setUserId(String userId){
-		this.userId = userId;
-	}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	public String getUserId(){
-		return this.userId;
-	}
+    public String getId() {
+        return this.id;
+    }
 
-	public void setLoanPyId(String loanPyId){
-		this.loanPyId = loanPyId;
-	}
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
-	public String getLoanPyId(){
-		return this.loanPyId;
-	}
+    public String getUserId() {
+        return this.userId;
+    }
 
-	public void setLoanMoney(BigDecimal loanMoney){
-		this.loanMoney = loanMoney;
-	}
+    public void setLoanPyId(String loanPyId) {
+        this.loanPyId = loanPyId;
+    }
 
-	public BigDecimal getLoanMoney(){
-		return this.loanMoney;
-	}
+    public String getLoanPyId() {
+        return this.loanPyId;
+    }
 
-	public void setLoanRate(String loanRate){
-		this.loanRate = loanRate;
-	}
+    public void setLoanMoney(BigDecimal loanMoney) {
+        this.loanMoney = loanMoney;
+    }
 
-	public String getLoanRate(){
-		return this.loanRate;
-	}
+    public BigDecimal getLoanMoney() {
+        return this.loanMoney;
+    }
 
-	public void setLoanPenalty(BigDecimal loanPenalty){
-		this.loanPenalty = loanPenalty;
-	}
+    public void setLoanRate(String loanRate) {
+        this.loanRate = loanRate;
+    }
 
-	public BigDecimal getLoanPenalty(){
-		return this.loanPenalty;
-	}
+    public String getLoanRate() {
+        return this.loanRate;
+    }
 
-	public void setLoanPenaltyRate(String loanPenaltyRate){
-		this.loanPenaltyRate = loanPenaltyRate;
-	}
+    public void setLoanPenalty(BigDecimal loanPenalty) {
+        this.loanPenalty = loanPenalty;
+    }
 
-	public String getLoanPenaltyRate(){
-		return this.loanPenaltyRate;
-	}
+    public BigDecimal getLoanPenalty() {
+        return this.loanPenalty;
+    }
 
-	public void setLoanStartTime(Date loanStartTime){
-		this.loanStartTime = loanStartTime;
-	}
+    public void setLoanPenaltyRate(String loanPenaltyRate) {
+        this.loanPenaltyRate = loanPenaltyRate;
+    }
 
-	public Date getLoanStartTime(){
-		return this.loanStartTime;
-	}
+    public String getLoanPenaltyRate() {
+        return this.loanPenaltyRate;
+    }
 
-	public void setLoanEndTime(Date loanEndTime){
-		this.loanEndTime = loanEndTime;
-	}
+    public void setLoanStartTime(Date loanStartTime) {
+        this.loanStartTime = loanStartTime;
+    }
 
-	public Date getLoanEndTime(){
-		return this.loanEndTime;
-	}
+    public Date getLoanStartTime() {
+        return this.loanStartTime;
+    }
 
-	public void setLoanStatus(String loanStatus){
-		this.loanStatus = loanStatus;
-	}
+    public void setLoanEndTime(Date loanEndTime) {
+        this.loanEndTime = loanEndTime;
+    }
 
-	public String getLoanStatus(){
-		return this.loanStatus;
-	}
+    public Date getLoanEndTime() {
+        return this.loanEndTime;
+    }
 
-	public void setCreateTime(Date createTime){
-		this.createTime = createTime;
-	}
+    public void setLoanStatus(String loanStatus) {
+        this.loanStatus = loanStatus;
+    }
 
-	public Date getCreateTime(){
-		return this.createTime;
-	}
+    public String getLoanStatus() {
+        return this.loanStatus;
+    }
 
-	public void setUpdateTime(Date updateTime){
-		this.updateTime = updateTime;
-	}
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
 
-	public Date getUpdateTime(){
-		return this.updateTime;
-	}
+    public Date getCreateTime() {
+        return this.createTime;
+    }
 
-	public void setDelFlag(String delFlag){
-		this.delFlag = delFlag;
-	}
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
 
-	public String getDelFlag(){
-		return this.delFlag;
-	}
+    public Date getUpdateTime() {
+        return this.updateTime;
+    }
 
-	public void setLoanPenaltyTime(String loanPenaltyTime){
-		this.loanPenaltyTime = loanPenaltyTime;
-	}
+    public void setDelFlag(String delFlag) {
+        this.delFlag = delFlag;
+    }
 
-	public String getLoanPenaltyTime(){
-		return this.loanPenaltyTime;
-	}
+    public String getDelFlag() {
+        return this.delFlag;
+    }
 
-	public void setLoanSysStatus(String loanSysStatus){
-		this.loanSysStatus = loanSysStatus;
-	}
+    public void setLoanPenaltyTime(String loanPenaltyTime) {
+        this.loanPenaltyTime = loanPenaltyTime;
+    }
 
-	public String getLoanSysStatus(){
-		return this.loanSysStatus;
-	}
+    public String getLoanPenaltyTime() {
+        return this.loanPenaltyTime;
+    }
 
-	public void setLoanSysRemark(String loanSysRemark){
-		this.loanSysRemark = loanSysRemark;
-	}
+    public void setLoanSysStatus(String loanSysStatus) {
+        this.loanSysStatus = loanSysStatus;
+    }
 
-	public String getLoanSysRemark(){
-		return this.loanSysRemark;
-	}
+    public String getLoanSysStatus() {
+        return this.loanSysStatus;
+    }
 
+    public void setLoanSysRemark(String loanSysRemark) {
+        this.loanSysRemark = loanSysRemark;
+    }
+
+    public String getLoanSysRemark() {
+        return this.loanSysRemark;
+    }
+
+    public Integer getCustomerType() {
+        return customerType;
+    }
+
+    public void setCustomerType(Integer customerType) {
+        this.customerType = customerType;
+    }
 }

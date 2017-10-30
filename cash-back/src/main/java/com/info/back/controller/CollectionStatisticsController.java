@@ -1,20 +1,12 @@
 package com.info.back.controller;
 
-import java.io.OutputStream;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import com.info.back.dao.IBackUserCompanyPermissionsDao;
 import com.info.back.service.*;
+import com.info.back.utils.BackConstant;
+import com.info.back.utils.ExcelUtil;
+import com.info.constant.Constant;
 import com.info.web.pojo.*;
-import com.octo.captcha.engine.sound.utils.SoundToFile;
-import org.apache.poi.util.SystemOutLogger;
+import com.info.web.util.DateUtil;
+import com.info.web.util.PageConfig;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,11 +16,14 @@ import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.info.back.utils.BackConstant;
-import com.info.back.utils.ExcelUtil;
-import com.info.constant.Constant;
-import com.info.web.util.DateUtil;
-import com.info.web.util.PageConfig;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.OutputStream;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 @Controller
 @RequestMapping("statistics/")
