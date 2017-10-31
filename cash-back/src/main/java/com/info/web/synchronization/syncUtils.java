@@ -89,9 +89,9 @@ public class syncUtils {
 		mmanUserLoan.setLoanPenalty(new BigDecimal(Integer.parseInt(String.valueOf(repaymentMap.get("plan_late_fee")))/100));//滞纳金
 		mmanUserLoan.setLoanStatus(status);//借款状态
 		mmanUserLoan.setUpdateTime(new Date());
-		if(BackConstant.XJX_LOAN_STATUS_RETURN_SUCCESS.equals(status)){
-			mmanUserLoan.setCustomerType(BackConstant.CUSTOMER_TYPE_OLD); // 还款完成,用户变成老用户
-		}
+//		if(BackConstant.XJX_LOAN_STATUS_RETURN_SUCCESS.equals(status)){
+//			mmanUserLoan.setCustomerType(BackConstant.CUSTOMER_TYPE_OLD); // 还款完成,用户变成老用户
+//		}
 		localDataDao.updateMmanUserLoan(mmanUserLoan);
 	}
 	/**

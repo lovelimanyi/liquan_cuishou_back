@@ -681,7 +681,7 @@
 						        AND (DATE_FORMAT(dtl.create_date, '%Y-%m-%d') = DATE_FORMAT(log.create_date, '%Y-%m-%d')
 						        OR DATE_FORMAT(dtl.update_date, '%Y-%m-%d') = DATE_FORMAT(log.create_date, '%Y-%m-%d'))*/
 							LEFT JOIN credit_loan_pay dtl on ord.loan_id = dtl.loan_id
-							LEFT JOIN audit_center ac on ac.loan_id = ord.loan_id and (ac.status = 5 or ac.status = 2)
+							LEFT JOIN audit_center ac on ac.loan_id = ord.loan_id and (ac.status = 5 or ac.status = 2) and ac.type = 3
 						    /*and  (DATE_FORMAT(dtl.create_date, '%Y-%m-%d') = DATE_FORMAT(log.create_date, '%Y-%m-%d')
 						        OR DATE_FORMAT(dtl.update_date, '%Y-%m-%d') = DATE_FORMAT(log.create_date, '%Y-%m-%d'))*/
 						 WHERE
