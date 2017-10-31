@@ -44,9 +44,4 @@ public interface ICountCollectionAssessmentService {
     void callMGroupAssessment(HashMap<String, Object> params);
 
     void countCallOrder(HashMap<String, Object> params);
-
-    void deleteAssessmentList(HashMap<String,Object> params);
-
-    void deleteCountCollectionOrder(HashMap<String,Object> params);
-
 }
