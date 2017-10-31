@@ -9,8 +9,7 @@ import com.info.web.util.DateUtil;
 import org.apache.commons.collections.CollectionUtils;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +21,7 @@ import com.info.web.util.PageConfig;
 
 @Service
 public class CountCollectionAssessmentService implements ICountCollectionAssessmentService {
-    private static Logger logger = LoggerFactory.getLogger(CountCollectionAssessmentService.class);
+    private static Logger logger = Logger.getLogger(CountCollectionAssessmentService.class);
     @Autowired
     private ICountCollectionAssessmentDao countCollectionAssessmentDao;
     @Autowired
@@ -299,7 +298,6 @@ public class CountCollectionAssessmentService implements ICountCollectionAssessm
     @Override
     public void countCallOrder(HashMap<String, Object> params) {
         String nowDate = String.valueOf(params.get("begDate"));
-        logger.info("nowDate: {} ", nowDate);
         params.put("currDate", DateUtil.getDateTimeFormat(nowDate, "yyyy-MM-dd"));
         List<CountCollectionAssessment> collectionList = countCollectionAssessmentDao.queryCollectionList(params);
 
