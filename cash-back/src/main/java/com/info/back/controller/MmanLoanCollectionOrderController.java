@@ -143,7 +143,7 @@ public class MmanLoanCollectionOrderController extends BaseController {
             response.setContentType("application/msexcel");// 定义输出类型
             SXSSFWorkbook workbook = new SXSSFWorkbook(10000);
             String[] titles = {"借款编号", "催收公司", "催收组", "借款人姓名", "借款人身份证", "借款手机号", "借款金额", "逾期天数",
-                    "滞纳金", "催收状态", "应还时间", "已还金额", "最新还款时间", "最后催收时间", "承诺还款时间", "派单时间", "当前催收员", "上一催收员", "减免滞纳金","派单人"};
+                    "滞纳金", "催收状态", "应还时间", "已还金额", "最新还款时间", "最后催收时间", "承诺还款时间", "派单时间", "当前催收员", "上一催收员", "减免滞纳金","派单人","用户类型（0 新用户   1 老用户）"};
             List<SysDict> dictlist = sysDictService.getStatus("collection_group");
             HashMap<String, String> dictMap = BackConstant.orderState(dictlist);
             List<SysDict> statulist = sysDictService.getStatus("xjx_collection_order_state");
@@ -185,6 +185,7 @@ public class MmanLoanCollectionOrderController extends BaseController {
                     conList[17] = r.getLastUserName() == null ? "" : r.getLastUserName();
                     conList[18] = String.valueOf(r.getReductionMoney() == null ? "" : r.getReductionMoney());
                     conList[19] = r.getDispatchName() == null ? "" : r.getDispatchName();
+                    conList[20] = r.getCustomerType() == null ? "" : String.valueOf(r.getCustomerType());
                     contents.add(conList);
                 }
                 ExcelUtil.buildExcel(workbook, "管理跟踪统计", titles, contents, i, total, os);
