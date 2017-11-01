@@ -37,6 +37,8 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
 	private ICreditLoanPayDao creditLoanPayDao;
     @Autowired
 	private IMmanUserLoanDao mmanUserLoanDao;
+	@Autowired
+	private IOperationRecordService operationRecordService;
     
 	public List<MmanLoanCollectionOrder> getOrderList(MmanLoanCollectionOrder mmanLoanCollectionOrder) {
 		return mmanLoanCollectionOrderDao.getOrderList(mmanLoanCollectionOrder);
@@ -80,7 +82,31 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
 		params.put(Constant.NAME_SPACE, "MmanLoanCollectionOrder");
 		PageConfig<OrderBaseResult> page = new PageConfig<OrderBaseResult>();
 		page = orderPaginationDao.findPage("getCollectionOrderList", "getCollectionOrderCount", params, null);
+		// 插入操作记录
+		insertOperateRecord(params);
 		return page;
+	}
+
+	private void insertOperateRecord(HashMap<String, Object> params) {
+		OperationRecord record = new OperationRecord();
+		record.setSource(params.get("source") == null ? null : Integer.valueOf(params.get("source").toString()));   // 来源  总订单
+		record.setBeginCollectionTime(params.get("collectionBeginTime") == null ? null : params.get("collectionBeginTime").toString());
+		record.setEndCollectionTime(params.get("collectionEndTime") == null ? null : params.get("collectionEndTime").toString());
+		record.setBeginDispatchTime(params.get("dispatchBeginTime") == null ? null : params.get("dispatchBeginTime").toString());
+		record.setEndDispatchTime(params.get("dispatchEndTime") == null ? null : params.get("dispatchEndTime").toString());
+		record.setBeginOverDuedays(params.get("overDueDaysBegin") == null ? null : Integer.valueOf(params.get("overDueDaysBegin").toString()));
+		record.setEndOverDuedays(params.get("overDueDaysEnd") == null ? null : Integer.valueOf(params.get("overDueDaysEnd").toString()));
+		record.setCollectionCompanyId(params.get("companyId") == null ? null : params.get("companyId").toString());
+		record.setCollectionGroup(params.get("collectionGroup") == null ? null : params.get("collectionGroup").toString());
+		record.setCurrentCollectionUserName(params.get("collectionRealName") == null ? null : params.get("collectionRealName").toString());
+		record.setCollectionStatus(params.get("status") == null ? null : params.get("status").toString());
+		record.setFollowUpGrad(params.get("topImportant") == null ? null : params.get("topImportant").toString());
+		record.setLoanUserName(params.get("loanRealName") == null ? null : params.get("loanRealName").toString());
+		record.setLoanUserPhone(params.get("loanUserPhone") == null ? null : params.get("loanUserPhone").toString());
+		record.setOperateUserAccount(params.get("currentUserAccount") == null ? null : params.get("currentUserAccount").toString());
+		record.setLoanId(params.get("loanId") == null ? null : params.get("loanId").toString());
+		record.setOperateTime(new Date());
+		operationRecordService.insert(record);
 	}
 
 	@Override
@@ -88,6 +114,8 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
 		params.put(Constant.NAME_SPACE, "MmanLoanCollectionOrder");
 		PageConfig<OrderBaseResult> page = new PageConfig<OrderBaseResult>();
 		page = orderPaginationDao.findPage("getCollectionOrderList", "getOrderCount", params, null);
+		// 插入操作记录
+		insertOperateRecord(params);
 		return page;
 	}
 

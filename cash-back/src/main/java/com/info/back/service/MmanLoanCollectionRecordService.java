@@ -84,7 +84,7 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
                     allRuleLimitCountMap.put(ruleOri.getCompanyId() + "_" + ruleOri.getCollectionGroup(), ruleOri.getEveryLimit());
                 }
             }
-            logger.info("allRuleLimitCountMap:" + allRuleLimitCountMap);
+//            logger.info("allRuleLimitCountMap:" + allRuleLimitCountMap);
 
             //开始分配前,先筛选出有效催收员(手里单子未超出上限的催收员),查询并设置每个催收员今日派到手里的订单数(包括已完成的)
             String currentCompanyGroup = "";//当前公司_组

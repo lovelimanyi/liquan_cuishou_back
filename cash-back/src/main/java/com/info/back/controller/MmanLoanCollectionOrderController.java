@@ -69,6 +69,8 @@ public class MmanLoanCollectionOrderController extends BaseController {
             BackUser backUser = (BackUser) request.getSession().getAttribute(Constant.BACK_USER);
             if (backUser != null) {
 //				logger.info("backUser is not null");
+                params.put("source",BackConstant.OPERATION_RECORD_SOURCE_TOTAL_ORDER);  // 操作來源 催收总订单
+                params.put("currentUserAccount",backUser.getUserAccount());
                 List<BackUserCompanyPermissions> CompanyPermissionsList = backUserService.findCompanyPermissions(backUser.getId());
                 if (CompanyPermissionsList != null && CompanyPermissionsList.size() > 0) {//指定公司的订单
                     params.put("CompanyPermissionsList", CompanyPermissionsList);
@@ -275,5 +277,4 @@ public class MmanLoanCollectionOrderController extends BaseController {
         model.addAttribute("params", params);
         return null;
     }
-
 }

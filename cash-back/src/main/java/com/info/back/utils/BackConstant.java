@@ -97,6 +97,10 @@ public class BackConstant {
 
 	public final static String XJX_LOAN_STATUS_RETURN_SUCCESS = "5";    // 借款表还款完成
 
+	public static final Integer OPERATION_RECORD_SOURCE_TOTAL_ORDER = 1;   // 操作（查询）记录来源  1 催收总订单    2 我的催收订单
+
+	public static final Integer OPERATION_RECORD_SOURCE_MY_ORDER = 2;
+
 	static{
 		groupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_S1,"S1");
 		groupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_S2,"S2");

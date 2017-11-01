@@ -269,10 +269,11 @@ public class CountCollectionAssessmentService implements ICountCollectionAssessm
 
     @Override
     public void countCallAssessment(HashMap<String, Object> params) {
-//		countCollectionAssessmentDao.callAssessment(params);
         String begDate = String.valueOf(params.get("begDate"));
         String endDate = String.valueOf(params.get("endDate"));
-        logger.info("begDate: {} | endDate: {}", begDate, endDate);
+        logger.info("删除考核统计数据.....");
+        countCollectionAssessmentDao.deleteAssessmentList(params);
+        logger.info("删除考核统计数据完成!!");
         int count = 0;
         try {
             count = DateUtil.daysBetween(DateUtil.formatDate(begDate, "yyyy-MM-dd"), DateUtil.formatDate(endDate, "yyyy-MM-dd"));

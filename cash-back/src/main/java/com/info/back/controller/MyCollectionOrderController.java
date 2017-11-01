@@ -105,6 +105,7 @@ public class MyCollectionOrderController extends BaseController {
 
         BackUser backUser = (BackUser) request.getSession().getAttribute(
                 Constant.BACK_USER);
+        params.put("currentUserAccount",backUser.getUserAccount());
         List<BackUserCompanyPermissions> CompanyPermissionsList = backUserService
                 .findCompanyPermissions(backUser.getId());
         if (CompanyPermissionsList != null && CompanyPermissionsList.size() > 0) {// 指定公司的订单
@@ -125,7 +126,7 @@ public class MyCollectionOrderController extends BaseController {
             }
 
         }
-
+        params.put("source",BackConstant.OPERATION_RECORD_SOURCE_MY_ORDER);  // 操作來源 我的催收订单
         // 查询公司列表
         MmanLoanCollectionCompany mmanLoanCollectionCompany = new MmanLoanCollectionCompany();
         List<MmanLoanCollectionCompany> ListMmanLoanCollectionCompany = mmanLoanCollectionCompanyService
