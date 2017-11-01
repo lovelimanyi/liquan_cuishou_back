@@ -16,76 +16,10 @@
                          至
                          <input type="text" id="endOperateTime" name="endOperateTime"  value="${params.endOperateTime}" class="date textInput readonly" datefmt="yyyy-MM-dd"  readonly="readonly"/>
                      </td>
-                    <%--<c:choose>
-                        <c:when test="${not empty params.CompanyPermissionsList}">
-                            <td>催 收 公 司：
-                                <select name="companyId">
-                                    <option value="">全部</option>
-                                    <c:forEach var="company" items="${MmanLoanCollectionCompanys }">
-                                        <c:forEach var="companyViw" items="${params.CompanyPermissionsList}">
-                                            <c:if test="${companyViw.companyId eq company.id}">
-                                                <option value="${company.id }" <c:if test="${company.id eq params.companyId}">selected = "selected"</c:if>>
-                                                        ${company.title}
-                                                </option>
-                                            </c:if>
-                                        </c:forEach>
-                                    </c:forEach>
-                                </select>
-                            </td>
-                        </c:when>
-                        <c:otherwise>
-                            <td>催 收 公 司：
-                                <select name="companyId">
-                                    <option value="">全部</option>
-                                    <c:forEach var="company" items="${MmanLoanCollectionCompanys }">
-                                        <option value="${company.id }" <c:if test="${company.id eq params.companyId}">selected = "selected"</c:if>>
-                                                ${company.title}
-                                        </option>
-                                    </c:forEach>
-                                </select>
-                            </td>
-                        </c:otherwise>
-                    </c:choose>
                     <td>
                         操作账号：
-                        <select name="type">
-                            <option value="">全部</option>
-                            <c:forEach var="problemFeedBackType" items="${problemFeedBackType}">
-                                <option value="${problemFeedBackType.key}" <c:if test="${problemFeedBackType.key eq params.type}">selected="selected"</c:if> >${problemFeedBackType.value}</option>
-                            </c:forEach>
-                        </select>
+                        <input type="text" id="operateUserAccount" name="operateUserAccount" value="${params.operateUserAccount }"/>
                     </td>
-                </tr>--%>
-                <td>
-                    操作账号：
-                    <input type="text" id="operateUserAccount" name="operateUserAccount" value="${params.operateUserAccount }"/>
-                </td>
-                <%--<tr>
-                    <td>
-                        借 款 编 号：
-                        <input type="text" name="loanId" value="${params.loanId }"/>
-                    </td>
-                    <td>
-                        执&nbsp;&nbsp;&nbsp;&nbsp;行&nbsp;&nbsp;&nbsp;人：
-                        <input type="text" name="operator" value="${params.operator }"/>
-                    </td>
-                    <td>
-                        创&nbsp;&nbsp;建&nbsp;&nbsp;人：
-                        <input type="text" name="createUsername" value="${params.createUsername }"/>
-                    </td>
-                    <td>
-                        状&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;态：
-                        <select name="status">
-                            <option value="">全部</option>
-                            <c:forEach var="problemFeedBackStatus" items="${problemFeedBackStatus}">
-                                <option value="${problemFeedBackStatus.key}" <c:if test="${problemFeedBackStatus.key eq params.status}">selected="selected"</c:if>>${problemFeedBackStatus.value}</option>
-                            </c:forEach>
-                        </select>
-                    </td>
-                    <td>
-                        问题编号：
-                        <input type="text" style="width: 50px;" name="problemNumber" value="${params.problemNumber }"/>
-                    </td>--%>
                     <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
                     <td>
                         <div class="buttonActive">
