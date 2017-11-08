@@ -101,6 +101,8 @@ public class BackConstant {
 
 	public static final Integer OPERATION_RECORD_SOURCE_MY_ORDER = 2;
 
+	public static final Integer OPERATION_RECORD_RETAIN_DAYS = 10;  // 操作记录数据保留时间
+
 	static{
 		groupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_S1,"S1");
 		groupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_S2,"S2");

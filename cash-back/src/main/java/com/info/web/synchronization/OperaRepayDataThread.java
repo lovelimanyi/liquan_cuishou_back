@@ -52,10 +52,10 @@ public class OperaRepayDataThread implements Runnable {
             //获取app端还款信息
             HashMap<String,Object> repayment = this.dataDao.getAssetRepayment(map);
             loger.error("repayment:"+repayment);
-            String loanId = String.valueOf(repayment.get("asset_order_id"));//借款id
-            map.put("ORDER_ID", loanId);//还款id
             if(null!=repayment){
                 try{
+                    String loanId = String.valueOf(repayment.get("asset_order_id"));//借款id
+                    map.put("ORDER_ID", loanId);//还款id
                     HashMap<String, Object> borrowOrder = null;
                     List<HashMap<String, Object>> repaymentDetailList = null;
                     if(!checkLoanStatus(loanId)){

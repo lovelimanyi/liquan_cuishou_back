@@ -2,14 +2,20 @@ package com.info.back.task;
 
 import java.util.Date;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.info.back.service.IBackUserService;
 
+/**
+ * @Author Administrator
+ * @Description: 启用催收员
+ * @Params
+ * @Return 
+ * @CreateTime 2017/11/2 0002 上午 11:29
+ */
 public class TaskDisableOrEnableCollections {
-	protected Logger logger = LoggerFactory.getLogger(TaskDisableOrEnableCollections.class);
+	protected Logger logger = Logger.getLogger(TaskDisableOrEnableCollections.class);
 	
 	@Autowired
 	private IBackUserService backUserService;

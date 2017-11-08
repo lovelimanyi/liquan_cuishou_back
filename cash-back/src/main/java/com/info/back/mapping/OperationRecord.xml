@@ -38,7 +38,7 @@
     </select>
     <delete id="deleteByDate" parameterType="HashMap">
 		delete from operation_record
-		where DATE_FORMAT(operate_time,"%Y-%m-%d") &lt;= #{endDate}
+		where operate_time &lt;= #{endDate}
 	</delete>
 
     <insert id="insert" parameterType="com.info.web.pojo.OperationRecord">

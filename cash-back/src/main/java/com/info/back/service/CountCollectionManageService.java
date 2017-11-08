@@ -79,7 +79,7 @@ public class CountCollectionManageService implements ICountCollectionManageServi
     public void deleteManageList(HashMap<String, Object> params) {
         countCollectionManageDao.deleteManageList(params);
     }
-
+    @Override
     public List<CountCollectionManage> findAll(HashMap<String, Object> params) {
         return countCollectionManageDao.findAll(params);
     }
