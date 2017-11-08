@@ -14,6 +14,7 @@ public interface ICountCollectionAssessmentDao {
 	 * @return
 	 */
 	List<CountCollectionAssessment> findAll(HashMap<String, Object> params);
+
 	Integer findAllCount(HashMap<String, Object> params);
 	/**
 	 * 累计
@@ -21,6 +22,7 @@ public interface ICountCollectionAssessmentDao {
 	 * @return
 	 */
 	List<CountCollectionAssessment> findAllByGroup(HashMap<String, Object> params);
+
 	Integer findAllCountByGroup(HashMap<String, Object> params);
 
 	/**
@@ -28,7 +30,6 @@ public interface ICountCollectionAssessmentDao {
 	 * @param params
 	 * @return
      */
-	List<CountCollectionAssessment> findAllByCompany(HashMap<String, Object> params);
 	Integer findAllCountByCompany(HashMap<String, Object> params);
 	
 	/**
@@ -41,7 +42,6 @@ public interface ICountCollectionAssessmentDao {
 	 * 执行存储过程
 	 * @param params
 	 */
-	void callAssessment(HashMap<String, Object> params);
 	void callMGroupAssessment(HashMap<String, Object> params);
 
 	/**
@@ -82,10 +82,5 @@ public interface ICountCollectionAssessmentDao {
 	/**
 	 * 删除考核统计记录
 	 */
-	void deleteAssessmentList(HashMap<String,Object> params);
-
-	/**
-	 * 删除订单统计记录
-	 */
-	void deleteCountCollectionOrder(HashMap<String,Object> params);
+	int deleteAssessmentList(HashMap<String,Object> params);
 }

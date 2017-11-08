@@ -28,14 +28,8 @@ public interface ICountCollectionManageDao {
     CountCollectionManage getOne(Integer id);
 
     /**
-     * 执行存储过程
-     */
-    void callManage(HashMap<String, Object> params);
-
-
-    /**
      * 删除管理统计记录
      */
-    void deleteManageList(HashMap<String, Object> params);
+    int deleteManageList(HashMap<String, Object> params);
 
 }

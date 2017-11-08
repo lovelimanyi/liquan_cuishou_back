@@ -271,8 +271,8 @@ public class CountCollectionAssessmentService implements ICountCollectionAssessm
         String begDate = String.valueOf(params.get("begDate"));
         String endDate = String.valueOf(params.get("endDate"));
         logger.info("删除考核统计数据.....");
-        countCollectionAssessmentDao.deleteAssessmentList(params);
-        logger.info("删除考核统计数据完成!!");
+        int delNumber = countCollectionAssessmentDao.deleteAssessmentList(params);
+        logger.info("删除考核统计数据完成,本次共删除数据 " + delNumber + " 条。");
         int count = 0;
         try {
             count = DateUtil.daysBetween(DateUtil.formatDate(begDate, "yyyy-MM-dd"), DateUtil.formatDate(endDate, "yyyy-MM-dd"));

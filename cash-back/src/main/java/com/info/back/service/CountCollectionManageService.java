@@ -1,26 +1,24 @@
 package com.info.back.service;
 
-import java.math.BigDecimal;
-import java.text.ParseException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-
 import com.info.back.dao.ICountCollectionAssessmentDao;
+import com.info.back.dao.ICountCollectionManageDao;
+import com.info.back.dao.IPaginationDao;
+import com.info.constant.Constant;
 import com.info.web.pojo.CountCashBusiness;
+import com.info.web.pojo.CountCollectionAssessment;
+import com.info.web.pojo.CountCollectionManage;
 import com.info.web.synchronization.dao.IPaginationXjxDao;
 import com.info.web.util.DateUtil;
+import com.info.web.util.PageConfig;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.info.back.dao.ICountCollectionManageDao;
-import com.info.back.dao.IPaginationDao;
-import com.info.constant.Constant;
-import com.info.web.pojo.CountCollectionAssessment;
-import com.info.web.pojo.CountCollectionManage;
-import com.info.web.util.PageConfig;
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * 管理跟踪统计
@@ -213,22 +211,9 @@ public class CountCollectionManageService implements ICountCollectionManageServi
 
     @Override
     public void countCallManage(HashMap<String, Object> params) {
-//		countCollectionManageDao.callManage(params);
-//        params.put("begDate", DateUtil.getDayFirst());
-//        params.put("endDate", new Date());
         logger.info("删除管理统计数据............");
-        countCollectionManageDao.deleteManageList(params);
-        logger.info("删除管理统计数据完成!!!");
-//		Date date = new Date();
-//		int count = 0;
-//		try {
-//			count = DateUtil.daysBetween(DateUtil.getDayFirst(),new Date());
-//		} catch (ParseException e) {
-//			logger.error("计算时间天数异常",e);
-//		}
-//		logger.info("天数："+count);
-//		for (int i = count; i>=0 ; i--){
-//			params.put("currDate",DateUtil.getBeforeOrAfter(date,-i));
+        int delNumber = countCollectionManageDao.deleteManageList(params);
+        logger.info("删除管理统计数据完成,本次共删除数据 " + delNumber + " 条。");
         List<CountCollectionAssessment> manageList = countCollectionAssessmentDao.queryManageList(params);
         logger.info("管理统计报表manageList = {}" +  manageList != null ? manageList.size() : null);
         if (CollectionUtils.isNotEmpty(manageList)) {
