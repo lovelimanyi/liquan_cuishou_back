@@ -102,15 +102,32 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
         record.setEndOverDuedays(params.get("overDueDaysEnd") == null ? null : Integer.valueOf(params.get("overDueDaysEnd").toString()));
         record.setCollectionCompanyId(params.get("companyId") == null ? null : params.get("companyId").toString());
         record.setCollectionGroup(params.get("collectionGroup") == null ? null : params.get("collectionGroup").toString());
+        String collectionRealName = params.get("collectionRealName") == null ? null : params.get("collectionRealName").toString();
+        record.setCurrentCollectionUserName(this.getCorrectParam(collectionRealName));
         record.setCurrentCollectionUserName(params.get("collectionRealName") == null ? null : params.get("collectionRealName").toString());
         record.setCollectionStatus(params.get("status") == null ? null : params.get("status").toString());
         record.setFollowUpGrad(params.get("topImportant") == null ? null : params.get("topImportant").toString());
-        record.setLoanUserName(params.get("loanRealName") == null ? null : params.get("loanRealName").toString());
-        record.setLoanUserPhone(params.get("loanUserPhone") == null ? null : params.get("loanUserPhone").toString());
-        record.setOperateUserAccount(params.get("currentUserAccount") == null ? null : params.get("currentUserAccount").toString());
+        String loanUserName = params.get("loanRealName") == null ? null : params.get("loanRealName").toString();
+        record.setLoanUserName(this.getCorrectParam(loanUserName));
+        String loanUserPhone = params.get("loanUserPhone") == null ? null : params.get("loanUserPhone").toString();
+        record.setLoanUserPhone(this.getCorrectParam(loanUserPhone));
+        String currentUserAccount = params.get("currentUserAccount") == null ? null : params.get("currentUserAccount").toString();
+        record.setOperateUserAccount(this.getCorrectParam(currentUserAccount));
         record.setLoanId(params.get("loanId") == null ? null : params.get("loanId").toString());
         record.setOperateTime(new Date());
         operationRecordService.insert(record);
+    }
+
+    /**
+     * @Description 处理后台传入数据，防止脏数据超出限制
+     * @param params
+     * @return
+     */
+    private String getCorrectParam(String params) {
+        if(StringUtils.isNotEmpty(params) && params.length() > 50){
+            params = params.substring(0,49);
+        }
+        return params;
     }
 
     @Override
