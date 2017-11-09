@@ -168,19 +168,19 @@ public class BackConstant {
 		problemFeedBackStatus.put("1","已解决");
 
 		// 风控标签
-		fengKongLabels.put("%失联%","1");
-		fengKongLabels.put("%难联系%","2");
-		fengKongLabels.put("%首通后屏蔽%","3");
-		fengKongLabels.put("%首通前屏蔽%","4");
-		fengKongLabels.put("%联系人不匹配%","5");
-		fengKongLabels.put("%联系人重号%","6");
-		fengKongLabels.put("%疑似黑中介办理%","7");
-		fengKongLabels.put("%各平台欠款%","8");
-		fengKongLabels.put("%各银行欠款%","9");
-		fengKongLabels.put("%无赖不还%","10");
-		fengKongLabels.put("%诚信度低%","11");
-		fengKongLabels.put("%无偿还能力%","12");
-		fengKongLabels.put("%忘记还款%","13");
+		fengKongLabels.put("失联","1");
+		fengKongLabels.put("难联系","2");
+		fengKongLabels.put("首通后屏蔽","3");
+		fengKongLabels.put("首通前屏蔽","4");
+		fengKongLabels.put("联系人不匹配","5");
+		fengKongLabels.put("联系人重号","6");
+		fengKongLabels.put("疑似黑中介办理","7");
+		fengKongLabels.put("各平台欠款","8");
+		fengKongLabels.put("各银行欠款","9");
+		fengKongLabels.put("无赖不还","10");
+		fengKongLabels.put("诚信度低","11");
+		fengKongLabels.put("无偿还能力","12");
+		fengKongLabels.put("忘记还款","13");
 
 	}
 

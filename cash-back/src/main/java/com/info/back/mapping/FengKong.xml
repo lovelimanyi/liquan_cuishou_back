@@ -18,18 +18,18 @@
 		fk.updatetime AS updatetime
 	</sql>
 	<select id="findAllCount" parameterType="HashMap" resultType="Integer">
-		SELECT count(1) 
+		SELECT count(1)
 		FROM fengkong_label fk
 		<where>
 				1=1
 			<if test="status!=null and status!=''">
 				and fk.status = #{status}
 			</if>
-		</where>	
+		</where>
 	</select>
-	
+
 	<select id="findAll" resultType="com.info.web.pojo.FengKong" parameterType="HashMap">
-		SELECT 
+		SELECT
 			<include refid="sqlFengKongColumns"/>
 		FROM fengkong_label fk
 		<where>
@@ -37,33 +37,33 @@
 			<if test="status!=null and status!=''">
 				and fk.status = #{status}
 			</if>
-		</where>	
+		</where>
 	</select>
-	
+
 	<select id="getFengKongById" resultMap="queryResultMap" parameterType="INTEGER">
-		SELECT 
+		SELECT
 			<include refid="sqlFengKongColumns"/>
 		FROM fengkong_label fk
 		WHERE fk.id=#{id}
 	</select>
-	
+
 	<select id="getFengKongList" resultMap="queryResultMap">
-		SELECT 
+		SELECT
 			<include refid="sqlFengKongColumns"/>
 		FROM fengkong_label fk
 		WHERE 1=1 and fk.status='0'
 	</select>
-	
+
 	<insert id="insert" parameterType="com.info.web.pojo.FengKong">
 		INSERT INTO fengkong_label (fk_label,createtime)
 		VALUES(#{fkLabel},now())
 	</insert>
-	
+
 	<update id="update" parameterType="com.info.web.pojo.FengKong">
-		UPDATE fengkong_label 
-		<set> 
-			<if test="fkLabel != null and fkLabel != ''">fk_label=#{fkLabel,jdbcType=VARCHAR},</if>  
-			<if test="status != null and status != ''">status=#{status,jdbcType=VARCHAR},</if>  
+		UPDATE fengkong_label
+		<set>
+			<if test="fkLabel != null and fkLabel != ''">fk_label=#{fkLabel,jdbcType=VARCHAR},</if>
+			<if test="status != null and status != ''">status=#{status,jdbcType=VARCHAR},</if>
 			updatetime = now()
 		</set>
 		WHERE id = #{id}

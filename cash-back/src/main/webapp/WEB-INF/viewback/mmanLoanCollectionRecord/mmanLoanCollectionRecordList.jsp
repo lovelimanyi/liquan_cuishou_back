@@ -121,7 +121,8 @@
 						<select name="fengKongLabel" >
 							<option value="">全部</option>
 							<c:forEach var="fengKongLabel" items="${fengKongLabels }">
-								<option value="${fengKongLabel.id }" <c:if test="${fengKongLabel.id eq labels.get(params.fengKongLabel)}">selected = "selected"</c:if>>
+								<option value="${fengKongLabel.id }" <c:if test="${fengKongLabel.id eq labels.get(fn:replace(params.fengKongLabel,'%',''))}">selected
+										="selected"</c:if>>
 										${fengKongLabel.fkLabel}
 								</option>
 							</c:forEach>
