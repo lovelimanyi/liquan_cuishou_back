@@ -36,7 +36,7 @@ public class HttpUtils {
 //        HashMap<String, String> map = SysCacheUtils.getConfigParams("GET_JXL");
 //        String key = map.get("JXL_GET_AUTH_NAME");
 //        String pwd = map.get("JXL_GET_AUTH_PWD");
-//        String auth = "xjx_application_client_dev"+":"+"xjx_dev";
+//        String auth = "xjx_application_client_stage"+":"+"xjx_stage";
         String auth = "xjx_application_client"+":"+"xjx_123456";
         byte[] encodedAuth = Base64Utils.encode(auth.getBytes(Charset.forName("US-ASCII")));
         String authHeader = "Basic " + new String(encodedAuth);
@@ -57,6 +57,7 @@ public class HttpUtils {
             if (url.contains("https://risk-internal.xianjinxia.com/api/storage/v1/report/")){
                 get.addHeader("Authorization",getAuthHeader());
             }
+//            get.addHeader("Authorization",getAuthHeader());
             get.setConfig(requestConfig);
             response = httpClient.execute(get);
             String tuid = response.getFirstHeader("X-TUID")==null?null:response.getFirstHeader("X-TUID").getValue();
