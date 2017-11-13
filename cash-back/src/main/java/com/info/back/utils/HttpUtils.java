@@ -72,8 +72,6 @@ public class HttpUtils {
                 jxlResponse.setJxlData(EntityUtils.toString(entity));
                 return jxlResponse;
             }
-//            String  str = EntityUtils.toString(entity);
-//            System.out.println(str);
             return null;
 
         } catch (Exception e) {
