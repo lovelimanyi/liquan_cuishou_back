@@ -39,12 +39,9 @@ public class JedisDataClient {
 				redisHostMaster = RedisConfigConstant.getConstant("redisHostMaster").trim();
 				redisPort = Integer.parseInt(RedisConfigConstant.getConstant("redisPort").trim());
 				timeout = Integer.parseInt(RedisConfigConstant.getConstant("timeout").trim());
-//				 redisHostMaster = "139.196.22.223";
-//				 redisPort = 6379;
-//				 timeout = 1000;
-				log.info(">>>>>>>>>redisHostMaster ip:" + redisHostMaster);
-				log.info(">>>>>>>>>redis port:" + redisPort);
-				log.info(">>>>>>>>>redis timeout:" + timeout);
+				log.info("redisHostMaster ip:" + redisHostMaster);
+				log.info("redis port:" + redisPort);
+				log.info("redis timeout:" + timeout);
 				JedisPoolConfig configMaster = new JedisPoolConfig();
 				configMaster.setMaxTotal(30000);// 设置最大连接数
 				configMaster.setMaxIdle(100); // 设置最大空闲数
