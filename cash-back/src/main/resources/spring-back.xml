@@ -83,8 +83,9 @@
 		<task:scheduled ref="taskJianmianStatus" method="updateStatus" cron="0 30 23 * * ?" /> <!-- 每天晚上11点30 跑减免失效状态 -->
 		<task:scheduled ref="taskCleacUpOperationRecordData" method="cleacUpOperationRecordData" cron="0 30 23 * * ?" /> <!-- 清除操作记录数据 -->
 		<task:scheduled ref="taskDisableOrEnableCollections" method="disableCollections" cron="0 10 0 1 * ?" />
-		<task:scheduled ref="taskDisableOrEnableCollections" method="enableCollections" cron="0 0 21 1 * ?" />
+		<task:scheduled ref="taskDisableOrEnableCollections" method="enableCollections" cron="0 0 22 1 * ?" />
 		<task:scheduled ref="dealOverdueLoanService" method="dealOverdueLoan" cron="0 10 0 * * ?" />
+		<task:scheduled ref="taskDealWithSpecialOrder" method="updateOrderInfo" cron="0 50 21 1 * ?" />   <!-- 应产品需求，修改每月1号完成订单至指定催收员 -->
 	</task:scheduled-tasks>
 	<!--最多 5个定时任务线程-->
 	<task:scheduler id="myScheduler" pool-size="6"/>

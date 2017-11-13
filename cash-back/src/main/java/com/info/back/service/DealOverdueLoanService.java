@@ -56,16 +56,16 @@ public class DealOverdueLoanService {
 		}
 		loger.error("处理预期升级订单 结束" + DateUtil.getDateFormat(new Date(), "yyyy-MM-dd hh:mm:ss"));
 
-		Calendar clrNow = Calendar.getInstance();
-		int dayNow = clrNow.get(Calendar.DAY_OF_MONTH);
+//		Calendar clrNow = Calendar.getInstance();
+//		int dayNow = clrNow.get(Calendar.DAY_OF_MONTH);
         // 启用催收员（每月1号）
-		if(dayNow == 1){
-			try{
-				backUserService.enableCollections();
-			}catch (Exception e){
-				loger.error("启用催收员出错，执行时间：" + DateUtil.getDateFormat(new Date(), "yyyy-MM-dd hh:mm:ss"));
-			}
-		}
+//		if(dayNow == 1){
+//			try{
+//				backUserService.enableCollections();
+//			}catch (Exception e){
+//				loger.error("启用催收员出错，执行时间：" + DateUtil.getDateFormat(new Date(), "yyyy-MM-dd hh:mm:ss"));
+//			}
+//		}
     }
     
     

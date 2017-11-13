@@ -103,6 +103,8 @@ public class BackConstant {
 
 	public static final Integer OPERATION_RECORD_RETAIN_DAYS = 10;  // 操作记录数据保留时间
 
+	public static final String COLLECTION_USER_ID = "615e5ec76de04fc39ea5a05118a91c08";   // 产品指定接收催收完成订单催收员uuid
+
 	static{
 		groupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_S1,"S1");
 		groupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_S2,"S2");

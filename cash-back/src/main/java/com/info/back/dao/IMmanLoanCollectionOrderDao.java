@@ -103,4 +103,18 @@ public interface IMmanLoanCollectionOrderDao {
 
 	int deleteOrderInfoAndLoanInfoByloanId(String orderId);
 
+	/**
+	 * 查询一号还款订单信息
+	 * @param map
+	 * @return
+	 */
+	List<MmanLoanCollectionOrder> getOrderInFirstDay(HashMap<String,Object> map);
+
+	/**
+	 * 更新订单信息到指定催收员手上
+	 * @param map
+	 * @return
+	 */
+	int updateOrderInfo(HashMap<String,Object> map);
+
 }
