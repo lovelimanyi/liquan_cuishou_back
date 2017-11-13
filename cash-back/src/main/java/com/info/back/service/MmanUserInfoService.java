@@ -8,6 +8,7 @@ import com.info.back.vo.JxlResponse;
 import com.info.back.vo.jxl.*;
 import com.info.back.vo.jxl2.JxlUserReport;
 import com.info.back.vo.jxl_360.Rong360Report;
+import com.info.back.vo.jxl_dk360.Dk360Report;
 import com.info.back.vo.jxl_jdq.JdqReport;
 import com.info.back.vo.jxl_jlm.JlmReport;
 import com.info.constant.Constant;
@@ -67,12 +68,19 @@ public class MmanUserInfoService implements IMmanUserInfoService {
         String ossUrl = channelSwitchingDao.getChannelValue("jxl_oss_url").getChannelValue();
         String url = ossUrl+phone;
         String returnUrl = "";
+//        String phone = "18601603060";
+//        String url = "http://apigateway.cee10a53e8937498ab6c068afee5df20a.cn-hangzhou.alicontainer.com/api/storage/v1/report/"+phone+"?subtype=dk360_detail";
+
         try {
             String jxlDetail = userInfo.getJxlDetail();
-            //如果jxlDetail不为空，则从数据库中查出来解析，如果为空，则从Hbase中查出来解析
+//            如果jxlDetail不为空，则从数据库中查出来解析，如果为空，则从Hbase中查出来解析
             if (StringUtils.isNotBlank(jxlDetail)){ //原始现金侠的聚信立报告-分为两种：从数据库中查出来解析
                 handleCashmanJxl(jxlDetail,model);
                 //返回 现金侠原始聚信立报告页面
+                model.addAttribute("name",userInfo.getRealname());
+                model.addAttribute("gender",userInfo.getUserSex());
+                model.addAttribute("idNumber",userInfo.getIdNumber());
+                model.addAttribute("age",userInfo.getUserAge());
                 returnUrl = "mycollectionorder/jxlReport";
                 return returnUrl;
             }
@@ -108,6 +116,14 @@ public class MmanUserInfoService implements IMmanUserInfoService {
                     model.addAttribute("datasource",jdqReport.getDatasource());
                     //返回 借点钱聚信立报告页面
                     returnUrl = "mycollectionorder/jdqReport";
+                }else if (jxlType.equals(Constant.DK360_DETAIL)){
+                    Dk360Report dk360Report = JSONObject.toJavaObject(jsonDetail,Dk360Report.class);
+                    model.addAttribute("user",dk360Report.getUser());
+                    model.addAttribute("",dk360Report.getBill());
+                    model.addAttribute("",dk360Report.getMsg());
+                    model.addAttribute("",dk360Report.getNet());
+                    model.addAttribute("teleData",dk360Report.getTel().getTeldata());
+                    returnUrl = "mycollectionorder/dk360Report";
                 }else {
                     //其他情况暂时先返回原始聚信立报告页面
                     returnUrl = "mycollectionorder/jxlReport";
