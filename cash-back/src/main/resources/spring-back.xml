@@ -57,6 +57,8 @@
 				<value>/collectionOrder/kokuan</value>
 				<value>/collectionOrder/sendMsg</value>
 				<value>/collectionOrder/withhold-callback</value>
+				<value>/sync/loan-order-info</value>
+				<value>/sync/repayment</value>
 			</list>
 		</property>
 	</bean>
