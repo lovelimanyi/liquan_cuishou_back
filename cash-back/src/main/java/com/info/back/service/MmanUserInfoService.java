@@ -11,6 +11,7 @@ import com.info.back.vo.jxl_360.Rong360Report;
 import com.info.back.vo.jxl_dk360.Dk360Report;
 import com.info.back.vo.jxl_jdq.JdqReport;
 import com.info.back.vo.jxl_jlm.JlmReport;
+import com.info.back.vo.jxl_rs.RsReport;
 import com.info.constant.Constant;
 import com.info.web.pojo.ContactInfo;
 import com.info.web.pojo.MmanUserInfo;
@@ -68,8 +69,8 @@ public class MmanUserInfoService implements IMmanUserInfoService {
         String ossUrl = channelSwitchingDao.getChannelValue("jxl_oss_url").getChannelValue();
         String url = ossUrl+phone;
         String returnUrl = "";
-//        String phone = "18601603060";
-//        String url = "http://apigateway.cee10a53e8937498ab6c068afee5df20a.cn-hangzhou.alicontainer.com/api/storage/v1/report/"+phone+"?subtype=dk360_detail";
+//        String phone = "18612567487";
+//        String url = "http://apigateway.cee10a53e8937498ab6c068afee5df20a.cn-hangzhou.alicontainer.com/api/storage/v1/report/"+phone+"?subtype=rs_detail";
 
         try {
             String jxlDetail = userInfo.getJxlDetail();
@@ -119,11 +120,15 @@ public class MmanUserInfoService implements IMmanUserInfoService {
                 }else if (jxlType.equals(Constant.DK360_DETAIL)){
                     Dk360Report dk360Report = JSONObject.toJavaObject(jsonDetail,Dk360Report.class);
                     model.addAttribute("user",dk360Report.getUser());
-                    model.addAttribute("",dk360Report.getBill());
-                    model.addAttribute("",dk360Report.getMsg());
-                    model.addAttribute("",dk360Report.getNet());
                     model.addAttribute("teleData",dk360Report.getTel().getTeldata());
                     returnUrl = "mycollectionorder/dk360Report";
+                }else if (jxlType.equals(Constant.RS_DETAIL)){
+                    RsReport rsReport = JSONObject.toJavaObject(jsonDetail,RsReport.class);
+                    model.addAttribute("basicInfo",rsReport.getBasicInfo());
+                    model.addAttribute("billSummary",rsReport.getBillSummaryList());
+                    model.addAttribute("callDetail",rsReport.getCallDetailList());
+                    model.addAttribute("smsDetail",rsReport.getSmsDetailList());
+                    returnUrl = "mycollectionorder/rsReport";
                 }else {
                     //其他情况暂时先返回原始聚信立报告页面
                     returnUrl = "mycollectionorder/jxlReport";
