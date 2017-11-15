@@ -157,6 +157,9 @@ public class Constant {
 	public static final String R360_DETAIL = "r360_detail"; //融360
 	public static final String JLM_DEATIL = "jlm_detail"; //借了吗
 	public static final String FQGJ_DETAIL = "fqgj_detail"; //分期管家
+	public static final String DK360_DETAIL = "dk360_detail"; //360贷款
+	public static final String RS_DETAIL = "rs_detail"; //榕树
+	public static final String LF_DETAIL = "lf_detail";//来福贷款王渠道
 
 
 
