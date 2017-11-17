@@ -215,12 +215,10 @@ public class CountCollectionManageService implements ICountCollectionManageServi
         int delNumber = countCollectionManageDao.deleteManageList(params);
         logger.info("删除管理统计数据完成,本次共删除数据 " + delNumber + " 条。");
         List<CountCollectionAssessment> manageList = countCollectionAssessmentDao.queryManageList(params);
-        logger.info("管理统计报表manageList = {}" +  manageList != null ? manageList.size() : null);
         if (CollectionUtils.isNotEmpty(manageList)) {
             countCollectionAssessmentDao.insertManageList(manageList);
         }
         logger.info("管理统计执行完成!!!");
-//		}
     }
 
     public static void main(String[] args) {

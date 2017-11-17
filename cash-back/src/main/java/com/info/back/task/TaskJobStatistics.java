@@ -34,7 +34,7 @@ public class TaskJobStatistics {
             int day = today.get(Calendar.DAY_OF_MONTH);
             HashMap<String, Object> params = new HashMap<String, Object>();
             // 为减轻服务器(数据库压力),每月1号统计暂停执行
-            if (currentHour < 1) {
+            if (currentHour < 6) {
                 // 第一次统计前一天的数据
                 params.put("currDate", DateUtil.getBeforeOrAfter(date, -1));
                 params.put("begDate", DateUtil.getDateFormat(DateUtil.getBeforeOrAfter(date, -1), "yyyy-MM-dd"));
@@ -49,13 +49,14 @@ public class TaskJobStatistics {
                     logger.info("1号统计暂停执行......" + DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
                     return;
                 }
-                // 考核统计
-                countCollectionAssessmentService.countCallAssessment(params);
-                logger.info("考核统计执行完成,完成时间 :" + DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
-                // 管理统计
-                countCollectionManageService.countCallManage(params);
-                logger.info("管理统计执行完成,完成时间 :" + DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
             }
+
+            // 考核统计
+            countCollectionAssessmentService.countCallAssessment(params);
+            logger.info("考核统计执行完成,完成时间 :" + DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
+            // 管理统计
+            countCollectionManageService.countCallManage(params);
+            logger.info("管理统计执行完成,完成时间 :" + DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("call count procedure error:", e);
