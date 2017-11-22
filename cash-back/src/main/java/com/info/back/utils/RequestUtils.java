@@ -224,9 +224,6 @@ public class RequestUtils {
 			}
 		}
 
-		System.out.println("============================================");
-		System.out.println("========client IP:" + ipAddress + "=============");
-		System.out.println("============================================");
 		return ipAddress;
 	}
 

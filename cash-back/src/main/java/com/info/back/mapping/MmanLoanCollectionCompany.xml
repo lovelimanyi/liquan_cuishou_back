@@ -21,6 +21,8 @@
 		<result column="update_date" property="updateDate" jdbcType="TIMESTAMP"/>
 		<!-- 地区 -->
 		<result column="region" property="region" jdbcType="VARCHAR"/>
+		<!-- ip -->
+		<result column="company_address" property="companyAddress" jdbcType="VARCHAR"/>
 	</resultMap>
 	<select id="findAllCount"  parameterType="HashMap" resultType="Integer">
 		select count(1) from mman_loan_collection_company
@@ -155,8 +157,17 @@
 		  </foreach>
 	   </if>
 	</update>
+
+	<select id="getCompanyIps" resultMap="queryResultMap">
+		SELECT c.id,c.title,c.company_address,c.update_date FROM mman_loan_collection_company c WHERE c.status = 1
+	</select>
+
 	<!-- 根据主键获取单条记录 -->
-	<select id="get" resultMap="queryResultMap" parameterType="com.info.web.pojo.MmanLoanCollectionCompany">SELECT t.id , t.title , t.create_date , t.priority , t.status , t.self_business,t.region FROM mman_loan_collection_company t WHERE id = #{id,jdbcType=VARCHAR}</select>
+	<select id="get" resultMap="queryResultMap" parameterType="com.info.web.pojo.MmanLoanCollectionCompany">
+		SELECT t.id , t.title ,t.company_address, t.create_date , t.priority ,t.status ,t.self_business,t.region
+		FROM mman_loan_collection_company t
+		WHERE id = #{id,jdbcType=VARCHAR}
+	</select>
 	<!-- 根据主键删除记录 -->
 	<update id="del" parameterType="String">
 			UPDATE  mman_loan_collection_company set status=2 WHERE id = #{id,jdbcType=VARCHAR}
