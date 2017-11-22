@@ -208,4 +208,22 @@ public class CollectionCompanyService implements ICollectionCompanyService{
 	public List<MmanLoanCollectionCompany> getCompanyList(HashMap<String, Object> map) {
 		return mmanLoanCollectionCompanyDao.getCompanyList(map);
 	}
+
+	@Override
+	public List<MmanLoanCollectionCompany> getCompanyIps() {
+		return mmanLoanCollectionCompanyDao.getCompanyIps();
+	}
+
+	@Override
+	public List<MmanLoanCollectionCompany> dealwithCompanyInfo(List<MmanLoanCollectionCompany> companys) {
+		if (companys.size() > 0) {
+			for (MmanLoanCollectionCompany company : companys) {
+				if(org.apache.commons.lang3.StringUtils.isNotEmpty(company.getCompanyAddress())){
+					String ips = company.getCompanyAddress().replace(",", StringUtils.repeat("",5));
+					company.setCompanyAddress(ips);
+				}
+			}
+		}
+		return companys;
+	}
 }

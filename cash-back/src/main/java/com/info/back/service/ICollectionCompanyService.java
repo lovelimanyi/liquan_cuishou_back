@@ -7,6 +7,7 @@ import java.util.Map;
 import com.info.back.result.JsonResult;
 import com.info.web.pojo.MmanLoanCollectionCompany;
 import com.info.web.util.PageConfig;
+import org.apache.commons.lang3.StringUtils;
 
 public interface ICollectionCompanyService {
 	
@@ -15,37 +16,41 @@ public interface ICollectionCompanyService {
 	 * @param params
 	 * @return
 	 */
-	public PageConfig<MmanLoanCollectionCompany> findPage(HashMap<String, Object> params);
+	PageConfig<MmanLoanCollectionCompany> findPage(HashMap<String, Object> params);
 	/**
 	 * 添加公司
-	 * @param mmanLoanCollectionCompany
+	 * @param
 	 * @return
 	 */
-	public JsonResult saveCompany(Map<String, String>  params);
+	JsonResult saveCompany(Map<String, String>  params);
 	/**
 	 * 修改
-	 * @param mmanLoanCollectionCompany
+	 * @param
 	 * @return
 	 */
-	public JsonResult updateCompany(Map<String, String>  params);
+	JsonResult updateCompany(Map<String, String>  params);
 	/**
 	 * 删除公司
 	 * @param id
 	 * @return
 	 */
-	public JsonResult deleteCompany(String id);
+	JsonResult deleteCompany(String id);
 	/**
 	 * 根据id查询公司信息
 	 * @param compayId
 	 * @return
 	 */
-	public MmanLoanCollectionCompany get(String compayId);
+	MmanLoanCollectionCompany get(String compayId);
 	/**
 	 * 查询所有公司记录
 	 * @return
 	 */
-	public List<MmanLoanCollectionCompany> selectCompanyList();
+	List<MmanLoanCollectionCompany> selectCompanyList();
 
 
-	public  List<MmanLoanCollectionCompany> getCompanyList(HashMap<String,Object> map);
+	List<MmanLoanCollectionCompany> getCompanyList(HashMap<String,Object> map);
+
+	List<MmanLoanCollectionCompany> getCompanyIps();
+
+	List<MmanLoanCollectionCompany> dealwithCompanyInfo(List<MmanLoanCollectionCompany> companys);
 }
