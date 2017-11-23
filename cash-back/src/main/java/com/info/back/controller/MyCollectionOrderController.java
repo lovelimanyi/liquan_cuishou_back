@@ -307,7 +307,7 @@ public class MyCollectionOrderController extends BaseController {
                 params.put("loanMoney", baseOrder.getLoanMoney());
                 params.put("loanPenlty", baseOrder.getLoanPenlty());
                 // 逾期8天以内订单催收建议不允许拒绝
-                if (baseOrder.getOverdueDays() > 8) {
+                if (baseOrder.getOverdueDays() > 3) {
                     statulist = sysDictService.getStatus("xjx_collection_advise");
                 } else {
                     statulist = sysDictService.getOtherStatus(params);
