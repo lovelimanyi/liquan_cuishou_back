@@ -608,9 +608,10 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
                                 long actualPayMonery = koPayMonery.multiply(new BigDecimal(100)).longValue();
                                 String uuid = IdGen.uuid();
                                 String sign = MD5coding.MD5(AESUtil.encrypt(mmanLoanCollectionOrderOri.getUserId() + mmanLoanCollectionOrderOri.getPayId() + actualPayMonery + uuid, PayContents.XJX_WITHHOLDING_NOTIFY_KEY));
-                                ChannelSwitching withholdChannel = channelSwitchingDao.getChannelValue("cuishou_withhold_channel");
+
+                                String withholdChannel = getWithholdChannel();
                                 // 根据渠道区分代扣请求发送地方
-                                if (BackConstant.CUISHOU_WITHHOLD_CHANNEL_PAYMENTCENTER.equals(withholdChannel.getChannelValue())) {
+                                if (BackConstant.CUISHOU_WITHHOLD_CHANNEL_PAYMENTCENTER.equals(withholdChannel)) {
                                     logger.info("订单: " + params.get("id").toString() + " 通过支付中心发起代扣...");
                                     WithholdParam withhold = new WithholdParam();
                                     withhold.setMoney(BigDecimal.valueOf(actualPayMonery)); // 扣款金额
@@ -720,10 +721,21 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
         return reslut;
     }
 
+    private String getWithholdChannel() throws Exception {
+        String withholdChannel;
+        if(StringUtils.isNotBlank(JedisDataClient.get("WITHHOLD_CHANNEL"))){
+            withholdChannel = JedisDataClient.get("WITHHOLD_CHANNEL");
+        }else {
+            withholdChannel = channelSwitchingDao.getChannelValue("cuishou_withhold_channel").getChannelValue();
+            JedisDataClient.set("WITHHOLD_CHANNEL",withholdChannel,60 * 60);
+        }
+        return withholdChannel;
+    }
+
     private long getCreateTimePlus(CollectionWithholdingRecord record) {
         long createTime = 0;
         if(record == null){
-            createTime = new Date().getTime();
+            createTime = System.currentTimeMillis();
         }else {
             createTime = record.getCreateDate().getTime();//最新一条代扣时间
         }
