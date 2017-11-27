@@ -43,7 +43,7 @@ public class MmanUserInfoController extends BaseController {
             HashMap<String, Object> params = getParametersO(request);
             MmanLoanCollectionOrder order =  null;
             if(StringUtils.isNotBlank(params.get("id")+"")){
-               order = mmanLoanCollectionOrderService.getOrderById(params.get("id").toString());
+                order = mmanLoanCollectionOrderService.getOrderById(params.get("id").toString());
             }
             if(order != null){
                 int overdueDay = order.getOverdueDays();
@@ -53,8 +53,8 @@ public class MmanUserInfoController extends BaseController {
                     if((BackConstant.COLLECTION_ROLE_ID.toString().equals(backUser.getRoleId()) && "2".equals(order.getJxlStatus()))|| !BackConstant.COLLECTION_ROLE_ID.toString().equals(backUser.getRoleId())){
                         url = mmanUserInfoService.handleJxl(model,userId);
                     }else {
-                        if (overdueDay < 5){
-                            model.addAttribute(MESSAGE, "逾期5天以上订单才能查看聚信里报告！");
+                        if (overdueDay < 2){
+                            model.addAttribute(MESSAGE, "逾期2天以上订单才能查看聚信里报告！");
                             url="mycollectionorder/jxlReport";
                         }else if (overdueDay>30){
                             url = mmanUserInfoService.handleJxl(model,userId);
@@ -66,8 +66,8 @@ public class MmanUserInfoController extends BaseController {
                     model.addAttribute(MESSAGE, "催收成功订单不允许查看聚信里报告！");
                 }
             }else{
-                    logger.error("该订单异常，请核实，订单号：" + params.get("id"));
-                }
+                logger.error("该订单异常，请核实，订单号：" + params.get("id"));
+            }
             model.addAttribute("params", params);
         } catch (Exception e) {
             logger.error("jxlException", e);

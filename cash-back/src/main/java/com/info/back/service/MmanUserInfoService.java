@@ -11,6 +11,7 @@ import com.info.back.vo.jxl_360.Rong360Report;
 import com.info.back.vo.jxl_dk360.Dk360Report;
 import com.info.back.vo.jxl_jdq.JdqReport;
 import com.info.back.vo.jxl_jlm.JlmReport;
+import com.info.back.vo.jxl_lf.LfReport;
 import com.info.back.vo.jxl_rs.RsReport;
 import com.info.constant.Constant;
 import com.info.web.pojo.ContactInfo;
@@ -55,7 +56,7 @@ public class MmanUserInfoService implements IMmanUserInfoService {
     public List<ContactInfo> getContactInfo(String phoneNum) {
         return mmanUserInfoDao.getContactInfo(phoneNum);
     }
-    
+
     @Autowired
     private IChannelSwitchingDao channelSwitchingDao;
 
@@ -129,6 +130,11 @@ public class MmanUserInfoService implements IMmanUserInfoService {
                     model.addAttribute("callDetail",rsReport.getCallDetailList());
                     model.addAttribute("smsDetail",rsReport.getSmsDetailList());
                     returnUrl = "mycollectionorder/rsReport";
+                }else if (jxlType.equals(Constant.LF_DETAIL)){
+                    LfReport lfReport = JSONObject.toJavaObject(jsonDetail,LfReport.class);
+                    model.addAttribute("basicInfo",lfReport.getCarrier_mobile_basic());
+                    model.addAttribute("call",lfReport.getCarrier_mobile_voice_call());
+                    returnUrl = "mycollectionorder/lfReport";
                 }else {
                     //其他情况暂时先返回原始聚信立报告页面
                     returnUrl = "mycollectionorder/jxlReport";
