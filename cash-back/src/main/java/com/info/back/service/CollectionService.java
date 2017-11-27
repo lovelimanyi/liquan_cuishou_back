@@ -130,4 +130,9 @@ public class CollectionService implements ICollectionService{
 			logger.error("CollectionService deleteTagDelete", e);
 		}
 	}
+
+	@Override
+	public Collection getCollectionByUserName(String username) {
+		return collectionDao.getCollectionByUserName(username);
+	}
 }

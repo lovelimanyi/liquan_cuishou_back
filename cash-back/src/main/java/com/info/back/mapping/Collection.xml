@@ -143,4 +143,8 @@
 	<update id="updateDeleteCoection" parameterType="String">
 		update back_user u set u.`status`=3 WHERE u.`uuid`=#{id}
 	</update>
+
+	<select id="getCollectionByUserName" parameterType="String" resultType="com.info.web.pojo.Collection">
+		SELECT id,user_name AS userName,status FROM back_user WHERE user_name = #{username}
+	</select>
 </mapper>
