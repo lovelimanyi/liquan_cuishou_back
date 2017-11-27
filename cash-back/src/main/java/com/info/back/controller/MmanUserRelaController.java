@@ -21,13 +21,13 @@ import java.util.List;
 @RequestMapping("mmanUserRela/")
 public class MmanUserRelaController extends BaseController {
 	private static Logger logger = Logger.getLogger(MmanUserRelaController.class);
-	
+
 	@Autowired
 	private IMmanUserRelaService mmanUserRelaService;
-	
+
 	@Autowired
 	private IMmanLoanCollectionOrderService mmanLoanCollectionOrderService;
-	
+
 	@RequestMapping("getMmanUserRelaPage")
 	public String getMmanUserRelaPage(HttpServletRequest request,HttpServletResponse response, Model model){
 		HashMap<String, Object> params = this.getParametersO(request);
@@ -41,21 +41,28 @@ public class MmanUserRelaController extends BaseController {
 				int overdueDays = order.getOverdueDays();//逾期天数
 				params.put("overdueDays",overdueDays);
 				if(!BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())){
-					if(overdueDays <= 1){
-						erroMsg = "逾期2天方可申请查看通讯录";
-					}else if(overdueDays >= 2 && overdueDays <= 3){
-						params.put("num",2);
+					if(overdueDays <= 3){
+//						erroMsg = "逾期2天方可申请查看通讯录";
+						params.put("num",10);
 						List<MmanUserRela> list = mmanUserRelaService.getList(params);
 						model.addAttribute("list", list);
-					}else if(overdueDays >= 4 && overdueDays <= 5){
-						params.put("num",5);
-						List<MmanUserRela> list = mmanUserRelaService.getList(params);
-						model.addAttribute("list", list);
-					}else if(overdueDays >= 6 && overdueDays <= 10){
-						params.put("num",15);
-						List<MmanUserRela> list = mmanUserRelaService.getList(params);
-						model.addAttribute("list", list);
-					}else{
+					}
+					// 暂时调整，大于3天可以查看所有的通讯录
+//					else if(overdueDays >= 2 && overdueDays <= 3){
+//						params.put("num",2);
+//						List<MmanUserRela> list = mmanUserRelaService.getList(params);
+//						model.addAttribute("list", list);
+//					}
+//					else if(overdueDays >= 4 && overdueDays <= 5){
+//						params.put("num",5);
+//						List<MmanUserRela> list = mmanUserRelaService.getList(params);
+//						model.addAttribute("list", list);
+//					}else if(overdueDays >= 6 && overdueDays <= 10){
+//						params.put("num",15);
+//						List<MmanUserRela> list = mmanUserRelaService.getList(params);
+//						model.addAttribute("list", list);
+//					}
+					else{
 						PageConfig<MmanUserRela> pageConfig = mmanUserRelaService.findPage(params);
 						model.addAttribute("pm", pageConfig);
 					}
@@ -108,5 +115,5 @@ public class MmanUserRelaController extends BaseController {
 		}
 		return "mycollectionorder/relaCountPage";
 	}
-	
+
 }

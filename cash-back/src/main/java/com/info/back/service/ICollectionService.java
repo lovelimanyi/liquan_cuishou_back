@@ -12,32 +12,39 @@ public interface ICollectionService {
 	 * @param params
 	 * @return
 	 */
-	public PageConfig<Collection> findPage(HashMap<String, Object> params);
+	PageConfig<Collection> findPage(HashMap<String, Object> params);
 	/**
 	 * 根据id查询用户信息
 	 * @param params
 	 * @return
 	 */
-	public Collection findOneCollection(Integer id);
+	Collection findOneCollection(Integer id);
 	/**
 	 * 修改催收员
 	 * @param collection
 	 */
-	public JsonResult updateById(Collection collection);
+	JsonResult updateById(Collection collection);
 	/**
 	 * 添加催收员
 	 * @param collection
 	 */
-	public JsonResult insert(Collection collection);
+	JsonResult insert(Collection collection);
 	/**
 	 * 删除催收员
 	 * @param id
 	 * @return
 	 */
-	public JsonResult deleteCollection(Integer id);
+	JsonResult deleteCollection(Integer id);
 	/**
 	 * 删除标记为删除的订单
 	 */
-	public void deleteTagDelete();
+	void deleteTagDelete();
+
+	/**
+	 * 根据催收员姓名获取催收员
+	 * @param username
+	 * @return
+	 */
+	Collection getCollectionByUserName(String username);
 
 }
