@@ -53,10 +53,10 @@ public class MmanUserInfoController extends BaseController {
                     if((BackConstant.COLLECTION_ROLE_ID.toString().equals(backUser.getRoleId()) && "2".equals(order.getJxlStatus()))|| !BackConstant.COLLECTION_ROLE_ID.toString().equals(backUser.getRoleId())){
                         url = mmanUserInfoService.handleJxl(model,userId);
                     }else {
-                        if (overdueDay < 2){
+                        if (overdueDay < 0){
                             model.addAttribute(MESSAGE, "逾期2天以上订单才能查看聚信里报告！");
                             url="mycollectionorder/jxlReport";
-                        }else if (overdueDay>30){
+                        }else if (overdueDay>0){
                             url = mmanUserInfoService.handleJxl(model,userId);
                         }else {
                             url="mycollectionorder/tapplyJxlRepor";

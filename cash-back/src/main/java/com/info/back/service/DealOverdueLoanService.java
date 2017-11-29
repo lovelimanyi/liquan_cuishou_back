@@ -32,7 +32,7 @@ public class DealOverdueLoanService {
 	private IMmanLoanCollectionOrderService manLoanCollectionOrderService;
 
 
-    public void dealOverdueLoan() {
+    public void dealOverdueLoan() throws Exception{
         loger.error("处理预期升级订单 开始" + DateUtil.getDateFormat(new Date(), "yyyy-MM-dd hh:mm:ss"));
         MmanUserLoan mmanUserLoan = new MmanUserLoan();
 		mmanUserLoan.setLoanStatus(BackConstant.CREDITLOANAPPLY_OVERDUE);
@@ -47,11 +47,6 @@ public class DealOverdueLoanService {
 					DealOverdueLoanThread dealOverdueOrderThread = new DealOverdueLoanThread(loan.getId(),taskJobMiddleService,order.getIdNumber());
 					pool.execute(dealOverdueOrderThread);
 				}
-        	}
-        	try {
-        		Thread.sleep(10);
-        	} catch (Exception e) {
-        		loger.error("处理逾期订单出错，订单号：" + loan.getId());
         	}
 		}
 		loger.error("处理预期升级订单 结束" + DateUtil.getDateFormat(new Date(), "yyyy-MM-dd hh:mm:ss"));
@@ -70,6 +65,10 @@ public class DealOverdueLoanService {
     
     
     public static void main(String[] args) {
-    	new DealOverdueLoanService().dealOverdueLoan();
+    	try{
+			new DealOverdueLoanService().dealOverdueLoan();
+		}catch (Exception e){
+			loger.error("");
+		}
 	}
 }

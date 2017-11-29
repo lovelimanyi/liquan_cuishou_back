@@ -41,7 +41,7 @@ public class MmanUserRelaController extends BaseController {
 				int overdueDays = order.getOverdueDays();//逾期天数
 				params.put("overdueDays",overdueDays);
 				if(!BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())){
-					if(overdueDays <= 3){
+					if(overdueDays <= 0){
 //						erroMsg = "逾期2天方可申请查看通讯录";
 						params.put("num",10);
 						List<MmanUserRela> list = mmanUserRelaService.getList(params);
