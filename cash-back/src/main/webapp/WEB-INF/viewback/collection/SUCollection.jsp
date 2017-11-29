@@ -218,26 +218,26 @@
 </div>
 </body>
 <script type="text/javascript">
-    /*
+
     $("#userName input").blur(function () {
-        debugger;
         var username = $("#userName input").val();
         if(username != ''){
             $.ajax({
                 url: "/back/collection/checkCollections",
                 data: {"userName":username},
                 dataType: 'json',
-                type: "GET", //POST提交
+                type: "POST",
+                scriptCharset: "utf-8",
                 success: function (data) {
-                    alert(data);
-                    if ('true' == data) {
-                        alert("");
-                        $("#userName input").val("系统中已存在催收员" + username + ",请核实！")
+                    debugger;
+                    if ('200' == data.code) {
+                        alertMsg.error("系统中已存在该催收员，请核实！");
                     }
                 }
             });
         }
-    })
-    */
+    });
+
+
 </script>
 </html>
