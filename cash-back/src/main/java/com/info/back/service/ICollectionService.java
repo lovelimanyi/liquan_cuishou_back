@@ -47,4 +47,11 @@ public interface ICollectionService {
 	 */
 	Collection getCollectionByUserName(String username);
 
+	/**
+	 * 根据催收员账号获取催收员信息
+	 * @param userAccount
+	 * @return
+	 */
+	Collection getCollectionByUserAccount(String userAccount);
+
 }

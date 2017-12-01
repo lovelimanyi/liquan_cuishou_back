@@ -183,7 +183,25 @@ public class CollectionController extends BaseController {
             HashMap<String, Object> res = new HashMap<>();
             if (user != null) {
                 res.put("code", "200");
-//                res.put("messg", "系统中已存在名为 " + userName + " 的催收员，请核实！");
+            }
+            s = JSON.toJSONString(res);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return s;
+    }
+
+    @RequestMapping("/checkUserAccount")
+    @ResponseBody
+    public String getCollectionByUserAccount(HttpServletRequest request) {
+        String s = null;
+        try {
+            Map<String, String> params = this.getParameters(request);
+            String userAccount = params.get("userAccount");
+            Collection user = collectionService.getCollectionByUserAccount(userAccount);
+            HashMap<String, Object> res = new HashMap<>();
+            if (user != null) {
+                res.put("code", "200");
             }
             s = JSON.toJSONString(res);
         } catch (Exception e) {

@@ -119,6 +119,7 @@ public class BackConstant {
 		groupNameTypeMap.put("55","M1-M2");
 		groupNameTypeMap.put("66","M2-M3");
 		groupNameTypeMap.put("77","M3+");
+		groupNameTypeMap.put("88","M6+");
 
 		groupStatusMap.put("0", "禁用");
 		groupStatusMap.put("1", "启用");
