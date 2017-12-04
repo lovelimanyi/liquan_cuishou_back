@@ -51,7 +51,9 @@ public class OperaOverdueDataThread implements Runnable {
 			String userId  = String.valueOf(repayment.get("user_id"));    	//用户id
 			map.put("ORDER_ID", loanId);
 			map.put("USER_ID", userId);
-			if (null != repayment) {
+			int repaymentMoney = Integer.parseInt(String.valueOf(repayment.get("repayment_amount")));
+			int repaymentedMoney = Integer.parseInt(String.valueOf(repayment.get("repaymented_amount")));
+			if (null != repayment &&(repaymentMoney != repaymentedMoney)) {
 				try {
 					HashMap<String, Object> borrowOrder = null;					//借款信息--app端
 					List<HashMap<String, Object>> repaymentDetailList = null;	//还款详情信息--app端
