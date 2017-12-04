@@ -114,6 +114,7 @@ public class OperaOverdueDataThread implements Runnable {
 					e0.printStackTrace();
 				}
 			}else{
+                loger.error("del-key===="+payId);
 				RedisUtil.delRedisKey(Constant.TYPE_OVERDUE_ + payId);
 			}
 		}
