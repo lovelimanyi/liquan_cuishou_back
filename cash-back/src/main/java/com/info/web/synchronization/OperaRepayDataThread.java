@@ -54,11 +54,12 @@ public class OperaRepayDataThread implements Runnable {
             loger.error("repayment:"+repayment);
             //获取app端还款详情信息
             List<HashMap<String, Object>> repaymentDetailList = this.dataDao.getAssetRepaymentDetail(map);
-            int repaymentMoney = Integer.parseInt(String.valueOf(repayment.get("repayment_amount")));
-            int repaymentedMoney = Integer.parseInt(String.valueOf(repayment.get("repaymented_amount")));
+            String repaymentMoney =String.valueOf(repayment.get("repayment_amount"));
+            String repaymentedMoney = String.valueOf(repayment.get("repaymented_amount"));
             loger.error("repaymentMoney===="+repaymentMoney+"repaymentedMoney==="+repaymentedMoney);
             //只有应还金额=已还金额 且 还款详情列表不为空才执行逻辑
-            if(null!=repayment && (repaymentMoney==repaymentedMoney)&& repaymentDetailList.size()>0) {
+            if(null!=repayment && (repaymentMoney.equals(repaymentedMoney))&& repaymentDetailList.size()>0) {
+                loger.error("第二次repaymentMoney===="+repaymentMoney+"repaymentedMoney==="+repaymentedMoney);
                 try {
                     String loanId = String.valueOf(repayment.get("asset_order_id"));//借款id
                     map.put("ORDER_ID", loanId);//还款id
