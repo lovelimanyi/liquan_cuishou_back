@@ -43,7 +43,7 @@ public class LoginController extends BaseController {
 	 * 
 	 * @param processUrl
 	 * @param returnUrl
-	 * @param authId
+	 * @param
 	 * @return
 	 */
 	private String getView(String processUrl, String returnUrl) {
@@ -69,7 +69,6 @@ public class LoginController extends BaseController {
 			HttpServletResponse response, Model model) {
 
 		try {
-			JedisDataClient.set("xiaokedou", "小蝌蚪");
 			String processUrl = request.getParameter(PROCESS_URL);
 			String returnUrl = request.getParameter(RETURN_URL);
 			String message = request.getParameter(MESSAGE);
