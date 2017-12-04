@@ -53,6 +53,7 @@ public class OperaOverdueDataThread implements Runnable {
 			map.put("USER_ID", userId);
 			int repaymentMoney = Integer.parseInt(String.valueOf(repayment.get("repayment_amount")));
 			int repaymentedMoney = Integer.parseInt(String.valueOf(repayment.get("repaymented_amount")));
+			loger.error("repaymentMoney===="+repaymentMoney+"repaymentedMoney==="+repaymentedMoney);
 			if (null != repayment &&(repaymentMoney != repaymentedMoney)) {
 				try {
 					HashMap<String, Object> borrowOrder = null;					//借款信息--app端
@@ -258,7 +259,6 @@ public class OperaOverdueDataThread implements Runnable {
 	 * @param phoneNmuber
 	 */
 	private void saveUserRael(List<ContactList> contactList, MmanUserRela mmanUserRela,String phoneNmuber) {
-		loger.info("userRealStart:"+payId);
 		if(null!=contactList && 0<contactList.size()) {
 			for (int j = 0; j < contactList.size(); j++) {
 				ContactList contact = contactList.get(j);

@@ -56,7 +56,7 @@ public class OperaRepayDataThread implements Runnable {
             List<HashMap<String, Object>> repaymentDetailList = this.dataDao.getAssetRepaymentDetail(map);
             int repaymentMoney = Integer.parseInt(String.valueOf(repayment.get("repayment_amount")));
             int repaymentedMoney = Integer.parseInt(String.valueOf(repayment.get("repaymented_amount")));
-
+            loger.error("repaymentMoney===="+repaymentMoney+"repaymentedMoney==="+repaymentedMoney);
             //只有应还金额=已还金额 且 还款详情列表不为空才执行逻辑
             if(null!=repayment && (repaymentMoney==repaymentedMoney)&& repaymentDetailList.size()>0) {
                 try {
