@@ -890,6 +890,7 @@
 		 o.current_overdue_level = #{orderCollectionUserOverDueLevel},
 		 o.outside_company_id = #{orderCompanyId}
 	WHERE
-		 o.loan_id = #{loanId};
+		 o.loan_id = #{loanId}
+	AND l.type = '5';
 	</update>
 </mapper>
