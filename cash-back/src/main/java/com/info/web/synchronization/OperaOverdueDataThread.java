@@ -53,9 +53,7 @@ public class OperaOverdueDataThread implements Runnable {
 			map.put("USER_ID", userId);
 			String repaymentMoney =String.valueOf(repayment.get("repayment_amount"));
 			String repaymentedMoney = String.valueOf(repayment.get("repaymented_amount"));
-			loger.error("repaymentMoney===="+repaymentMoney+"repaymentedMoney==="+repaymentedMoney);
 			if (null != repayment &&(!repaymentMoney.equals(repaymentedMoney))) {
-				loger.error("第二次repaymentMoney===="+repaymentMoney+"repaymentedMoney==="+repaymentedMoney);
 				try {
 					HashMap<String, Object> borrowOrder = null;					//借款信息--app端
 					List<HashMap<String, Object>> repaymentDetailList = null;	//还款详情信息--app端
@@ -114,7 +112,6 @@ public class OperaOverdueDataThread implements Runnable {
 					e0.printStackTrace();
 				}
 			}else{
-                loger.error("del-key===="+payId);
 				RedisUtil.delRedisKey(Constant.TYPE_OVERDUE_ + payId);
 			}
 		}
