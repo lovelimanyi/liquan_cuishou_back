@@ -629,12 +629,14 @@ public class MyCollectionOrderController extends BaseController {
         JSONObject obj = JSONObject.parseObject(text);
         String uuid = (String) obj.get("uuid");
         boolean code = (boolean) obj.get("result");
+        String msg = (String) obj.get("msg");
         HashMap<String, Object> map = new HashMap<>();
         map.put("id", uuid);
         if (code) {
             map.put("status", 1); // 代扣成功
         } else {
             map.put("status", 2); // 代扣失败
+            map.put("msg",msg); // 代扣失败原因
         }
         map.put("updateDate", new Date());
         int count = collectionWithholdingRecordService.updateWithholdStatus(map);// 更新代扣记录状态
