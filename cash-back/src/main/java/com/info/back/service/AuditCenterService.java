@@ -159,7 +159,7 @@ public class AuditCenterService implements IAuditCenterService {
                             if(StringUtils.isNotBlank(xjxWithholdingStr)) {
                                 JSONObject jos = new JSONObject().fromObject(xjxWithholdingStr);
                                 logger.info("返回还款结果信息jos转换"+jos);
-                                if("0".equals("0")){ //接口返回成功 -- 本地update审核表，订单表
+                                if("0".equals(jos.get("code"))){ //接口返回成功 -- 本地update审核表，订单表
                                     if(params.get("status").equals(Constant.AUDIT_PASS)){ //减免计入考核
                                         map.put("reductionMoney",auditCenter.getReductionMoney()); //减免金额
                                     }else {
