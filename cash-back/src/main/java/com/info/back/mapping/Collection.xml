@@ -147,4 +147,8 @@
 	<select id="getCollectionByUserName" parameterType="String" resultType="com.info.web.pojo.Collection">
 		SELECT id,user_name AS userName,status FROM back_user WHERE user_name = #{username}
 	</select>
+
+	<select id="getCollectionByUserAccount" parameterType="String" resultType="com.info.web.pojo.Collection">
+		SELECT id,user_account AS userAccount,status FROM back_user WHERE user_account = #{userAccount}
+	</select>
 </mapper>

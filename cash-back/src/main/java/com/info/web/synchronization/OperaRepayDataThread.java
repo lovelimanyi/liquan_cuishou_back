@@ -52,36 +52,40 @@ public class OperaRepayDataThread implements Runnable {
             //获取app端还款信息
             HashMap<String,Object> repayment = this.dataDao.getAssetRepayment(map);
             loger.error("repayment:"+repayment);
-            if(null!=repayment){
-                try{
+            //获取app端还款详情信息
+            List<HashMap<String, Object>> repaymentDetailList = this.dataDao.getAssetRepaymentDetail(map);
+            String repaymentMoney =String.valueOf(repayment.get("repayment_amount"));
+            String repaymentedMoney = String.valueOf(repayment.get("repaymented_amount"));
+            loger.error("repaymentMoney===="+repaymentMoney+"repaymentedMoney==="+repaymentedMoney);
+            //只有应还金额=已还金额 且 还款详情列表不为空才执行逻辑
+            if(null!=repayment && (repaymentMoney.equals(repaymentedMoney))&& repaymentDetailList.size()>0) {
+                loger.error("第二次repaymentMoney===="+repaymentMoney+"repaymentedMoney==="+repaymentedMoney);
+                try {
                     String loanId = String.valueOf(repayment.get("asset_order_id"));//借款id
                     map.put("ORDER_ID", loanId);//还款id
                     HashMap<String, Object> borrowOrder = null;
-                    List<HashMap<String, Object>> repaymentDetailList = null;
-                    if(!checkLoanStatus(loanId)){
+
+                    if (!checkLoanStatus(loanId, payId)) {
                         //获取app端借款信息
                         borrowOrder = this.dataDao.getAssetBorrowOrder(map);
-                        //获取app端还款详情信息
-                        repaymentDetailList = this.dataDao.getAssetRepaymentDetail(map);
-                        if(null!=borrowOrder && null!=repaymentDetailList){
+
+                        if (null != borrowOrder && null != repaymentDetailList) {
                             //更新借款表
-                            syncUtils.updateMmanUserLoan(localDataDao,loanId,repayment,Constant.STATUS_OVERDUE_FIVE);
+                            syncUtils.updateMmanUserLoan(localDataDao, loanId, repayment, Constant.STATUS_OVERDUE_FIVE);
                             //更新还款表
-                            syncUtils.updateCreditLoanPay(localDataDao,payId,repayment);
+                            syncUtils.updateCreditLoanPay(localDataDao, payId, repayment);
                             //保存还款详情表
-                            syncUtils.saveCreditLoanPayDetail(localDataDao,repayment,payId, repaymentDetailList);
+                            syncUtils.saveCreditLoanPayDetail(localDataDao, repayment, payId, repaymentDetailList);
                             //更新订单表-保存催收流转日志
-                            loger.error("start-updateOrderAndLog-loanId:"+loanId);
-                            loger.error("startDate-updateOrderAndLog"+DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
-                            updateOrderAndLog(loanId,repayment);
-                            loger.error("end-updateOrderAndLog-loanId:"+loanId);
+                            loger.error("start-updateOrderAndLog-loanId:" + loanId);
+                            loger.error("startDate-updateOrderAndLog" + DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
+                            updateOrderAndLog(loanId, repayment);
+                            loger.error("end-updateOrderAndLog-loanId:" + loanId);
 
                         }
-                        RedisUtil.delRedisKey(Constant.TYPE_REPAY_+payId);
-                    }else{
-                        RedisUtil.delRedisKey(Constant.TYPE_REPAY_+payId);
+                        RedisUtil.delRedisKey(Constant.TYPE_REPAY_ + payId);
                     }
-                }catch(Exception e0){
+                } catch (Exception e0) {
                     e0.printStackTrace();
                 }
             }
@@ -132,16 +136,21 @@ public class OperaRepayDataThread implements Runnable {
      *
      * @return true 已经还款完成  false未还款完成
      */
-    public boolean checkLoanStatus(String id){
+    public boolean checkLoanStatus(String id,String payId){
         if(StringUtils.isNotBlank(id)){
             HashMap<String,String> map = new HashMap<String,String>();
             map.put("ID", id);
             String userLoan = null;
             userLoan = this.localDataDao.checkLoanStatus(map);
-            if(userLoan == null || userLoan.equals("5")){
+            if (userLoan.equals("5")){
+                //如果还款完成，删除redis中的TYPE_REPAY
+                RedisUtil.delRedisKey(Constant.TYPE_REPAY_+payId);
+                return true;
+            }else if(userLoan == null){
+                //如果没有该订单，不做处理
                 return true;
             }else {
-                return false;
+                return  false;
             }
         }
         return true;

@@ -51,7 +51,11 @@ public class OperaOverdueDataThread implements Runnable {
 			String userId  = String.valueOf(repayment.get("user_id"));    	//用户id
 			map.put("ORDER_ID", loanId);
 			map.put("USER_ID", userId);
-			if (null != repayment) {
+			String repaymentMoney =String.valueOf(repayment.get("repayment_amount"));
+			String repaymentedMoney = String.valueOf(repayment.get("repaymented_amount"));
+			loger.error("repaymentMoney===="+repaymentMoney+"repaymentedMoney==="+repaymentedMoney);
+			if (null != repayment &&(!repaymentMoney.equals(repaymentedMoney))) {
+				loger.error("第二次repaymentMoney===="+repaymentMoney+"repaymentedMoney==="+repaymentedMoney);
 				try {
 					HashMap<String, Object> borrowOrder = null;					//借款信息--app端
 					List<HashMap<String, Object>> repaymentDetailList = null;	//还款详情信息--app端
@@ -110,6 +114,7 @@ public class OperaOverdueDataThread implements Runnable {
 					e0.printStackTrace();
 				}
 			}else{
+                loger.error("del-key===="+payId);
 				RedisUtil.delRedisKey(Constant.TYPE_OVERDUE_ + payId);
 			}
 		}
@@ -256,7 +261,6 @@ public class OperaOverdueDataThread implements Runnable {
 	 * @param phoneNmuber
 	 */
 	private void saveUserRael(List<ContactList> contactList, MmanUserRela mmanUserRela,String phoneNmuber) {
-		loger.info("userRealStart:"+payId);
 		if(null!=contactList && 0<contactList.size()) {
 			for (int j = 0; j < contactList.size(); j++) {
 				ContactList contact = contactList.get(j);

@@ -135,4 +135,9 @@ public class CollectionService implements ICollectionService{
 	public Collection getCollectionByUserName(String username) {
 		return collectionDao.getCollectionByUserName(username);
 	}
+
+	@Override
+	public Collection getCollectionByUserAccount(String userAccount) {
+		return collectionDao.getCollectionByUserAccount(userAccount);
+	}
 }

@@ -30,6 +30,7 @@ import com.info.web.pojo.Collection;
 import com.info.web.pojo.MmanLoanCollectionCompany;
 import com.info.web.util.PageConfig;
 import com.info.web.util.encrypt.MD5coding;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * 催收员管理Controller
@@ -172,14 +173,40 @@ public class CollectionController extends BaseController {
     }
 
     @RequestMapping("/checkCollections")
+    @ResponseBody
     public String getCollectionByUserName(HttpServletRequest request) {
-        Map<String, String> params = this.getParameters(request);
-        String result = null;
-        String userName = params.get("userName");
-        Collection user = collectionService.getCollectionByUserName(userName);
-        if (user != null) {
-            result = "true";
+        String s = null;
+        try {
+            Map<String, String> params = this.getParameters(request);
+            String userName = params.get("userName");
+            Collection user = collectionService.getCollectionByUserName(userName);
+            HashMap<String, Object> res = new HashMap<>();
+            if (user != null) {
+                res.put("code", "200");
+            }
+            s = JSON.toJSONString(res);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return result;
+        return s;
+    }
+
+    @RequestMapping("/checkUserAccount")
+    @ResponseBody
+    public String getCollectionByUserAccount(HttpServletRequest request) {
+        String s = null;
+        try {
+            Map<String, String> params = this.getParameters(request);
+            String userAccount = params.get("userAccount");
+            Collection user = collectionService.getCollectionByUserAccount(userAccount);
+            HashMap<String, Object> res = new HashMap<>();
+            if (user != null) {
+                res.put("code", "200");
+            }
+            s = JSON.toJSONString(res);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return s;
     }
 }

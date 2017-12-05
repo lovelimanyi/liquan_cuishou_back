@@ -26,7 +26,7 @@
                         用户名:
                     </label>
                 </dt>
-                <dd>
+                <dd id="userAccount">
                     <c:if test="${empty collection.id }">
                         <input name="userAccount" value="${collection.userAccount}" minlength="6" maxlength="16" class="required" type="text"
                                alt="请输入用户名" size="30"/>
@@ -218,26 +218,44 @@
 </div>
 </body>
 <script type="text/javascript">
-    /*
+
     $("#userName input").blur(function () {
-        debugger;
         var username = $("#userName input").val();
         if(username != ''){
             $.ajax({
                 url: "/back/collection/checkCollections",
                 data: {"userName":username},
                 dataType: 'json',
-                type: "GET", //POST提交
+                type: "POST",
+                scriptCharset: "utf-8",
                 success: function (data) {
-                    alert(data);
-                    if ('true' == data) {
-                        alert("");
-                        $("#userName input").val("系统中已存在催收员" + username + ",请核实！")
+                    debugger;
+                    if ('200' == data.code) {
+                        alertMsg.error("系统中已存在姓名为 " + username + " 的催收员，请核实！");
                     }
                 }
             });
         }
-    })
-    */
+    });
+
+    $("#userAccount input").blur(function () {
+        var userAccount = $("#userAccount input").val();
+        if(userAccount != ''){
+            $.ajax({
+                url: "/back/collection/checkUserAccount",
+                data: {"userAccount":userAccount},
+                dataType: 'json',
+                type: "POST",
+                scriptCharset: "utf-8",
+                success: function (data) {
+                    debugger;
+                    if ('200' == data.code) {
+                        alertMsg.error("系统中已存在账号为 " + userAccount + " 的催收员，请修改！");
+                    }
+                }
+            });
+        }
+    });
+
 </script>
 </html>
