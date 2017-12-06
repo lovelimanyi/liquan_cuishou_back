@@ -625,25 +625,30 @@ public class MyCollectionOrderController extends BaseController {
     @RequestMapping(value = "withhold-callback")
     @ResponseBody
     public void dealWithholdResult(String text) {
-        logger.info("接收到代扣回调请求参数 " + text);
-        JSONObject obj = JSONObject.parseObject(text);
-        String uuid = (String) obj.get("uuid");
-        boolean code = (boolean) obj.get("result");
-        String msg = (String) obj.get("msg");
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("id", uuid);
-        if (code) {
-            map.put("status", 1); // 代扣成功
-        } else {
-            map.put("status", 2); // 代扣失败
-            map.put("msg",msg); // 代扣失败原因
-        }
-        map.put("updateDate", new Date());
-        int count = collectionWithholdingRecordService.updateWithholdStatus(map);// 更新代扣记录状态
-        if (count > 0) {
-            obj.put("0", "更新成功！");
-        } else {
-            obj.put("1", "更新失败！");
+        try{
+            logger.info("接收到代扣回调请求参数 " + text);
+            JSONObject obj = JSONObject.parseObject(text);
+            String uuid = (String) obj.get("uuid");
+            boolean code = (boolean) obj.get("result");
+            String msg = (String) obj.get("msg");
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("id", uuid);
+            if (code) {
+                map.put("status", 1); // 代扣成功
+            } else {
+                map.put("status", 2); // 代扣失败
+                map.put("msg",msg); // 代扣失败原因
+            }
+            map.put("updateDate", new Date());
+            int count = collectionWithholdingRecordService.updateWithholdStatus(map);// 更新代扣记录状态
+            if (count > 0) {
+                obj.put("0", "更新成功！");
+            } else {
+                obj.put("1", "更新失败！");
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            logger.error("处理代扣回调异常");
         }
     }
 
