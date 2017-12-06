@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.info.back.service.ICollectionWithholdingRecordService;
 import com.info.web.pojo.CollectionWithholdingRecord;
+import org.springframework.stereotype.Component;
 
+@Component
 public class TaskWithholdStatus {
 	protected Logger logger = LoggerFactory.getLogger(TaskWithholdStatus.class);
 	@Autowired
