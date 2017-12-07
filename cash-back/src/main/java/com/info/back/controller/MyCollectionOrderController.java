@@ -630,7 +630,7 @@ public class MyCollectionOrderController extends BaseController {
             JSONObject obj = JSONObject.parseObject(text);
             String uuid = (String) obj.get("uuid");
             boolean code = (boolean) obj.get("result");
-            String msg = (String) obj.get("msg");
+            Object msg = obj.get("msg");
             HashMap<String, Object> map = new HashMap<>();
             map.put("id", uuid);
             if (code) {
