@@ -86,7 +86,7 @@ public class syncUtils {
 	public static void updateMmanUserLoan(ILocalDataDao localDataDao,String loanId,HashMap<String,Object> repaymentMap,String status){
 		MmanUserLoan mmanUserLoan = new MmanUserLoan();
 		mmanUserLoan.setId(loanId);//借款id
-		mmanUserLoan.setLoanPenalty(new BigDecimal(Integer.parseInt(String.valueOf(repaymentMap.get("plan_late_fee")))/100));//滞纳金
+		mmanUserLoan.setLoanPenalty(new BigDecimal(Integer.parseInt(String.valueOf(repaymentMap.get("plan_late_fee")))/100.00));//滞纳金
 		mmanUserLoan.setLoanStatus(status);//借款状态
 		mmanUserLoan.setUpdateTime(new Date());
 //		if(BackConstant.XJX_LOAN_STATUS_RETURN_SUCCESS.equals(status)){
