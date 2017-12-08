@@ -140,12 +140,12 @@ public class OperaRepayDataThread implements Runnable {
             map.put("ID", id);
             String userLoan = null;
             userLoan = this.localDataDao.checkLoanStatus(map);
-            if (userLoan.equals("5")){
-                //如果还款完成，删除redis中的TYPE_REPAY
+            if (userLoan == null){
+                // 如果没有该订单，不做处理
                 RedisUtil.delRedisKey(Constant.TYPE_REPAY_+payId);
                 return true;
-            }else if(userLoan == null){
-                //如果没有该订单，不做处理
+            }else if(userLoan.equals("5")){
+                // 如果还款完成，删除redis中的TYPE_REPAY
                 RedisUtil.delRedisKey(Constant.TYPE_REPAY_+payId);
                 return true;
             }else {
