@@ -118,7 +118,7 @@ public class TaskJobMiddleService {
         logger.error("overdueList size:" + overdueList.size());
 
         if (null != overdueList && overdueList.size() > 0) {
-            for (MmanUserLoan mmanUserLoanOri : overdueList) {
+            for (MmanUserLoan mmanUserLoanOri : overdueList)
                 try {
                     //更新借款
                     CreditLoanPay creditLoanPay = creditLoanPayService.findByLoanId(mmanUserLoanOri.getId());
@@ -449,7 +449,7 @@ public class TaskJobMiddleService {
                                 }
                             }
                         } else {
-                        // if (dayNow > 1 && dayNow < 12)
+                            // if (dayNow > 1 && dayNow < 12)
                             logger.error("mmanLoancollectionOrder redispatch enter 11 mmanUserLoanOri ,id:" + mmanUserLoanOri.getId());
 
                             MmanLoanCollectionOrder mmanLoanCollectionOrder = new MmanLoanCollectionOrder();
@@ -485,7 +485,10 @@ public class TaskJobMiddleService {
 
 
                                 Map<String, String> personMap = new HashMap<String, String>();
-                                personMap.put("beginDispatchTime", DateUtil.getDateFormat("yyyy-MM-dd 00:00:00"));
+                                Calendar cal = Calendar.getInstance();
+                                cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), 2);
+                                Date date = cal.getTime();
+                                personMap.put("beginDispatchTime", DateUtil.getDateFormat(date,"yyyy-MM-dd 00:00:00"));
                                 personMap.put("endDispatchTime", DateUtil.getDateFormat((DateUtil.getBeforeOrAfter(new Date(), 1)), "yyyy-MM-dd HH:mm:ss"));
                                 personMap.put("groupLevel", BackConstant.XJX_OVERDUE_LEVEL_S1_OR_S2);
                                 personMap.put("userStatus", BackConstant.ON);
@@ -648,7 +651,6 @@ public class TaskJobMiddleService {
                 } catch (Exception e) {
                     logger.error("分配当前催收任务出错，借款ID：" + mmanUserLoanOri.getId(), e);
                 }
-            }
 
             //2 将订单派到对应分组催收员
             mmanLoanCollectionRecordService.assignCollectionOrderToRelatedGroup(mmanLoanCollectionOrderNo111List, mmanLoanCollectionPersonNo111List, now);
