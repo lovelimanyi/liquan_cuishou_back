@@ -161,6 +161,11 @@ public class Constant {
 	public static final String RS_DETAIL = "rs_detail"; //榕树
 	public static final String LF_DETAIL = "lf_detail";//来福贷款王渠道
 
+	/**
+	 * 大额，小额常量
+	 */
+	public static final String BIG = "1";//大额
+	public static final String SMALL = "2";//小额
 
 
 }

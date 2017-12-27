@@ -17,6 +17,8 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import javax.sound.midi.Soundbank;
+import java.math.BigDecimal;
 import java.net.URL;
 
 /**
@@ -31,43 +33,55 @@ public class TestOss {
     @Test
     public void test() {
 
-        System.out.println(DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
-//        String phone = "18601603060"; //360贷款导航
-          String phone = "18612567487"; //subtype=rs_detail 百融网，榕树
-//        String phone = "13351025564"; //聚信立
-//        String phone = "13351025562";//借点钱
-//        String phone = "13018622852";//融360
-//        String phone = "13022100592";//借了吗
-//        String phone = "13025597181";//分期管家
+        BigDecimal aaa = new BigDecimal(2);
+        BigDecimal bb = aaa.divide(new BigDecimal(10000));
+        System.out.println(bb);
 
-        String url = "http://apigateway.cee10a53e8937498ab6c068afee5df20a.cn-hangzhou.alicontainer.com/api/storage/v1/report/"+phone+"?subtype=rs_detail";
-        try {
-            JxlResponse jxlResponse = HttpUtils.get(url,null);
-            if (jxlResponse != null){
-                String jxlType = jxlResponse.getJxlType();
-                String result = jxlResponse.getJxlData();
-                JSONObject jsonDetail = JSONObject.parseObject(result);
-                if (jxlType.equals(Constant.JLM_DEATIL) || jxlType.equals(Constant.FQGJ_DETAIL)){
-                    JlmReport jlmReport = JSONObject.toJavaObject(jsonDetail,JlmReport.class);
-                    System.out.println(jlmReport);
-                }else if (jxlType.equals(Constant.R360_DETAIL)){
-                    Rong360Report rong360Report = JSONObject.toJavaObject(jsonDetail,Rong360Report.class);
-                    System.out.println(rong360Report);
-                }else if(jxlType.equals(Constant.JXL_DETAIL)){
-                    handleCashmanJxl(result);
-                }else if(jxlType.equals(Constant.JDQ_DETAIL)){
-                    JdqReport jdqReport = JSONObject.toJavaObject(jsonDetail,JdqReport.class);
-                    System.out.println(jdqReport);
-                }else if (jxlType.equals(Constant.DK360_DETAIL)){
-                    Dk360Report dk360Report = JSONObject.toJavaObject(jsonDetail,Dk360Report.class);
-                    System.out.println(dk360Report);
-                }
-                System.out.println(jxlType);
-                System.out.println(jsonDetail);
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+
+
+        BigDecimal receivableMoney = new BigDecimal(Integer.parseInt("3")).multiply(new BigDecimal(3000)).divide(new BigDecimal(10000)).add(new BigDecimal(100).add(new BigDecimal(3000)));
+
+//        BigDecimal receivableMoney = new BigDecimal(Integer.parseInt("3")).multiply(new BigDecimal(3000)).add(new BigDecimal(100).add(new BigDecimal(3000)));
+
+        System.out.println(receivableMoney);
+
+//        System.out.println(DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
+////        String phone = "18601603060"; //360贷款导航
+//          String phone = "18612567487"; //subtype=rs_detail 百融网，榕树
+////        String phone = "13351025564"; //聚信立
+////        String phone = "13351025562";//借点钱
+////        String phone = "13018622852";//融360
+////        String phone = "13022100592";//借了吗
+////        String phone = "13025597181";//分期管家
+//
+//        String url = "http://apigateway.cee10a53e8937498ab6c068afee5df20a.cn-hangzhou.alicontainer.com/api/storage/v1/report/"+phone+"?subtype=rs_detail";
+//        try {
+//            JxlResponse jxlResponse = HttpUtils.get(url,null);
+//            if (jxlResponse != null){
+//                String jxlType = jxlResponse.getJxlType();
+//                String result = jxlResponse.getJxlData();
+//                JSONObject jsonDetail = JSONObject.parseObject(result);
+//                if (jxlType.equals(Constant.JLM_DEATIL) || jxlType.equals(Constant.FQGJ_DETAIL)){
+//                    JlmReport jlmReport = JSONObject.toJavaObject(jsonDetail,JlmReport.class);
+//                    System.out.println(jlmReport);
+//                }else if (jxlType.equals(Constant.R360_DETAIL)){
+//                    Rong360Report rong360Report = JSONObject.toJavaObject(jsonDetail,Rong360Report.class);
+//                    System.out.println(rong360Report);
+//                }else if(jxlType.equals(Constant.JXL_DETAIL)){
+//                    handleCashmanJxl(result);
+//                }else if(jxlType.equals(Constant.JDQ_DETAIL)){
+//                    JdqReport jdqReport = JSONObject.toJavaObject(jsonDetail,JdqReport.class);
+//                    System.out.println(jdqReport);
+//                }else if (jxlType.equals(Constant.DK360_DETAIL)){
+//                    Dk360Report dk360Report = JSONObject.toJavaObject(jsonDetail,Dk360Report.class);
+//                    System.out.println(dk360Report);
+//                }
+//                System.out.println(jxlType);
+//                System.out.println(jsonDetail);
+//            }
+//        }catch (Exception e){
+//            e.printStackTrace();
+//        }
     }
 
     /**

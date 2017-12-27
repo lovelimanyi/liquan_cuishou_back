@@ -38,6 +38,8 @@
 				loan_penalty_time,
 				loan_sys_status,
 				loan_sys_remark,
+				term_number,
+				borrowing_type,
 				customer_type
 			)values(
 				#{id},
@@ -58,6 +60,8 @@
 				#{loanPenaltyTime},
 				#{loanSysStatus},
 				#{loanSysRemark},
+				#{termNumber},
+				#{borrowingType},
 				#{customerType}
 			)
 		]]>
@@ -141,6 +145,8 @@
 				update_Date,
 				rest_principle,
 				installmentMethod,
+				realget_service_charge,
+				remain_service_charge,
 				create_By,
 				update_By
 			)values(
@@ -165,6 +171,8 @@
 
 				#{restPrinciple},
 				#{installmentMethod},
+				#{realgetServiceCharge},
+				#{remainServiceCharge},
 				#{createBy},
 				#{updateBy}
 			)

@@ -44,7 +44,7 @@ public class DealOverdueLoanService {
         	{
 				MmanLoanCollectionOrder order = manLoanCollectionOrderService.getOrderByLoanId(loan.getId());
 				if(order != null){
-					DealOverdueLoanThread dealOverdueOrderThread = new DealOverdueLoanThread(loan.getId(),taskJobMiddleService,order.getIdNumber());
+					DealOverdueLoanThread dealOverdueOrderThread = new DealOverdueLoanThread(loan.getId(),taskJobMiddleService,order.getIdNumber(),loan.getBorrowingType());
 					pool.execute(dealOverdueOrderThread);
 				}
         	}

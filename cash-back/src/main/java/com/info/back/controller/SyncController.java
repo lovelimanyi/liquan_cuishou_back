@@ -1,10 +1,22 @@
 package com.info.back.controller;
 
-import com.alibaba.fastjson.JSONObject;
+import com.info.back.service.ISyncService;
+import com.info.vo.bigAmount.BigAmountRequestParams;
+import com.info.vo.bigAmount.Loan;
+import com.info.vo.bigAmount.Repayment;
+import com.info.vo.bigAmount.RepaymentDetail;
+import com.info.web.pojo.dto.CollectionNotifyDto;
+import com.info.web.util.DateUtil;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 
 
 /**
@@ -19,36 +31,68 @@ public class SyncController {
 
     private static Logger logger = Logger.getLogger(SyncController.class);
 
+    @Autowired
+    private ISyncService syncService;
+
+//    @RequestMapping(value = "/repay")
+//    @ResponseBody
+//    public void repay(@RequestBody Repayment repayment){
+//
+//        System.out.println(repayment.getId());
+//        System.out.println(repayment.getLoanId());
+//
+//    }
+
+
+
     /**
      * 处理逾期订单数据
-     * @param text
+     * @param
      */
-    @RequestMapping("/loan-order-info")
+    @RequestMapping(value = "/loan-order-info",method = RequestMethod.POST,consumes = "application/json")
     @ResponseBody
-    public void dealwithOverdueOrder(String  text) {
-        logger.info("接收到逾期订单数据：" + text);
+    public void dealwithOverdueOrder(HttpServletRequest request,@RequestBody CollectionNotifyDto collectionNotifyDto) {
+        logger.info("接收到逾期订单数据：");
         try {
-            JSONObject json = JSONObject.parseObject(text);
-            if (json != null) {
-                Object loan = json.get("loan");
-                Object repayment = json.get("repayment");
-                Object repaymentDetail = json.get("repaymentDetail");
-                if (loan != null) {
-                    // todo
-                } else {
-                    logger.info("解析json,loan is null...");
-                }
 
-                if (repayment != null) {
-                    // todo
+            if (collectionNotifyDto != null) {
+                BigAmountRequestParams bigAmount  = handleCollectionNotifyDto(collectionNotifyDto);
+//                BigAmountRequestParams bigAmount =JSONObject.toJavaObject(json,BigAmountRequestParams.class);
+
+
+//                BigAmountRequestParams bigAmount = new BigAmountRequestParams();
+//                Repayment repayment1 = new Repayment();
+//                repayment1.setId("00000000");
+//                repayment1.setLoanId("11111111");
+//                repayment1.setReceivableDate("2017-11-15");
+//                repayment1.setReceiveMoney("102000");
+//                repayment1.setLoanPenalty("2000");
+//                repayment1.setRealMoney("0");
+//                repayment1.setCreateDate("2017-11-16");
+//                bigAmount.setRepayment(repayment1);
+//
+//
+//                Loan loan1 = new Loan();
+//                loan1.setId("11111111");
+//                loan1.setLoanMoney("100000");
+//                loan1.setLoanRate("1500");
+//                loan1.setServiceCharge("150");
+//                loan1.setPaidMoney("100150");
+//                loan1.setLoanPenalty("2000");
+//                loan1.setLoanPenaltyRate("200");
+//                loan1.setLoanEndTime("2017-11-15");
+//                loan1.setUserId("5680253");
+//                loan1.setTermNumber("1");
+//                bigAmount.setLoan(loan1);
+
+
+                Loan loan = bigAmount.getLoan();
+                Repayment repayment = bigAmount.getRepayment();
+                if (loan != null && repayment!= null) {
+                    //逾期同步
+                    syncService.handleOverdue(repayment,loan);
                 } else {
                     logger.info("解析json,repayment is null...");
-                }
-
-                if (repaymentDetail != null) {
-                    // todo
-                } else {
-                    logger.info("解析json,repaymentDetail is null...");
                 }
             }
         } catch (Exception e) {
@@ -57,24 +101,100 @@ public class SyncController {
         }
     }
 
+
+
     /**
      * 处理还款数据
-     * @param text
+     * @param
      */
-    @RequestMapping("/repayment")
+    @RequestMapping(value = "/repayment" ,method = RequestMethod.POST)
     @ResponseBody
-    public void dealwithRepayment(String text){
-        logger.info("接收到还款数据：" + text);
+    public void dealwithRepayment(@RequestBody CollectionNotifyDto collectionNotifyDto){
+        logger.info("接收到还款数据：");
         try{
-            JSONObject json = JSONObject.parseObject(text);
-            if(json != null){
-                // todo
-            }else {
 
+            if (collectionNotifyDto != null) {
+                BigAmountRequestParams bigAmount  = handleCollectionNotifyDto(collectionNotifyDto);
+//                BigAmountRequestParams bigAmount = new BigAmountRequestParams();
+//                Repayment repayment1 = new Repayment();
+//                repayment1.setId("00000000");
+//                repayment1.setLoanId("11111111");
+//                repayment1.setReceivableDate("2017-11-15");
+//                repayment1.setReceiveMoney("102000");
+//                repayment1.setLoanPenalty("2000");
+//                repayment1.setRealMoney("102000");
+//                repayment1.setCreateDate("2017-11-16");
+//                bigAmount.setRepayment(repayment1);
+//
+//
+//                Loan loan1 = new Loan();
+//                loan1.setId("11111111");
+//                loan1.setLoanMoney("100000");
+//                loan1.setLoanRate("1500");
+//                loan1.setServiceCharge("150");
+//                loan1.setPaidMoney("100150");
+//                loan1.setLoanPenalty("2000");
+//                loan1.setLoanPenaltyRate("200");
+//                loan1.setLoanEndTime("2017-11-15");
+//                loan1.setUserId("5680253");
+//                loan1.setTermNumber("1");
+//                bigAmount.setLoan(loan1);
+
+
+
+                Loan loan = bigAmount.getLoan();
+                Repayment repayment = bigAmount.getRepayment();
+                RepaymentDetail repaymentDetail = bigAmount.getRepaymentDetail();
+                if (loan != null && repayment!= null && repaymentDetail != null) {
+                    //还款完成同步
+                    syncService.handleRepay(repayment,loan,repaymentDetail);
+                } else {
+                    logger.info("解析json,repayment is null...");
+                }
             }
         }catch (Exception e){
             logger.error("json字符串解析错误！");
             e.printStackTrace();
         }
     }
+    private BigAmountRequestParams handleCollectionNotifyDto(CollectionNotifyDto collectionNotifyDto) {
+        BigAmountRequestParams bigAmountRequestParams = new BigAmountRequestParams();
+        if (collectionNotifyDto.getRepayment()!= null && collectionNotifyDto.getLoan() != null){
+            Loan loan = new Loan();
+            loan.setId(String.valueOf(collectionNotifyDto.getLoan().getId()));
+            loan.setLoanMoney(String.valueOf(collectionNotifyDto.getLoan().getLoanMoney()));
+            loan.setLoanRate(String.valueOf(collectionNotifyDto.getLoan().getLoanRate()));
+            loan.setServiceCharge(String.valueOf(collectionNotifyDto.getLoan().getServiceCharge()));
+            loan.setPaidMoney(String.valueOf(collectionNotifyDto.getLoan().getPaidMoney()));
+            loan.setLoanPenalty(String.valueOf(collectionNotifyDto.getLoan().getLoanPenalty()));
+            loan.setLoanPenaltyRate(String.valueOf(collectionNotifyDto.getLoan().getLoanPenaltyRate()));
+            loan.setLoanEndTime(DateUtil.getDateFormat(new Date(collectionNotifyDto.getLoan().getLoanEndTime()),"yyyy-MM-dd"));
+            loan.setUserId(String.valueOf(collectionNotifyDto.getLoan().getUserId()));
+            loan.setTermNumber(String.valueOf(collectionNotifyDto.getLoan().getTermNumber()));
+            bigAmountRequestParams.setLoan(loan);
+
+            Repayment repayment = new Repayment();
+            repayment.setId(String.valueOf(collectionNotifyDto.getRepayment().getId()));
+            repayment.setLoanId(String.valueOf(collectionNotifyDto.getRepayment().getLoanId()));
+            repayment.setReceivableDate(DateUtil.getDateFormat(new Date(collectionNotifyDto.getRepayment().getReceivableDate()),"yyyy-MM-dd"));
+            repayment.setReceiveMoney(String.valueOf(collectionNotifyDto.getRepayment().getReceiveMoney()));
+            repayment.setLoanPenalty(String.valueOf(collectionNotifyDto.getRepayment().getLoanPenalty()));
+            repayment.setRealMoney(String.valueOf(collectionNotifyDto.getRepayment().getRealMoney()));
+            repayment.setCreateDate(DateUtil.getDateFormat(new Date(collectionNotifyDto.getRepayment().getCreateDate()),"yyyy-MM-dd"));
+            bigAmountRequestParams.setRepayment(repayment);
+        }
+        if (collectionNotifyDto.getRepayment()!= null && collectionNotifyDto.getLoan() != null && collectionNotifyDto.getRepaymentDetail()!= null){
+            RepaymentDetail repaymentDetail = new RepaymentDetail();
+            repaymentDetail.setId(String.valueOf(collectionNotifyDto.getRepaymentDetail().getId()));
+            repaymentDetail.setCreateDate(DateUtil.getDateFormat(new Date(collectionNotifyDto.getRepaymentDetail().getCreateDate()),"yyyy-MM-dd"));
+            repaymentDetail.setPayId(String.valueOf(collectionNotifyDto.getRepaymentDetail().getPayId()));
+            repaymentDetail.setReturnType(String.valueOf(collectionNotifyDto.getRepaymentDetail().getReturnType()));
+            repaymentDetail.setRemark(String.valueOf(collectionNotifyDto.getRepaymentDetail().getRemark()));
+            bigAmountRequestParams.setRepaymentDetail(repaymentDetail);
+        }
+
+        return bigAmountRequestParams;
+
+    }
+
 }

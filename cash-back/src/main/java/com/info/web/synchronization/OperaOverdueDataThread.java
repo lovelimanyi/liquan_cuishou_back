@@ -83,9 +83,9 @@ public class OperaOverdueDataThread implements Runnable {
 							syncUtils.saveCreditLoanPayDetail(localDataDao,repayment,payId, repaymentDetailList);
 							loger.info("保存还款详情表");
 							//保存用户信息表--联系人表--银行卡
-							saveUserInfo(userId,userInfo,userContactsList,cardInfo);
+							syncUtils.saveUserInfo(localDataDao,payId,userId,userInfo,userContactsList,cardInfo);
 						}
-						this.taskJobMiddleService.dispatchforLoanId(loanId,userInfo.get("id_number").toString());
+						this.taskJobMiddleService.dispatchforLoanId(loanId,userInfo.get("id_number").toString(),Constant.SMALL);
 						RedisUtil.delRedisKey(Constant.TYPE_OVERDUE_ + payId);
 					} else {
 						loger.info("loanId:"+loanId);
@@ -174,145 +174,7 @@ public class OperaOverdueDataThread implements Runnable {
 		}
 
 	}
-	/**
-	 * 保存用户信息
-	 * @param userId  用户id
-	 * @param userInfo 用户信息
-	 * @param userContactsList 用户联系人
-	 * @param cardInfo 银行卡信息
-	 * */
-	private void saveUserInfo(String userId,HashMap<String, Object> userInfo,List<HashMap<String, Object>> userContactsList,HashMap<String, Object> cardInfo){
-		if(checkUserInfo(userId)) {//如果借款人信息不存在
-			//保存用户信息
-			userInfo.put("user_from", 0);
-			this.localDataDao.saveMmanUserInfo(userInfo);
-			//保存用户联系人
-			saveMmanUserRela(userInfo, userContactsList);
-			//保存银行卡
-			saveUpdateSysUserBankCard(cardInfo,IdGen.uuid());
-		}else{//借款人信息存在
-			if(checkUserRela(userId)){//通讯录不存在
-				//保存用户联系人
-				saveMmanUserRela(userInfo, userContactsList);
-			}
-			//更新银行卡
-			saveUpdateSysUserBankCard(cardInfo,null);
-		}
-	}
-	//保存用户联系人
-	private void saveMmanUserRela(HashMap<String,Object> userInfo,List<HashMap<String,Object>> userContactsList){
-		List<ContactList> contactList = null;
-		try{
-			contactList = JxlJsonUtil.operaJxlDetail(String.valueOf(userInfo.get("jxl_detail")));
-		}catch(Exception e){
-			loger.error("解析聚信立异常-payId"+payId);
-		}
-		MmanUserRela mmanUserRela = null;
-		//保存第一联系人
-		saveMmanUserRelas("firstContact",mmanUserRela,userInfo,userContactsList,contactList);
-		//保存第二联系人
-		saveMmanUserRelas("secondContact",mmanUserRela,userInfo,userContactsList,contactList);
-		//保存其他联系人
-		saveMmanUserRelas("otherContact",mmanUserRela,userInfo,userContactsList,contactList);
-	}
 
-	private void saveMmanUserRelas(String flag,MmanUserRela mmanUserRela, HashMap<String, Object> userInfo, List<HashMap<String, Object>> userContactsList, List<ContactList> contactList) {
-		mmanUserRela = new MmanUserRela();
-		String phoneNmuber = null;
-		mmanUserRela.setUserId(String.valueOf(userInfo.get("id")));
-		mmanUserRela.setDelFlag("0");
-		if (flag.equals("firstContact")){//第一联系人
-			mmanUserRela.setId(IdGen.uuid());
-			phoneNmuber = String.valueOf(userInfo.get("first_contact_phone"));
-			mmanUserRela.setContactsKey("1");
-			mmanUserRela.setInfoName(String.valueOf(userInfo.get("first_contact_name")));
-			mmanUserRela.setInfoValue(phoneNmuber);
-			mmanUserRela.setRelaKey(String.valueOf(userInfo.get("frist_contact_relation")));
-			//保存第一联系人
-			saveUserRael(contactList,mmanUserRela,phoneNmuber);
-		}else if (flag.equals("secondContact")){//第二联系人
-			mmanUserRela.setId(IdGen.uuid());
-			phoneNmuber = String.valueOf(userInfo.get("second_contact_phone"));
-			mmanUserRela.setContactsKey("2");
-			mmanUserRela.setInfoName(String.valueOf(userInfo.get("second_contact_name")));
-			mmanUserRela.setInfoValue(phoneNmuber);
-			mmanUserRela.setRelaKey(String.valueOf(userInfo.get("second_contact_relation")));
-			//保存第二联系人
-			saveUserRael(contactList,mmanUserRela,phoneNmuber);
-		}else {//其他联系人
-			for(int i=0;i<userContactsList.size();i++){
-				mmanUserRela.setId(IdGen.uuid());
-				HashMap<String,Object> userRela = userContactsList.get(i);
-				phoneNmuber = String.valueOf(userRela.get("contact_phone"));
-				mmanUserRela.setInfoName(String.valueOf(userRela.get("contact_name")));
-				mmanUserRela.setInfoValue(phoneNmuber);
-				//保存其他联系人
-				saveUserRael(contactList,mmanUserRela,phoneNmuber);
-			}
-		}
-	}
-	/**
-	 * 设置联系人属性 --保存联系人
-	 * @param contactList
-	 * @param mmanUserRela
-	 * @param phoneNmuber
-	 */
-	private void saveUserRael(List<ContactList> contactList, MmanUserRela mmanUserRela,String phoneNmuber) {
-		if(null!=contactList && 0<contactList.size()) {
-			for (int j = 0; j < contactList.size(); j++) {
-				ContactList contact = contactList.get(j);
-				if (phoneNmuber.equals(contact.getPhone_num().trim())) {
-					mmanUserRela.setPhoneNumLoc(contact.getPhone_num_loc());//归属地
-					int callcnt = 0;
-					try {
-						callcnt = Integer.parseInt(String.valueOf(contact.getCall_cnt()));
-					} catch (Exception e) {
-					}
-					mmanUserRela.setCallCnt(callcnt);//联系次数
-					int CallOutCnt = 0;
-					try {
-						CallOutCnt = Integer.parseInt(String.valueOf(contact.getCall_out_cnt()));
-					} catch (Exception e) {
-					}
-					mmanUserRela.setCallOutCnt(CallOutCnt);//主叫次数
-
-					int CallInCnt = 0;
-					try {
-						CallInCnt = Integer.parseInt(String.valueOf(contact.getCall_in_cnt()));
-					} catch (Exception e) {
-					}
-					mmanUserRela.setCallInCnt(CallInCnt);//被叫次数
-
-					mmanUserRela.setCallLen(JxlJsonUtil.getCallLen(contact.getCall_len()));//联系时间-分
-					mmanUserRela.setCallOutLen(JxlJsonUtil.getCallLen(contact.getCall_out_len()));//主叫时间-分
-					mmanUserRela.setCallInLen(JxlJsonUtil.getCallLen(contact.getCall_in_len()));//被叫时间-分
-					break;
-				}
-			}
-		}
-		try {
-			this.localDataDao.saveMmanUserRela(mmanUserRela);
-		}catch (Exception e){
-			loger.error("联系人信息错误：payId"+payId+"错误值："+phoneNmuber,e);
-		}
-	}
-	// 保存-更新用户银行卡
-	private void saveUpdateSysUserBankCard(HashMap<String,Object> cardInfo,String uuid){
-		SysUserBankCard bankCard = new SysUserBankCard();
-		bankCard.setUserId(String.valueOf(cardInfo.get("user_id")));
-		bankCard.setBankCard(String.valueOf(cardInfo.get("card_no")));
-		bankCard.setDepositBank(String.valueOf(cardInfo.get("bank_name")));
-		bankCard.setBankInstitutionNo(String.valueOf(cardInfo.get("bank_id")));
-		bankCard.setName(String.valueOf(cardInfo.get("open_name")));
-		bankCard.setMobile(String.valueOf(cardInfo.get("phone")));
-		bankCard.setCityName(String.valueOf(cardInfo.get("bank_address")));
-		if (uuid != null && !uuid.equals("")){
-			bankCard.setId(IdGen.uuid());
-			this.localDataDao.saveSysUserBankCard(bankCard);
-		}else{
-			this.localDataDao.updateSysUserBankCard(bankCard);
-		}
-	}
 	/**
 	 * 验证订单是否重复入库
 	 * @param loanId 根据借款id判断同一个订单是否重复入库

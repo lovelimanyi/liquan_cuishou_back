@@ -77,7 +77,7 @@ public class OperaRepayDataThread implements Runnable {
                             //更新订单表-保存催收流转日志
                             loger.error("start-updateOrderAndLog-loanId:" + loanId);
                             loger.error("startDate-updateOrderAndLog" + DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
-                            updateOrderAndLog(loanId, repayment);
+                            syncUtils.updateOrderAndLog(loanId,repayment,localDataDao,payId);
                             loger.error("end-updateOrderAndLog-loanId:" + loanId);
 
                         }
@@ -88,45 +88,6 @@ public class OperaRepayDataThread implements Runnable {
                 }
             }
         }
-    }
-
-    private void updateOrderAndLog(String loanId,HashMap<String, Object> repaymentMap){
-        MmanLoanCollectionOrder order = null;
-        //更新订单
-        order = syncUtils.updateMmanLoanCollectionOrder(localDataDao,loanId,repaymentMap,Constant.STATUS_OVERDUE_FOUR);
-
-        BackUser backUser = null;
-        if(null!=order){
-            String backUserId = order.getCurrentCollectionUserId();
-            HashMap<String,Object> umap = new HashMap<String,Object>();
-            umap.put("ID", backUserId);
-            backUser = this.localDataDao.selectBackUser(umap);
-        }
-        if(null!=backUser){
-            loger.error("start-saveLoanChangeLog-loanId"+loanId);
-            loger.error("startDate-saveLoanChangeLog-loanId"+DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
-            MmanLoanCollectionStatusChangeLog loanChangeLog = new MmanLoanCollectionStatusChangeLog();
-            loanChangeLog.setId(IdGen.uuid());
-            loanChangeLog.setLoanCollectionOrderId(order.getOrderId());
-            loanChangeLog.setBeforeStatus(order.getStatus());
-            loanChangeLog.setAfterStatus(Constant.STATUS_OVERDUE_FOUR);
-            loanChangeLog.setType(Constant.STATUS_OVERDUE_FIVE);//催收完成
-            loanChangeLog.setOperatorName(Constant.OPERATOR_NAME);
-            loanChangeLog.setRemark(Constant.PAY_MENT_SUCCESS+backUser.getUserName());
-            loanChangeLog.setCompanyId(backUser.getCompanyId());
-            loanChangeLog.setCurrentCollectionUserId(backUser.getUuid());
-            loanChangeLog.setCurrentCollectionUserLevel(backUser.getGroupLevel());
-            if(StringUtils.isNotBlank(order.getS1Flag())){
-                loanChangeLog.setCurrentCollectionOrderLevel(BackConstant.XJX_OVERDUE_LEVEL_S1);
-            }else{
-                loanChangeLog.setCurrentCollectionOrderLevel(order.getCurrentOverdueLevel());
-            }
-            loanChangeLog.setCreateDate(new Date());
-            this.localDataDao.saveLoanChangeLog(loanChangeLog);
-            loger.error("end-saveLoanChangeLog-loanId"+loanId);
-            loger.error("endDate-saveLoanChangeLog-loanId"+DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
-        }
-
     }
 
     /**

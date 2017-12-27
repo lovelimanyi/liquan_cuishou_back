@@ -1160,16 +1160,22 @@ public class MyCollectionOrderController extends BaseController {
     public void doReduction(HttpServletRequest request, HttpServletResponse response, Model model) {
         JsonResult result = new JsonResult("-1", "申请减免失败");
         HashMap<String, Object> params = this.getParametersO(request);
-        try {
-            int checkingNumber = auditCenterService.getAuditChecking(params);//获取状态为审核中的减免申请个数
-            if (checkingNumber == 0) {//审核状态为非审核中，就添加减免申请
-                result = auditCenterService.saveAuditReduction(params, request);
-            } else {//审核状态为审核中
-                result.setMsg("减免正在审核，不能重复申请！");
+
+        MmanLoanCollectionOrder order= mmanLoanCollectionOrderService.getOrderById(params.get("id").toString());
+        if ("6".equals(order.getStatus())){
+            result.setMsg("该订单已经发起减免了，不能重复申请！");
+        }else{
+            try {
+                int checkingNumber = auditCenterService.getAuditChecking(params);//获取状态为审核中的减免申请个数
+                if (checkingNumber == 0) {//审核状态为非审核中，就添加减免申请
+                    result = auditCenterService.saveAuditReduction(params, request);
+                } else {//审核状态为审核中
+                    result.setMsg("减免正在审核，不能重复申请！");
+                }
+            } catch (Exception e) {
+                result.setMsg("申请减免异常");
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            result.setMsg("申请减免异常");
-            e.printStackTrace();
         }
         SpringUtils.renderDwzResult(response, "0".equals(result.getCode()),
                 result.getMsg(), DwzResult.CALLBACK_CLOSECURRENT,
