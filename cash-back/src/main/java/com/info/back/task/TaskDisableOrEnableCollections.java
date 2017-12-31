@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.info.back.service.IBackUserService;
+import org.springframework.stereotype.Component;
 
 /**
  * @Author Administrator
@@ -14,6 +15,7 @@ import com.info.back.service.IBackUserService;
  * @Return 
  * @CreateTime 2017/11/2 0002 上午 11:29
  */
+@Component
 public class TaskDisableOrEnableCollections {
 	protected Logger logger = Logger.getLogger(TaskDisableOrEnableCollections.class);
 	

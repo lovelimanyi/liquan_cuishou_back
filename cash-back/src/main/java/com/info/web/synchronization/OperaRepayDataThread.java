@@ -146,6 +146,7 @@ public class OperaRepayDataThread implements Runnable {
                 return true;
             }else if(userLoan == null){
                 //如果没有该订单，不做处理
+                RedisUtil.delRedisKey(Constant.TYPE_REPAY_+payId);
                 return true;
             }else {
                 return  false;

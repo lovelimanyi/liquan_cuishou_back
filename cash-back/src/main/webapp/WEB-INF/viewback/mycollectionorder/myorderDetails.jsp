@@ -250,6 +250,7 @@
 					<th align="center">已还金额</th>
 					<th align="center">扣款金额</th>
 					<th align="center">扣款状态</th>
+					<th align="center">失败原因</th>
 					<th align="center">更新时间</th>
 				</tr>
 				<c:forEach var="withhold" items="${withholdList}" varStatus="status">
@@ -288,6 +289,9 @@
 								<c:when test="${withhold.status eq 1}">成功</c:when>
 								<c:when test="${withhold.status eq 2}">失败</c:when>
 							</c:choose>
+						</td>
+						<td>
+								${withhold.remark }
 						</td>
 						<td>
 							<fmt:formatDate value="${withhold.updateDate }" pattern="yyyy-MM-dd HH:mm:ss"/>

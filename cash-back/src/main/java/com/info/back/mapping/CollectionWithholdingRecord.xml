@@ -79,7 +79,7 @@
 			<!--)-->
 			<!--AND DATE_FORMAT(now(), '%Y-%m-%d') <= DATE_FORMAT(ipr.repay_time, '%Y-%m-%d')-->
 		<!--]]>-->
-		UPDATE collection_withholding_record SET `status` = #{status},`update_date` = #{updateDate} WHERE id = #{id}
+		UPDATE collection_withholding_record SET `status` = #{status},`update_date` = #{updateDate},`remark` = #{msg} WHERE id = #{id}
 	</update>
 
 	<update id="updateOverdueStatus" >

@@ -66,11 +66,6 @@
 	<context:component-scan base-package="com.info.back.controller">
 	</context:component-scan>
 
-	<bean id="taskJobStatistics" class="com.info.back.task.TaskJobStatistics"></bean>
-	<bean id="taskWithholdStatus" class="com.info.back.task.TaskWithholdStatus"></bean>
-	<bean id="taskJianmianStatus" class="com.info.back.task.TaskJianmianStatus"></bean>
-	<bean id="taskDisableOrEnableCollections" class="com.info.back.task.TaskDisableOrEnableCollections"></bean>
-
 	<task:scheduled-tasks scheduler="myScheduler">
 		<!--<task:scheduled ref="taskJobMiddleService" method="autoDispatch" cron="0 11 1,12,20 * * ?" />每天凌晨3、5、9、20点11分 跑分单，逾期计算-->
 		<task:scheduled ref="taskJobStatistics" method="callProcedure" cron="0 2 0,11,14,17,20,22 * * ?" />
@@ -91,4 +86,5 @@
 	</task:scheduled-tasks>
 	<!--最多 5个定时任务线程-->
 	<task:scheduler id="myScheduler" pool-size="6"/>
+
 </beans>

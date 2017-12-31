@@ -448,8 +448,8 @@ public class TaskJobMiddleService {
                                     }
                                 }
                             }
-                        } else if (dayNow > 1 && dayNow < 12) {
-
+                        } else {
+                        // if (dayNow > 1 && dayNow < 12)
                             logger.error("mmanLoancollectionOrder redispatch enter 11 mmanUserLoanOri ,id:" + mmanUserLoanOri.getId());
 
                             MmanLoanCollectionOrder mmanLoanCollectionOrder = new MmanLoanCollectionOrder();
@@ -529,7 +529,9 @@ public class TaskJobMiddleService {
                                 manLoanCollectionOrderService.saveMmanLoanCollectionOrder(mmanLoanCollectionOrderOri);
                                 continue;
                             }
-                        } else {
+                        }
+                        /*
+                        else {
                             //1.3 若当前为每月12号-月底，订单和所有分组要分多种情况
 
                             //1.3.1 所有新订单，分组为S1
@@ -641,6 +643,7 @@ public class TaskJobMiddleService {
                                 }
                             }
                         }
+                        */
                     }
                 } catch (Exception e) {
                     logger.error("分配当前催收任务出错，借款ID：" + mmanUserLoanOri.getId(), e);

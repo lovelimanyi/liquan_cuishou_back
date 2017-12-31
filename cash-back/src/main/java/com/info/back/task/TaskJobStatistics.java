@@ -11,12 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.info.back.service.ICountCollectionAssessmentService;
 import com.info.back.service.ICountCollectionManageService;
 import com.info.web.util.DateUtil;
+import org.springframework.stereotype.Component;
 
 /**
  * 统计定时
  *
  * @author Administrator
  */
+@Component
 public class TaskJobStatistics {
 
     protected Logger logger = Logger.getLogger(TaskJobStatistics.class);
