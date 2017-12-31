@@ -54,7 +54,9 @@
 	
 	<select id="findOrderList"  parameterType="String" resultMap="BaseResultMap">
 		
-		SELECT w.`loan_user_name`,w.`loan_user_phone`,w.`arrears_money`,w.`hasalso_money`,w.`deductions_money`,w.`status`,w.`order_status`,w.`create_date`,w.`update_date` FROM collection_withholding_record w WHERE w.`order_id`=#{id}
+		SELECT
+		w.`loan_user_name`,w.`loan_user_phone`,w.`arrears_money`,w.`hasalso_money`,w.`deductions_money`,w.`status`,w.`order_status`,w.`create_date`,w.`update_date`,w.`remark` FROM
+		collection_withholding_record w WHERE w.`order_id`=#{id}
 		ORDER BY w.`create_date` DESC
 	</select>
 	<select id="findTowHoursList"  parameterType="String" resultType="com.info.web.pojo.CollectionWithholdingRecord">
