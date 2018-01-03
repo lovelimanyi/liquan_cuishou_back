@@ -45,6 +45,26 @@ public class CreditLoanPay {
 	// （这里不用）
 	private String updateBy;
 
+	private BigDecimal realgetServiceCharge;
+
+	private BigDecimal remainServiceCharge;
+
+	public BigDecimal getRealgetServiceCharge() {
+		return realgetServiceCharge;
+	}
+
+	public void setRealgetServiceCharge(BigDecimal realgetServiceCharge) {
+		this.realgetServiceCharge = realgetServiceCharge;
+	}
+
+	public BigDecimal getRemainServiceCharge() {
+		return remainServiceCharge;
+	}
+
+	public void setRemainServiceCharge(BigDecimal remainServiceCharge) {
+		this.remainServiceCharge = remainServiceCharge;
+	}
+
 	public void setId(String id){
 		this.id = id;
 	}

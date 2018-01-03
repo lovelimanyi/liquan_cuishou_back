@@ -45,7 +45,25 @@ public class MmanUserLoan {
     private String loanSysRemark;
     // 新老客户(0 新用户   2 老用户)
     private Integer customerType;
+    private String termNumber;
 
+    private String borrowingType;
+
+    public String getTermNumber() {
+        return termNumber;
+    }
+
+    public void setTermNumber(String termNumber) {
+        this.termNumber = termNumber;
+    }
+
+    public String getBorrowingType() {
+        return borrowingType;
+    }
+
+    public void setBorrowingType(String borrowingType) {
+        this.borrowingType = borrowingType;
+    }
 
 
     public BigDecimal getPaidMoney() {

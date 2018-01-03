@@ -3,6 +3,8 @@ package com.info.back.utils;
 import com.info.back.vo.JxlResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -10,6 +12,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
@@ -87,7 +90,41 @@ public class HttpUtils {
             }
         }
     }
+    public static String postJson(String apiURL, String params){
+        HttpClient httpClient = new DefaultHttpClient();
+        HttpPost httpPost = new HttpPost(apiURL);
+        String body = null;
+//      logger.info("parameters:" + parameters);
+        try {
 
+            // 建立一个NameValuePair数组，用于存储欲传送的参数
+            httpPost.addHeader("Content-type","application/json; charset=utf-8");
+            httpPost.setHeader("Accept", "application/json");
+            if (params != null) {
+                // 设置字符集
+                StringEntity stringEntity = new StringEntity(params, "utf-8");
+                // 设置参数实体
+                httpPost.setEntity(stringEntity);
+            }
+//          httpPost.setEntity(new SerializableEntity(parameters, Charset.forName("UTF-8")));
+
+            org.apache.http.HttpResponse response = httpClient.execute(httpPost);
+
+            int statusCode = response.getStatusLine().getStatusCode();
+
+            if (statusCode != HttpStatus.SC_OK) {
+//                logger.error("Method failed:" + response.getStatusLine());
+            }
+
+            // Read the response body
+            body = EntityUtils.toString(response.getEntity());
+
+        } catch (IOException e) {
+            // 网络错误
+            e.printStackTrace();
+        }
+        return body;
+    }
     public static String doGet(String url, Map<String, Object> params) {
         CloseableHttpClient httpClient = HttpClients.createDefault();
         //超时设置

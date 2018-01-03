@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.info.back.dao.IChannelSwitchingDao;
+import com.info.constant.Constant;
 import com.info.web.pojo.*;
 import com.info.web.util.JedisDataClient;
 import org.apache.commons.lang3.StringUtils;
@@ -52,7 +53,7 @@ public class TaskJobMiddleService {
     @Autowired
     private IChannelSwitchingDao channelSwitchingDao;
 
-    public void dispatchforLoanId(String loanId, String idNumber) {
+    public void dispatchforLoanId(String loanId, String idNumber,String type) {
         logger.error("dispatchforLoanId start,loanId:" + loanId);
 
         if (StringUtils.isBlank(loanId)) {
@@ -72,7 +73,7 @@ public class TaskJobMiddleService {
             return;
         }
 
-        dispatchForLoanId(mmanUserLoan, idNumber);
+        dispatchForLoanId(mmanUserLoan, idNumber,type);
 
         logger.error("dispatchforLoanId end,loanId:" + loanId);
 
@@ -82,7 +83,7 @@ public class TaskJobMiddleService {
     /**
      * 分配催收任务，更新催收相关操作(更新催收订单，添加流转日志，更新借款、还款逾期额天数状态等)
      */
-    public void dispatchForLoanId(MmanUserLoan mmanUserLoan, String idNumber) {
+    public void dispatchForLoanId(MmanUserLoan mmanUserLoan, String idNumber ,String type) {
 
         logger.error("TaskJobMiddleService dispatchForLoanId start" + "开始时间 : " + Calendar.getInstance().getTimeInMillis() + "借款id :" + mmanUserLoan.getId());
         //初始化参数
@@ -149,7 +150,7 @@ public class TaskJobMiddleService {
                         /*if ((loanMoney.subtract(payedMoney)).compareTo(BigDecimal.valueOf(0.00)) <= 0) {
                             pmoney = null==mmanUserLoanOri.getLoanPenalty()?new BigDecimal("0"):mmanUserLoanOri.getLoanPenalty();
 						}*/
-                        loanMoney = loanMoney.add(pmoney).setScale(2, BigDecimal.ROUND_HALF_UP);  // 应还总额
+//                        loanMoney = loanMoney.add(pmoney).setScale(2, BigDecimal.ROUND_HALF_UP);  // 应还总额
                         mmanUserLoanOri.setLoanPenalty(pmoney);//逾期滞纳金 DecimalFormatUtil.df2Points.format(pmoney.doubleValue())
 
                         // 外层循环处理时间随着数据量增长会越来越长，防止更新滞纳金（罚息）时覆盖更新已还款的数据
@@ -164,7 +165,12 @@ public class TaskJobMiddleService {
                         CreditLoanPay np = new CreditLoanPay();
                         np.setId(creditLoanPay.getId());
                         np.setReceivableInterest(znj);  //  剩余应还罚息
-                        np.setReceivableMoney(mmanUserLoanOri.getLoanMoney().add(mmanUserLoanOri.getLoanPenalty())); // 应还总额
+                        if (type.equals(Constant.BIG)){
+                           BigDecimal receivableMoney = pmoney.add(mmanUserLoanOri.getServiceCharge()).add(mmanUserLoanOri.getLoanMoney());
+                            np.setReceivableMoney(receivableMoney);
+                        }else{
+                            np.setReceivableMoney(mmanUserLoanOri.getLoanMoney().add(mmanUserLoanOri.getLoanPenalty())); // 应还总额
+                        }
                         creditLoanPayService.updateCreditLoanPay(np);
 
 
@@ -710,9 +716,17 @@ public class TaskJobMiddleService {
      * @return
      */
     private BigDecimal getLoanPenalty(MmanUserLoan mmanUserLoanOri, BigDecimal loanMoney, int pday) {
-        BigDecimal pRate = new BigDecimal((Double.parseDouble(mmanUserLoanOri.getLoanPenaltyRate()) / 10000));//罚息率
+        BigDecimal pRate = new BigDecimal(Integer.parseInt(mmanUserLoanOri.getLoanPenaltyRate())).divide(new BigDecimal(10000));
+//        BigDecimal pRate = new BigDecimal((Double.parseDouble(mmanUserLoanOri.getLoanPenaltyRate()) / 10000));//罚息率
         BigDecimal paidMoney = mmanUserLoanOri.getPaidMoney();  // 借款本金和服务费之和
+//        BigDecimal loanMoney = mmanUserLoanOri.getLoanMoney();
         BigDecimal pmoney = null;
+        //TODO 第一版本先按照借款金额算滞纳金，第二版用剩余应还本金算滞纳金
+        if(mmanUserLoanOri.getBorrowingType().equals(Constant.BIG)){
+            pmoney = loanMoney.multiply(new BigDecimal(pday)).multiply(pRate).setScale(2, BigDecimal.ROUND_HALF_UP);
+            return pmoney;
+        }
+
         // 计算订单罚息
         try {
             if (paidMoney != null && paidMoney.compareTo(new BigDecimal("0")) > 0) {
@@ -782,27 +796,27 @@ public class TaskJobMiddleService {
     /**
      * 分配催收任务，更新催收相关操作(更新催收订单，添加流转日志，更新借款、还款逾期额天数状态等)
      */
-    public void autoDispatch() {
-        logger.error("TaskJobMiddleService autoDispatch start");
-        //初始化参数
-
-        MmanUserLoan mmanUserLoan = new MmanUserLoan();
-        mmanUserLoan.setLoanStatus(BackConstant.CREDITLOANAPPLY_OVERDUE);
-        //mmanUserLoan.setCreateTime(new Date());
-        List<MmanUserLoan> overdueList = manUserLoanService.findMmanUserLoanList2(mmanUserLoan);
-        logger.error("overdueList size:" + overdueList.size());
-
-        if (null != overdueList && overdueList.size() > 0) {
-            for (MmanUserLoan mmanUserLoanOri : overdueList) {
-                MmanLoanCollectionOrder order = manLoanCollectionOrderService.getOrderByLoanId(mmanUserLoanOri.getId());
-                if (order != null) {
-                    dispatchforLoanId(mmanUserLoanOri.getId(), order.getIdNumber());
-                } else {
-                    logger.error("处理逾期数据失败，原因：借款订单对象为空，借款id" + mmanUserLoanOri.getId());
-                }
-            }
-        }
-        logger.error("TaskJobMiddleService autoDispatch end");
-    }
+//    public void autoDispatch() {
+//        logger.error("TaskJobMiddleService autoDispatch start");
+//        //初始化参数
+//
+//        MmanUserLoan mmanUserLoan = new MmanUserLoan();
+//        mmanUserLoan.setLoanStatus(BackConstant.CREDITLOANAPPLY_OVERDUE);
+//        //mmanUserLoan.setCreateTime(new Date());
+//        List<MmanUserLoan> overdueList = manUserLoanService.findMmanUserLoanList2(mmanUserLoan);
+//        logger.error("overdueList size:" + overdueList.size());
+//
+//        if (null != overdueList && overdueList.size() > 0) {
+//            for (MmanUserLoan mmanUserLoanOri : overdueList) {
+//                MmanLoanCollectionOrder order = manLoanCollectionOrderService.getOrderByLoanId(mmanUserLoanOri.getId());
+//                if (order != null) {
+//                    dispatchforLoanId(mmanUserLoanOri.getId(), order.getIdNumber());
+//                } else {
+//                    logger.error("处理逾期数据失败，原因：借款订单对象为空，借款id" + mmanUserLoanOri.getId());
+//                }
+//            }
+//        }
+//        logger.error("TaskJobMiddleService autoDispatch end");
+//    }
 }
 
