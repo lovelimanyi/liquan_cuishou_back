@@ -491,9 +491,9 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
                                         mmanLoanCollectionOrderOri.setJxlStatus(BackConstant.XJX_JXL_STATUS_REFUSE);
                                         Date now = new Date();
                                         mmanLoanCollectionOrderOri.setUpdateDate(now);
-                                        if("S1".equals(mmanLoanCollectionOrderOri.getS1Flag())){
+                                        if ("S1".equals(mmanLoanCollectionOrderOri.getS1Flag())) {
                                             mmanLoanCollectionStatusChangeLog.setCurrentCollectionOrderLevel(BackConstant.XJX_OVERDUE_LEVEL_S1);
-                                        }else {
+                                        } else {
                                             mmanLoanCollectionStatusChangeLog.setCurrentCollectionOrderLevel(mmanLoanCollectionOrderOri.getCurrentOverdueLevel());
                                         }
                                         mmanLoanCollectionOrderDao.updateCollectionOrder(mmanLoanCollectionOrderOri);
@@ -586,21 +586,24 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
                             koPayMonery = new BigDecimal(params.get("payMoney"));
                         }
                         if (CompareUtils.greaterEquals(maxpayMonery, koPayMonery)) {
-                            HashMap<String, String> dayMap = new HashMap<String, String>();
+                            HashMap<String, Object> dayMap = new HashMap<>();
                             dayMap.put("orderId", params.get("id").toString());
                             dayMap.put("currDate", DateUtil.getDateFormat(new Date(), "yyyy-MM-dd"));
-                            //查询当天定单代扣次数
+                            dayMap.put("status", 2);
+                            //查询当天定单代扣失败次数
                             int count = collectionWithholdingRecordDao.findCurrDayWithhold(dayMap);
+                            String currentUserRoleId = String.valueOf(params.get("roleId"));
                             //超级管理员，催收经理 不受权限控制
-                            if (Constant.ROLE_ID.equals(String.valueOf(params.get("roleId"))) || "10001".equals(String.valueOf(params.get("roleId")))) {
+                            if (Constant.ROLE_ID.equals(currentUserRoleId) || BackConstant.SURPER_MANAGER_ROLE_ID.toString().equals(currentUserRoleId)
+                                    || BackConstant.OUTSOURCE_MANAGER_ROLE_ID.toString().equals(currentUserRoleId)) {
                                 count = 0;
                             }
-                            if (count < 5) {
+                            if (count < 3) {
                                 // 判断该笔订单是否有还款中待处理的数据(redis中是否存在对应key)
                                 String payId = mmanLoanCollectionOrderOri.getPayId();
                                 String overdueKeys = JedisDataClient.get(Constant.TYPE_OVERDUE_ + payId);
                                 String repayKeys = JedisDataClient.get(Constant.TYPE_REPAY_ + payId);
-                                if(StringUtils.isNotEmpty(overdueKeys) || StringUtils.isNotEmpty(repayKeys)){
+                                if (StringUtils.isNotEmpty(overdueKeys) || StringUtils.isNotEmpty(repayKeys)) {
                                     reslut.setMsg("该用户正在还款处理中,请稍后查看");
                                     reslut.setCode("-1");
                                     return reslut;
@@ -700,7 +703,7 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
                                     }
                                 }
                             } else {
-                                reslut.setMsg("每笔订单每天代扣次数不能超过五次");
+                                reslut.setMsg("该订单今日代扣失败次数太多，不允许操作，请联系组长代扣！");
                             }
                         } else {
                             reslut.setMsg("代扣金额不能大于" + creditLoanPay.getReceivablePrinciple().add(creditLoanPay.getReceivableInterest()));
@@ -723,20 +726,20 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
 
     private String getWithholdChannel() throws Exception {
         String withholdChannel;
-        if(StringUtils.isNotBlank(JedisDataClient.get("WITHHOLD_CHANNEL"))){
+        if (StringUtils.isNotBlank(JedisDataClient.get("WITHHOLD_CHANNEL"))) {
             withholdChannel = JedisDataClient.get("WITHHOLD_CHANNEL");
-        }else {
+        } else {
             withholdChannel = channelSwitchingDao.getChannelValue("cuishou_withhold_channel").getChannelValue();
-            JedisDataClient.set("WITHHOLD_CHANNEL",withholdChannel,60 * 60);
+            JedisDataClient.set("WITHHOLD_CHANNEL", withholdChannel, 60 * 60);
         }
         return withholdChannel;
     }
 
     private long getCreateTimePlus(CollectionWithholdingRecord record) {
         long createTime = 0;
-        if(record == null){
+        if (record == null) {
             createTime = System.currentTimeMillis();
-        }else {
+        } else {
             createTime = record.getCreateDate().getTime();//最新一条代扣时间
         }
         return createTime + 2 * 60 * 1000; //新增2分钟

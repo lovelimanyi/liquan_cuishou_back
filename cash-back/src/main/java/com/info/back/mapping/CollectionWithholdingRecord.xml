@@ -49,7 +49,7 @@
 		</trim> 
 	</insert>
 	<select id="findCurrDayWithhold" parameterType="HashMap" resultType="Integer">
-		<![CDATA[	SELECT COUNT(1) FROM collection_withholding_record w WHERE w.`order_id`=#{orderId} AND  DATE_FORMAT(w.`create_date`,'%Y-%m-%d')=#{currDate}  ]]>
+		<![CDATA[	SELECT COUNT(1) FROM collection_withholding_record w WHERE w.`order_id`=#{orderId} AND  DATE_FORMAT(w.`create_date`,'%Y-%m-%d')=#{currDate} AND w.`status` = {status}]]>
 	</select>
 	
 	<select id="findOrderList"  parameterType="String" resultMap="BaseResultMap">

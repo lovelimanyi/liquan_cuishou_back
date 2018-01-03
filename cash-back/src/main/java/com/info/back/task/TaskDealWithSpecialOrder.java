@@ -36,6 +36,18 @@ public class TaskDealWithSpecialOrder {
         List<MmanLoanCollectionOrder> orderList = mmanLoanCollectionOrderDao.getOrderInFirstDay(map);
         int count = 0;
         int totalCount = 0;
+        totalCount = updateOrderAndLog(orderList, totalCount);
+        logger.info("修改订单信息完成，本次共修改数据 " + totalCount + " 条.");
+    }
+
+    /**
+     * 更新订单信息和流转日志
+     * @param orderList
+     * @param totalCount
+     * @return
+     */
+    private int updateOrderAndLog(List<MmanLoanCollectionOrder> orderList, int totalCount) {
+        int count;
         if (orderList.size() > 0) {
             BackUser user = backUserService.getBackUserByUuid(BackConstant.COLLECTION_USER_ID);
             HashMap<String, Object> param = new HashMap<>();
@@ -53,6 +65,6 @@ public class TaskDealWithSpecialOrder {
                 totalCount += count;
             }
         }
-        logger.info("修改订单信息完成，本次共修改数据 " + totalCount + " 条.");
+        return totalCount;
     }
 }
