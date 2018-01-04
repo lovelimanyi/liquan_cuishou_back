@@ -591,11 +591,12 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
                             dayMap.put("currDate", DateUtil.getDateFormat(new Date(), "yyyy-MM-dd"));
                             dayMap.put("status", 2);
                             //查询当天定单代扣失败次数
-                            int count = collectionWithholdingRecordDao.findCurrDayWithhold(dayMap);
+                            List<CollectionWithholdingRecord> list = collectionWithholdingRecordDao.findCurrDayWithhold(dayMap);
+                            int count = list.size();
                             String currentUserRoleId = String.valueOf(params.get("roleId"));
-                            //超级管理员，催收经理 不受权限控制
-                            if (Constant.ROLE_ID.equals(currentUserRoleId) || BackConstant.SURPER_MANAGER_ROLE_ID.toString().equals(currentUserRoleId)
-                                    || BackConstant.OUTSOURCE_MANAGER_ROLE_ID.toString().equals(currentUserRoleId)) {
+                            //超级管理员，高级经理 不受权限控制
+                            if (BackConstant.SURPER_MANAGER_ROLE_ID.toString().equals(currentUserRoleId) ||
+                                    BackConstant.SUPER_MANAGE_ROLE_ID.toString().equals(currentUserRoleId)) {
                                 count = 0;
                             }
                             if (count < 3) {
@@ -703,7 +704,7 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
                                     }
                                 }
                             } else {
-                                reslut.setMsg("该订单今日代扣失败次数太多，不允许操作，请联系组长代扣！");
+                                reslut.setMsg(list.get(0).getRemark() + " 代扣失败，您今日还有1次代扣机会 / 您今日已经无法代扣，请联系委外对接人代扣。");
                             }
                         } else {
                             reslut.setMsg("代扣金额不能大于" + creditLoanPay.getReceivablePrinciple().add(creditLoanPay.getReceivableInterest()));

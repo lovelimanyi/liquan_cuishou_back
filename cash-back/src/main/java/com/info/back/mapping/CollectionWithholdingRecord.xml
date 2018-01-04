@@ -48,8 +48,9 @@
 			<if test="updateDate !=null">#{updateDate},</if>
 		</trim> 
 	</insert>
-	<select id="findCurrDayWithhold" parameterType="HashMap" resultType="Integer">
-		<![CDATA[	SELECT COUNT(1) FROM collection_withholding_record w WHERE w.`order_id`=#{orderId} AND  DATE_FORMAT(w.`create_date`,'%Y-%m-%d')=#{currDate} AND w.`status` = {status}]]>
+	<select id="findCurrDayWithhold" parameterType="HashMap" resultType="com.info.web.pojo.CollectionWithholdingRecord">
+		SELECT w.id,w.`status`,w.remark FROM collection_withholding_record w WHERE w.`order_id` = #{orderId} AND  DATE_FORMAT(w.`create_date`,'%Y-%m-%d') = #{currDate} AND
+		w.`status` = #{status} ORDER BY w.`create_date` DESC
 	</select>
 	
 	<select id="findOrderList"  parameterType="String" resultMap="BaseResultMap">

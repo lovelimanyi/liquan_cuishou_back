@@ -18,7 +18,7 @@ public interface ICollectionWithholdingRecordDao {
 
 	 List<CollectionWithholdingRecord> findTowHoursList();
 
-	 int findCurrDayWithhold(HashMap<String, Object> dayMap);
+	 List<CollectionWithholdingRecord> findCurrDayWithhold(HashMap<String, Object> dayMap);
 
 	 int updateWithholdStatus(Map<String, Object> map);
 

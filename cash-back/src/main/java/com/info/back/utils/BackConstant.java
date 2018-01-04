@@ -55,6 +55,8 @@ public class BackConstant {
 
 	public final static Integer COLLECTION_MANAGE_ROLE_ID=10025;//催收主管角色ID
 
+	public final static Integer SUPER_MANAGE_ROLE_ID=10030;//催收主管角色ID
+
 	public final static Integer MANAGER_ROLE_ID=10019;//经理角色ID
 
 	public final static String XJX_COLLECTION_ORDER_STATE_SUCCESS = "4";// 现金侠催收状态催收成功
