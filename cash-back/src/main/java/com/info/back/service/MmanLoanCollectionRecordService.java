@@ -704,7 +704,8 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
                                     }
                                 }
                             } else {
-                                reslut.setMsg(list.get(0).getRemark() + " 代扣失败，您今日还有1次代扣机会 / 您今日已经无法代扣，请联系委外对接人代扣。");
+                                String msg = list.get(0).getRemark() == null ? "" : list.get(0).getRemark();
+                                reslut.setMsg(msg + " 代扣失败，您今日还有1次代扣机会 / 您今日已经无法代扣，请联系委外对接人代扣。");
                             }
                         } else {
                             reslut.setMsg("代扣金额不能大于" + creditLoanPay.getReceivablePrinciple().add(creditLoanPay.getReceivableInterest()));
