@@ -161,7 +161,8 @@
 		t.del_flag as delFlag, 
 		t.loan_penalty_time as loanPenaltyTime, 
 		t.loan_sys_status as loanSysStatus, 
-		t.loan_sys_remark as loanSysRemark
+		t.loan_sys_remark as loanSysRemark,
+		t.borrowing_type AS borrowingType
 		FROM mman_user_loan t 
 		<where>
 			<if test="loanStatus != null and loanStatus !=''">
