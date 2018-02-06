@@ -1,5 +1,6 @@
 package com.info.back.service;
 
+import java.util.HashMap;
 import java.util.List;
 
 import com.info.web.pojo.BackUser;
@@ -25,4 +26,6 @@ public interface IMmanLoanCollectionCompanyService {
 	public List<MmanLoanCollectionCompany> findCompanyByUserId(BackUser user);
 
 	public MmanLoanCollectionCompany getCompanyById(String id);
+
+    List<MmanLoanCollectionCompany> getCompanyByIds(HashMap<String,Object> param);
 }

@@ -1,5 +1,6 @@
 package com.info.back.service;
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,11 @@ public class MmanLoanCollectionCompanyService implements IMmanLoanCollectionComp
 	@Override
 	public MmanLoanCollectionCompany getCompanyById(String id) {
 		return mmanLoanCollectionCompanyDao.getCompanyById(id);
+	}
+
+	@Override
+	public List<MmanLoanCollectionCompany> getCompanyByIds(HashMap<String,Object> param) {
+		return mmanLoanCollectionCompanyDao.getCompanyByIds(param);
 	}
 
 }
