@@ -196,6 +196,9 @@
 		SELECT * FROM mman_loan_collection_company WHERE id = #{id}
 	</select>
     <select id="getCompanyByIds" parameterType="HashMap" resultType="com.info.web.pojo.MmanLoanCollectionCompany">
-		SELECT id,title from mman_loan_collection_company WHERE id IN (#{ids}) AND status = #{status}
+        SELECT id,title from mman_loan_collection_company WHERE `status` = #{status} AND id IN
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
 	</select>
 </mapper>

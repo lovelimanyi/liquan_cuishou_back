@@ -689,13 +689,12 @@ public class MyCollectionOrderController extends BaseController {
                 companyList = mmanLoanCollectionCompanyService
                         .getList(mmanLoanCollectionCompany);
             } else {
-                StringBuilder sb = new StringBuilder();
+                List<String> companys = new ArrayList<>();
                 for (BackUserCompanyPermissions permission : CompanyPermissionsList) {
-                    sb.append(permission.getCompanyId()).append(",");
+                    companys.add(permission.getCompanyId());
                 }
-                String ids = sb.toString().substring(0, sb.toString().length() - 1);
                 HashMap<String,Object> param = new HashMap<>();
-                param.put("ids",ids);
+                param.put("ids",companys);
                 param.put("status",BackConstant.ON);
                 companyList = mmanLoanCollectionCompanyService.getCompanyByIds(param);
             }
