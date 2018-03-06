@@ -1,6 +1,7 @@
 package com.info.back.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Repository;
 
@@ -9,17 +10,19 @@ import com.info.web.pojo.MmanUserLoan;
 @Repository
 public interface IMmanUserLoanDao {
 
-	public List<MmanUserLoan> findMmanUserLoanList(MmanUserLoan queryMmanUsersLoan) ;
+	List<MmanUserLoan> findMmanUserLoanList(MmanUserLoan queryMmanUsersLoan) ;
 	
-	public List<MmanUserLoan> findMmanUserLoanList2(MmanUserLoan queryMmanUsersLoan) ;
+	List<MmanUserLoan> findMmanUserLoanList2(MmanUserLoan queryMmanUsersLoan) ;
 	
-	public void updateMmanUserLoan(MmanUserLoan queryMmanUsersLoan);
+	void updateMmanUserLoan(MmanUserLoan queryMmanUsersLoan);
 	
-	public int saveNotNull(MmanUserLoan mmanUserLoan);
+	int saveNotNull(MmanUserLoan mmanUserLoan);
 
-	public int updateNotNull(MmanUserLoan mmanUserLoan);
+	int updateNotNull(MmanUserLoan mmanUserLoan);
 
-	public MmanUserLoan get(String loanId);
+	MmanUserLoan get(String loanId);
 	
-	public int updatePaymoney(MmanUserLoan loan);
+	int updatePaymoney(MmanUserLoan loan);
+
+    List<String> getOverdueOrder(Map<String, Object> map);
 }

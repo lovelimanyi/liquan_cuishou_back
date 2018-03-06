@@ -1,14 +1,17 @@
 package com.info.back.service;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.info.back.dao.*;
+import com.info.back.utils.BackConstant;
 import com.info.web.pojo.*;
 
+import com.info.web.util.DateUtil;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.apache.commons.lang3.StringUtils;
@@ -119,13 +122,13 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
     }
 
     /**
-     * @Description 处理后台传入数据，防止脏数据超出限制
      * @param params
      * @return
+     * @Description 处理后台传入数据，防止脏数据超出限制
      */
     private String getCorrectParam(String params) {
-        if(StringUtils.isNotEmpty(params) && params.length() > 50){
-            params = params.substring(0,49);
+        if (StringUtils.isNotEmpty(params) && params.length() > 50) {
+            params = params.substring(0, 49);
         }
         return params;
     }
@@ -263,4 +266,116 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
         return manLoanCollectionOrderDao.getOrderloanId(loanId);
     }
 
+    @Override
+    public void updateOrderInfo(String loanId) {
+
+        MmanUserLoan loan = mmanUserLoanDao.get(loanId);
+        if (loan == null) {
+            logger.error("更新逾期订单出错，借款对象为空，借款id: " + loanId);
+            return;
+        }
+        CreditLoanPay pay = creditLoanPayDao.findByLoanId(loanId);
+        if (pay == null) {
+            logger.error("更新逾期订单出错，还款对象为空，借款id: " + loanId);
+            return;
+        }
+        MmanLoanCollectionOrder order = getOrderByLoanId(loanId);
+        if (order == null) {
+            logger.error("更新逾期订单出错，订单对象为空，借款id: " + loanId);
+            return;
+        }
+        if(BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())){
+            logger.error("更新逾期订单出错，该订单已还款完成，请核实，借款id: " + loanId);
+            return;
+        }
+
+        BigDecimal loanMoney = loan.getLoanMoney(); // 借款本金
+        if (BackConstant.CREDITLOANAPPLY_OVERDUE.equals(loan.getLoanStatus())) {
+            // 计算去逾期天数
+            int overdueDays = getOverdueDays(loan);
+            // 计算罚息
+            BigDecimal pmoney = getLoanPenalty(loan, loanMoney, overdueDays);
+
+            // 如果滞纳金超过本金金额  则滞纳金金额等于本金且不再增加
+            if (pmoney.compareTo(loanMoney) >= 0) {
+                pmoney = loanMoney;
+            }
+
+            //对于逾期了多次还款的状况，还够本金则不算新罚息，计算到上次罚息值即可（如借1000，罚息120，上次还了1100，本次补足剩余20即可，罚息依然是120）
+                        /*if ((loanMoney.subtract(payedMoney)).compareTo(BigDecimal.valueOf(0.00)) <= 0) {
+                            pmoney = null==mmanUserLoanOri.getLoanPenalty()?new BigDecimal("0"):mmanUserLoanOri.getLoanPenalty();
+						}*/
+//                        loanMoney = loanMoney.add(pmoney).setScale(2, BigDecimal.ROUND_HALF_UP);  // 应还总额
+
+            // 外层循环处理时间随着数据量增长会越来越长，防止更新滞纳金（罚息）时覆盖更新已还款的数据
+
+            MmanUserLoan mmanUserLoanForUpdate = new MmanUserLoan();
+            mmanUserLoanForUpdate.setId(loan.getId());
+            mmanUserLoanForUpdate.setLoanPenalty(pmoney);  // 更新借款表滞纳金
+            mmanUserLoanDao.updateMmanUserLoan(mmanUserLoanForUpdate);
+
+            // 更新还款表中剩余应还滞纳金
+            BigDecimal znj = pmoney.subtract(pay.getRealgetInterest());  // 剩余应还滞纳金 = 订单滞纳金 - 实收罚息
+            CreditLoanPay loanPay = new CreditLoanPay();
+            loanPay.setId(pay.getId());
+            loanPay.setReceivableInterest(znj);  //  剩余应还罚息
+            loanPay.setReceivableMoney(loan.getLoanMoney().add(pmoney)); // 应还总额
+            creditLoanPayDao.updateCreditLoanPay(loanPay);
+
+            // 更新订单表信息
+            MmanLoanCollectionOrder collectionOrder = new MmanLoanCollectionOrder();
+            collectionOrder.setLoanId(loan.getId());
+            collectionOrder.setOverdueDays(overdueDays);
+            manLoanCollectionOrderDao.updateOrderOverdueDays(collectionOrder);
+
+        }
+    }
+
+    /**
+     * 计算订单当前的逾期天数
+     *
+     * @param mmanUserLoanOri
+     * @return
+     */
+    private int getOverdueDays(MmanUserLoan mmanUserLoanOri) {
+        int pday = 0;
+        try {
+            pday = DateUtil.daysBetween(mmanUserLoanOri.getLoanEndTime(), new Date());
+        } catch (ParseException e) {
+            logger.error("parse failed", e);
+        }
+        return pday;
+    }
+
+    /**
+     * 计算订单罚息
+     *
+     * @param loan
+     * @param loanMoney
+     * @param pday
+     * @return
+     */
+    private BigDecimal getLoanPenalty(MmanUserLoan loan, BigDecimal loanMoney, int pday) {
+        BigDecimal pRate = new BigDecimal(Integer.parseInt(loan.getLoanPenaltyRate())).divide(new BigDecimal(10000));
+//        BigDecimal pRate = new BigDecimal((Double.parseDouble(mmanUserLoanOri.getLoanPenaltyRate()) / 10000));//罚息率
+        BigDecimal paidMoney = loan.getPaidMoney();  // 借款本金和服务费之和
+//        BigDecimal loanMoney = mmanUserLoanOri.getLoanMoney();
+        BigDecimal pmoney = null;
+        if (loan.getBorrowingType().equals(Constant.BIG)) {
+            pmoney = loanMoney.multiply(new BigDecimal(pday)).multiply(pRate).setScale(2, BigDecimal.ROUND_HALF_UP);
+            return pmoney;
+        }
+
+        // 计算订单罚息
+        try {
+            if (paidMoney != null && paidMoney.compareTo(BigDecimal.ZERO) > 0) {
+                pmoney = (paidMoney.multiply(pRate).multiply(new BigDecimal(pday))).setScale(2, BigDecimal.ROUND_HALF_UP);//逾期金额(部分还款算全罚息  服务费算罚息)
+            } else {
+                pmoney = (loanMoney.multiply(pRate).multiply(new BigDecimal(pday))).setScale(2, BigDecimal.ROUND_HALF_UP);//逾期金额（部分还款算全罚息  服务费不算罚息)
+            }
+        } catch (Exception e) {
+            logger.error("calculate Penalty error！ loanid =" + loan.getId());
+        }
+        return pmoney;
+    }
 }

@@ -202,7 +202,6 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
         return pageConfig;
     }
 
-
     private void addOrUpdateOrderAndAddStatusChangeLogAndUpdatePayStatus(MmanLoanCollectionPerson person,
                                                                          MmanLoanCollectionOrder mmanLoanCollectionOrder, Date date) {
 

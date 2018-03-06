@@ -851,7 +851,7 @@
 		select l.id from mman_loan_collection_order o LEFT JOIN mman_user_loan l on l.id = o.loan_id where loan_user_phone = #{userPhone} AND l.loan_end_time = #{loanEndTime}
 	</select>
 	<select id="getOrderByLoanId" parameterType="String" resultMap="queryResultMap">
-		SELECT loan_id,id_number FROM mman_loan_collection_order WHERE loan_id = #{loanId}
+		SELECT loan_id,id_number,status FROM mman_loan_collection_order WHERE loan_id = #{loanId}
 	</select>
 	<select id="getStopOrderInfoById" parameterType="String" resultType="com.info.web.pojo.OrderInfo">
 		SELECT o.loan_id AS loanId,o.loan_user_name AS loanUserName,l.user_id AS userId,o.order_id AS orderId,o.loan_user_phone AS loanUserPhone,l.loan_money AS
@@ -892,5 +892,9 @@
 	WHERE
 		 o.loan_id = #{loanId}
 	AND l.type = '5';
+	</update>
+
+	<update id="updateOrderOverdueDays" parameterType="com.info.web.pojo.MmanLoanCollectionOrder">
+		UPDATE mman_loan_collection_order SET overdueDays = #{overdueDays} WHERE loan_id = #{loanId}
 	</update>
 </mapper>
