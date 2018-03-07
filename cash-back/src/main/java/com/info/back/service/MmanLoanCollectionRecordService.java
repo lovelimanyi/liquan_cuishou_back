@@ -78,7 +78,7 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
 
             //2.1 查询当前组中所有非禁用的催收员，按照截止到当前手里未处理的订单数升序排序(前面已查)，并查出他们组每人每天单数上限(上限规则中公司+组唯一)，取出有效催收员
             List<MmanLoanCollectionRule> allRuleList = mmanLoanCollectionRuleDao.findList(new MmanLoanCollectionRule());
-            HashMap<String, Integer> allRuleLimitCountMap = new HashMap<String, Integer>();
+            HashMap<String, Integer> allRuleLimitCountMap = new HashMap<>();
             if (null != allRuleList && allRuleList.size() > 0) {
                 for (MmanLoanCollectionRule ruleOri : allRuleList) {
                     allRuleLimitCountMap.put(ruleOri.getCompanyId() + "_" + ruleOri.getCollectionGroup(), ruleOri.getEveryLimit());

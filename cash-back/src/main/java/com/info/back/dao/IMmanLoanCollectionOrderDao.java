@@ -108,4 +108,6 @@ public interface IMmanLoanCollectionOrderDao {
     int updateOrderInfo(HashMap<String, Object> map);
 
     void updateOrderOverdueDays(MmanLoanCollectionOrder collectionOrder);
+
+    List<String> getOverdueOrderIds(Map<String, Object> map);
 }

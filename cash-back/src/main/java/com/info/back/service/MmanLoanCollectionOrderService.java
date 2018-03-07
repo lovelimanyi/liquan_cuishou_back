@@ -1,24 +1,22 @@
 package com.info.back.service;
 
+import com.info.back.dao.*;
+import com.info.back.result.JsonResult;
+import com.info.back.utils.BackConstant;
+import com.info.back.utils.IdGen;
+import com.info.constant.Constant;
+import com.info.web.pojo.*;
+import com.info.web.util.DateUtil;
+import com.info.web.util.PageConfig;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.*;
-
-import com.info.back.dao.*;
-import com.info.back.utils.BackConstant;
-import com.info.web.pojo.*;
-
-import com.info.web.util.DateUtil;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Service;
-
-import com.info.web.util.PageConfig;
-import com.info.back.result.JsonResult;
-import com.info.back.utils.IdGen;
-import com.info.constant.Constant;
-import org.springframework.util.CollectionUtils;
 
 @Service
 public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderService {
@@ -373,14 +371,7 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
             personMap.put("userStatus", BackConstant.ON);
             personList = backUserDao.findUnCompleteCollectionOrderByCurrentUnCompleteCountListByMap(personMap);
             if (CollectionUtils.isEmpty(personList)) {
-                SysAlertMsg alertMsg = new SysAlertMsg();
-                alertMsg.setTitle("分配催收任务失败");
-                alertMsg.setContent("所有M1-M2组查无可用催收人,请及时添加或启用该组催收员。");
-                alertMsg.setDealStatus(BackConstant.OFF);
-                alertMsg.setStatus(BackConstant.OFF);
-                alertMsg.setType(SysAlertMsg.TYPE_COMMON);
-                sysAlertMsgDao.insert(alertMsg);
-                logger.warn("所有M1-M2组查无可用催收人...");
+                inserWarnMsg();
                 return;
             }
         } else {
@@ -405,6 +396,215 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
             }
         }
         mmanLoanCollectionRecordService.assignCollectionOrderToRelatedGroup(orderList, personList, now);
+    }
+
+    @Override
+    public List<String> getOverdueOrderIds(Map<String, Object> map) {
+        return manLoanCollectionOrderDao.getOverdueOrderIds(map);
+    }
+
+    /**
+     * 逾期订单升级
+     *
+     * @param loanId
+     */
+    @Override
+    public void orderUpgrade(String loanId) {
+        try {
+            MmanUserLoan loan = mmanUserLoanDao.get(loanId);
+            Calendar clrLoanEnd = Calendar.getInstance();
+            clrLoanEnd.setTime(loan.getLoanEndTime());
+            int yearLoanEnd = clrLoanEnd.get(Calendar.YEAR);
+            int monthLoanEnd = clrLoanEnd.get(Calendar.MONTH) + 1;
+            Calendar calendar = Calendar.getInstance();
+            int yearNow = calendar.get(Calendar.YEAR);
+            int monthNow = calendar.get(Calendar.MONTH) + 1;
+            int monthDiff = (yearNow * 12 + monthNow) - (yearLoanEnd * 12 + monthLoanEnd);
+            // 跨越次数为0不处理
+            if (monthDiff == 0) {
+                return;
+            }
+            MmanLoanCollectionOrder order = new MmanLoanCollectionOrder();
+            order.setLoanId(loanId);
+            List<MmanLoanCollectionOrder> orders = mmanLoanCollectionOrderDao.findList(order);
+            if (CollectionUtils.isEmpty(orders)) {
+                logger.error("逾期升级出错，订单为空，借款id: " + loanId);
+                return;
+            }
+            order = orders.get(0);
+            if (BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())) {
+                logger.error("逾期升级出错，订单已还款完成，借款id: " + loanId);
+                return;
+            }
+            List<MmanLoanCollectionOrder> orderList = new ArrayList<>();
+            List<MmanLoanCollectionPerson> personList = new ArrayList<>();
+            if (monthDiff == 1) {
+                this.dispatchOrderToM1(order, orderList, personList);
+            } else if (monthDiff == 2) {
+                this.dispatchOrderToM2(order, orderList, personList);
+            } else if (monthDiff >= 3 && monthDiff < 6) {
+                this.dispatchOrderToM3(order, orderList, personList);
+            } else if (monthDiff >= 6) {
+                this.dispatchOrderToM6(order, orderList, personList);
+            }
+            mmanLoanCollectionRecordService.assignCollectionOrderToRelatedGroup(orderList, personList, new Date());
+        } catch (Exception e) {
+            logger.error("处理订单逾期升级出错，借款id: " + loanId);
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * 跨月一次的订单分到M1-M2组
+     *
+     * @param order
+     * @param orderList
+     * @param personList
+     */
+    private void dispatchOrderToM1(MmanLoanCollectionOrder order, List<MmanLoanCollectionOrder> orderList, List<MmanLoanCollectionPerson> personList) {
+        if (!BackConstant.XJX_OVERDUE_LEVEL_M1_M2.equals(order.getCurrentOverdueLevel())) {
+            this.setCommonVariables(order, orderList);
+
+            Map<String, String> personMap = new HashMap<>();
+            personMap.put("beginDispatchTime", DateUtil.getDateFormat("yyyy-MM-dd 00:00:00"));
+            personMap.put("endDispatchTime", DateUtil.getDateFormat((DateUtil.getBeforeOrAfter(new Date(), 1)), "yyyy-MM-dd HH:mm:ss"));
+            personMap.put("groupLevel", BackConstant.XJX_OVERDUE_LEVEL_M1_M2);
+            personMap.put("userStatus", BackConstant.ON);
+            personList = backUserDao.findUnCompleteCollectionOrderByCurrentUnCompleteCountListByMap(personMap);
+            if (CollectionUtils.isEmpty(personList)) {
+                this.inserWarnMsg();
+                return;
+            }
+        }
+    }
+
+    /**
+     * 跨月两次的订单分到M2-M3组
+     *
+     * @param order
+     * @param orderList
+     * @param personList
+     */
+    private void dispatchOrderToM2(MmanLoanCollectionOrder order, List<MmanLoanCollectionOrder> orderList, List<MmanLoanCollectionPerson> personList) {
+        if (!BackConstant.XJX_OVERDUE_LEVEL_M2_M3.equals(order.getCurrentOverdueLevel())) {
+            this.setCommonVariables(order, orderList);
+
+            Map<String, String> personMap = new HashMap<>();
+            personMap.put("beginDispatchTime", DateUtil.getDateFormat("yyyy-MM-dd 00:00:00"));
+            personMap.put("endDispatchTime", DateUtil.getDateFormat((DateUtil.getBeforeOrAfter(new Date(), 1)), "yyyy-MM-dd HH:mm:ss"));
+            personMap.put("groupLevel", BackConstant.XJX_OVERDUE_LEVEL_M2_M3);
+            personMap.put("userStatus", BackConstant.ON);
+
+            personList = backUserDao.findUnCompleteCollectionOrderByCurrentUnCompleteCountListByMap(personMap);
+            if (CollectionUtils.isEmpty(personList)) {
+                SysAlertMsg alertMsg = new SysAlertMsg();
+                alertMsg.setTitle("分配催收任务失败");
+                alertMsg.setContent("所有公司M2-M3组查无可用催收人,请及时添加或启用该组催收员。");
+                alertMsg.setDealStatus(BackConstant.OFF);
+                alertMsg.setStatus(BackConstant.OFF);
+                alertMsg.setType(SysAlertMsg.TYPE_COMMON);
+                sysAlertMsgDao.insert(alertMsg);
+                logger.warn("所有公司M2-M3组查无可用催收人...");
+                return;
+            }
+        }
+    }
+
+    /**
+     * 跨月3-5次的订单分到M3+组
+     *
+     * @param order
+     * @param orderList
+     * @param personList
+     */
+    private void dispatchOrderToM3(MmanLoanCollectionOrder order, List<MmanLoanCollectionOrder> orderList, List<MmanLoanCollectionPerson> personList) {
+        if (!BackConstant.XJX_OVERDUE_LEVEL_M3P.equals(order.getCurrentOverdueLevel())) {
+            this.setCommonVariables(order, orderList);
+
+            Map<String, String> personMap = new HashMap<>();
+            personMap.put("beginDispatchTime", DateUtil.getDateFormat("yyyy-MM-dd 00:00:00"));
+            personMap.put("endDispatchTime", DateUtil.getDateFormat((DateUtil.getBeforeOrAfter(new Date(), 1)), "yyyy-MM-dd HH:mm:ss"));
+            personMap.put("groupLevel", BackConstant.XJX_OVERDUE_LEVEL_M3P);
+            personMap.put("userStatus", BackConstant.ON);
+
+            personList = backUserDao.findUnCompleteCollectionOrderByCurrentUnCompleteCountListByMap(personMap);
+            if (CollectionUtils.isEmpty(personList)) {
+                SysAlertMsg alertMsg = new SysAlertMsg();
+                alertMsg.setTitle("分配催收任务失败");
+                alertMsg.setContent("所有公司M3+组查无可用催收人,请及时添加或启用该组催收员。");
+                alertMsg.setDealStatus(BackConstant.OFF);
+                alertMsg.setStatus(BackConstant.OFF);
+                alertMsg.setType(SysAlertMsg.TYPE_COMMON);
+                sysAlertMsgDao.insert(alertMsg);
+                logger.warn("所有M3+组查无可用催收人...");
+                return;
+            }
+        }
+    }
+
+    /**
+     * 跨月6次及以上的订单分到M3+组
+     *
+     * @param order
+     * @param orderList
+     * @param personList
+     */
+    private void dispatchOrderToM6(MmanLoanCollectionOrder order, List<MmanLoanCollectionOrder> orderList, List<MmanLoanCollectionPerson> personList) {
+        if (!BackConstant.XJX_OVERDUE_LEVEL_M6P.equals(order.getCurrentOverdueLevel())) {
+            this.setCommonVariables(order, orderList);
+            Map<String, String> personMap = new HashMap<>();
+            personMap.put("beginDispatchTime", DateUtil.getDateFormat("yyyy-MM-dd 00:00:00"));
+            personMap.put("endDispatchTime", DateUtil.getDateFormat((DateUtil.getBeforeOrAfter(new Date(), 1)), "yyyy-MM-dd HH:mm:ss"));
+            personMap.put("groupLevel", BackConstant.XJX_OVERDUE_LEVEL_M6P);
+            personMap.put("userStatus", BackConstant.ON);
+
+            personList = backUserDao.findUnCompleteCollectionOrderByCurrentUnCompleteCountListByMap(personMap);
+            if (CollectionUtils.isEmpty(personList)) {
+                SysAlertMsg alertMsg = new SysAlertMsg();
+                alertMsg.setTitle("分配催收任务失败");
+                alertMsg.setContent("所有公司M6+组查无可用催收人,请及时添加或启用该组催收员。");
+                alertMsg.setDealStatus(BackConstant.OFF);
+                alertMsg.setStatus(BackConstant.OFF);
+                alertMsg.setType(SysAlertMsg.TYPE_COMMON);
+                sysAlertMsgDao.insert(alertMsg);
+                logger.warn("所有M6+组查无可用催收人...");
+                return;
+            }
+        }
+    }
+
+    /**
+     * M1-M2组满足条件催收员为空时，插入提示消息
+     */
+    private void inserWarnMsg() {
+        SysAlertMsg alertMsg = new SysAlertMsg();
+        alertMsg.setTitle("分配催收任务失败");
+        alertMsg.setContent("所有M1-M2组查无可用催收人,请及时添加或启用该组催收员。");
+        alertMsg.setDealStatus(BackConstant.OFF);
+        alertMsg.setStatus(BackConstant.OFF);
+        alertMsg.setType(SysAlertMsg.TYPE_COMMON);
+        sysAlertMsgDao.insert(alertMsg);
+        logger.warn("所有M1-M2组查无可用催收人...");
+    }
+
+    /**
+     * 设置派单时定单对象的通用参数
+     *
+     * @param order
+     */
+    private void setCommonVariables(MmanLoanCollectionOrder order, List<MmanLoanCollectionOrder> orderList) {
+        String sysName = "系统";
+        String sysPromoteRemark = "逾期升级，系统重新派单";
+        order.setDispatchName(sysName);
+        order.setDispatchTime(new Date());
+        order.setS1Flag(null);   // 订单逾期升级  S1flg置为null
+        order.setOperatorName(sysName);
+        order.setRemark(sysPromoteRemark);
+        order.setLastCollectionUserId(order.getCurrentCollectionUserId());//上一催收员
+        //更新聚信立报告申请审核状态为初始状态，下一催收员要看需要重新申请
+        order.setJxlStatus(BackConstant.XJX_JXL_STATUS_REFUSE);
+        orderList.add(order);
     }
 
     /**
