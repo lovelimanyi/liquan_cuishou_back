@@ -131,4 +131,12 @@ public interface IMmanLoanCollectionOrderService {
 
 	void updateOrderInfo(String loanId);
 
+	/**
+	 * 新订单派单
+	 * @param loanId
+	 * @param idNumber
+	 * @param type
+	 */
+	void dispatchOrderNew(String loanId,String idNumber,String type);
+
 }

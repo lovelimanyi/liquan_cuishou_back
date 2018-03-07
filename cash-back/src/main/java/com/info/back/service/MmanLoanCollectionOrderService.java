@@ -2,10 +2,7 @@ package com.info.back.service;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.info.back.dao.*;
 import com.info.back.utils.BackConstant;
@@ -21,6 +18,7 @@ import com.info.web.util.PageConfig;
 import com.info.back.result.JsonResult;
 import com.info.back.utils.IdGen;
 import com.info.constant.Constant;
+import org.springframework.util.CollectionUtils;
 
 @Service
 public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderService {
@@ -42,6 +40,13 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
     private IMmanUserLoanDao mmanUserLoanDao;
     @Autowired
     private IOperationRecordService operationRecordService;
+    @Autowired
+    private IBackUserDao backUserDao;
+    @Autowired
+    private ISysAlertMsgDao sysAlertMsgDao;
+    @Autowired
+    private IMmanLoanCollectionRecordService mmanLoanCollectionRecordService;
+
 
     @Override
     public List<MmanLoanCollectionOrder> getOrderList(MmanLoanCollectionOrder mmanLoanCollectionOrder) {
@@ -284,7 +289,7 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
             logger.error("更新逾期订单出错，订单对象为空，借款id: " + loanId);
             return;
         }
-        if(BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())){
+        if (BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())) {
             logger.error("更新逾期订单出错，该订单已还款完成，请核实，借款id: " + loanId);
             return;
         }
@@ -307,8 +312,6 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
 						}*/
 //                        loanMoney = loanMoney.add(pmoney).setScale(2, BigDecimal.ROUND_HALF_UP);  // 应还总额
 
-            // 外层循环处理时间随着数据量增长会越来越长，防止更新滞纳金（罚息）时覆盖更新已还款的数据
-
             MmanUserLoan mmanUserLoanForUpdate = new MmanUserLoan();
             mmanUserLoanForUpdate.setId(loan.getId());
             mmanUserLoanForUpdate.setLoanPenalty(pmoney);  // 更新借款表滞纳金
@@ -327,8 +330,81 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
             collectionOrder.setLoanId(loan.getId());
             collectionOrder.setOverdueDays(overdueDays);
             manLoanCollectionOrderDao.updateOrderOverdueDays(collectionOrder);
-
         }
+    }
+
+    @Override
+    public void dispatchOrderNew(String loanId, String idNumber, String type) {
+        MmanUserLoan mmanUserLoan = mmanUserLoanDao.get(loanId);
+        if (mmanUserLoan == null) {
+            return;
+        }
+        CreditLoanPay creditLoanPay = creditLoanPayDao.findByLoanId(loanId);
+        if (creditLoanPay == null) {
+            return;
+        }
+        List<MmanLoanCollectionOrder> orderList = new ArrayList<>();
+        List<MmanLoanCollectionPerson> personList;
+        Date now = new Date();
+        String sysName = "系统";
+        String sysRemark = "系统派单";
+        MmanLoanCollectionOrder order = new MmanLoanCollectionOrder();
+        order.setLoanId(mmanUserLoan.getId());
+        order.setOrderId(mmanUserLoan.getLoanPyId());
+        order.setUserId(mmanUserLoan.getUserId());
+        order.setOverdueDays(getOverdueDays(mmanUserLoan));
+        order.setPayId(creditLoanPay.getId());
+        order.setDispatchName(sysName);
+        order.setDispatchTime(now);
+        order.setOperatorName(sysName);
+        order.setRemark(sysRemark);
+        order.setJxlStatus(BackConstant.XJX_JXL_STATUS_REFUSE);
+        order.setIdNumber(idNumber);  // 借款人身份证号
+        saveMmanLoanCollectionOrder(order);
+        orderList.add(order);
+
+        Calendar clrNow = Calendar.getInstance();
+        int dayNow = clrNow.get(Calendar.DAY_OF_MONTH);
+        Map<String, String> personMap = new HashMap<>();
+        if (dayNow == 1) {
+            personMap.put("beginDispatchTime", DateUtil.getDateFormat("yyyy-MM-dd 00:00:00"));
+            personMap.put("endDispatchTime", DateUtil.getDateFormat((DateUtil.getBeforeOrAfter(new Date(), 1)), "yyyy-MM-dd HH:mm:ss"));
+            personMap.put("groupLevel", BackConstant.XJX_OVERDUE_LEVEL_M1_M2);
+            personMap.put("userStatus", BackConstant.ON);
+            personList = backUserDao.findUnCompleteCollectionOrderByCurrentUnCompleteCountListByMap(personMap);
+            if (CollectionUtils.isEmpty(personList)) {
+                SysAlertMsg alertMsg = new SysAlertMsg();
+                alertMsg.setTitle("分配催收任务失败");
+                alertMsg.setContent("所有M1-M2组查无可用催收人,请及时添加或启用该组催收员。");
+                alertMsg.setDealStatus(BackConstant.OFF);
+                alertMsg.setStatus(BackConstant.OFF);
+                alertMsg.setType(SysAlertMsg.TYPE_COMMON);
+                sysAlertMsgDao.insert(alertMsg);
+                logger.warn("所有M1-M2组查无可用催收人...");
+                return;
+            }
+        } else {
+            Calendar cal = Calendar.getInstance();
+            cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), 2);
+            Date date = cal.getTime();
+            personMap.put("beginDispatchTime", DateUtil.getDateFormat(date, "yyyy-MM-dd 00:00:00"));
+            personMap.put("endDispatchTime", DateUtil.getDateFormat((DateUtil.getBeforeOrAfter(new Date(), 1)), "yyyy-MM-dd HH:mm:ss"));
+            personMap.put("groupLevel", BackConstant.XJX_OVERDUE_LEVEL_S1_OR_S2);
+            personMap.put("userStatus", BackConstant.ON);
+            personList = backUserDao.findUnCompleteCollectionOrderByCurrentUnCompleteCountListByMap(personMap);
+            if (CollectionUtils.isEmpty(personList)) {
+                SysAlertMsg alertMsg = new SysAlertMsg();
+                alertMsg.setTitle("分配催收任务失败");
+                alertMsg.setContent("所有公司S1、S2组查无可用催收人,请及时添加或启用该组催收员。");
+                alertMsg.setDealStatus(BackConstant.OFF);
+                alertMsg.setStatus(BackConstant.OFF);
+                alertMsg.setType(SysAlertMsg.TYPE_COMMON);
+                sysAlertMsgDao.insert(alertMsg);
+                logger.warn("所有公司S1、S2组查无可用催收人...");
+                return;
+            }
+        }
+        mmanLoanCollectionRecordService.assignCollectionOrderToRelatedGroup(orderList, personList, now);
     }
 
     /**
@@ -357,9 +433,7 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
      */
     private BigDecimal getLoanPenalty(MmanUserLoan loan, BigDecimal loanMoney, int pday) {
         BigDecimal pRate = new BigDecimal(Integer.parseInt(loan.getLoanPenaltyRate())).divide(new BigDecimal(10000));
-//        BigDecimal pRate = new BigDecimal((Double.parseDouble(mmanUserLoanOri.getLoanPenaltyRate()) / 10000));//罚息率
         BigDecimal paidMoney = loan.getPaidMoney();  // 借款本金和服务费之和
-//        BigDecimal loanMoney = mmanUserLoanOri.getLoanMoney();
         BigDecimal pmoney = null;
         if (loan.getBorrowingType().equals(Constant.BIG)) {
             pmoney = loanMoney.multiply(new BigDecimal(pday)).multiply(pRate).setScale(2, BigDecimal.ROUND_HALF_UP);
