@@ -117,4 +117,5 @@ public interface IMmanLoanCollectionOrderDao {
 	 */
 	int updateOrderInfo(HashMap<String,Object> map);
 
+    void updateOverdueDays(MmanLoanCollectionOrder order);
 }

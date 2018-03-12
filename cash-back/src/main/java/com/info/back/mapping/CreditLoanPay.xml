@@ -189,7 +189,9 @@
 			<if test="receivableInterest != null">receivable_interest=#{receivableInterest},</if>  
 			<if test="realMoney != null">real_money=#{realMoney},</if>  
 			<if test="realgetPrinciple != null">realget_principle=#{realgetPrinciple},</if>  
-			<if test="realgetInterest != null">realget_interest=#{realgetInterest},</if> 
+			<if test="realgetInterest != null">realget_interest=#{realgetInterest},</if>
+			<if test="realgetAccrual != null">realget_accrual=#{realgetAccrual},</if>
+			<if test="remainAccrual != null">remain_accrual=#{remainAccrual},</if>
 			<if test="reductionMoney != null">reduction_money = reduction_money + #{reductionMoney},</if>  
 			<if test="status != null">status=#{status},</if>  
 			<if test="createDate != null">create_date=#{createDate},</if>  

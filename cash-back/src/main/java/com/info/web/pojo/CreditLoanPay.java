@@ -48,6 +48,24 @@ public class CreditLoanPay {
 	private BigDecimal realgetServiceCharge;
 
 	private BigDecimal remainServiceCharge;
+	private BigDecimal realgetAccrual;//实收利息
+	private BigDecimal remainAccrual;//剩余利息
+
+	public BigDecimal getRealgetAccrual() {
+		return realgetAccrual;
+	}
+
+	public void setRealgetAccrual(BigDecimal realgetAccrual) {
+		this.realgetAccrual = realgetAccrual;
+	}
+
+	public BigDecimal getRemainAccrual() {
+		return remainAccrual;
+	}
+
+	public void setRemainAccrual(BigDecimal remainAccrual) {
+		this.remainAccrual = remainAccrual;
+	}
 
 	public BigDecimal getRealgetServiceCharge() {
 		return realgetServiceCharge;

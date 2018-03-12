@@ -2,17 +2,34 @@ package com.info.web.pojo.dto;
 
 public class CollectionNotifyLoanDto{
     private Long id;
-    private Long userId;
-    private Integer loanMoney;
-    private Integer loanRate;
-    private Integer paidMoney;
-    private Integer loanPenalty;
-    private Integer serviceCharge;
-    private Integer loanPenaltyRate;
-    private Integer termNumber;
+    private Long userId; //用户id
+    private Integer loanMoney; //借款本金
+    private Integer loanRate; //借款利率
+    private Integer paidMoney; //(本金+服务费)  由于现在无服务费，次字段赋值为 借款本金即可
+    private Integer loanPenalty; //滞纳金
+    private Integer serviceCharge; //服务费（暂时未用到，值为 0即可）
+    private Integer loanPenaltyRate; //滞纳金利率
+    private Integer termNumber; //期数
     private Long loanEndTime;
     private Long loanStartTime;
+    private Integer lateDay; //逾期天数
+    private Integer accrual; //利息
 
+    public Integer getAccrual() {
+        return accrual;
+    }
+
+    public void setAccrual(Integer accrual) {
+        this.accrual = accrual;
+    }
+
+    public Integer getLateDay() {
+        return lateDay;
+    }
+
+    public void setLateDay(Integer lateDay) {
+        this.lateDay = lateDay;
+    }
 
     public Long getId() {
         return id;
