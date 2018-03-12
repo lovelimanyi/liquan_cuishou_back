@@ -36,8 +36,6 @@ public class SyncService implements ISyncService {
     @Autowired
     private ILocalDataDao localDataDao;
     @Autowired
-    private TaskJobMiddleService taskJobMiddleService;
-    @Autowired
     private ICreditLoanPayDao creditLoanPayDao;
     @Autowired
     private MmanLoanCollectionOrderService orderService;
@@ -89,7 +87,8 @@ public class SyncService implements ISyncService {
             syncUtils.saveUserInfo(localDataDao,payId,userId,userInfo,userContactsList,cardInfo);
 
             //派单
-            taskJobMiddleService.dispatchforLoanId(loanId,userInfo.get("id_number").toString(),Constant.BIG);
+//            taskJobMiddleService.dispatchforLoanId(loanId,userInfo.get("id_number").toString(),Constant.BIG);
+            orderService.dispatchOrderNew(loanId,userInfo.get("id_number").toString(),Constant.BIG);
         }
 
     }

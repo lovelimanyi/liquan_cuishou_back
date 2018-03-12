@@ -349,7 +349,7 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
     @Override
     public void dispatchOrderNew(String loanId, String idNumber, String type) {
         try {
-
+            logger.info("处理派单开始，借款id: " + loanId);
             MmanUserLoan mmanUserLoan = mmanUserLoanDao.get(loanId);
             if (mmanUserLoan == null) {
                 return;
@@ -412,6 +412,7 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
                 }
             }
             mmanLoanCollectionRecordService.assignCollectionOrderToRelatedGroup(orderList, personList, now);
+            logger.info("处理派单完成，借款id: " + loanId);
         } catch (Exception e) {
             logger.error("新订单入催派单出错，借款id: " + loanId);
             e.printStackTrace();

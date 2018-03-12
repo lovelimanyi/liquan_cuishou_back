@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import com.info.back.service.IMmanLoanCollectionOrderService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,7 @@ public class DataSyncService {
 	@Autowired
 	private ILocalDataDao localDataDao;
 	@Autowired
-	private TaskJobMiddleService taskJobMiddleService;
+	private IMmanLoanCollectionOrderService orderService;
 	private static final String LOCK_FLAG = "1";
 	
 	/**
@@ -70,7 +71,7 @@ public class DataSyncService {
 		if(null!=list && 0<list.size()){
 			try{
 				loger.info("处理逾期数据");
-				SendOverdueManage dendOverdueManage = new SendOverdueManage(list,this.dataDao,this.localDataDao,this.taskJobMiddleService);
+				SendOverdueManage dendOverdueManage = new SendOverdueManage(list,this.dataDao,this.localDataDao,this.orderService);
 				dendOverdueManage.send();
 			}catch(Exception e){
 				e.printStackTrace();
