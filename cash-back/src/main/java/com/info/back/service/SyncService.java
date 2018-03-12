@@ -103,14 +103,18 @@ public class SyncService implements ISyncService {
         CreditLoanPay creditLoanPay1 = creditLoanPayDao.get(payId);
         int receivablePrinciple = Integer.parseInt(String.valueOf(repayment.getReceivablePrinciple()));//剩余应还本金
         if (creditLoanPay1 != null){
-            // 还款 --更新还款表
-            CreditLoanPay creditLoanPay = handleRCreditLoanPay(repayment,loanId,loan,creditLoanPay1);
-            localDataDao.updateCreditLoanPay(creditLoanPay);//更新还款表
+
             //保存还款详情
             HashMap<String,String> map = new HashMap<String,String>();
             map.put("PAY_ID", payId);
             List<String> idList = localDataDao.selectCreditLoanPayDetail(map);//查询目前插入的还款记录
             if (syncUtils.checkDetailId(idList, repaymentDetail.getId())){
+
+                // 还款 --更新还款表
+                CreditLoanPay creditLoanPay = handleRCreditLoanPay(repayment,loanId,loan,creditLoanPay1);
+                localDataDao.updateCreditLoanPay(creditLoanPay);//更新还款表
+
+
                 CreditLoanPayDetail creditLoanPayDetail = new CreditLoanPayDetail();
                 creditLoanPayDetail.setCreateDate(DateUtil.getDateTimeFormat(repaymentDetail.getCreateDate(), "yyyy-MM-dd"));
                 creditLoanPayDetail.setId(repaymentDetail.getId());
@@ -143,25 +147,24 @@ public class SyncService implements ISyncService {
                 }
 
                 localDataDao.saveCreditLoanPayDetail(creditLoanPayDetail);
-            }
 
-            //更新订单表，催收流转日志表
-            HashMap<String,Object> repaymentMap = new HashMap<>();
-            repaymentMap.put("user_id",userId);
-            repaymentMap.put("repaymented_amount",repayment.getRealMoney());
-            //如果还款完成，则更新借款表,更新订单表，添加催收流转日志
-            if (receivablePrinciple <= 0) {
-                // 更新借款表-还款完成同步
-                MmanUserLoan mmanUserLoan = new MmanUserLoan();
-                mmanUserLoan.setId(loanId);
-                mmanUserLoan.setLoanStatus(Constant.STATUS_OVERDUE_FIVE);//借款状态5 还款完成
-                mmanUserLoan.setUpdateTime(new Date());
-                localDataDao.updateMmanUserLoan(mmanUserLoan);
-                syncUtils.updateOrderAndLog(loanId,repaymentMap,localDataDao,payId);
-            }else {//如果部分还款，只更新订单表
-                syncUtils.updateMmanLoanCollectionOrder(localDataDao,loanId,repaymentMap,Constant.STATUS_OVERDUE_ONE);
+                //更新订单表，催收流转日志表
+                HashMap<String,Object> repaymentMap = new HashMap<>();
+                repaymentMap.put("user_id",userId);
+                repaymentMap.put("repaymented_amount",repayment.getRealMoney());
+                //如果还款完成，则更新借款表,更新订单表，添加催收流转日志
+                if (receivablePrinciple <= 0) {
+                    // 更新借款表-还款完成同步
+                    MmanUserLoan mmanUserLoan = new MmanUserLoan();
+                    mmanUserLoan.setId(loanId);
+                    mmanUserLoan.setLoanStatus(Constant.STATUS_OVERDUE_FIVE);//借款状态5 还款完成
+                    mmanUserLoan.setUpdateTime(new Date());
+                    localDataDao.updateMmanUserLoan(mmanUserLoan);
+                    syncUtils.updateOrderAndLog(loanId,repaymentMap,localDataDao,payId);
+                }else {//如果部分还款，只更新订单表
+                    syncUtils.updateMmanLoanCollectionOrder(localDataDao,loanId,repaymentMap,Constant.STATUS_OVERDUE_ONE);
+                }
             }
-
         }
 
     }
