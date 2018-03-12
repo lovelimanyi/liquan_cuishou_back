@@ -913,4 +913,10 @@
             </if>
         </where>
     </select>
+
+	<update id="updateOverdueDays" parameterType="com.info.web.pojo.MmanLoanCollectionOrder">
+		UPDATE mman_loan_collection_order o
+		SET o.overdueDays = #{overdueDays}
+		WHERE o.loan_id = #{loanId}
+	</update>
 </mapper>

@@ -110,4 +110,5 @@ public interface IMmanLoanCollectionOrderDao {
     void updateOrderOverdueDays(MmanLoanCollectionOrder collectionOrder);
 
     List<String> getOverdueOrderIds(Map<String, Object> map);
+    void updateOverdueDays(MmanLoanCollectionOrder order);
 }

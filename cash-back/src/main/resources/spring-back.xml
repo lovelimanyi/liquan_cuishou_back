@@ -12,7 +12,7 @@
     	http://www.springframework.org/schema/task/spring-task-3.2.xsd">
 
 	<mvc:resources location="/resources/" mapping="/resources/**"></mvc:resources>
-	<mvc:resources location="/files/" mapping="/files/**"></mvc:resources>
+	<!--<mvc:resources location="/files/" mapping="/files/**"></mvc:resources>-->
 	<mvc:view-controller path="/" view-name="/login" />
 	<!--对模型视图名称的解析，即在模型视图名称添加前后缀 -->
 	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
@@ -58,33 +58,51 @@
 				<value>/collectionOrder/sendMsg</value>
 				<value>/collectionOrder/withhold-callback</value>
 				<value>/sync/loan-order-info</value>
+				<value>/sync/loan-order-update</value>
 				<value>/sync/repayment</value>
+				<value>/sync/repay</value>
 			</list>
 		</property>
 	</bean>
 	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter" />
 	<context:component-scan base-package="com.info.back.controller">
 	</context:component-scan>
+	<mvc:annotation-driven />
+	<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+		<property name="messageConverters">
+			<list>
+				<bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+					<property name="supportedMediaTypes">
+						<list>
+							<value>text/html;charset=UTF-8</value>
+							<value>text/plain;charset=UTF-8</value>
+							<value>application/json;charset=UTF-8</value>
+						</list>
+					</property>
+				</bean>
+			</list>
+		</property>
+	</bean>
 
-	<task:scheduled-tasks scheduler="myScheduler">
-		<!--<task:scheduled ref="taskJobMiddleService" method="autoDispatch" cron="0 11 1,12,20 * * ?" />每天凌晨3、5、9、20点11分 跑分单，逾期计算-->
-		<task:scheduled ref="taskJobStatistics" method="callProcedure" cron="0 2 0,11,14,17,20,22 * * ?" />
-		<task:scheduled ref="taskJobStatistics" method="callCountCollection" cron="0 1 0 * * ?" /> <!-- 催收记录统计 凌晨01分跑 -->
-		<task:scheduled ref="taskWithholdStatus" method="updateStatus" cron="0 25 10,14,21 * * ?" />
-		<task:scheduled ref="dataSyncService" method="syncOverdueDate" cron="0 40 2 * * ?" /><!--每天凌晨2点40跑逾期-->
-		<!--3点开始跑逾期，到4点跑完了，先执行部分还款数据，5点开始跑全部还款数据(1-4之间不执行续期、还款、代扣，为了防止3点逾期还未推送，还款先推送了)-->
-		<task:scheduled ref="twoMinSyncOperateService" method="twoMinSyncOverdue" cron="0 0/2 4-23 * * ?" /><!--4点到24点   每2分钟跑逾期(部分还款)-->
-		<task:scheduled ref="twoMinSyncOperateService" method="twoMinSyncOther" cron="0 0/2 5-23 * * ?" /><!--5点到24点   每2分钟跑续期，还款，代扣 -->
-		<task:scheduled ref="twoMinSyncOperateService" method="twoMinSyncOther" cron="0 0/2 0 * * ?" /><!--0点到1点   每2分钟跑续期，还款，代扣 -->
-		<task:scheduled ref="twoMinSyncOperateService" method="twoMinSyncOverdue" cron="0 0/6 0 * * ?" /><!--4点到24点   每2分钟跑逾期(部分还款)-->
-		<task:scheduled ref="taskJianmianStatus" method="updateStatus" cron="0 30 23 * * ?" /> <!-- 每天晚上11点30 跑减免失效状态 -->
-		<task:scheduled ref="taskCleacUpOperationRecordData" method="cleacUpOperationRecordData" cron="0 30 23 * * ?" /> <!-- 清除操作记录数据 -->
-		<task:scheduled ref="taskDisableOrEnableCollections" method="disableCollections" cron="0 5 0 1 * ?" />
-		<task:scheduled ref="taskDisableOrEnableCollections" method="enableCollections" cron="0 0 23 1 * ?" />
-		<task:scheduled ref="dealOverdueLoanService" method="dealOverdueLoan" cron="0 10 0 * * ?" />
-		<task:scheduled ref="taskDealWithSpecialOrder" method="updateOrderInfo" cron="0 0 7 2 * ?" />   <!-- 应产品需求，修改每月1号完成订单至指定催收员(每月2号7点执行) -->
-	</task:scheduled-tasks>
-	<!--最多 5个定时任务线程-->
-	<task:scheduler id="myScheduler" pool-size="6"/>
+	<!--<task:scheduled-tasks scheduler="myScheduler">-->
+		<!--&lt;!&ndash;<task:scheduled ref="taskJobMiddleService" method="autoDispatch" cron="0 11 1,12,20 * * ?" />每天凌晨3、5、9、20点11分 跑分单，逾期计算&ndash;&gt;-->
+		<!--<task:scheduled ref="taskJobStatistics" method="callProcedure" cron="0 2 0,11,14,17,20,22 * * ?" />-->
+		<!--<task:scheduled ref="taskJobStatistics" method="callCountCollection" cron="0 1 0 * * ?" /> &lt;!&ndash; 催收记录统计 凌晨01分跑 &ndash;&gt;-->
+		<!--<task:scheduled ref="taskWithholdStatus" method="updateStatus" cron="0 25 10,14,21 * * ?" />-->
+		<!--<task:scheduled ref="dataSyncService" method="syncOverdueDate" cron="0 40 2 * * ?" />&lt;!&ndash;每天凌晨2点40跑逾期&ndash;&gt;-->
+		<!--&lt;!&ndash;3点开始跑逾期，到4点跑完了，先执行部分还款数据，5点开始跑全部还款数据(1-4之间不执行续期、还款、代扣，为了防止3点逾期还未推送，还款先推送了)&ndash;&gt;-->
+		<!--<task:scheduled ref="twoMinSyncOperateService" method="twoMinSyncOverdue" cron="0 0/2 4-23 * * ?" />&lt;!&ndash;4点到24点   每2分钟跑逾期(部分还款)&ndash;&gt;-->
+		<!--<task:scheduled ref="twoMinSyncOperateService" method="twoMinSyncOther" cron="0 0/2 5-23 * * ?" />&lt;!&ndash;5点到24点   每2分钟跑续期，还款，代扣 &ndash;&gt;-->
+		<!--<task:scheduled ref="twoMinSyncOperateService" method="twoMinSyncOther" cron="0 0/2 0 * * ?" />&lt;!&ndash;0点到1点   每2分钟跑续期，还款，代扣 &ndash;&gt;-->
+		<!--<task:scheduled ref="twoMinSyncOperateService" method="twoMinSyncOverdue" cron="0 0/6 0 * * ?" />&lt;!&ndash;4点到24点   每2分钟跑逾期(部分还款)&ndash;&gt;-->
+		<!--<task:scheduled ref="taskJianmianStatus" method="updateStatus" cron="0 30 23 * * ?" /> &lt;!&ndash; 每天晚上11点30 跑减免失效状态 &ndash;&gt;-->
+		<!--<task:scheduled ref="taskCleacUpOperationRecordData" method="cleacUpOperationRecordData" cron="0 30 23 * * ?" /> &lt;!&ndash; 清除操作记录数据 &ndash;&gt;-->
+		<!--<task:scheduled ref="taskDisableOrEnableCollections" method="disableCollections" cron="0 5 0 1 * ?" />-->
+		<!--<task:scheduled ref="taskDisableOrEnableCollections" method="enableCollections" cron="0 0 23 1 * ?" />-->
+		<!--<task:scheduled ref="dealOverdueLoanService" method="dealOverdueLoan" cron="0 10 0 * * ?" />-->
+		<!--<task:scheduled ref="taskDealWithSpecialOrder" method="updateOrderInfo" cron="0 0 7 2 * ?" />   &lt;!&ndash; 应产品需求，修改每月1号完成订单至指定催收员(每月2号7点执行) &ndash;&gt;-->
+	<!--</task:scheduled-tasks>-->
+	<!--&lt;!&ndash;最多 5个定时任务线程&ndash;&gt;-->
+	<!--<task:scheduler id="myScheduler" pool-size="6"/>-->
 
 </beans>

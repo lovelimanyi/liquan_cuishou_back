@@ -20,6 +20,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import javax.sound.midi.Soundbank;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.util.Date;
 
 /**
  * 类描述：
@@ -36,6 +37,10 @@ public class TestOss {
         BigDecimal aaa = new BigDecimal(2);
         BigDecimal bb = aaa.divide(new BigDecimal(10000));
         System.out.println(bb);
+
+        Long da =DateUtil.getDateTimeFormat("2018-01-22","yyyy-MM-dd").getTime();
+//        String dd = da.toString();
+        System.out.println(da);
 
 
 

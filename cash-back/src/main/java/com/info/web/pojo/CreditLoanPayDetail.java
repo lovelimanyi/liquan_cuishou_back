@@ -20,6 +20,9 @@ public class CreditLoanPayDetail {
 	private BigDecimal realPrinciple;
 	// 剩余应还利息
 	private BigDecimal realInterest;
+
+	private BigDecimal realgetAccrual;//实收利息
+	private BigDecimal remainAccrual;//剩余利息
 	// 还款方式
 	private String returnType;
 	// 备注
@@ -42,6 +45,22 @@ public class CreditLoanPayDetail {
 	private String currentCollectionUserId;
 	//纪录2-11号S1组订单到S2人手上的标志
 	private String s1Flag;
+
+	public BigDecimal getRealgetAccrual() {
+		return realgetAccrual;
+	}
+
+	public void setRealgetAccrual(BigDecimal realgetAccrual) {
+		this.realgetAccrual = realgetAccrual;
+	}
+
+	public BigDecimal getRemainAccrual() {
+		return remainAccrual;
+	}
+
+	public void setRemainAccrual(BigDecimal remainAccrual) {
+		this.remainAccrual = remainAccrual;
+	}
 
 	public void setId(String id){
 		this.id = id;

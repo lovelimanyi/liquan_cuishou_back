@@ -13,4 +13,9 @@ public interface ISyncService {
     void handleOverdue(Repayment repayment, Loan loan);
 
     void handleRepay(Repayment repayment, Loan loan, RepaymentDetail repaymentDetail);
+    /**
+     * 每日更新滞纳金，罚息。
+     * @param repayment,loan
+     */
+    void updateOverdue(Repayment repayment, Loan loan);
 }

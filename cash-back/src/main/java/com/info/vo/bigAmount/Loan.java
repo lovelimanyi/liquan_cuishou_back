@@ -15,9 +15,27 @@ public class Loan {
     private String loanRate;
     private String loanStartTime;
     private String paidMoney;
+    private String accrual;
     private String serviceCharge;
     private String userId;
     private String termNumber;
+    private Integer overdueDays;
+
+    public String getAccrual() {
+        return accrual;
+    }
+
+    public void setAccrual(String accrual) {
+        this.accrual = accrual;
+    }
+
+    public Integer getOverdueDays() {
+        return overdueDays;
+    }
+
+    public void setOverdueDays(Integer overdueDays) {
+        this.overdueDays = overdueDays;
+    }
 
     public String getId() {
         return id;
