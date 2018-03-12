@@ -70,6 +70,7 @@ public class SyncService implements ISyncService {
             mmanUserLoan.setLoanPenalty(new BigDecimal(Integer.parseInt(loan.getLoanPenalty())/100.00));
             mmanUserLoan.setServiceCharge(new BigDecimal(Integer.parseInt(loan.getServiceCharge())/100.00));//服务费
             mmanUserLoan.setLoanPenaltyRate(loan.getLoanPenaltyRate());
+            mmanUserLoan.setAccrual(new BigDecimal(Integer.parseInt(loan.getAccrual())/100.00));//利息
             mmanUserLoan.setLoanEndTime(DateUtil.getDateTimeFormat(loan.getLoanEndTime(), "yyyy-MM-dd"));
             mmanUserLoan.setUpdateTime(new Date());
             mmanUserLoan.setLoanStatus(Constant.STATUS_OVERDUE_FOUR);//4：逾期
