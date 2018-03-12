@@ -110,7 +110,10 @@
     </update>
     <!-- 根据主键获取单条记录 -->
     <select id="get" resultMap="queryResultMap" parameterType="com.info.web.pojo.MmanUserLoan">
-    SELECT t.id , t.user_id , t.loan_py_id , t.loan_money ,t.paid_money,t.loan_rate ,t.service_charge, t.loan_penalty , t.loan_penalty_rate , t.loan_start_time , t.loan_end_time , t.loan_status , t.create_time , t.update_time , t.del_flag , t.loan_penalty_time , t.loan_sys_status , t.loan_sys_remark, t.borrowing_type FROM mman_user_loan t WHERE id = #{id,jdbcType=VARCHAR}</select>
+    SELECT t.id , t.user_id , t.loan_py_id , t.loan_money ,t.paid_money,t.loan_rate ,t.service_charge, t.loan_penalty , t.loan_penalty_rate , t.loan_start_time , t.loan_end_time
+     , t.loan_status , t.create_time , t.update_time , t.del_flag , t.loan_penalty_time , t.loan_sys_status , t.loan_sys_remark, t.borrowing_type,t.term_number FROM
+     mman_user_loan t WHERE
+     id = #{id,jdbcType=VARCHAR}</select>
     <!-- 根据主键删除记录 -->
     <delete id="del" parameterType="com.info.web.pojo.MmanUserLoan">DELETE FROM mman_user_loan WHERE id = #{id,jdbcType=VARCHAR}</delete>
 
@@ -223,6 +226,7 @@
             <if test="borrowingType != null and borrowingType != ''">
                 AND borrowing_type = #{borrowingType}
             </if>
+            AND term_number IS NULL
         </where>
     </select>
 </mapper>

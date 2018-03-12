@@ -282,6 +282,10 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
             logger.error("更新逾期订单出错，借款对象为空，借款id: " + loanId);
             return;
         }
+        if(loan.getTermNumber() != null){
+            logger.error("更新逾期订单出错，更新逾期订单只处理原来小额来源的订单，借款id: " + loanId);
+            return;
+        }
         CreditLoanPay pay = creditLoanPayDao.findByLoanId(loanId);
         if (pay == null) {
             logger.error("更新逾期订单出错，还款对象为空，借款id: " + loanId);

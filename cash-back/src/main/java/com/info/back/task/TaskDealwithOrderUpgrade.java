@@ -33,7 +33,7 @@ public class TaskDealwithOrderUpgrade {
         for (String loanId : loanIds) {
             try {
                 if (StringUtils.isEmpty(loanId)) {
-                    return;
+                    continue;
                 }
                 DealwithOrderUpgradeThread thread = new DealwithOrderUpgradeThread(loanId, orderService);
                 pool.execute(thread);

@@ -34,6 +34,9 @@ public class TaskUpdateOrderInfo {
     @Autowired
     private IMmanLoanCollectionOrderService orderService;
 
+    /**
+     * 只更新原来小额订单来源的订单，经过交易系统的订单由对方更新后推送给我们
+     */
     public void updateOrderInfo() {
         logger.info("更新逾期订单开始... ");
         Map<String, Object> map = new HashMap<>();
