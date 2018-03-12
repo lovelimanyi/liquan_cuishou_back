@@ -196,8 +196,8 @@ public class SyncController {
             repaymentDetail.setRealMoney(String.valueOf(collectionNotifyDto.getRepaymentDetail().getRealMoney()));
             repaymentDetail.setRealPenlty(String.valueOf(collectionNotifyDto.getRepaymentDetail().getRealPenlty()));
             repaymentDetail.setRealPrinciple(String.valueOf(collectionNotifyDto.getRepaymentDetail().getRealPrinciple()));
-            repaymentDetail.setRealgetAccrual(String.valueOf(collectionNotifyDto.getRepayment().getRealgetAccrual()));
-            repaymentDetail.setRemainAccrual(String.valueOf(collectionNotifyDto.getRepayment().getRemainAccrual()));
+            repaymentDetail.setRealgetAccrual(String.valueOf(collectionNotifyDto.getRepaymentDetail().getRealgetAccrual()));
+            repaymentDetail.setRemainAccrual(String.valueOf(collectionNotifyDto.getRepaymentDetail().getRemainAccrual()));
             bigAmountRequestParams.setRepaymentDetail(repaymentDetail);
         }
 
