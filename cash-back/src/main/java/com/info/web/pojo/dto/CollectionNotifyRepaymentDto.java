@@ -1,5 +1,7 @@
 package com.info.web.pojo.dto;
 
+import java.math.BigDecimal;
+
 public class CollectionNotifyRepaymentDto{
 
     private Long id;
@@ -7,12 +9,83 @@ public class CollectionNotifyRepaymentDto{
     private Long createDate;
     private Long receivableStartdate;
     private Long receivableDate;
-    private Integer receiveMoney;
-    private Integer realMoney;
-    private Integer loanPenalty;
+    private Integer receiveMoney; //应还总额
+    private Integer realMoney; //总实收金额（总实收本金+总实收利息+总实收滞纳金）
+    private Integer loanPenalty; //滞纳金
     private String status;
 
+    private Integer realgetPrinciple;//总实收本金
+    private Integer receivablePrinciple;//剩余应还本金
+    private Integer realgetInterest;//总实收滞纳金
+    private Integer receivableInterest;//剩余应还滞纳金
+    private Integer realgetServiceCharge;//实收服务费
+    private Integer remainServiceCharge;//剩余应还服务费
+    private Integer realgetAccrual;//总实收利息
+    private Integer remainAccrual;//剩余利息
 
+    public Integer getRealgetAccrual() {
+        return realgetAccrual;
+    }
+
+    public void setRealgetAccrual(Integer realgetAccrual) {
+        this.realgetAccrual = realgetAccrual;
+    }
+
+    public Integer getRemainAccrual() {
+        return remainAccrual;
+    }
+
+    public void setRemainAccrual(Integer remainAccrual) {
+        this.remainAccrual = remainAccrual;
+    }
+
+    public Integer getRealgetPrinciple() {
+        return realgetPrinciple;
+    }
+
+    public void setRealgetPrinciple(Integer realgetPrinciple) {
+        this.realgetPrinciple = realgetPrinciple;
+    }
+
+    public Integer getReceivablePrinciple() {
+        return receivablePrinciple;
+    }
+
+    public void setReceivablePrinciple(Integer receivablePrinciple) {
+        this.receivablePrinciple = receivablePrinciple;
+    }
+
+    public Integer getRealgetInterest() {
+        return realgetInterest;
+    }
+
+    public void setRealgetInterest(Integer realgetInterest) {
+        this.realgetInterest = realgetInterest;
+    }
+
+    public Integer getReceivableInterest() {
+        return receivableInterest;
+    }
+
+    public void setReceivableInterest(Integer receivableInterest) {
+        this.receivableInterest = receivableInterest;
+    }
+
+    public Integer getRealgetServiceCharge() {
+        return realgetServiceCharge;
+    }
+
+    public void setRealgetServiceCharge(Integer realgetServiceCharge) {
+        this.realgetServiceCharge = realgetServiceCharge;
+    }
+
+    public Integer getRemainServiceCharge() {
+        return remainServiceCharge;
+    }
+
+    public void setRemainServiceCharge(Integer remainServiceCharge) {
+        this.remainServiceCharge = remainServiceCharge;
+    }
 
     public Long getId() {
         return id;

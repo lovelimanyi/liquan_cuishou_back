@@ -263,4 +263,10 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
         return manLoanCollectionOrderDao.getOrderloanId(loanId);
     }
 
+    @Override
+    public void updateOverdueDays(MmanLoanCollectionOrder order) {
+        manLoanCollectionOrderDao.updateOverdueDays(order);
+
+    }
+
 }

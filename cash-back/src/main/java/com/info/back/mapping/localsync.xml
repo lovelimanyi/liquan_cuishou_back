@@ -73,6 +73,9 @@
 				<if test="userId != null and userId !=''">
 				  <![CDATA[user_id = #{userId},]]>
 				</if>
+				<if test="accrual != null and accrual !=''">
+					<![CDATA[accrual = #{accrual},]]>
+				</if>
 				<if test="loanPyId != null and loanPyId !=''">
 				  <![CDATA[loan_py_id = #{loanPyId},]]>
 				</if>
@@ -147,6 +150,8 @@
 				installmentMethod,
 				realget_service_charge,
 				remain_service_charge,
+				realget_accrual,
+				remain_accrual,
 				create_By,
 				update_By
 			)values(
@@ -173,6 +178,8 @@
 				#{installmentMethod},
 				#{realgetServiceCharge},
 				#{remainServiceCharge},
+				#{realgetAccrual},
+				#{remainAccrual},
 				#{createBy},
 				#{updateBy}
 			)
@@ -226,6 +233,18 @@
 			<if test="restPrinciple != null">
 			  <![CDATA[rest_principle = #{restPrinciple},]]>
 			</if>
+			<if test="realgetServiceCharge != null">
+				<![CDATA[realget_service_charge = #{realgetServiceCharge},]]>
+			</if>
+			<if test="remainServiceCharge != null">
+				<![CDATA[remain_service_charge = #{remainServiceCharge},]]>
+			</if>
+			<if test="realgetAccrual != null">
+				<![CDATA[realget_accrual = #{realgetAccrual},]]>
+			</if>
+			<if test="remainAccrual != null">
+				<![CDATA[remain_accrual = #{remainAccrual},]]>
+			</if>
 			<if test="installmentMethod != null and installmentMethod !=''">
 			  <![CDATA[installmentMethod = #{installmentMethod},]]>
 			</if>
@@ -276,6 +295,8 @@
 				bank_flownum,
 				real_date,
 				current_collection_user_id,
+				realget_accrual,
+				remain_accrual,
 				s1_flag
 			)values(
 				#{id},
@@ -299,6 +320,8 @@
 				#{bankFlownum},
 				#{realDate},
 				#{currentCollectionUserId},
+				#{realgetAccrual},
+				#{remainAccrual},
 				#{s1Flag}
 			)
 	</insert>

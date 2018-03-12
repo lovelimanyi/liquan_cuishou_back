@@ -33,20 +33,38 @@ public class SyncController {
 
     @Autowired
     private ISyncService syncService;
+    /**
+     * 每日更新滞纳金，罚息。
+     * @param
+     */
+    @RequestMapping(value = "/loan-order-update",method = RequestMethod.POST,consumes = "application/json")
+    @ResponseBody
+    public void updateOverdueOrder(HttpServletRequest request,@RequestBody CollectionNotifyDto collectionNotifyDto) {
+        logger.info("每日更新逾期订单数据：");
+        String orderId = null;
+        try{
+            if (collectionNotifyDto != null) {
+                BigAmountRequestParams bigAmount = handleCollectionNotifyDto(collectionNotifyDto);
+                Loan loan = bigAmount.getLoan();
+                Repayment repayment = bigAmount.getRepayment();
+                if (loan != null && repayment!= null) {
+                    //逾期同步
+                    orderId = loan.getId();
+                    syncService.updateOverdue(repayment,loan);
+                } else {
+                    logger.info("解析json,repayment is null...");
+                }
+            }
+        }catch (Exception e){
+            logger.error("overdueOrderUpdateException:orderId="+orderId,e);
+        }
+    }
 
-//    @RequestMapping(value = "/repay")
-//    @ResponseBody
-//    public void repay(@RequestBody Repayment repayment){
-//
-//        System.out.println(repayment.getId());
-//        System.out.println(repayment.getLoanId());
-//
-//    }
 
 
 
     /**
-     * 处理逾期订单数据
+     * 逾期订单推送
      * @param
      */
     @RequestMapping(value = "/loan-order-info",method = RequestMethod.POST,consumes = "application/json")
@@ -115,38 +133,11 @@ public class SyncController {
 
             if (collectionNotifyDto != null) {
                 BigAmountRequestParams bigAmount  = handleCollectionNotifyDto(collectionNotifyDto);
-//                BigAmountRequestParams bigAmount = new BigAmountRequestParams();
-//                Repayment repayment1 = new Repayment();
-//                repayment1.setId("00000000");
-//                repayment1.setLoanId("11111111");
-//                repayment1.setReceivableDate("2017-11-15");
-//                repayment1.setReceiveMoney("102000");
-//                repayment1.setLoanPenalty("2000");
-//                repayment1.setRealMoney("102000");
-//                repayment1.setCreateDate("2017-11-16");
-//                bigAmount.setRepayment(repayment1);
-//
-//
-//                Loan loan1 = new Loan();
-//                loan1.setId("11111111");
-//                loan1.setLoanMoney("100000");
-//                loan1.setLoanRate("1500");
-//                loan1.setServiceCharge("150");
-//                loan1.setPaidMoney("100150");
-//                loan1.setLoanPenalty("2000");
-//                loan1.setLoanPenaltyRate("200");
-//                loan1.setLoanEndTime("2017-11-15");
-//                loan1.setUserId("5680253");
-//                loan1.setTermNumber("1");
-//                bigAmount.setLoan(loan1);
-
-
-
                 Loan loan = bigAmount.getLoan();
                 Repayment repayment = bigAmount.getRepayment();
                 RepaymentDetail repaymentDetail = bigAmount.getRepaymentDetail();
                 if (loan != null && repayment!= null && repaymentDetail != null) {
-                    //还款完成同步
+                    //还款同步
                     syncService.handleRepay(repayment,loan,repaymentDetail);
                 } else {
                     logger.info("解析json,repayment is null...");
@@ -171,6 +162,8 @@ public class SyncController {
             loan.setLoanEndTime(DateUtil.getDateFormat(new Date(collectionNotifyDto.getLoan().getLoanEndTime()),"yyyy-MM-dd"));
             loan.setUserId(String.valueOf(collectionNotifyDto.getLoan().getUserId()));
             loan.setTermNumber(String.valueOf(collectionNotifyDto.getLoan().getTermNumber()));
+            loan.setOverdueDays(collectionNotifyDto.getLoan().getLateDay());
+            loan.setAccrual(String.valueOf(collectionNotifyDto.getLoan().getAccrual()));
             bigAmountRequestParams.setLoan(loan);
 
             Repayment repayment = new Repayment();
@@ -180,6 +173,14 @@ public class SyncController {
             repayment.setReceiveMoney(String.valueOf(collectionNotifyDto.getRepayment().getReceiveMoney()));
             repayment.setLoanPenalty(String.valueOf(collectionNotifyDto.getRepayment().getLoanPenalty()));
             repayment.setRealMoney(String.valueOf(collectionNotifyDto.getRepayment().getRealMoney()));
+            repayment.setRealgetPrinciple(String.valueOf(collectionNotifyDto.getRepayment().getRealgetPrinciple()));
+            repayment.setReceivablePrinciple(String.valueOf(collectionNotifyDto.getRepayment().getReceivablePrinciple()));
+            repayment.setRealgetServiceCharge(String.valueOf(collectionNotifyDto.getRepayment().getRealgetServiceCharge()));
+            repayment.setRemainServiceCharge(String.valueOf(collectionNotifyDto.getRepayment().getRemainServiceCharge()));
+            repayment.setRealgetInterest(String.valueOf(collectionNotifyDto.getRepayment().getRealgetInterest()));
+            repayment.setReceivableInterest(String.valueOf(collectionNotifyDto.getRepayment().getReceivableInterest()));
+            repayment.setRealgetAccrual(String.valueOf(collectionNotifyDto.getRepayment().getRealgetAccrual()));
+            repayment.setRemainAccrual(String.valueOf(collectionNotifyDto.getRepayment().getRemainAccrual()));
             repayment.setCreateDate(DateUtil.getDateFormat(new Date(collectionNotifyDto.getRepayment().getCreateDate()),"yyyy-MM-dd"));
             bigAmountRequestParams.setRepayment(repayment);
         }
@@ -190,6 +191,13 @@ public class SyncController {
             repaymentDetail.setPayId(String.valueOf(collectionNotifyDto.getRepaymentDetail().getPayId()));
             repaymentDetail.setReturnType(String.valueOf(collectionNotifyDto.getRepaymentDetail().getReturnType()));
             repaymentDetail.setRemark(String.valueOf(collectionNotifyDto.getRepaymentDetail().getRemark()));
+
+            repaymentDetail.setRealInterest(String.valueOf(collectionNotifyDto.getRepaymentDetail().getRealInterest()));
+            repaymentDetail.setRealMoney(String.valueOf(collectionNotifyDto.getRepaymentDetail().getRealMoney()));
+            repaymentDetail.setRealPenlty(String.valueOf(collectionNotifyDto.getRepaymentDetail().getRealPenlty()));
+            repaymentDetail.setRealPrinciple(String.valueOf(collectionNotifyDto.getRepaymentDetail().getRealPrinciple()));
+            repaymentDetail.setRealgetAccrual(String.valueOf(collectionNotifyDto.getRepayment().getRealgetAccrual()));
+            repaymentDetail.setRemainAccrual(String.valueOf(collectionNotifyDto.getRepayment().getRemainAccrual()));
             bigAmountRequestParams.setRepaymentDetail(repaymentDetail);
         }
 

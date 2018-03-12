@@ -13,6 +13,61 @@ public class RepaymentDetail {
     private String returnType;
     private String remark;
 
+    private String realMoney;
+    private String realPrinciple;
+    private String realInterest;
+    private String realPenlty;
+    private String realgetAccrual;//实收利息
+    private String remainAccrual;//剩余利息
+
+    public String getRealgetAccrual() {
+        return realgetAccrual;
+    }
+
+    public void setRealgetAccrual(String realgetAccrual) {
+        this.realgetAccrual = realgetAccrual;
+    }
+
+    public String getRemainAccrual() {
+        return remainAccrual;
+    }
+
+    public void setRemainAccrual(String remainAccrual) {
+        this.remainAccrual = remainAccrual;
+    }
+
+    public String getRealMoney() {
+        return realMoney;
+    }
+
+    public void setRealMoney(String realMoney) {
+        this.realMoney = realMoney;
+    }
+
+    public String getRealPrinciple() {
+        return realPrinciple;
+    }
+
+    public void setRealPrinciple(String realPrinciple) {
+        this.realPrinciple = realPrinciple;
+    }
+
+    public String getRealInterest() {
+        return realInterest;
+    }
+
+    public void setRealInterest(String realInterest) {
+        this.realInterest = realInterest;
+    }
+
+    public String getRealPenlty() {
+        return realPenlty;
+    }
+
+    public void setRealPenlty(String realPenlty) {
+        this.realPenlty = realPenlty;
+    }
+
     public String getRemark() {
         return remark;
     }

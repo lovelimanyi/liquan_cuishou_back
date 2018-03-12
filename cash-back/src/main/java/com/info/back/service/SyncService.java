@@ -8,6 +8,7 @@ import com.info.vo.bigAmount.Repayment;
 import com.info.vo.bigAmount.RepaymentDetail;
 import com.info.web.pojo.CreditLoanPay;
 import com.info.web.pojo.CreditLoanPayDetail;
+import com.info.web.pojo.MmanLoanCollectionOrder;
 import com.info.web.pojo.MmanUserLoan;
 import com.info.web.synchronization.dao.IDataDao;
 import com.info.web.synchronization.syncUtils;
@@ -38,6 +39,10 @@ public class SyncService implements ISyncService {
     private TaskJobMiddleService taskJobMiddleService;
     @Autowired
     private ICreditLoanPayDao creditLoanPayDao;
+    @Autowired
+    private MmanLoanCollectionOrderService orderService;
+    @Autowired
+    private CreditLoanPayService creditLoanPayService;
 
     @Override
     public void handleOverdue(Repayment repayment, Loan loan) {
@@ -53,10 +58,6 @@ public class SyncService implements ISyncService {
             HashMap<String, Object> cardInfo = dataDao.getUserCardInfo(map);	//银行卡--app端
             List<HashMap<String, Object>> userContactsList = dataDao.getUserContacts(map);	//用户联系人--app端
 
-
-            // 保存还款表-逾期同步
-            CreditLoanPay creditLoanPay = handleRCreditLoanPay(repayment,loanId,loan,null);
-            localDataDao.saveCreditLoanPay(creditLoanPay);//保存还款表
             //保存借款表-逾期同步
             MmanUserLoan mmanUserLoan = new MmanUserLoan();
             mmanUserLoan.setId(loanId);
@@ -74,10 +75,15 @@ public class SyncService implements ISyncService {
             mmanUserLoan.setLoanStatus(Constant.STATUS_OVERDUE_FOUR);//4：逾期
             mmanUserLoan.setCreateTime(new Date());
             mmanUserLoan.setDelFlag("0");//0正常1：删除
-            mmanUserLoan.setLoanPyId("123456789");
+            mmanUserLoan.setLoanPyId(loanId);
             // 标识新老用户 0 新用户  1 老用户
             mmanUserLoan.setCustomerType(Integer.valueOf(userInfo.get("customer_type") == null ? "0" : userInfo.get("customer_type").toString()));
             localDataDao.saveMmanUserLoan(mmanUserLoan);
+
+
+            // 保存还款表-逾期同步
+            CreditLoanPay creditLoanPay = handleRCreditLoanPay(repayment,loanId,loan,null);
+            localDataDao.saveCreditLoanPay(creditLoanPay);//保存还款表
 
             //保存用户信息表--联系人表--银行卡
             syncUtils.saveUserInfo(localDataDao,payId,userId,userInfo,userContactsList,cardInfo);
@@ -94,17 +100,11 @@ public class SyncService implements ISyncService {
         String userId = loan.getUserId();
         String loanId = loan.getId()+"-"+loan.getTermNumber();
         CreditLoanPay creditLoanPay1 = creditLoanPayDao.get(payId);
+        int receivablePrinciple = Integer.parseInt(String.valueOf(repayment.getReceivablePrinciple()));//剩余应还本金
         if (creditLoanPay1 != null){
-            // 更新还款表-逾期同步
+            // 还款 --更新还款表
             CreditLoanPay creditLoanPay = handleRCreditLoanPay(repayment,loanId,loan,creditLoanPay1);
             localDataDao.updateCreditLoanPay(creditLoanPay);//更新还款表
-
-            // 更新借款表-逾期同步
-            MmanUserLoan mmanUserLoan = new MmanUserLoan();
-            mmanUserLoan.setId(loanId);
-            mmanUserLoan.setLoanStatus(Constant.STATUS_OVERDUE_FIVE);//借款状态5 还款完成
-            mmanUserLoan.setUpdateTime(new Date());
-            localDataDao.updateMmanUserLoan(mmanUserLoan);
             //保存还款详情
             HashMap<String,String> map = new HashMap<String,String>();
             map.put("PAY_ID", payId);
@@ -117,12 +117,12 @@ public class SyncService implements ISyncService {
                 creditLoanPayDetail.setUpdateDate(new Date());
                 creditLoanPayDetail.setReturnType(repaymentDetail.getReturnType());
                 creditLoanPayDetail.setRemark(repaymentDetail.getRemark());
-                int realMoney = Integer.parseInt(loan.getLoanMoney());//借款本金
-                int realPenlty = Integer.parseInt(loan.getLoanPenalty());//滞纳金
-                creditLoanPayDetail.setRealMoney(new BigDecimal(realMoney/100.00));
-                creditLoanPayDetail.setRealPenlty(new BigDecimal(realPenlty/100.00));
-                creditLoanPayDetail.setRealPrinciple(new BigDecimal(0));
-                creditLoanPayDetail.setRealInterest(new BigDecimal(0));
+                creditLoanPayDetail.setRealMoney(new BigDecimal(Integer.parseInt(repaymentDetail.getRealMoney())/100.00));
+                creditLoanPayDetail.setRealPenlty(new BigDecimal(Integer.parseInt(repaymentDetail.getRealPenlty())/100.00));
+                creditLoanPayDetail.setRealPrinciple(new BigDecimal(Integer.parseInt(repaymentDetail.getRealPrinciple())/100.00));
+                creditLoanPayDetail.setRealInterest(new BigDecimal(Integer.parseInt(repaymentDetail.getRealInterest())/100.00));
+                creditLoanPayDetail.setRealgetAccrual(new BigDecimal(Integer.parseInt(repaymentDetail.getRealgetAccrual())/100.00));
+                creditLoanPayDetail.setRemainAccrual(new BigDecimal(Integer.parseInt(repaymentDetail.getRemainAccrual())/100.00));
                 HashMap<String,Object> repayDetail = new HashMap<>();
                 repayDetail.put("asset_repayment_id",payId);
                 repayDetail.put("asset_order_id",loanId);
@@ -143,12 +143,59 @@ public class SyncService implements ISyncService {
 
                 localDataDao.saveCreditLoanPayDetail(creditLoanPayDetail);
             }
+
             //更新订单表，催收流转日志表
             HashMap<String,Object> repaymentMap = new HashMap<>();
             repaymentMap.put("user_id",userId);
             repaymentMap.put("repaymented_amount",repayment.getRealMoney());
-            syncUtils.updateOrderAndLog(loanId,repaymentMap,localDataDao,payId);
+            //如果还款完成，则更新借款表,更新订单表，添加催收流转日志
+            if (receivablePrinciple <= 0) {
+                // 更新借款表-还款完成同步
+                MmanUserLoan mmanUserLoan = new MmanUserLoan();
+                mmanUserLoan.setId(loanId);
+                mmanUserLoan.setLoanStatus(Constant.STATUS_OVERDUE_FIVE);//借款状态5 还款完成
+                mmanUserLoan.setUpdateTime(new Date());
+                localDataDao.updateMmanUserLoan(mmanUserLoan);
+                syncUtils.updateOrderAndLog(loanId,repaymentMap,localDataDao,payId);
+            }else {//如果部分还款，只更新订单表
+                syncUtils.updateMmanLoanCollectionOrder(localDataDao,loanId,repaymentMap,Constant.STATUS_OVERDUE_ONE);
+            }
+
         }
+
+    }
+
+    /**
+     * 每日更新滞纳金，罚息。
+     * @param repayment,loan
+     */
+    @Override
+    public void updateOverdue(Repayment repayment, Loan loan) {
+        String payId = repayment.getId();
+        String userId = loan.getUserId();
+        String loanId = loan.getId()+"-"+loan.getTermNumber();
+        //更新订单表：逾期天数
+        MmanLoanCollectionOrder order = new MmanLoanCollectionOrder();
+        order.setLoanId(loanId);
+        order.setOverdueDays(loan.getOverdueDays());
+        orderService.updateOverdueDays(order);
+        //更新借款表：滞纳金，利息；
+        MmanUserLoan mmanUserLoan = new MmanUserLoan();
+        mmanUserLoan.setId(loanId);
+        mmanUserLoan.setLoanPenalty(new BigDecimal(Integer.parseInt(loan.getLoanPenalty())/100.00));//滞纳金
+        mmanUserLoan.setAccrual(new BigDecimal(Integer.parseInt(loan.getAccrual())/100.00));
+        localDataDao.updateMmanUserLoan(mmanUserLoan);
+        //更新还款表：应还金额，剩余应还本金，剩余应还滞纳金，剩余应还利息，剩余应还服务费
+        CreditLoanPay creditLoanPay = new CreditLoanPay();
+        creditLoanPay.setId(payId);
+        creditLoanPay.setReceivableMoney(new BigDecimal(Integer.parseInt(repayment.getReceiveMoney())/100.00));//应还金额(总数)
+        creditLoanPay.setRealgetPrinciple(new BigDecimal(Integer.parseInt(repayment.getRealgetPrinciple())/100.00));//实收本金
+        creditLoanPay.setReceivablePrinciple(new BigDecimal(Integer.parseInt(repayment.getReceivablePrinciple())/100.00));//剩余应还本金
+        creditLoanPay.setRealgetInterest(new BigDecimal(Integer.parseInt(repayment.getRealgetInterest())/100.00));//实收滞纳金
+        creditLoanPay.setReceivableInterest(new BigDecimal(Integer.parseInt(repayment.getReceivableInterest())/100.00));//剩余应还滞纳金
+        creditLoanPay.setRealgetAccrual(new BigDecimal(Integer.parseInt(repayment.getRealgetAccrual())/100.00));//实收利息
+        creditLoanPay.setRemainAccrual(new BigDecimal(Integer.parseInt(repayment.getRemainAccrual())/100.00));//剩余应还利息
+        creditLoanPayService.updateCreditLoanPay(creditLoanPay);
 
     }
 
@@ -159,25 +206,29 @@ public class SyncService implements ISyncService {
         creditLoanPay.setLoanId(loanId);//借款id
         creditLoanPay.setReceivableDate(DateUtil.getDateTimeFormat(repayment.getReceivableDate(),"yyyy-MM-dd"));//应还日期
         if(creditLoanPay1 == null){//派单
-            creditLoanPay.setReceivableMoney(new BigDecimal(Integer.parseInt(String.valueOf(repayment.getReceiveMoney()))/100.00));//应还金额(总数)
-            creditLoanPay.setReceivablePrinciple(new BigDecimal(Integer.parseInt(String.valueOf(loan.getLoanMoney()))/100.00));//应还本金
-            creditLoanPay.setRemainServiceCharge(new BigDecimal(Integer.parseInt(String.valueOf(loan.getServiceCharge()))/100.00));//应还服务费
-            creditLoanPay.setReceivableInterest(new BigDecimal(Integer.parseInt(String.valueOf(loan.getLoanPenalty()))/100.00));//应还滞纳金
-            creditLoanPay.setRealMoney(new BigDecimal(Integer.parseInt(String.valueOf(repayment.getRealMoney()))/100.00));//实收金额
-            creditLoanPay.setRealgetInterest(new BigDecimal(0));
-            creditLoanPay.setRealgetPrinciple(new BigDecimal(0));
             creditLoanPay.setCreateDate(new Date());
-        }else{// 还款
-            //TODO 还款逻辑待开发
-            int receiveMoney = Integer.parseInt(String.valueOf(repayment.getReceiveMoney()));//总应还款金额(本金+服务费+滞纳金)
-            int loanMoney = Integer.parseInt(String.valueOf(loan.getServiceCharge()));//本金
-            int loanPenalty = Integer.parseInt(String.valueOf(loan.getLoanPenalty()));//滞纳金
-            int serviceCharge = Integer.parseInt(String.valueOf(loan.getServiceCharge()));//服务费
-            int realMoney = Integer.parseInt(String.valueOf(repayment.getRealMoney()));//本次实收金额
-            //实收罚息
-            int realPenalty = realMoney -(receiveMoney-loanPenalty);
-//            if ()
         }
+        int receiveMoney = Integer.parseInt(String.valueOf(repayment.getReceiveMoney()));//总应还款金额(本金+服务费+滞纳金)
+        int realMoney = Integer.parseInt(String.valueOf(repayment.getRealMoney()));//实收金额
+        int realgetPrinciple = Integer.parseInt(String.valueOf(repayment.getRealgetPrinciple()));//实收本金
+        int receivablePrinciple = Integer.parseInt(String.valueOf(repayment.getReceivablePrinciple()));//剩余应还本金
+        int realgetInterest = Integer.parseInt(String.valueOf(repayment.getRealgetInterest()));//实收滞纳金
+        int receivableInterest = Integer.parseInt(String.valueOf(repayment.getReceivableInterest()));//剩余应还滞纳金
+        int realgetServiceCharge = Integer.parseInt(String.valueOf(repayment.getRealgetServiceCharge()));//实收服务费
+        int remainServiceCharge = Integer.parseInt(String.valueOf(repayment.getRemainServiceCharge()));//剩余应还服务费
+        int realgetAccrual = Integer.parseInt(String.valueOf(repayment.getRealgetAccrual()));//实收利息
+        int remainAccrual = Integer.parseInt(String.valueOf(repayment.getRemainAccrual()));//剩余应还利息
+
+        creditLoanPay.setRealMoney(new BigDecimal(realMoney/100.00));
+        creditLoanPay.setReceivableMoney(new BigDecimal(receiveMoney/100.00));
+        creditLoanPay.setRealgetInterest(new BigDecimal(realgetInterest/100.00));
+        creditLoanPay.setRealgetPrinciple(new BigDecimal(realgetPrinciple/100.00));
+        creditLoanPay.setRealgetServiceCharge(new BigDecimal(realgetServiceCharge/100.00));
+        creditLoanPay.setReceivablePrinciple(new BigDecimal(receivablePrinciple/100.00));
+        creditLoanPay.setReceivableInterest(new BigDecimal(receivableInterest/100.00));
+        creditLoanPay.setRemainServiceCharge(new BigDecimal(remainServiceCharge/100.00));
+        creditLoanPay.setRealgetAccrual(new BigDecimal(realgetAccrual/100.00));
+        creditLoanPay.setRemainAccrual(new BigDecimal(remainAccrual/100.00));
         creditLoanPay.setUpdateDate(new Date());
         return creditLoanPay;
     }

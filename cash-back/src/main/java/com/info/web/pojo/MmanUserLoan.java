@@ -25,6 +25,8 @@ public class MmanUserLoan {
     private BigDecimal serviceCharge;
     // 本金+服务费
     private BigDecimal paidMoney;
+    //本金利息
+    private BigDecimal accrual;
     // 放款时间（借款起始时间）
     private Date loanStartTime;
     // 应还时间（借款结束时间）
@@ -48,6 +50,14 @@ public class MmanUserLoan {
     private String termNumber;
 
     private String borrowingType;
+
+    public BigDecimal getAccrual() {
+        return accrual;
+    }
+
+    public void setAccrual(BigDecimal accrual) {
+        this.accrual = accrual;
+    }
 
     public String getTermNumber() {
         return termNumber;
