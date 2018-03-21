@@ -39,6 +39,7 @@
 				loan_sys_status,
 				loan_sys_remark,
 				term_number,
+				merchant_no,
 				borrowing_type,
 				customer_type
 			)values(
@@ -61,6 +62,7 @@
 				#{loanSysStatus},
 				#{loanSysRemark},
 				#{termNumber},
+				#{merchantNo},
 				#{borrowingType},
 				#{customerType}
 			)

@@ -76,6 +76,7 @@ public class SyncService implements ISyncService {
             mmanUserLoan.setLoanStatus(Constant.STATUS_OVERDUE_FOUR);//4：逾期
             mmanUserLoan.setCreateTime(new Date());
             mmanUserLoan.setDelFlag("0");//0正常1：删除
+            mmanUserLoan.setMerchantNo(loan.getMerchantNo());
             mmanUserLoan.setLoanPyId(loanId);
             // 标识新老用户 0 新用户  1 老用户
             mmanUserLoan.setCustomerType(Integer.valueOf(userInfo.get("customer_type") == null ? "0" : userInfo.get("customer_type").toString()));

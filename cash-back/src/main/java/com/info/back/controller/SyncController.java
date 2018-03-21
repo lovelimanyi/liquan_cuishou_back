@@ -132,6 +132,7 @@ public class SyncController {
             loan.setTermNumber(String.valueOf(collectionNotifyDto.getLoan().getTermNumber()));
             loan.setOverdueDays(collectionNotifyDto.getLoan().getLateDay());
             loan.setAccrual(String.valueOf(collectionNotifyDto.getLoan().getAccrual()));
+            loan.setMerchantNo(collectionNotifyDto.getLoan().getMerchantNo());
             bigAmountRequestParams.setLoan(loan);
 
             Repayment repayment = new Repayment();
