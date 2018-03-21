@@ -43,10 +43,10 @@ public class ThreadPoolDealwithOrderUpgrade extends ThreadGroup {
     private synchronized Runnable getTask(int threadid) throws InterruptedException {
         while (workQueue.size() == 0) {
             if (isClosed) return null;
-            System.out.println("处理逾期借款 工作线程" + threadid + "等待任务...");
+            System.out.println("处理逾期订单逾期升级 工作线程" + threadid + "等待任务...");
             wait();
         }
-        System.out.println("处理逾期借款 工作线程" + threadid + "开始执行任务...");
+        System.out.println("处理逾期订单逾期升级 工作线程" + threadid + "开始执行任务...");
         return (Runnable) workQueue.removeFirst();
     }
 

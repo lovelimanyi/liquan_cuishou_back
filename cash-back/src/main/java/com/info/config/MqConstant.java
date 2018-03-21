@@ -12,4 +12,7 @@ public class MqConstant {
     public final static String MQ_QUEUE_NAME = propertiesLoader.getProperty("queueName");
     public final static Integer MQ_QUEUE_MAX_COUNT = propertiesLoader.getInteger("queueMaxCount");
     public final static Integer MQ_IS_CREATETABLE = propertiesLoader.getInteger("isCreateTable");
+
+    public final static String MQ_QUEUE_TABLE_NAME_MAX = propertiesLoader.getProperty("queueTableNameMax");
+    public final static String MQ_QUEUE_NAME_MAX = propertiesLoader.getProperty("queueNameMax");
 }

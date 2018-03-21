@@ -30,6 +30,7 @@ public class TaskDealwithOrderUpgrade {
         map.put("orderStatus", BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS);
         List<String> loanIds = orderService.getOverdueOrderIds(map);
         ThreadPoolDealwithOrderUpgrade pool = ThreadPoolDealwithOrderUpgrade.getInstance();
+        pool.setDaemon(true);
         for (String loanId : loanIds) {
             try {
                 if (StringUtils.isEmpty(loanId)) {

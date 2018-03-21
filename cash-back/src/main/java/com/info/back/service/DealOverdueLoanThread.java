@@ -24,7 +24,7 @@ public class DealOverdueLoanThread implements Runnable {
 	@Override
 	public void run() {
 		logger.error("处理逾期订单/派单开始  " + new Date() + "借款id:" + loanId);
-		
+
 			try{
 				taskJobMiddleService.dispatchforLoanId(loanId,idNumber,type);
 			}catch(Exception e){

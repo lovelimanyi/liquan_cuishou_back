@@ -44,6 +44,7 @@ public class TaskUpdateOrderInfo {
         map.put("borrowingType", Constant.SMALL);
         List<String> loanIds = mmanUserLoanService.getOverdueOrder(map);
         ThreadPoolUpdateOrderInfo poolUpdateOrderInfo = ThreadPoolUpdateOrderInfo.getInstance();
+        poolUpdateOrderInfo.setDaemon(true);
         for (String loanId : loanIds) {
             try {
                 if (StringUtils.isEmpty(loanId)) {

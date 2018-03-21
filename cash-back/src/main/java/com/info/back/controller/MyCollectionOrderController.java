@@ -693,9 +693,9 @@ public class MyCollectionOrderController extends BaseController {
                 for (BackUserCompanyPermissions permission : CompanyPermissionsList) {
                     companys.add(permission.getCompanyId());
                 }
-                HashMap<String,Object> param = new HashMap<>();
-                param.put("ids",companys);
-                param.put("status",BackConstant.ON);
+                HashMap<String, Object> param = new HashMap<>();
+                param.put("ids", companys);
+                param.put("status", BackConstant.ON);
                 companyList = mmanLoanCollectionCompanyService.getCompanyByIds(param);
             }
             List<SysDict> dict = sysDictService

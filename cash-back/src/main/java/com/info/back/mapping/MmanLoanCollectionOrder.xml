@@ -777,7 +777,7 @@
         <if test="csstatus != null">and csstatus=#{csstatus,jdbcType=VARCHAR}</if>
     </select>
 
-    <select id="getOrderPageCount" resultType="Integer" parameterType="HashMap">
+    <select id="getOrderPageCount" resultType="int" parameterType="HashMap">
 		select count(1) from mman_loan_collection_order
 	</select>
 

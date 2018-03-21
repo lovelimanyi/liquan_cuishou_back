@@ -17,6 +17,7 @@ import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,9 +67,16 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
     private IChannelSwitchingDao channelSwitchingDao;
     @Autowired
     private IFengKongService fengKongService;
+    @Autowired
+    private IMmanUserLoanService mmanUserLoanService;
 
+    @Qualifier("mqClient")
     @Autowired
     MqClient mqClient;
+
+    @Qualifier("mqClientMax")
+    @Autowired
+    MqClient mqClientMax;
 
     public void assignCollectionOrderToRelatedGroup(
             List<MmanLoanCollectionOrder> mmanLoanCollectionOrderList,
@@ -623,10 +631,19 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
                                     withhold.setUuid(uuid); // uuid
                                     withhold.setUserId(mmanLoanCollectionOrderOri.getUserId()); // 用户id
                                     withhold.setSign(sign);
-                                    String json = JSONUtil.beanToJson(withhold);
-                                    MqMessage msg = new MqMessage();
-                                    msg.setMessage(json);
-                                    mqClient.sendMessage(msg);
+                                    // 区分大小额 向不同的队列发送消息
+                                    MmanUserLoan loan = mmanUserLoanService.get(mmanLoanCollectionOrderOri.getLoanId());
+                                    if (Constant.SMALL.equals(loan.getBorrowingType())) {
+                                        String json = JSONUtil.beanToJson(withhold);
+                                        MqMessage msg = new MqMessage();
+                                        msg.setMessage(json);
+                                        mqClient.sendMessage(msg);
+                                    } else if (Constant.BIG.equals(loan.getBorrowingType())) {
+                                        String json = JSONUtil.beanToJson(withhold);
+                                        MqMessage msg = new MqMessage();
+                                        msg.setMessage(json);
+                                        mqClientMax.sendMessage(msg);
+                                    }
 
                                     //插入一条代扣记录
                                     CollectionWithholdingRecord WithholdingRecord = new CollectionWithholdingRecord();
