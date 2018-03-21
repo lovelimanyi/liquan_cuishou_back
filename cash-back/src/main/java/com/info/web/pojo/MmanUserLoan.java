@@ -48,8 +48,16 @@ public class MmanUserLoan {
     // 新老客户(0 新用户   2 老用户)
     private Integer customerType;
     private String termNumber;
-
+    private String merchantNo;
     private String borrowingType;
+
+    public String getMerchantNo() {
+        return merchantNo;
+    }
+
+    public void setMerchantNo(String merchantNo) {
+        this.merchantNo = merchantNo;
+    }
 
     public BigDecimal getAccrual() {
         return accrual;
