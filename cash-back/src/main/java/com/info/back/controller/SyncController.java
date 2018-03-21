@@ -67,7 +67,7 @@ public class SyncController {
     @RequestMapping(value = "/loan-order-info",method = RequestMethod.POST,consumes = "application/json")
     @ResponseBody
     public void dealwithOverdueOrder(HttpServletRequest request,@RequestBody CollectionNotifyDto collectionNotifyDto) {
-        logger.info("接收到逾期订单数据：");
+        logger.info("接收到逾期订单数据：" + collectionNotifyDto);
         try {
 
             if (collectionNotifyDto != null) {

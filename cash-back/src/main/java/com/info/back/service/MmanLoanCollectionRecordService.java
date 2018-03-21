@@ -17,6 +17,7 @@ import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,9 +67,16 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
     private IChannelSwitchingDao channelSwitchingDao;
     @Autowired
     private IFengKongService fengKongService;
+    @Autowired
+    private IMmanUserLoanService mmanUserLoanService;
 
+    @Qualifier("mqClient")
     @Autowired
     MqClient mqClient;
+
+    @Qualifier("mqClientMax")
+    @Autowired
+    MqClient mqClientMax;
 
     public void assignCollectionOrderToRelatedGroup(
             List<MmanLoanCollectionOrder> mmanLoanCollectionOrderList,
@@ -78,7 +86,7 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
 
             //2.1 查询当前组中所有非禁用的催收员，按照截止到当前手里未处理的订单数升序排序(前面已查)，并查出他们组每人每天单数上限(上限规则中公司+组唯一)，取出有效催收员
             List<MmanLoanCollectionRule> allRuleList = mmanLoanCollectionRuleDao.findList(new MmanLoanCollectionRule());
-            HashMap<String, Integer> allRuleLimitCountMap = new HashMap<String, Integer>();
+            HashMap<String, Integer> allRuleLimitCountMap = new HashMap<>();
             if (null != allRuleList && allRuleList.size() > 0) {
                 for (MmanLoanCollectionRule ruleOri : allRuleList) {
                     allRuleLimitCountMap.put(ruleOri.getCompanyId() + "_" + ruleOri.getCollectionGroup(), ruleOri.getEveryLimit());
@@ -202,7 +210,6 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
         return pageConfig;
     }
 
-
     private void addOrUpdateOrderAndAddStatusChangeLogAndUpdatePayStatus(MmanLoanCollectionPerson person,
                                                                          MmanLoanCollectionOrder mmanLoanCollectionOrder, Date date) {
 
@@ -289,14 +296,15 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
         mmanLoanCollectionStatusChangeLog.setAfterStatus(mmanLoanCollectionOrder.getStatus());
         mmanLoanCollectionStatusChangeLog.setCompanyId(mmanLoanCollectionOrder.getOutsideCompanyId());
 
-        mmanLoanCollectionStatusChangeLogDao.insert(mmanLoanCollectionStatusChangeLog);
+        mmanLoanCollectionOrderService.saveMmanLoanCollectionOrder(mmanLoanCollectionOrder);
 
         //更新还款状态
         CreditLoanPay creditLoanPay = creditLoanPayService.findByLoanId(mmanLoanCollectionOrder.getLoanId());
         creditLoanPay.setStatus(Integer.parseInt(person.getGroupLevel()));
         creditLoanPayService.save(creditLoanPay);
 
-        mmanLoanCollectionOrderService.saveMmanLoanCollectionOrder(mmanLoanCollectionOrder);
+        mmanLoanCollectionStatusChangeLogDao.insert(mmanLoanCollectionStatusChangeLog);
+
     }
 
     public List<MmanLoanCollectionRecord> findAll(HashMap<String, Object> params) {
@@ -623,10 +631,19 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
                                     withhold.setUuid(uuid); // uuid
                                     withhold.setUserId(mmanLoanCollectionOrderOri.getUserId()); // 用户id
                                     withhold.setSign(sign);
-                                    String json = JSONUtil.beanToJson(withhold);
-                                    MqMessage msg = new MqMessage();
-                                    msg.setMessage(json);
-                                    mqClient.sendMessage(msg);
+                                    // 区分大小额 向不同的队列发送消息
+                                    MmanUserLoan loan = mmanUserLoanService.get(mmanLoanCollectionOrderOri.getLoanId());
+                                    if (Constant.SMALL.equals(loan.getBorrowingType())) {
+                                        String json = JSONUtil.beanToJson(withhold);
+                                        MqMessage msg = new MqMessage();
+                                        msg.setMessage(json);
+                                        mqClient.sendMessage(msg);
+                                    } else if (Constant.BIG.equals(loan.getBorrowingType())) {
+                                        String json = JSONUtil.beanToJson(withhold);
+                                        MqMessage msg = new MqMessage();
+                                        msg.setMessage(json);
+                                        mqClientMax.sendMessage(msg);
+                                    }
 
                                     //插入一条代扣记录
                                     CollectionWithholdingRecord WithholdingRecord = new CollectionWithholdingRecord();

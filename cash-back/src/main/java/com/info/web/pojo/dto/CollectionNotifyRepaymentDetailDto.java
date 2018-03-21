@@ -104,6 +104,18 @@ public class CollectionNotifyRepaymentDetailDto{
 
     @Override
     public String toString() {
-        return "CollectionNotifyRepaymentDetailDto{" + "id=" + id + ", createDate=" + createDate + ", returnType='" + returnType + '\'' + ", remark='" + remark + '\'' + ", payId=" + payId + '}';
+        return "CollectionNotifyRepaymentDetailDto{" +
+                "id=" + id +
+                ", createDate=" + createDate +
+                ", returnType='" + returnType + '\'' +
+                ", remark='" + remark + '\'' +
+                ", payId=" + payId +
+                ", realMoney=" + realMoney +
+                ", realPrinciple=" + realPrinciple +
+                ", realPenlty=" + realPenlty +
+                ", realInterest=" + realInterest +
+                ", realgetAccrual=" + realgetAccrual +
+                ", remainAccrual=" + remainAccrual +
+                '}';
     }
 }

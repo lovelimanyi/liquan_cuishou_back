@@ -39,6 +39,7 @@ public class DealOverdueLoanService {
 		List<MmanUserLoan> overdueList = Collections.synchronizedList(new ArrayList<MmanUserLoan>()); 
 		overdueList = mmanUserLoanDao.findMmanUserLoanList2(mmanUserLoan);
         ThreadPoolDealOverdueLoan pool = ThreadPoolDealOverdueLoan.getInstance();
+		pool.setDaemon(true);
         for (MmanUserLoan loan : overdueList) {
         	synchronized(this)
         	{

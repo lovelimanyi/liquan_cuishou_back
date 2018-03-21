@@ -165,7 +165,7 @@ public class TaskJobMiddleService {
                         CreditLoanPay np = new CreditLoanPay();
                         np.setId(creditLoanPay.getId());
                         np.setReceivableInterest(znj);  //  剩余应还罚息
-                        if (type.equals(Constant.BIG)){
+                        if (Constant.BIG.equals(type)){
                            BigDecimal receivableMoney = pmoney.add(mmanUserLoanOri.getServiceCharge()).add(mmanUserLoanOri.getLoanMoney());
                             np.setReceivableMoney(receivableMoney);
                         }else{

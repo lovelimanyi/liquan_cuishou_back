@@ -1,6 +1,7 @@
 package com.info.back.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -55,5 +56,10 @@ public class MmanUserLoanService implements IMmanUserLoanService{
 	public int updatePaymoney(MmanUserLoan loan) {
 		
 		return manUserLoanDao.updatePaymoney(loan);
+	}
+
+	@Override
+	public List<String> getOverdueOrder(Map<String, Object> map) {
+		return manUserLoanDao.getOverdueOrder(map);
 	}
 }

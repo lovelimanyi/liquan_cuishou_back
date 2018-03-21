@@ -1,9 +1,7 @@
 package com.info.back.service;
 
 import com.info.back.result.JsonResult;
-import com.info.web.pojo.MmanLoanCollectionOrder;
-import com.info.web.pojo.OrderBaseResult;
-import com.info.web.pojo.OrderInfo;
+import com.info.web.pojo.*;
 import com.info.web.util.PageConfig;
 
 import java.util.HashMap;
@@ -11,23 +9,23 @@ import java.util.List;
 import java.util.Map;
 
 public interface IMmanLoanCollectionOrderService {
-	
+
 	/**
 	 * 根据条件查询符合的订单
 	 * @param mmanLoanCollectionOrder
 	 * @return
 	 */
 	 List<MmanLoanCollectionOrder> getOrderList(MmanLoanCollectionOrder mmanLoanCollectionOrder);
-	
-	
+
+
 	/**
 	 * 分页查询
 	 * @param params
 	 * @return
 	 */
 	 PageConfig<MmanLoanCollectionOrder> findPage(HashMap<String, Object> params);
-	
-	
+
+
 	 PageConfig<OrderBaseResult> getPage(HashMap<String, Object> params);
 
 
@@ -39,8 +37,8 @@ public interface IMmanLoanCollectionOrderService {
 	 * @return
 	 */
 	 List<MmanLoanCollectionOrder> findList(MmanLoanCollectionOrder queryManLoanCollectionOrder);
-	
-	
+
+
 	/**
 	 * 保存派单 信息
 	 * @param order
@@ -59,14 +57,14 @@ public interface IMmanLoanCollectionOrderService {
 	 void updateRecord(MmanLoanCollectionOrder mmanLoanCollectionOrder);
 
 	 MmanLoanCollectionOrder getOrderById(String id);
-	
+
 	/**
 	 * 标记订单重要程度
 	 * @param params
 	 * @return
 	 */
 	 JsonResult saveTopOrder(Map<String, Object> params);
-	
+
     /**
      * 根据orderId查询一条记录
      * @param orderId
@@ -107,9 +105,9 @@ public interface IMmanLoanCollectionOrderService {
 
     /**
 	 * 审核状态更新
-	 * 
+	 *
 	 *//*
-	
+
 	public void sveUpdateJmStatus(HashMap<String, String> params);*/
 
 	/**
@@ -130,6 +128,20 @@ public interface IMmanLoanCollectionOrderService {
 	int deleteOrderInfoAndLoanInfoByloanId(String loanId);
 
 	MmanLoanCollectionOrder getOrderloanId(String loanId);
+
+	void updateOrderInfo(String loanId);
+
+	/**
+	 * 新订单派单
+	 * @param loanId
+	 * @param idNumber
+	 * @param type
+	 */
+	void dispatchOrderNew(String loanId,String idNumber,String type);
+
+	List<String> getOverdueOrderIds(Map<String,Object> map);
+
+	void orderUpgrade(String loanId);
 
 	void updateOverdueDays(MmanLoanCollectionOrder order);
 }

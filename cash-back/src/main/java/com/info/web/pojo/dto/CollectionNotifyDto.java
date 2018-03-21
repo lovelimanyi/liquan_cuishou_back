@@ -39,5 +39,15 @@ public class CollectionNotifyDto {
     public void setScheduleTaskOverdueId(Long scheduleTaskOverdueId) {
         this.scheduleTaskOverdueId = scheduleTaskOverdueId;
     }
+
+    @Override
+    public String toString() {
+        return "CollectionNotifyDto{" +
+                "loan=" + loan +
+                ", repayment=" + repayment +
+                ", repaymentDetail=" + repaymentDetail +
+                ", scheduleTaskOverdueId=" + scheduleTaskOverdueId +
+                '}';
+    }
 }
 

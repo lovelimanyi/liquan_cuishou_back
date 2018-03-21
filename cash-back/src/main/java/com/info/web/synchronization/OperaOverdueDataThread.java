@@ -1,6 +1,7 @@
 package com.info.web.synchronization;
 
 import com.info.back.dao.ILocalDataDao;
+import com.info.back.service.IMmanLoanCollectionOrderService;
 import com.info.back.service.TaskJobMiddleService;
 import com.info.back.utils.IdGen;
 import com.info.back.vo.jxl.ContactList;
@@ -26,13 +27,13 @@ public class OperaOverdueDataThread implements Runnable {
 	private String payId;
 	private IDataDao dataDao;
 	private ILocalDataDao localDataDao;
-	private TaskJobMiddleService taskJobMiddleService;
+	private IMmanLoanCollectionOrderService orderService;
 
-	public OperaOverdueDataThread(String payId, IDataDao dataDao,ILocalDataDao localDataDao,TaskJobMiddleService taskJobMiddleService) {
+	public OperaOverdueDataThread(String payId, IDataDao dataDao,ILocalDataDao localDataDao,IMmanLoanCollectionOrderService orderService) {
 		this.payId = payId;
 		this.dataDao = dataDao;
 		this.localDataDao = localDataDao;
-		this.taskJobMiddleService = taskJobMiddleService;
+		this.orderService = orderService;
 	}
 
 	public OperaOverdueDataThread() {
@@ -85,7 +86,8 @@ public class OperaOverdueDataThread implements Runnable {
 							//保存用户信息表--联系人表--银行卡
 							syncUtils.saveUserInfo(localDataDao,payId,userId,userInfo,userContactsList,cardInfo);
 						}
-						this.taskJobMiddleService.dispatchforLoanId(loanId,userInfo.get("id_number").toString(),Constant.SMALL);
+						this.orderService.dispatchOrderNew(loanId,userInfo.get("id_number").toString(),Constant.SMALL);
+//						this.taskJobMiddleService.dispatchforLoanId(loanId,userInfo.get("id_number").toString(),Constant.SMALL);
 						RedisUtil.delRedisKey(Constant.TYPE_OVERDUE_ + payId);
 					} else {
 						loger.info("loanId:"+loanId);

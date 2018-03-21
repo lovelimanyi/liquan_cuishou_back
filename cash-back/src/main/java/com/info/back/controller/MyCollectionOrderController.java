@@ -105,7 +105,7 @@ public class MyCollectionOrderController extends BaseController {
 
         BackUser backUser = (BackUser) request.getSession().getAttribute(
                 Constant.BACK_USER);
-        params.put("currentUserAccount",backUser.getUserAccount());
+        params.put("currentUserAccount", backUser.getUserAccount());
         List<BackUserCompanyPermissions> CompanyPermissionsList = backUserService
                 .findCompanyPermissions(backUser.getId());
         if (CompanyPermissionsList != null && CompanyPermissionsList.size() > 0) {// 指定公司的订单
@@ -126,7 +126,7 @@ public class MyCollectionOrderController extends BaseController {
             }
 
         }
-        params.put("source",BackConstant.OPERATION_RECORD_SOURCE_MY_ORDER);  // 操作來源 我的催收订单
+        params.put("source", BackConstant.OPERATION_RECORD_SOURCE_MY_ORDER);  // 操作來源 我的催收订单
         // 查询公司列表
         MmanLoanCollectionCompany mmanLoanCollectionCompany = new MmanLoanCollectionCompany();
         List<MmanLoanCollectionCompany> ListMmanLoanCollectionCompany = mmanLoanCollectionCompanyService
@@ -625,7 +625,7 @@ public class MyCollectionOrderController extends BaseController {
     @RequestMapping(value = "withhold-callback")
     @ResponseBody
     public void dealWithholdResult(String text) {
-        try{
+        try {
             logger.info("接收到代扣回调请求参数 " + text);
             JSONObject obj = JSONObject.parseObject(text);
             String uuid = (String) obj.get("uuid");
@@ -637,7 +637,7 @@ public class MyCollectionOrderController extends BaseController {
                 map.put("status", 1); // 代扣成功
             } else {
                 map.put("status", 2); // 代扣失败
-                map.put("msg",msg); // 代扣失败原因
+                map.put("msg", msg); // 代扣失败原因
             }
             map.put("updateDate", new Date());
             int count = collectionWithholdingRecordService.updateWithholdStatus(map);// 更新代扣记录状态
@@ -646,7 +646,7 @@ public class MyCollectionOrderController extends BaseController {
             } else {
                 obj.put("1", "更新失败！");
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             logger.error("处理代扣回调异常");
         }
@@ -666,6 +666,7 @@ public class MyCollectionOrderController extends BaseController {
     public String toOrderDistibute(HttpServletRequest request,
                                    HttpServletResponse response, Model model) {
         HashMap<String, Object> params = getParametersO(request);
+        BackUser backUser = (BackUser) request.getSession().getAttribute(Constant.BACK_USER);
         try {
             if (params.get("ids") != null
                     && StringUtils.isNotBlank(params.get("ids").toString())) {
@@ -678,10 +679,25 @@ public class MyCollectionOrderController extends BaseController {
                 model.addAttribute("message", "请选择要转派的订单");
             }
             // 催收公司
+            List<MmanLoanCollectionCompany> companyList = null;
             MmanLoanCollectionCompany mmanLoanCollectionCompany = new MmanLoanCollectionCompany();
             mmanLoanCollectionCompany.setStatus(BackConstant.ON);// 启用的催收公司
-            List<MmanLoanCollectionCompany> companyList = mmanLoanCollectionCompanyService
-                    .getList(mmanLoanCollectionCompany);
+
+            List<BackUserCompanyPermissions> CompanyPermissionsList = backUserService
+                    .findCompanyPermissions(backUser.getId());
+            if (CompanyPermissionsList.size() == 0) {
+                companyList = mmanLoanCollectionCompanyService
+                        .getList(mmanLoanCollectionCompany);
+            } else {
+                List<String> companys = new ArrayList<>();
+                for (BackUserCompanyPermissions permission : CompanyPermissionsList) {
+                    companys.add(permission.getCompanyId());
+                }
+                HashMap<String, Object> param = new HashMap<>();
+                param.put("ids", companys);
+                param.put("status", BackConstant.ON);
+                companyList = mmanLoanCollectionCompanyService.getCompanyByIds(param);
+            }
             List<SysDict> dict = sysDictService
                     .findDictByType("xjx_overdue_level"); // 催收组
             model.addAttribute("companyList", companyList);// 启用的公司列表
@@ -1161,10 +1177,10 @@ public class MyCollectionOrderController extends BaseController {
         JsonResult result = new JsonResult("-1", "申请减免失败");
         HashMap<String, Object> params = this.getParametersO(request);
 
-        MmanLoanCollectionOrder order= mmanLoanCollectionOrderService.getOrderById(params.get("id").toString());
-        if ("6".equals(order.getStatus())){
+        MmanLoanCollectionOrder order = mmanLoanCollectionOrderService.getOrderById(params.get("id").toString());
+        if ("6".equals(order.getStatus())) {
             result.setMsg("该订单已经发起减免了，不能重复申请！");
-        }else{
+        } else {
             try {
                 int checkingNumber = auditCenterService.getAuditChecking(params);//获取状态为审核中的减免申请个数
                 if (checkingNumber == 0) {//审核状态为非审核中，就添加减免申请

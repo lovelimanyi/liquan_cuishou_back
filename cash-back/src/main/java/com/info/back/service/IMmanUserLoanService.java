@@ -27,6 +27,8 @@ public interface IMmanUserLoanService {
 	public MmanUserLoan get(String loanId);
 	
 	public int updatePaymoney(MmanUserLoan loan);
-	
-	
+
+
+	List<String> getOverdueOrder(Map<String, Object> map);
+
 }
