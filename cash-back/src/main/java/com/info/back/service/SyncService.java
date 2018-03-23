@@ -91,6 +91,11 @@ public class SyncService implements ISyncService {
             //派单
 //            taskJobMiddleService.dispatchforLoanId(loanId,userInfo.get("id_number").toString(),Constant.BIG);
             orderService.dispatchOrderNew(loanId,userInfo.get("id_number").toString(),Constant.BIG);
+        }else {
+            //每日更新
+            if(loan.getOverdueDays() > 1){
+                updateOverdue(repayment,loan);
+            }
         }
 
     }
