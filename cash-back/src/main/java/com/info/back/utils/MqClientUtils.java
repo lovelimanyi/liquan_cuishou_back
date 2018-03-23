@@ -33,17 +33,4 @@ public class MqClientUtils {
         }
         return mq;
     }
-
-    @Bean
-    public MqClient mqClientMax() {
-        MqClient mq = null;
-        try {
-            mq = new MqClient(MqConstant.MQ_URL, dataSource, MqConstant.MQ_QUEUE_TABLE_NAME_MAX, MqConstant.MQ_QUEUE_NAME_MAX, MqConstant.MQ_QUEUE_MAX_COUNT,
-                    MqConstant.MQ_IS_CREATETABLE);
-            mq.start();
-        } catch (Exception e) {
-            logger.error("mq启动初始化异常",e);
-        }
-        return mq;
-    }
 }

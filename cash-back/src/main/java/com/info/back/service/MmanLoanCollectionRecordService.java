@@ -74,10 +74,6 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
     @Autowired
     MqClient mqClient;
 
-    @Qualifier("mqClientMax")
-    @Autowired
-    MqClient mqClientMax;
-
     public void assignCollectionOrderToRelatedGroup(
             List<MmanLoanCollectionOrder> mmanLoanCollectionOrderList,
             List<MmanLoanCollectionPerson> mmanLoanCollectionPersonList, Date date) {
@@ -638,11 +634,6 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
                                         MqMessage msg = new MqMessage();
                                         msg.setMessage(json);
                                         mqClient.sendMessage(msg);
-                                    } else if (Constant.BIG.equals(loan.getBorrowingType())) {
-                                        String json = JSONUtil.beanToJson(withhold);
-                                        MqMessage msg = new MqMessage();
-                                        msg.setMessage(json);
-                                        mqClientMax.sendMessage(msg);
                                     }
 
                                     //插入一条代扣记录
