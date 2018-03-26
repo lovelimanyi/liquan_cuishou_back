@@ -74,7 +74,8 @@ public class SyncController {
                 BigAmountRequestParams bigAmount  = handleCollectionNotifyDto(collectionNotifyDto);
                 Loan loan = bigAmount.getLoan();
                 Repayment repayment = bigAmount.getRepayment();
-                if (loan != null && repayment!= null) {
+                RepaymentDetail repaymentDetail = bigAmount.getRepaymentDetail();
+                if (loan != null && repayment!= null && repaymentDetail== null) {
                     //逾期同步
                     syncService.handleOverdue(repayment,loan);
                 } else {
