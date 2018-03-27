@@ -30,7 +30,7 @@ import java.util.List;
  */
 @Service
 public class SyncService implements ISyncService {
-    private static Logger loger = Logger.getLogger(SyncService.class);
+    private static Logger logger = Logger.getLogger(SyncService.class);
     @Autowired
     private IDataDao dataDao;
     @Autowired
@@ -50,10 +50,14 @@ public class SyncService implements ISyncService {
         String loanId = loan.getId()+"-"+loan.getTermNumber();
         CreditLoanPay creditLoanPay1 = creditLoanPayDao.get(payId);
         if (creditLoanPay1 == null){
+            logger.info("accept_overdue_order_begin=" + loanId);
             HashMap<String,String> map = new HashMap<>();
             map.put("USER_ID", loan.getUserId());
+            logger.info("get_userInfo=" + userId);
             HashMap<String, Object> userInfo = dataDao.getUserInfo(map);
+            logger.info("get_userCardInfo=" + userId);
             HashMap<String, Object> cardInfo = dataDao.getUserCardInfo(map);	//银行卡--app端
+            logger.info("get_userContacts=" + userId);
             List<HashMap<String, Object>> userContactsList = dataDao.getUserContacts(map);	//用户联系人--app端
 
             //保存借款表-逾期同步
@@ -93,7 +97,9 @@ public class SyncService implements ISyncService {
             orderService.dispatchOrderNew(loanId,userInfo.get("id_number").toString(),Constant.BIG);
         }else {
             //每日更新
+
             if(loan.getOverdueDays() > 1){
+                logger.info("accept_overdue_order_update=" + loanId);
                 updateOverdue(repayment,loan);
             }
         }
@@ -102,13 +108,14 @@ public class SyncService implements ISyncService {
 
     @Override
     public void handleRepay(Repayment repayment, Loan loan, RepaymentDetail repaymentDetail) {
+
         String payId = repayment.getId();
         String userId = loan.getUserId();
         String loanId = loan.getId()+"-"+loan.getTermNumber();
         CreditLoanPay creditLoanPay1 = creditLoanPayDao.get(payId);
         int receivablePrinciple = Integer.parseInt(String.valueOf(repayment.getReceivablePrinciple()));//剩余应还本金
         if (creditLoanPay1 != null){
-
+            logger.info("order_repayment_begin=" + loanId);
             //保存还款详情
             HashMap<String,String> map = new HashMap<String,String>();
             map.put("PAY_ID", payId);
@@ -223,8 +230,10 @@ public class SyncService implements ISyncService {
         int receivablePrinciple = Integer.parseInt(String.valueOf(repayment.getReceivablePrinciple()));//剩余应还本金
         int realgetInterest = Integer.parseInt(String.valueOf(repayment.getRealgetInterest()));//实收滞纳金
         int receivableInterest = Integer.parseInt(String.valueOf(repayment.getReceivableInterest()));//剩余应还滞纳金
-        int realgetServiceCharge = Integer.parseInt(String.valueOf(repayment.getRealgetServiceCharge()));//实收服务费
-        int remainServiceCharge = Integer.parseInt(String.valueOf(repayment.getRemainServiceCharge()));//剩余应还服务费
+//        int realgetServiceCharge = Integer.parseInt(String.valueOf(repayment.getRealgetServiceCharge()));//实收服务费
+//        int remainServiceCharge = Integer.parseInt(String.valueOf(repayment.getRemainServiceCharge()));//剩余应还服务费
+        int realgetServiceCharge = 0;//实收服务费
+        int remainServiceCharge = 0;//剩余应还服务费
         int realgetAccrual = Integer.parseInt(String.valueOf(repayment.getRealgetAccrual()));//实收利息
         int remainAccrual = Integer.parseInt(String.valueOf(repayment.getRemainAccrual()));//剩余应还利息
 
