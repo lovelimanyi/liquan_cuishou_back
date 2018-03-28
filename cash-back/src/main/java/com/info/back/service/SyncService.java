@@ -125,7 +125,7 @@ public class SyncService implements ISyncService {
                 // 还款 --更新还款表
                 CreditLoanPay creditLoanPay = handleRCreditLoanPay(repayment,loanId,loan,creditLoanPay1);
                 localDataDao.updateCreditLoanPay(creditLoanPay);//更新还款表
-
+                logger.info("更新还款表_还款表数据=" + payId+"----"+creditLoanPay);
 
                 CreditLoanPayDetail creditLoanPayDetail = new CreditLoanPayDetail();
                 creditLoanPayDetail.setCreateDate(DateUtil.getDateTimeFormat(repaymentDetail.getCreateDate(), "yyyy-MM-dd"));

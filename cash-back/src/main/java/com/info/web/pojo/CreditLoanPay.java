@@ -226,5 +226,32 @@ public class CreditLoanPay {
 	public void setReductionMoney(BigDecimal reductionMoney) {
 		this.reductionMoney = reductionMoney;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "CreditLoanPay{" +
+				"id='" + id + '\'' +
+				", loanId='" + loanId + '\'' +
+				", receivableStartdate=" + receivableStartdate +
+				", receivableDate=" + receivableDate +
+				", receivableMoney=" + receivableMoney +
+				", receivablePrinciple=" + receivablePrinciple +
+				", receivableInterest=" + receivableInterest +
+				", realMoney=" + realMoney +
+				", realgetPrinciple=" + realgetPrinciple +
+				", realgetInterest=" + realgetInterest +
+				", reductionMoney=" + reductionMoney +
+				", status=" + status +
+				", createDate=" + createDate +
+				", updateDate=" + updateDate +
+				", restPrinciple=" + restPrinciple +
+				", installmentMethod=" + installmentMethod +
+				", createBy='" + createBy + '\'' +
+				", updateBy='" + updateBy + '\'' +
+				", realgetServiceCharge=" + realgetServiceCharge +
+				", remainServiceCharge=" + remainServiceCharge +
+				", realgetAccrual=" + realgetAccrual +
+				", remainAccrual=" + remainAccrual +
+				'}';
+	}
 }
