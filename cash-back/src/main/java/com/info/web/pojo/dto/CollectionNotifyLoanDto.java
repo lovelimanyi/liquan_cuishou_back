@@ -142,6 +142,9 @@ public class CollectionNotifyLoanDto{
                 ", termNumber=" + termNumber +
                 ", loanEndTime=" + loanEndTime +
                 ", loanStartTime=" + loanStartTime +
+                ", lateDay=" + lateDay +
+                ", accrual=" + accrual +
+                ", merchantNo='" + merchantNo + '\'' +
                 '}';
     }
 }

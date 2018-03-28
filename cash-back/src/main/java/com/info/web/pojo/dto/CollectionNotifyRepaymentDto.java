@@ -172,6 +172,14 @@ public class CollectionNotifyRepaymentDto{
                 ", realMoney=" + realMoney +
                 ", loanPenalty=" + loanPenalty +
                 ", status='" + status + '\'' +
+                ", realgetPrinciple=" + realgetPrinciple +
+                ", receivablePrinciple=" + receivablePrinciple +
+                ", realgetInterest=" + realgetInterest +
+                ", receivableInterest=" + receivableInterest +
+                ", realgetServiceCharge=" + realgetServiceCharge +
+                ", remainServiceCharge=" + remainServiceCharge +
+                ", realgetAccrual=" + realgetAccrual +
+                ", remainAccrual=" + remainAccrual +
                 '}';
     }
 }
