@@ -39,6 +39,7 @@
 
 			<mvc:exclude-mapping path="/"/>
 			<mvc:exclude-mapping path="/loginPage"/>
+			<mvc:exclude-mapping path="/rightSubList"/>
 			<mvc:exclude-mapping path="/login"/>
 			<mvc:exclude-mapping path="/indexBack"/>
 			<mvc:exclude-mapping path="/logout"/>
