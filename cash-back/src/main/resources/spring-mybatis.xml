@@ -55,7 +55,7 @@
         <property name="mapperLocations" value="classpath:com/info/back/mapping/*.xml" />
 		 <property name="plugins">
             <list>
-                <bean class="com.zb.cloud.logcenter.sql.mybatis.ZbMybatisIntercreptor">
+                <bean class="com.xianjinxia.logcenter.sql.mybatis.CatBasicDataSourceInterceptor">
                 </bean>
             </list>
         </property>

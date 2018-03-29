@@ -14,9 +14,11 @@
 
     <dependencies>
 
+        <!-- cat -->
         <dependency>
-            <groupId>com.zb.cloud</groupId>
-            <artifactId>zb-logcenter-sdk</artifactId>
+            <groupId>com.xianjinxia</groupId>
+            <artifactId>logcenter-sdk</artifactId>
+            <version>1.0.3-SNAPSHOT</version>
         </dependency>
 
         <dependency>

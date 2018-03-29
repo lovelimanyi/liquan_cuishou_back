@@ -56,13 +56,6 @@
 
     <dependencyManagement>
         <dependencies>
-
-            <dependency>
-                <groupId>com.zb.cloud</groupId>
-                <artifactId>zb-logcenter-sdk</artifactId>
-                <version>${zb.logcenter.sdk.version}</version>
-            </dependency>
-
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
@@ -587,7 +580,6 @@
         <activiti.engine.version>5.16.4</activiti.engine.version>
 
         <c3p0.version>0.9.1.2</c3p0.version>
-        <zb.logcenter.sdk.version>1.0.3-SNAPSHOT</zb.logcenter.sdk.version>
         <log.home>/logs</log.home>
     </properties>
 

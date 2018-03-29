@@ -16,7 +16,7 @@
 
   <filter>
     <filter-name>logcenter-filter</filter-name>
-    <filter-class>com.zb.cloud.logcenter.http.filter.ZbHttpFilter</filter-class>
+    <filter-class>com.xianjinxia.logcenter.http.filter.CatHttpFilter</filter-class>
   </filter>
   <filter-mapping>
     <filter-name>logcenter-filter</filter-name>
