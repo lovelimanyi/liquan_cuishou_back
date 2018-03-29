@@ -63,7 +63,7 @@ public class AdminContextInterceptor extends HandlerInterceptorAdapter {
                     response.setHeader("statusCode", "301");// 在响应头设置session状态
                     return false;
                 }
-                response.sendRedirect("/back/login");
+                response.sendRedirect(getLoginUrl(request));
                 return false;
             }
 
