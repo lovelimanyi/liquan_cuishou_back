@@ -471,11 +471,12 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
             personMap.put("endDispatchTime", DateUtil.getDateFormat((DateUtil.getBeforeOrAfter(new Date(), 1)), "yyyy-MM-dd HH:mm:ss"));
             personMap.put("groupLevel", BackConstant.XJX_OVERDUE_LEVEL_M1_M2);
             personMap.put("userStatus", BackConstant.ON);
-            personList = backUserDao.findUnCompleteCollectionOrderByCurrentUnCompleteCountListByMap(personMap);
-            if (CollectionUtils.isEmpty(personList)) {
+            List<MmanLoanCollectionPerson> persons = backUserDao.findUnCompleteCollectionOrderByCurrentUnCompleteCountListByMap(personMap);
+            if (CollectionUtils.isEmpty(persons)) {
                 this.inserWarnMsg();
                 return;
             }
+            personList.addAll(persons);
         }
     }
 
@@ -496,9 +497,10 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
             personMap.put("groupLevel", BackConstant.XJX_OVERDUE_LEVEL_M2_M3);
             personMap.put("userStatus", BackConstant.ON);
 
-            personList = backUserDao.findUnCompleteCollectionOrderByCurrentUnCompleteCountListByMap(personMap);
-            if (CollectionUtils.isEmpty(personList)) {
+            List<MmanLoanCollectionPerson> persons = backUserDao.findUnCompleteCollectionOrderByCurrentUnCompleteCountListByMap(personMap);
+            if (CollectionUtils.isEmpty(persons)) {
                 SysAlertMsg alertMsg = new SysAlertMsg();
+                alertMsg.setId(IdGen.uuid());
                 alertMsg.setTitle("分配催收任务失败");
                 alertMsg.setContent("所有公司M2-M3组查无可用催收人,请及时添加或启用该组催收员。");
                 alertMsg.setDealStatus(BackConstant.OFF);
@@ -508,6 +510,7 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
                 logger.warn("所有公司M2-M3组查无可用催收人...");
                 return;
             }
+            personList.addAll(persons);
         }
     }
 
@@ -528,9 +531,10 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
             personMap.put("groupLevel", BackConstant.XJX_OVERDUE_LEVEL_M3P);
             personMap.put("userStatus", BackConstant.ON);
 
-            personList = backUserDao.findUnCompleteCollectionOrderByCurrentUnCompleteCountListByMap(personMap);
-            if (CollectionUtils.isEmpty(personList)) {
+            List<MmanLoanCollectionPerson> persons = backUserDao.findUnCompleteCollectionOrderByCurrentUnCompleteCountListByMap(personMap);
+            if (CollectionUtils.isEmpty(persons)) {
                 SysAlertMsg alertMsg = new SysAlertMsg();
+                alertMsg.setId(IdGen.uuid());
                 alertMsg.setTitle("分配催收任务失败");
                 alertMsg.setContent("所有公司M3+组查无可用催收人,请及时添加或启用该组催收员。");
                 alertMsg.setDealStatus(BackConstant.OFF);
@@ -540,6 +544,7 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
                 logger.warn("所有M3+组查无可用催收人...");
                 return;
             }
+            personList.addAll(persons);
         }
     }
 
@@ -559,9 +564,10 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
             personMap.put("groupLevel", BackConstant.XJX_OVERDUE_LEVEL_M6P);
             personMap.put("userStatus", BackConstant.ON);
 
-            personList = backUserDao.findUnCompleteCollectionOrderByCurrentUnCompleteCountListByMap(personMap);
-            if (CollectionUtils.isEmpty(personList)) {
+            List<MmanLoanCollectionPerson> persons = backUserDao.findUnCompleteCollectionOrderByCurrentUnCompleteCountListByMap(personMap);
+            if (CollectionUtils.isEmpty(persons)) {
                 SysAlertMsg alertMsg = new SysAlertMsg();
+                alertMsg.setId(IdGen.uuid());
                 alertMsg.setTitle("分配催收任务失败");
                 alertMsg.setContent("所有公司M6+组查无可用催收人,请及时添加或启用该组催收员。");
                 alertMsg.setDealStatus(BackConstant.OFF);
@@ -571,6 +577,7 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
                 logger.warn("所有M6+组查无可用催收人...");
                 return;
             }
+            personList.addAll(persons);
         }
     }
 
@@ -579,6 +586,7 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
      */
     private void inserWarnMsg() {
         SysAlertMsg alertMsg = new SysAlertMsg();
+        alertMsg.setId(IdGen.uuid());
         alertMsg.setTitle("分配催收任务失败");
         alertMsg.setContent("所有M1-M2组查无可用催收人,请及时添加或启用该组催收员。");
         alertMsg.setDealStatus(BackConstant.OFF);
