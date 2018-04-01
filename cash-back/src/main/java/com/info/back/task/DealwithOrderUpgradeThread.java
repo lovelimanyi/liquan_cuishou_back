@@ -19,15 +19,15 @@ public class DealwithOrderUpgradeThread implements Runnable {
 
     @Override
     public void run() {
-        logger.info("更新逾期订单开始  " + new Date().toLocaleString() + " 借款id:" + loanId);
+        logger.info("处理订单逾期升级开始  " + new Date().toLocaleString() + " 借款id:" + loanId);
 
         try {
             orderService.orderUpgrade(loanId);
         } catch (Exception e) {
-            logger.error("更新逾期订单出错 " + new Date().toLocaleString() + " 借款id:" + loanId);
+            logger.error("处理订单逾期升级出错 " + new Date().toLocaleString() + " 借款id:" + loanId);
             e.printStackTrace();
         }
-        logger.info("更新逾期订单结束  " + new Date().toLocaleString() + " 借款id:" + loanId);
+        logger.info("处理订单逾期升级结束  " + new Date().toLocaleString() + " 借款id:" + loanId);
     }
 
 }

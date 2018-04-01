@@ -288,14 +288,15 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
         mmanLoanCollectionStatusChangeLog.setAfterStatus(mmanLoanCollectionOrder.getStatus());
         mmanLoanCollectionStatusChangeLog.setCompanyId(mmanLoanCollectionOrder.getOutsideCompanyId());
 
-        mmanLoanCollectionStatusChangeLogDao.insert(mmanLoanCollectionStatusChangeLog);
+        mmanLoanCollectionOrderService.saveMmanLoanCollectionOrder(mmanLoanCollectionOrder);
 
         //更新还款状态
         CreditLoanPay creditLoanPay = creditLoanPayService.findByLoanId(mmanLoanCollectionOrder.getLoanId());
         creditLoanPay.setStatus(Integer.parseInt(person.getGroupLevel()));
         creditLoanPayService.save(creditLoanPay);
 
-        mmanLoanCollectionOrderService.saveMmanLoanCollectionOrder(mmanLoanCollectionOrder);
+        mmanLoanCollectionStatusChangeLogDao.insert(mmanLoanCollectionStatusChangeLog);
+
     }
 
     public List<MmanLoanCollectionRecord> findAll(HashMap<String, Object> params) {

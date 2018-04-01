@@ -30,8 +30,7 @@ public class TaskUpdateOrderInfo {
 
     @Autowired
     private IMmanUserLoanService mmanUserLoanService;
-    @Autowired
-    private ICreditLoanPayService creditLoanPayService;
+
     @Autowired
     private IMmanLoanCollectionOrderService orderService;
 

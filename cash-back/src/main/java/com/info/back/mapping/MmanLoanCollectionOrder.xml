@@ -906,7 +906,7 @@
 	</update>
 
     <select id="getOverdueOrderIds" parameterType="Map" resultType="String">
-        SELECT id FROM mman_loan_collection_order
+        SELECT loan_id FROM mman_loan_collection_order
         <where>
             <if test="orderStatus != null and orderStatus != ''">
                 AND `status` != #{orderStatus}
