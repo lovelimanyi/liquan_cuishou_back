@@ -167,5 +167,12 @@ public class Constant {
 	public static final String BIG = "1";//大额
 	public static final String SMALL = "2";//小额
 
-
+	/**
+	 * 催收代扣队列名----小额
+	 */
+	public static final String CUISHOU_WITHHOLD_QUEUE = "cuishou_withhold_queue";
+	/**
+	 * 催收代扣队列名----大额
+	 */
+	public static final String CUISHOU_WITHHOLD_QUEUE_BIG = "cuishou_withhold_queue_big";
 }

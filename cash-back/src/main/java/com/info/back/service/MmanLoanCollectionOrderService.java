@@ -419,11 +419,6 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
         }
     }
 
-    @Override
-    public List<String> getOverdueOrderIds(Map<String, Object> map) {
-        return manLoanCollectionOrderDao.getOverdueOrderIds(map);
-    }
-
     /**
      * 逾期订单升级
      *

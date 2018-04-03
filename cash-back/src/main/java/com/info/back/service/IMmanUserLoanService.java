@@ -14,21 +14,22 @@ import com.info.web.pojo.MmanUserLoan;
  */
 public interface IMmanUserLoanService {
 	
-	public List<MmanUserLoan> findMmanUserLoanList(MmanUserLoan queryMmanUsersLoan);
+	List<MmanUserLoan> findMmanUserLoanList(MmanUserLoan queryMmanUsersLoan);
 	
-	public List<MmanUserLoan> findMmanUserLoanList2(MmanUserLoan queryMmanUsersLoan);
+	List<MmanUserLoan> findMmanUserLoanList2(MmanUserLoan queryMmanUsersLoan);
 	
-	public void updateMmanUserLoan(MmanUserLoan manUsersLoan);
+	void updateMmanUserLoan(MmanUserLoan manUsersLoan);
 	
-	public int saveNotNull(MmanUserLoan mmanUserLoan);
+	int saveNotNull(MmanUserLoan mmanUserLoan);
 	
-	public int updateNotNull(MmanUserLoan mmanUserLoan);
+	int updateNotNull(MmanUserLoan mmanUserLoan);
 
-	public MmanUserLoan get(String loanId);
+	MmanUserLoan get(String loanId);
 	
-	public int updatePaymoney(MmanUserLoan loan);
+	int updatePaymoney(MmanUserLoan loan);
 
 
 	List<String> getOverdueOrder(Map<String, Object> map);
 
+	List<String> getOverdueOrderIds(Map<String, Object> map);
 }

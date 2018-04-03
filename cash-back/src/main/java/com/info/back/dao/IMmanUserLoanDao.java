@@ -25,4 +25,6 @@ public interface IMmanUserLoanDao {
 	int updatePaymoney(MmanUserLoan loan);
 
     List<String> getOverdueOrder(Map<String, Object> map);
+
+	List<String> getOverdueOrderIds(Map<String, Object> map);
 }

@@ -565,10 +565,11 @@ public class MyCollectionOrderController extends BaseController {
 
     @RequestMapping("tokokuan")
     public String tokokuan(HttpServletRequest request, Model model) {
+        String url = "mycollectionorder/tokokuan";
         Map<String, String> params = this.getParameters(request);
         if (StringUtils.isNotBlank(params.get("id"))) {
-            MmanLoanCollectionOrder mmanLoanCollectionOrderOri = mmanLoanCollectionOrderService
-                    .getOrderById(params.get("id").toString());
+            String loanId = params.get("id").toString();
+            MmanLoanCollectionOrder mmanLoanCollectionOrderOri = mmanLoanCollectionOrderService.getOrderById(loanId);
             if (mmanLoanCollectionOrderOri != null) {
                 CreditLoanPay creditLoanPay = creditLoanPayService
                         .get(mmanLoanCollectionOrderOri.getPayId());
@@ -576,12 +577,19 @@ public class MyCollectionOrderController extends BaseController {
                         "totalPayMonery",
                         creditLoanPay.getReceivablePrinciple().add(
                                 creditLoanPay.getReceivableInterest()));
+
+                // 大额代扣跳转到一个专门的页面
+                MmanUserLoan loan = mmanUserLoanService.get(mmanLoanCollectionOrderOri.getLoanId());
+                if (loan != null && Constant.BIG.equals(loan.getBorrowingType())) {
+                    url = "mycollectionorder/toBigkoukuan";
+                }
+
             } else {
                 logger.error("mmanLoanCollectionOrderOri is null, loanId : " + params.get("id"));
             }
         }
         model.addAttribute("params", params);
-        return "mycollectionorder/tokokuan";
+        return url;
     }
 
     /**
@@ -646,6 +654,35 @@ public class MyCollectionOrderController extends BaseController {
             } else {
                 obj.put("1", "更新失败！");
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("处理代扣回调异常");
+        }
+    }
+
+
+    /**
+     * 异步处理（更新代扣结果(大额)）,回调接口，用于告知代扣处理结果(代扣走支付中心)
+     */
+    @RequestMapping(value = "withhold-callback-big")
+    @ResponseBody
+    public void updateWithholdResult(HttpServletRequest request) {
+        try {
+            Map<String, String> params = this.getParameters(request);
+            String uuid = params.get("uuid");
+            String result = params.get("result");
+            Object msg = params.get("msg");
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("id", uuid);
+            if (true) {
+                map.put("status", 1); // 代扣成功
+            } else {
+                map.put("status", 2); // 代扣失败
+                map.put("msg", msg); // 代扣失败原因
+            }
+            map.put("updateDate", new Date());
+            // 更新代扣记录状态
+            collectionWithholdingRecordService.updateWithholdStatus(map);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("处理代扣回调异常");

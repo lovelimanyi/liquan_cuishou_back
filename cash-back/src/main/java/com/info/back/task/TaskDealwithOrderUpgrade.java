@@ -1,6 +1,7 @@
 package com.info.back.task;
 
 import com.info.back.service.IMmanLoanCollectionOrderService;
+import com.info.back.service.IMmanUserLoanService;
 import com.info.back.utils.BackConstant;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -25,10 +26,13 @@ public class TaskDealwithOrderUpgrade {
     @Autowired
     private IMmanLoanCollectionOrderService orderService;
 
+    @Autowired
+    private IMmanUserLoanService loanService;
+
     public void orderUpgrade() {
         Map<String, Object> map = new HashMap<>();
-        map.put("orderStatus", BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS);
-        List<String> loanIds = orderService.getOverdueOrderIds(map);
+        map.put("orderStatus", BackConstant.XJX_LOAN_STATUS_RETURN_SUCCESS);
+        List<String> loanIds = loanService.getOverdueOrderIds(map);
         ThreadPoolDealwithOrderUpgrade pool = ThreadPoolDealwithOrderUpgrade.getInstance();
         pool.setDaemon(true);
         for (String loanId : loanIds) {

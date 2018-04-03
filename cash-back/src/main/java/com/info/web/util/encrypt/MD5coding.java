@@ -45,7 +45,7 @@ public class MD5coding {
 	 * 
 	 * @param msg
 	 *            要处理的字符串
-	 * @param encryptLength加密字符串长度
+	 * @param
 	 * @param type
 	 *            begin从开头加密<br>
 	 *            end从结尾加密<br>

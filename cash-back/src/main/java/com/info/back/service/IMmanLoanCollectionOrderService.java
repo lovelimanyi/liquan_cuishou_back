@@ -139,8 +139,6 @@ public interface IMmanLoanCollectionOrderService {
 	 */
 	void dispatchOrderNew(String loanId,String idNumber,String type);
 
-	List<String> getOverdueOrderIds(Map<String,Object> map);
-
 	void orderUpgrade(String loanId);
 
 	void updateOverdueDays(MmanLoanCollectionOrder order);

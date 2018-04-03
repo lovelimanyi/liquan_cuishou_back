@@ -229,4 +229,13 @@
             AND term_number IS NULL
         </where>
     </select>
+
+    <select id="getOverdueOrderIds" parameterType="Map" resultType="String">
+        SELECT id FROM mman_user_loan
+        <where>
+            <if test="status != null and status != ''">
+                AND loan_status != #{orderStatus}
+            </if>
+        </where>
+    </select>
 </mapper>
