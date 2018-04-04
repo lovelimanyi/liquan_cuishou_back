@@ -198,6 +198,7 @@ public class SyncService implements ISyncService {
         MmanLoanCollectionOrder order = new MmanLoanCollectionOrder();
         order.setLoanId(loanId);
         order.setOverdueDays(loan.getOverdueDays());
+        order.setUpdateDate(new Date());
         orderService.updateOverdueDays(order);
         //更新借款表：滞纳金，利息；
         MmanUserLoan mmanUserLoan = new MmanUserLoan();
