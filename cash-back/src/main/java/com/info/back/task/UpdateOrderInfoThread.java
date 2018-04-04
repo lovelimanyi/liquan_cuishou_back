@@ -1,10 +1,6 @@
 package com.info.back.task;
 
 import com.info.back.service.IMmanLoanCollectionOrderService;
-import com.info.back.service.TaskJobMiddleService;
-import com.info.web.pojo.CreditLoanPay;
-import com.info.web.pojo.MmanLoanCollectionOrder;
-import com.info.web.pojo.MmanUserLoan;
 import org.apache.log4j.Logger;
 
 import java.util.Date;

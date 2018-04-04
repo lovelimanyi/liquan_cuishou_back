@@ -582,7 +582,7 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
                     if (BackConstant.SURPER_MANAGER_ROLE_ID.equals(Integer.valueOf(params.get("roleId"))) || record == null || new Date().getTime() > getCreateTimePlus(record)) {
                         CreditLoanPay creditLoanPay = creditLoanPayService.get(mmanLoanCollectionOrderOri.getPayId());
                         String payMonery = params.get("payMoney");//扣款金额
-                        BigDecimal koPayMonery = BigDecimal.ZERO;
+                        BigDecimal koPayMonery;
                         BigDecimal maxpayMonery = creditLoanPay.getReceivablePrinciple().add(creditLoanPay.getReceivableInterest());
                         if (payMonery == null || "".equals(payMonery) || !CompareUtils.greaterThanZero(new BigDecimal(payMonery))) {
                             koPayMonery = creditLoanPay.getReceivablePrinciple().add(creditLoanPay.getReceivableInterest());
@@ -783,7 +783,13 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
     private String getMessageString(MmanLoanCollectionOrder mmanLoanCollectionOrderOri, long actualPayMonery, String uuid, String sign) {
         WithholdParam withhold = new WithholdParam();
         withhold.setMoney(BigDecimal.valueOf(actualPayMonery)); // 扣款金额
-        withhold.setRepaymentId(mmanLoanCollectionOrderOri.getPayId()); // 还款id
+        String origianlPayId = mmanLoanCollectionOrderOri.getPayId();
+        if(StringUtils.isNotEmpty(origianlPayId) && origianlPayId.contains(Constant.SEPARATOR_FOR_ORDER_SOURCE)){
+            String payId = origianlPayId.substring(0,origianlPayId.length() - 2);
+            withhold.setRepaymentId(payId); // 还款id
+        }else {
+            withhold.setRepaymentId(mmanLoanCollectionOrderOri.getPayId()); // 还款id
+        }
         withhold.setUuid(uuid); // uuid
         withhold.setUserId(mmanLoanCollectionOrderOri.getUserId()); // 用户id
         withhold.setSign(sign);
