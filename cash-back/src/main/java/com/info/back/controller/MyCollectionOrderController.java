@@ -1,5 +1,6 @@
 package com.info.back.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.info.back.dao.ISmsUserDao;
 import com.info.back.dao.ITemplateSmsDao;
@@ -22,6 +23,7 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -630,7 +632,7 @@ public class MyCollectionOrderController extends BaseController {
     /**
      * 异步处理（更新代扣结果）,回调接口，用于告知代扣处理结果(代扣走支付中心)
      */
-    @RequestMapping(value = "withhold-callback")
+    @RequestMapping(value = "/withhold-callback")
     @ResponseBody
     public void dealWithholdResult(String text) {
         try {
@@ -664,25 +666,25 @@ public class MyCollectionOrderController extends BaseController {
     /**
      * 异步处理（更新代扣结果(大额)）,回调接口，用于告知代扣处理结果(代扣走支付中心)
      */
-    @RequestMapping(value = "withhold-callback-big")
+    @RequestMapping(value = "/withhold-callback-big")
     @ResponseBody
-    public void updateWithholdResult(HttpServletRequest request) {
+    public void updateWithholdResult(@RequestBody HashMap<String, Object> map) {
         try {
-            Map<String, String> params = this.getParameters(request);
-            String uuid = params.get("uuid");
-            String result = params.get("result");
-            Object msg = params.get("msg");
-            HashMap<String, Object> map = new HashMap<>();
-            map.put("id", uuid);
-            if (true) {
-                map.put("status", 1); // 代扣成功
+            JSONObject obj = JSONObject.parseObject(JSON.toJSONString(map));
+            String uuid = (String) obj.get("uuid");
+            boolean result = (boolean) obj.get("result");
+            Object msg = obj.get("msg");
+            HashMap<String, Object> parammMap = new HashMap<>();
+            parammMap.put("id", uuid);
+            if (result) {
+                parammMap.put("status", 1); // 代扣成功
             } else {
-                map.put("status", 2); // 代扣失败
-                map.put("msg", msg); // 代扣失败原因
+                parammMap.put("status", 2); // 代扣失败
+                parammMap.put("msg", msg); // 代扣失败原因
             }
-            map.put("updateDate", new Date());
+            parammMap.put("updateDate", new Date());
             // 更新代扣记录状态
-            collectionWithholdingRecordService.updateWithholdStatus(map);
+            collectionWithholdingRecordService.updateWithholdStatus(parammMap);
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("处理代扣回调异常");

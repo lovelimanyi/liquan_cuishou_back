@@ -57,6 +57,7 @@
 			<mvc:exclude-mapping path="/sync/loan-order-update"/>
 			<mvc:exclude-mapping path="/sync/loan-order-update"/>
 			<mvc:exclude-mapping path="/sync/repayment"/>
+			<mvc:exclude-mapping path="/collectionOrder/withhold-callback-big"/>
 			<bean class="com.info.back.interceptor.AdminContextInterceptor"/>
 		</mvc:interceptor>
 	</mvc:interceptors>
