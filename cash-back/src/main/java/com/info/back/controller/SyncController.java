@@ -72,12 +72,12 @@ public class SyncController {
             if (collectionNotifyDto != null) {
                 BigAmountRequestParams bigAmount  = handleCollectionNotifyDto(collectionNotifyDto);
                 Loan loan = bigAmount.getLoan();
-                logger.info("order_loanId_termNumber" + loan.getId().toString()+ loan.getTermNumber().toString());
+                logger.info("order_loanId_termNumber" + loan.getId().toString());
                 Repayment repayment = bigAmount.getRepayment();
                 RepaymentDetail repaymentDetail = bigAmount.getRepaymentDetail();
-                if (loan != null && repayment!= null && repaymentDetail== null) {
+                if (loan != null && repayment!= null ) {
                     //逾期同步或者每日更新
-                    syncService.handleOverdue(repayment,loan);
+                    syncService.handleOverdue(repayment,loan,repaymentDetail);
                 } else {
                     logger.info("解析json,repayment is null...");
                 }
@@ -103,7 +103,7 @@ public class SyncController {
             if (collectionNotifyDto != null) {
                 BigAmountRequestParams bigAmount  = handleCollectionNotifyDto(collectionNotifyDto);
                 Loan loan = bigAmount.getLoan();
-                logger.info("order_loanId_termNumber" + loan.getId().toString()+ loan.getTermNumber().toString());
+                logger.info("repay_order_loanId_termNumber" + loan.getId().toString());
                 Repayment repayment = bigAmount.getRepayment();
                 RepaymentDetail repaymentDetail = bigAmount.getRepaymentDetail();
                 if (loan != null && repayment!= null && repaymentDetail != null) {
@@ -124,7 +124,10 @@ public class SyncController {
         BigAmountRequestParams bigAmountRequestParams = new BigAmountRequestParams();
         if (collectionNotifyDto.getRepayment()!= null && collectionNotifyDto.getLoan() != null){
             Loan loan = new Loan();
-            loan.setId(String.valueOf(collectionNotifyDto.getLoan().getId()));
+            String termNumber = String.valueOf(collectionNotifyDto.getLoan().getTermNumber());
+            String loanId = String.valueOf(collectionNotifyDto.getLoan().getId())+"-"+termNumber;
+
+            loan.setId(loanId);
             loan.setLoanMoney(String.valueOf(collectionNotifyDto.getLoan().getLoanMoney()));
             loan.setLoanRate(String.valueOf(collectionNotifyDto.getLoan().getLoanRate()));
             loan.setServiceCharge(String.valueOf(collectionNotifyDto.getLoan().getServiceCharge()));
@@ -140,8 +143,10 @@ public class SyncController {
             bigAmountRequestParams.setLoan(loan);
 
             Repayment repayment = new Repayment();
-            repayment.setId(String.valueOf(collectionNotifyDto.getRepayment().getId()));
-            repayment.setLoanId(String.valueOf(collectionNotifyDto.getRepayment().getLoanId()));
+            //为了防止payId与小额重复，在payId后面加上-0
+            String payId =String.valueOf(collectionNotifyDto.getRepayment().getId())+"-0" ;
+            repayment.setId(payId);
+            repayment.setLoanId(loanId);
             repayment.setReceivableDate(DateUtil.getDateFormat(new Date(collectionNotifyDto.getRepayment().getReceivableDate()),"yyyy-MM-dd"));
             repayment.setReceiveMoney(String.valueOf(collectionNotifyDto.getRepayment().getReceiveMoney()));
             repayment.setLoanPenalty(String.valueOf(collectionNotifyDto.getRepayment().getLoanPenalty()));
@@ -158,10 +163,11 @@ public class SyncController {
             bigAmountRequestParams.setRepayment(repayment);
         }
         if (collectionNotifyDto.getRepayment()!= null && collectionNotifyDto.getLoan() != null && collectionNotifyDto.getRepaymentDetail()!= null&&collectionNotifyDto.getRepaymentDetail().getId() != null ){
+            String payId =String.valueOf(collectionNotifyDto.getRepayment().getId())+"-0" ;
             RepaymentDetail repaymentDetail = new RepaymentDetail();
             repaymentDetail.setId(String.valueOf(collectionNotifyDto.getRepaymentDetail().getId()));
             repaymentDetail.setCreateDate(DateUtil.getDateFormat(new Date(collectionNotifyDto.getRepaymentDetail().getCreateDate()),"yyyy-MM-dd"));
-            repaymentDetail.setPayId(String.valueOf(collectionNotifyDto.getRepaymentDetail().getPayId()));
+            repaymentDetail.setPayId(payId);
             repaymentDetail.setReturnType(String.valueOf(collectionNotifyDto.getRepaymentDetail().getReturnType()));
             repaymentDetail.setRemark(String.valueOf(collectionNotifyDto.getRepaymentDetail().getRemark()));
 

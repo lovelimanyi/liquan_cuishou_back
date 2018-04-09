@@ -10,7 +10,7 @@ import com.info.vo.bigAmount.RepaymentDetail;
  * 创建时间：2017/11/17 0017下午 02:36
  */
 public interface ISyncService {
-    void handleOverdue(Repayment repayment, Loan loan);
+    void handleOverdue(Repayment repayment, Loan loan,RepaymentDetail repaymentDetail);
 
     void handleRepay(Repayment repayment, Loan loan, RepaymentDetail repaymentDetail);
     /**

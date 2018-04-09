@@ -43,11 +43,11 @@ public class SyncService implements ISyncService {
     private CreditLoanPayService creditLoanPayService;
 
     @Override
-    public void handleOverdue(Repayment repayment, Loan loan) {
+    public void handleOverdue(Repayment repayment, Loan loan,RepaymentDetail repaymentDetail) {
 
         String payId = repayment.getId();
         String userId = loan.getUserId();
-        String loanId = loan.getId()+"-"+loan.getTermNumber();
+        String loanId = loan.getId();
         CreditLoanPay creditLoanPay1 = creditLoanPayDao.get(payId);
         if (creditLoanPay1 == null){
             logger.info("accept_overdue_order_begin=" + loanId);
@@ -83,6 +83,10 @@ public class SyncService implements ISyncService {
             // 标识新老用户 0 新用户  1 老用户
             mmanUserLoan.setCustomerType(Integer.valueOf(userInfo.get("customer_type") == null ? "0" : userInfo.get("customer_type").toString()));
             localDataDao.saveMmanUserLoan(mmanUserLoan);
+            //如果还款详情不为空则保存还款详情
+            if (repaymentDetail != null){
+                //TODO 待确定
+            }
 
 
             // 保存还款表-逾期同步
@@ -111,7 +115,7 @@ public class SyncService implements ISyncService {
 
         String payId = repayment.getId();
         String userId = loan.getUserId();
-        String loanId = loan.getId()+"-"+loan.getTermNumber();
+        String loanId = loan.getId();
         CreditLoanPay creditLoanPay1 = creditLoanPayDao.get(payId);
         int receivablePrinciple = Integer.parseInt(String.valueOf(repayment.getReceivablePrinciple()));//剩余应还本金
         if (creditLoanPay1 != null){
@@ -126,11 +130,11 @@ public class SyncService implements ISyncService {
                 CreditLoanPay creditLoanPay = handleRCreditLoanPay(repayment,loanId,loan,creditLoanPay1);
                 localDataDao.updateCreditLoanPay(creditLoanPay);//更新还款表
                 logger.info("更新还款表_还款表数据=" + payId+"----"+creditLoanPay);
-
+                //添加还款详情记录
                 CreditLoanPayDetail creditLoanPayDetail = new CreditLoanPayDetail();
                 creditLoanPayDetail.setCreateDate(DateUtil.getDateTimeFormat(repaymentDetail.getCreateDate(), "yyyy-MM-dd"));
                 creditLoanPayDetail.setId(repaymentDetail.getId());
-                creditLoanPayDetail.setPayId(payId);
+                creditLoanPayDetail.setPayId(repaymentDetail.getPayId());
                 creditLoanPayDetail.setUpdateDate(new Date());
                 creditLoanPayDetail.setReturnType(repaymentDetail.getReturnType());
                 creditLoanPayDetail.setRemark(repaymentDetail.getRemark());
@@ -189,11 +193,12 @@ public class SyncService implements ISyncService {
     public void updateOverdue(Repayment repayment, Loan loan) {
         String payId = repayment.getId();
         String userId = loan.getUserId();
-        String loanId = loan.getId()+"-"+loan.getTermNumber();
+        String loanId = loan.getId();
         //更新订单表：逾期天数
         MmanLoanCollectionOrder order = new MmanLoanCollectionOrder();
         order.setLoanId(loanId);
         order.setOverdueDays(loan.getOverdueDays());
+        order.setUpdateDate(new Date());
         orderService.updateOverdueDays(order);
         //更新借款表：滞纳金，利息；
         MmanUserLoan mmanUserLoan = new MmanUserLoan();
