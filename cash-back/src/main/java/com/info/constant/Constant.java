@@ -244,7 +244,7 @@ public class Constant {
     /**
      * 催收代扣队列名----大额
      */
-    public static final String CUISHOU_WITHHOLD_QUEUE_BIG = "cuishou_withhold_queue_big";
+    public static final String CUISHOU_WITHHOLD_QUEUE_BIG = "collection_withhold_push_queue";
 
     /**
      * 区分大小额订单标识符（大额订单借款id、还款id皆带有此标识）
