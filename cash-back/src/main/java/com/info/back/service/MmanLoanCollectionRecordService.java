@@ -583,7 +583,7 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
                         CreditLoanPay creditLoanPay = creditLoanPayService.get(mmanLoanCollectionOrderOri.getPayId());
                         String payMonery = params.get("payMoney");//扣款金额
                         BigDecimal koPayMonery;
-                        BigDecimal maxpayMonery = creditLoanPay.getReceivablePrinciple().add(creditLoanPay.getReceivableInterest());
+                        BigDecimal maxpayMonery = creditLoanPay.getReceivablePrinciple().add(creditLoanPay.getReceivableInterest()).add(creditLoanPay.getRemainAccrual());
                         if (payMonery == null || "".equals(payMonery) || !CompareUtils.greaterThanZero(new BigDecimal(payMonery))) {
                             koPayMonery = creditLoanPay.getReceivablePrinciple().add(creditLoanPay.getReceivableInterest());
                         } else {
@@ -643,7 +643,7 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
                                 reslut.setMsg(msg + " 代扣失败，您今日还有1次代扣机会 / 您今日已经无法代扣，请联系委外对接人代扣。");
                             }
                         } else {
-                            reslut.setMsg("代扣金额不能大于" + creditLoanPay.getReceivablePrinciple().add(creditLoanPay.getReceivableInterest()));
+                            reslut.setMsg("代扣金额不能大于" + creditLoanPay.getReceivablePrinciple().add(creditLoanPay.getReceivableInterest()).add(creditLoanPay.getRemainAccrual()));
                         }
                     } else {
                         reslut.setMsg("连续2次代扣时间不可小于2分钟，请稍后再试！");
