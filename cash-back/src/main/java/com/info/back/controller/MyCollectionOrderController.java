@@ -578,7 +578,7 @@ public class MyCollectionOrderController extends BaseController {
                 model.addAttribute(
                         "totalPayMonery",
                         creditLoanPay.getReceivablePrinciple().add(
-                                creditLoanPay.getReceivableInterest()));
+                                creditLoanPay.getReceivableInterest()).add(creditLoanPay.getRemainAccrual()));
 
                 // 大额代扣跳转到一个专门的页面
                 MmanUserLoan loan = mmanUserLoanService.get(mmanLoanCollectionOrderOri.getLoanId());
