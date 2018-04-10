@@ -109,7 +109,7 @@
 	</update>
 	<!-- 根据主键获取单条记录 -->
 	<select id="get" resultMap="queryResultMap" parameterType="com.info.web.pojo.CreditLoanPay">SELECT t.id , t.loan_id , t.receivable_startdate , t.receivable_date , t.receivable_money , t.receivable_principle , t.receivable_interest , t.real_money , t.realget_principle , t.realget_interest , t.status , t.create_date , t.update_Date , t.rest_principle , t.installmentMethod ,
- t.realget_service_charge,t.remain_service_charge,t.create_By , t.update_By,t.remain_accrual FROM credit_loan_pay t WHERE id = #{id,jdbcType=VARCHAR}</select>
+ t.realget_service_charge,t.remain_service_charge,t.create_By , t.update_By,t.remain_accrual as remainAccrual FROM credit_loan_pay t WHERE id = #{id,jdbcType=VARCHAR}</select>
 	<!-- 根据主键删除记录 -->
 	<delete id="del" parameterType="com.info.web.pojo.CreditLoanPay">DELETE FROM credit_loan_pay WHERE id = #{id,jdbcType=VARCHAR}</delete>
 	
