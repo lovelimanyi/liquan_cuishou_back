@@ -573,12 +573,10 @@ public class MyCollectionOrderController extends BaseController {
             String loanId = params.get("id").toString();
             MmanLoanCollectionOrder mmanLoanCollectionOrderOri = mmanLoanCollectionOrderService.getOrderById(loanId);
             if (mmanLoanCollectionOrderOri != null) {
-                CreditLoanPay creditLoanPay = creditLoanPayService
-                        .get(mmanLoanCollectionOrderOri.getPayId());
-                model.addAttribute(
-                        "totalPayMonery",
-                        creditLoanPay.getReceivablePrinciple().add(
-                                creditLoanPay.getReceivableInterest()).add(creditLoanPay.getRemainAccrual()));
+                CreditLoanPay creditLoanPay = creditLoanPayService.get(mmanLoanCollectionOrderOri.getPayId());
+                BigDecimal totalPayMonery = creditLoanPay.getReceivablePrinciple().add(
+                        creditLoanPay.getReceivableInterest()).add(creditLoanPay.getRemainAccrual() == null ? BigDecimal.ZERO : creditLoanPay.getRemainAccrual());
+                model.addAttribute("totalPayMonery",totalPayMonery);
 
                 // 大额代扣跳转到一个专门的页面
                 MmanUserLoan loan = mmanUserLoanService.get(mmanLoanCollectionOrderOri.getLoanId());

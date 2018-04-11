@@ -583,7 +583,8 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
                         CreditLoanPay creditLoanPay = creditLoanPayService.get(mmanLoanCollectionOrderOri.getPayId());
                         String payMonery = params.get("payMoney");//扣款金额
                         BigDecimal koPayMonery;
-                        BigDecimal maxpayMonery = creditLoanPay.getReceivablePrinciple().add(creditLoanPay.getReceivableInterest()).add(creditLoanPay.getRemainAccrual());
+                        BigDecimal maxpayMonery = creditLoanPay.getReceivablePrinciple().add(creditLoanPay.getReceivableInterest()).add(creditLoanPay.getRemainAccrual() == null
+                                ? BigDecimal.ZERO : creditLoanPay.getRemainAccrual());
                         if (payMonery == null || "".equals(payMonery) || !CompareUtils.greaterThanZero(new BigDecimal(payMonery))) {
                             koPayMonery = creditLoanPay.getReceivablePrinciple().add(creditLoanPay.getReceivableInterest());
                         } else {
@@ -663,6 +664,7 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
 
     /**
      * 发送mq消息
+     *
      * @param params
      * @param mmanLoanCollectionOrderOri
      * @param actualPayMonery
@@ -689,6 +691,7 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
 
     /**
      * 插入代扣记录
+     *
      * @param params
      * @param mmanLoanCollectionOrderOri
      * @param creditLoanPay
@@ -718,6 +721,7 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
 
     /**
      * 处理代扣结果
+     *
      * @param params
      * @param mmanLoanCollectionOrderOri
      * @param reslut
@@ -774,6 +778,7 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
 
     /**
      * 处理要被发送往mq的JSONSTRING
+     *
      * @param mmanLoanCollectionOrderOri
      * @param actualPayMonery
      * @param uuid
@@ -784,10 +789,10 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
         WithholdParam withhold = new WithholdParam();
         withhold.setMoney(BigDecimal.valueOf(actualPayMonery)); // 扣款金额
         String origianlPayId = mmanLoanCollectionOrderOri.getPayId();
-        if(StringUtils.isNotEmpty(origianlPayId) && origianlPayId.contains(Constant.SEPARATOR_FOR_ORDER_SOURCE)){
-            String payId = origianlPayId.substring(0,origianlPayId.length() - 2);
+        if (StringUtils.isNotEmpty(origianlPayId) && origianlPayId.contains(Constant.SEPARATOR_FOR_ORDER_SOURCE)) {
+            String payId = origianlPayId.substring(0, origianlPayId.length() - 2);
             withhold.setRepaymentId(payId); // 还款id
-        }else {
+        } else {
             withhold.setRepaymentId(mmanLoanCollectionOrderOri.getPayId()); // 还款id
         }
         withhold.setUuid(uuid); // uuid
