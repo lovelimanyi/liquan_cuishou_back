@@ -16,6 +16,7 @@
 			<form id="frm" method="post" enctype="multipart/form-data" action="collectionOrder/kokuan" onsubmit="return validateCallback(this, dialogAjaxDone);"
 				class="pageForm required-validate">
 				<input type="hidden" name="parentId" value="${params.parentId}" />
+				<input type="hidden" name="borrowingType" id="borrowingType" value="2">
 				<input type="hidden" name="id" id="id" value="${params.id }">
 				<div class="pageFormContent" layoutH="50" style="overflow: auto;">
 					<dl>
