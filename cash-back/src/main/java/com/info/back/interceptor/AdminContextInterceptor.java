@@ -136,10 +136,12 @@ public class AdminContextInterceptor extends HandlerInterceptorAdapter {
 
     private String getLoginUrl(HttpServletRequest request) {
         StringBuilder buff = new StringBuilder();
-        if (loginUrl.startsWith("/")) {
-            String ctx = request.getContextPath();
-            if (!StringUtils.isBlank(ctx)) {
-                buff.append(ctx);
+        if (StringUtils.isNotEmpty(loginUrl)) {
+            if (loginUrl.startsWith("/")) {
+                String ctx = request.getContextPath();
+                if (!StringUtils.isBlank(ctx)) {
+                    buff.append(ctx);
+                }
             }
         }
         buff.append(loginUrl).append("?");
@@ -153,10 +155,12 @@ public class AdminContextInterceptor extends HandlerInterceptorAdapter {
 
     private String getProcessUrl(HttpServletRequest request) {
         StringBuilder buff = new StringBuilder();
-        if (loginUrl.startsWith("/")) {
-            String ctx = request.getContextPath();
-            if (!StringUtils.isBlank(ctx)) {
-                buff.append(ctx);
+        if (StringUtils.isNotEmpty(loginUrl)) {
+            if (loginUrl.startsWith("/")) {
+                String ctx = request.getContextPath();
+                if (!StringUtils.isBlank(ctx)) {
+                    buff.append(ctx);
+                }
             }
         }
         buff.append(processUrl);
@@ -208,6 +212,7 @@ public class AdminContextInterceptor extends HandlerInterceptorAdapter {
 
     /**
      * 判断请求过来的ip是否在允许的范围内
+     *
      * @param request
      * @return
      * @throws Exception
@@ -217,9 +222,9 @@ public class AdminContextInterceptor extends HandlerInterceptorAdapter {
         List<String> orayIps = JedisDataClient.getList("orayIps", 0, -1);
         if (orayIps == null || orayIps.size() == 0) {
             List<MmanLoanCollectionCompany> companyIps = collectionCompanyService.getCompanyIps();
-            for (MmanLoanCollectionCompany company:companyIps) {
+            for (MmanLoanCollectionCompany company : companyIps) {
                 String CompanyIps = company.getCompanyAddress();
-                if(StringUtils.isNotEmpty(CompanyIps)){
+                if (StringUtils.isNotEmpty(CompanyIps)) {
                     List<String> ips = Arrays.asList(CompanyIps.split(","));
                     orayIps.addAll(ips);
                 }
@@ -233,7 +238,7 @@ public class AdminContextInterceptor extends HandlerInterceptorAdapter {
             request.getSession().removeAttribute(Constant.BACK_USER);
         }
         boolean loginFlag = false;
-        if(orayIps.contains(clientIp)){
+        if (orayIps.contains(clientIp)) {
             loginFlag = true; // 在花生壳范围内可以登录
         }
         return loginFlag;
