@@ -84,7 +84,7 @@
 	
 	<!-- 查询所有的状态(id和状态名) -->
 	<select id="getStatus" resultType="com.info.web.pojo.SysDict" parameterType="String">
-		select id,label,`value` from sys_dict where type = #{type} ORDER BY `value` DESC
+		select id,label,`value` from sys_dict d where type = #{type} ORDER BY d.sort DESC
 	</select>
 		
 	<!-- 保存,保存不为NULL的字段 -->
