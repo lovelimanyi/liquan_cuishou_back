@@ -44,6 +44,13 @@ public class BackConstant {
 
 	public final static String XJX_OVERDUE_LEVEL_M6P = "8";// 现金侠逾期等级或催收组M6+
 
+	public final static String XJX_OVERDUE_LEVEL_F_M1 = "11";// 大额现金侠逾期等级或催收组F-M1
+	public final static String XJX_OVERDUE_LEVEL_F_M2 = "12";// 大额现金侠逾期等级或催收组F-M2
+	public final static String XJX_OVERDUE_LEVEL_F_M3 = "13";// 大额现金侠逾期等级或催收组F-M3
+	public final static String XJX_OVERDUE_LEVEL_F_M6 = "16";// 大额现金侠逾期等级或催收组F-M6
+
+
+
 	public final static String XJX_OVERDUE_LEVEL_S1_OR_S2 = "34";// 现金侠逾期等级或催收组S1或S2，这个仅用于条件查询
 
 
@@ -114,6 +121,10 @@ public class BackConstant {
 		groupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_M2_M3,"M2-M3");
 		groupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_M3P,"M3+");
 		groupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_M6P,"M6+");
+		groupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_F_M1,"F-M1");
+		groupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_F_M2,"F-M2");
+		groupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_F_M3,"F-M3");
+		groupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_F_M6,"F-M6");
 
 		groupNameTypeMap.put("33","S1");
 		groupNameTypeMap.put("43","S2-S1");
