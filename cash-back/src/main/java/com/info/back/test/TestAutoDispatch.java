@@ -4,6 +4,7 @@ import com.info.back.service.IBackUserService;
 import com.info.back.service.ICollectionWithholdingRecordService;
 import com.info.back.service.IMmanLoanCollectionOrderService;
 import com.info.back.service.TaskJobMiddleService;
+import com.info.constant.Constant;
 import com.info.web.pojo.MmanLoanCollectionOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -48,7 +49,24 @@ public class TestAutoDispatch {
             System.out.println("*******************");
         }
     }
+
+    @Test
+    public void testOrderUpGrade() {
+        String id = "10379152";
+        orderService.orderUpgrade(id);
+    }
+
+
+    @Test
+    public void testBigOrderDispatch() {
+        String id = "142995-1";
+        String idNumber = "123456789987";
+        orderService.dispatchOrderNew(id, idNumber, Constant.BIG);
+    }
+
 }
+
+
 //		System.out.println(checkNumer("61232219901"));
 //
 //

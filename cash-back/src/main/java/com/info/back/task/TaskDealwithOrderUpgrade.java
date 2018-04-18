@@ -3,6 +3,7 @@ package com.info.back.task;
 import com.info.back.service.IMmanLoanCollectionOrderService;
 import com.info.back.service.IMmanUserLoanService;
 import com.info.back.utils.BackConstant;
+import com.info.constant.Constant;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,9 @@ public class TaskDealwithOrderUpgrade {
 
     public void orderUpgrade() {
         Map<String, Object> map = new HashMap<>();
+        //处理小额订单
         map.put("orderStatus", BackConstant.XJX_LOAN_STATUS_RETURN_SUCCESS);
+        map.put("borrowingType", Constant.SMALL);
         List<String> loanIds = loanService.getOverdueOrderIds(map);
         ThreadPoolDealwithOrderUpgrade pool = ThreadPoolDealwithOrderUpgrade.getInstance();
         pool.setDaemon(true);
@@ -41,6 +44,23 @@ public class TaskDealwithOrderUpgrade {
                     continue;
                 }
                 DealwithOrderUpgradeThread thread = new DealwithOrderUpgradeThread(loanId, orderService);
+                pool.execute(thread);
+            } catch (Exception e) {
+                logger.error("处理逾期订单升级出错，借款id: " + loanId);
+                e.printStackTrace();
+                continue;
+            }
+        }
+
+        //处理大额订单
+        map.put("borrowingType", Constant.BIG);
+        List<String> bigOrderloanIds = loanService.getOverdueOrderIds(map);
+        for (String loanId : bigOrderloanIds) {
+            try {
+                if (StringUtils.isEmpty(loanId)) {
+                    continue;
+                }
+                DealwithBigOrderUpgradeThread thread = new DealwithBigOrderUpgradeThread(loanId, orderService);
                 pool.execute(thread);
             } catch (Exception e) {
                 logger.error("处理逾期订单升级出错，借款id: " + loanId);

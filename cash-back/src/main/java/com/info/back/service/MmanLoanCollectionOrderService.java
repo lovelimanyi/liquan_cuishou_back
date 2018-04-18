@@ -58,7 +58,7 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
 
     @Override
     public PageConfig<MmanLoanCollectionOrder> findPage(HashMap<String, Object> params) {
-        PageConfig<MmanLoanCollectionOrder> page = new PageConfig<MmanLoanCollectionOrder>();
+        PageConfig<MmanLoanCollectionOrder> page;
         page = orderPaginationDao.findPage("getOrderPage", "getOrderPageCount", params, null);
         return page;
     }
@@ -95,7 +95,7 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
     @Override
     public PageConfig<OrderBaseResult> getPage(HashMap<String, Object> params) {
         params.put(Constant.NAME_SPACE, "MmanLoanCollectionOrder");
-        PageConfig<OrderBaseResult> page = new PageConfig<OrderBaseResult>();
+        PageConfig<OrderBaseResult> page;
         page = orderPaginationDao.findPage("getCollectionOrderList", "getCollectionOrderCount", params, null);
         // 插入操作记录
         insertOperateRecord(params);
@@ -144,7 +144,7 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
     @Override
     public PageConfig<OrderBaseResult> getCollectionUserPage(HashMap<String, Object> params) {
         params.put(Constant.NAME_SPACE, "MmanLoanCollectionOrder");
-        PageConfig<OrderBaseResult> page = new PageConfig<OrderBaseResult>();
+        PageConfig<OrderBaseResult> page;
         page = orderPaginationDao.findPage("getCollectionOrderList", "getOrderCount", params, null);
         // 插入操作记录
         insertOperateRecord(params);
@@ -197,7 +197,7 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
     @Override
     public PageConfig<OrderBaseResult> getMyPage(HashMap<String, Object> params) {
         params.put(Constant.NAME_SPACE, "MmanLoanCollectionOrder");
-        PageConfig<OrderBaseResult> page = new PageConfig<OrderBaseResult>();
+        PageConfig<OrderBaseResult> page;
         page = orderPaginationDao.findPage("getCollectionMyOrderList", "getCollectionMyOrderCount", params, null);
         return page;
     }
@@ -281,6 +281,147 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
     }
 
     @Override
+    public void dealwithBigOrderUpgrade(String loanId) {
+        try {
+            MmanUserLoan loan = mmanUserLoanDao.get(loanId);
+            if (loan == null) {
+                logger.error("处理逾期订单升级出错(借款对象为空)，借款id: " + loanId);
+                return;
+            }
+
+            List<MmanLoanCollectionOrder> orderList = new ArrayList<>();
+            List<MmanLoanCollectionPerson> personList = new ArrayList<>();
+            MmanLoanCollectionOrder order = new MmanLoanCollectionOrder();
+            order.setLoanId(loanId);
+            List<MmanLoanCollectionOrder> orders = mmanLoanCollectionOrderDao.findList(order);
+            if (CollectionUtils.isEmpty(orders)) {
+                logger.error("逾期升级出错，订单为空，借款id: " + loanId);
+                return;
+            }
+            order = orders.get(0);
+            if (BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())) {
+                logger.error("逾期升级出错，订单已还款完成，借款id: " + loanId);
+                return;
+            }
+            // 计算订单逾期天数
+            int dayCount = getOverdueDays(loan);
+
+            if (dayCount >= 31 && dayCount <= 60) {
+                this.dispatchOrderToFM2(order, orderList, personList);
+            } else if (dayCount >= 61 && dayCount <= 180) {
+                this.dispatchOrderToFM3(order, orderList, personList);
+            } else if (dayCount >= 181) {
+                this.dispatchOrderToFM6(order, orderList, personList);
+            }
+
+            mmanLoanCollectionRecordService.assignCollectionOrderToRelatedGroup(orderList, personList, new Date());
+        } catch (Exception e) {
+            logger.error("处理订单逾期升级出错，借款id: " + loanId);
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 大额订单逾期天数大于30天时升级到F-M2组
+     *
+     * @param order
+     * @param orderList
+     * @param personList
+     */
+    private void dispatchOrderToFM2(MmanLoanCollectionOrder order, List<MmanLoanCollectionOrder> orderList, List<MmanLoanCollectionPerson> personList) {
+        if (!BackConstant.XJX_OVERDUE_LEVEL_F_M2.equals(order.getCurrentOverdueLevel())) {
+            this.setCommonVariables(order);
+            orderList.add(order);
+
+            Map<String, String> personMap = new HashMap<>();
+            personMap.put("beginDispatchTime", DateUtil.getDateFormat("yyyy-MM-dd 00:00:00"));
+            personMap.put("endDispatchTime", DateUtil.getDateFormat((DateUtil.getBeforeOrAfter(new Date(), 1)), "yyyy-MM-dd HH:mm:ss"));
+            personMap.put("groupLevel", BackConstant.XJX_OVERDUE_LEVEL_F_M2);
+            personMap.put("userStatus", BackConstant.ON);
+            List<MmanLoanCollectionPerson> persons = backUserDao.findUnCompleteCollectionOrderByCurrentUnCompleteCountListByMap(personMap);
+            if (CollectionUtils.isEmpty(persons)) {
+                this.inserWarnMsg();
+                return;
+            }
+            personList.addAll(persons);
+        }
+    }
+
+    /**
+     * 大额订单逾期天数大于60天时升级到F-M3组
+     *
+     * @param order
+     * @param orderList
+     * @param personList
+     */
+    private void dispatchOrderToFM3(MmanLoanCollectionOrder order, List<MmanLoanCollectionOrder> orderList, List<MmanLoanCollectionPerson> personList) {
+        if (!BackConstant.XJX_OVERDUE_LEVEL_F_M3.equals(order.getCurrentOverdueLevel())) {
+            this.setCommonVariables(order);
+            orderList.add(order);
+
+            Map<String, String> personMap = new HashMap<>();
+            personMap.put("beginDispatchTime", DateUtil.getDateFormat("yyyy-MM-dd 00:00:00"));
+            personMap.put("endDispatchTime", DateUtil.getDateFormat((DateUtil.getBeforeOrAfter(new Date(), 1)), "yyyy-MM-dd HH:mm:ss"));
+            personMap.put("groupLevel", BackConstant.XJX_OVERDUE_LEVEL_F_M3);
+            personMap.put("userStatus", BackConstant.ON);
+            List<MmanLoanCollectionPerson> persons = backUserDao.findUnCompleteCollectionOrderByCurrentUnCompleteCountListByMap(personMap);
+            if (CollectionUtils.isEmpty(persons)) {
+                this.inserWarnMsg();
+                return;
+            }
+            personList.addAll(persons);
+        }
+    }
+
+    /**
+     * 大额订单逾期天数大于180天时升级到F-M6组
+     *
+     * @param order
+     * @param orderList
+     * @param personList
+     */
+    private void dispatchOrderToFM6(MmanLoanCollectionOrder order, List<MmanLoanCollectionOrder> orderList, List<MmanLoanCollectionPerson> personList) {
+        if (!BackConstant.XJX_OVERDUE_LEVEL_F_M6.equals(order.getCurrentOverdueLevel())) {
+            this.setCommonVariables(order);
+            orderList.add(order);
+
+            Map<String, String> personMap = new HashMap<>();
+            personMap.put("beginDispatchTime", DateUtil.getDateFormat("yyyy-MM-dd 00:00:00"));
+            personMap.put("endDispatchTime", DateUtil.getDateFormat((DateUtil.getBeforeOrAfter(new Date(), 1)), "yyyy-MM-dd HH:mm:ss"));
+            personMap.put("groupLevel", BackConstant.XJX_OVERDUE_LEVEL_F_M6);
+            personMap.put("userStatus", BackConstant.ON);
+            List<MmanLoanCollectionPerson> persons = backUserDao.findUnCompleteCollectionOrderByCurrentUnCompleteCountListByMap(personMap);
+            if (CollectionUtils.isEmpty(persons)) {
+                this.inserWarnMsg();
+                return;
+            }
+            personList.addAll(persons);
+        }
+    }
+
+    /**
+     * 计算给定日期之间相差的天数
+     *
+     * @param loanEndTime
+     * @return
+     */
+    private int getDaysCount(Date loanEndTime, Date date) {
+        try {
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("计算逾期天数出错！");
+        }
+        if (loanEndTime != null || date != null) {
+            long time = date.getTime() - loanEndTime.getTime();
+            long betweentDays = time / (1000 * 3600 * 24);
+            return Integer.parseInt(String.valueOf(betweentDays));
+        }
+        return 0;
+    }
+
+
+    @Override
     public void updateOrderInfo(String loanId) {
 
         MmanUserLoan loan = mmanUserLoanDao.get(loanId);
@@ -288,7 +429,7 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
             logger.error("更新逾期订单出错，借款对象为空，借款id: " + loanId);
             return;
         }
-        if(loan.getTermNumber() != null){
+        if (loan.getTermNumber() != null) {
             logger.error("更新逾期订单出错，更新逾期订单只处理原来小额来源的订单，借款id: " + loanId);
             return;
         }
@@ -309,7 +450,7 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
 
         BigDecimal loanMoney = loan.getLoanMoney(); // 借款本金
         if (BackConstant.CREDITLOANAPPLY_OVERDUE.equals(loan.getLoanStatus())) {
-            // 计算去逾期天数
+            // 计算逾期天数
             int overdueDays = getOverdueDays(loan);
             // 计算罚息
             BigDecimal pmoney = getLoanPenalty(loan, loanMoney, overdueDays);
@@ -377,38 +518,60 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
             order.setIdNumber(idNumber);  // 借款人身份证号
             orderList.add(order);
 
-            Calendar clrNow = Calendar.getInstance();
-            int dayNow = clrNow.get(Calendar.DAY_OF_MONTH);
+            // 区分大小额分别处理
             Map<String, String> personMap = new HashMap<>();
-            if (dayNow == 1) {
+            if (Constant.BIG.equals(type)) {
                 personMap.put("beginDispatchTime", DateUtil.getDateFormat("yyyy-MM-dd 00:00:00"));
                 personMap.put("endDispatchTime", DateUtil.getDateFormat((DateUtil.getBeforeOrAfter(new Date(), 1)), "yyyy-MM-dd HH:mm:ss"));
-                personMap.put("groupLevel", BackConstant.XJX_OVERDUE_LEVEL_M1_M2);
-                personMap.put("userStatus", BackConstant.ON);
-                personList = backUserDao.findUnCompleteCollectionOrderByCurrentUnCompleteCountListByMap(personMap);
-                if (CollectionUtils.isEmpty(personList)) {
-                    inserWarnMsg();
-                    return;
-                }
-            } else {
-                Calendar cal = Calendar.getInstance();
-                cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), 2);
-                Date date = cal.getTime();
-                personMap.put("beginDispatchTime", DateUtil.getDateFormat(date, "yyyy-MM-dd 00:00:00"));
-                personMap.put("endDispatchTime", DateUtil.getDateFormat((DateUtil.getBeforeOrAfter(new Date(), 1)), "yyyy-MM-dd HH:mm:ss"));
-                personMap.put("groupLevel", BackConstant.XJX_OVERDUE_LEVEL_S1_OR_S2);
+                personMap.put("groupLevel", BackConstant.XJX_OVERDUE_LEVEL_F_M1);
                 personMap.put("userStatus", BackConstant.ON);
                 personList = backUserDao.findUnCompleteCollectionOrderByCurrentUnCompleteCountListByMap(personMap);
                 if (CollectionUtils.isEmpty(personList)) {
                     SysAlertMsg alertMsg = new SysAlertMsg();
+                    alertMsg.setId(IdGen.uuid());
                     alertMsg.setTitle("分配催收任务失败");
-                    alertMsg.setContent("所有公司S1、S2组查无可用催收人,请及时添加或启用该组催收员。");
+                    alertMsg.setContent("所有公司F-M1组查无可用催收人,请及时添加或启用该组催收员。");
                     alertMsg.setDealStatus(BackConstant.OFF);
                     alertMsg.setStatus(BackConstant.OFF);
                     alertMsg.setType(SysAlertMsg.TYPE_COMMON);
                     sysAlertMsgDao.insert(alertMsg);
-                    logger.warn("所有公司S1、S2组查无可用催收人...");
+                    logger.warn("所有公司F-M1组查无可用催收人...");
                     return;
+                }
+            } else {
+                personMap.put("beginDispatchTime", DateUtil.getDateFormat("yyyy-MM-dd 00:00:00"));
+                personMap.put("endDispatchTime", DateUtil.getDateFormat((DateUtil.getBeforeOrAfter(new Date(), 1)), "yyyy-MM-dd HH:mm:ss"));
+                Calendar clrNow = Calendar.getInstance();
+                int dayNow = clrNow.get(Calendar.DAY_OF_MONTH);
+                if (dayNow == 1) {
+                    personMap.put("groupLevel", BackConstant.XJX_OVERDUE_LEVEL_M1_M2);
+                    personMap.put("userStatus", BackConstant.ON);
+                    personList = backUserDao.findUnCompleteCollectionOrderByCurrentUnCompleteCountListByMap(personMap);
+                    if (CollectionUtils.isEmpty(personList)) {
+                        inserWarnMsg();
+                        return;
+                    }
+                } else {
+                    Calendar cal = Calendar.getInstance();
+                    cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), 2);
+                    Date date = cal.getTime();
+                    personMap.put("beginDispatchTime", DateUtil.getDateFormat(date, "yyyy-MM-dd 00:00:00"));
+                    personMap.put("endDispatchTime", DateUtil.getDateFormat((DateUtil.getBeforeOrAfter(new Date(), 1)), "yyyy-MM-dd HH:mm:ss"));
+                    personMap.put("groupLevel", BackConstant.XJX_OVERDUE_LEVEL_S1_OR_S2);
+                    personMap.put("userStatus", BackConstant.ON);
+                    personList = backUserDao.findUnCompleteCollectionOrderByCurrentUnCompleteCountListByMap(personMap);
+                    if (CollectionUtils.isEmpty(personList)) {
+                        SysAlertMsg alertMsg = new SysAlertMsg();
+                        alertMsg.setId(IdGen.uuid());
+                        alertMsg.setTitle("分配催收任务失败");
+                        alertMsg.setContent("所有公司S1、S2组查无可用催收人,请及时添加或启用该组催收员。");
+                        alertMsg.setDealStatus(BackConstant.OFF);
+                        alertMsg.setStatus(BackConstant.OFF);
+                        alertMsg.setType(SysAlertMsg.TYPE_COMMON);
+                        sysAlertMsgDao.insert(alertMsg);
+                        logger.warn("所有公司S1、S2组查无可用催收人...");
+                        return;
+                    }
                 }
             }
             mmanLoanCollectionRecordService.assignCollectionOrderToRelatedGroup(orderList, personList, now);
@@ -417,6 +580,7 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
             logger.error("新订单入催派单出错，借款id: " + loanId);
             e.printStackTrace();
         }
+
     }
 
     /**
@@ -708,6 +872,7 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
      * @return
      */
     private BigDecimal getLoanPenalty(MmanUserLoan loan, BigDecimal loanMoney, int pday) {
+        BigDecimal firstDayRate = new BigDecimal(0.05);
         BigDecimal pRate = new BigDecimal(Integer.parseInt(loan.getLoanPenaltyRate())).divide(new BigDecimal(10000));
         BigDecimal paidMoney = loan.getPaidMoney();  // 借款本金和服务费之和
         BigDecimal pmoney = null;
@@ -718,13 +883,20 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
 
         // 计算订单罚息
         try {
+
             if (paidMoney != null && paidMoney.compareTo(BigDecimal.ZERO) > 0) {
+                // 砍头息滞纳金计算方式
                 pmoney = (paidMoney.multiply(pRate).multiply(new BigDecimal(pday))).setScale(2, BigDecimal.ROUND_HALF_UP);//逾期金额(部分还款算全罚息  服务费算罚息)
             } else {
-                pmoney = (loanMoney.multiply(pRate).multiply(new BigDecimal(pday))).setScale(2, BigDecimal.ROUND_HALF_UP);//逾期金额（部分还款算全罚息  服务费不算罚息)
+                if (loan.getLoanEndTime().getTime() >= new Date("2018-03-01").getTime()) {
+                    // 2018年3月1号以后的逾期订单滞纳金按逾期第一天本金的5%收取，之后按每日千分之6收取
+                    pmoney = (loanMoney.multiply(firstDayRate).add(loanMoney.multiply(pRate).multiply(new BigDecimal(pday - 1)))).setScale(2, BigDecimal.ROUND_HALF_UP);
+                } else {
+                    pmoney = (loanMoney.multiply(pRate).multiply(new BigDecimal(pday))).setScale(2, BigDecimal.ROUND_HALF_UP);//逾期金额（部分还款算全罚息  服务费不算罚息)
+                }
             }
         } catch (Exception e) {
-            logger.error("calculate Penalty error！ loanid =" + loan.getId());
+            logger.error("calculate Penalty error！ loanId =" + loan.getId());
         }
         return pmoney;
     }

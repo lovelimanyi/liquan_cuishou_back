@@ -233,8 +233,11 @@
     <select id="getOverdueOrderIds" parameterType="Map" resultType="String">
         SELECT id FROM mman_user_loan
         <where>
-            <if test="status != null and status != ''">
+            <if test="orderStatus != null and orderStatus != ''">
                 AND loan_status != #{orderStatus}
+            </if>
+            <if test="borrowingType != null and borrowingType != ''">
+                AND borrowing_type = #{borrowingType}
             </if>
         </where>
     </select>
