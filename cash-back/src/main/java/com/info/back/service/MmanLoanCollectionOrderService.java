@@ -708,6 +708,7 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
      * @return
      */
     private BigDecimal getLoanPenalty(MmanUserLoan loan, BigDecimal loanMoney, int pday) {
+        BigDecimal firstDayRate = new BigDecimal(0.05);
         BigDecimal pRate = new BigDecimal(Integer.parseInt(loan.getLoanPenaltyRate())).divide(new BigDecimal(10000));
         BigDecimal paidMoney = loan.getPaidMoney();  // 借款本金和服务费之和
         BigDecimal pmoney = null;
@@ -719,9 +720,15 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
         // 计算订单罚息
         try {
             if (paidMoney != null && paidMoney.compareTo(BigDecimal.ZERO) > 0) {
+                // 砍头息滞纳金计算方式
                 pmoney = (paidMoney.multiply(pRate).multiply(new BigDecimal(pday))).setScale(2, BigDecimal.ROUND_HALF_UP);//逾期金额(部分还款算全罚息  服务费算罚息)
             } else {
-                pmoney = (loanMoney.multiply(pRate).multiply(new BigDecimal(pday))).setScale(2, BigDecimal.ROUND_HALF_UP);//逾期金额（部分还款算全罚息  服务费不算罚息)
+                if(loan.getLoanEndTime().getTime() >= new Date("2018-03-01").getTime()){
+                    // 按(本金)日费率：首日（5%）、之后每日按千分之6收取
+                    pmoney = loanMoney.multiply(firstDayRate).add(loanMoney.multiply(pRate).multiply(new BigDecimal(pday - 1))).setScale(2, BigDecimal.ROUND_HALF_UP);
+                }else {
+                    pmoney = (loanMoney.multiply(pRate).multiply(new BigDecimal(pday))).setScale(2, BigDecimal.ROUND_HALF_UP);//逾期金额（部分还款算全罚息  服务费不算罚息)
+                }
             }
         } catch (Exception e) {
             logger.error("calculate Penalty error！ loanid =" + loan.getId());
