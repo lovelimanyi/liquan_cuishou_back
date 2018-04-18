@@ -10,6 +10,7 @@ import com.info.web.util.DateUtil;
 import com.info.web.util.JedisDataClient;
 import com.info.web.util.PageConfig;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -288,7 +289,7 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
             logger.error("更新逾期订单出错，借款对象为空，借款id: " + loanId);
             return;
         }
-        if(loan.getTermNumber() != null){
+        if (loan.getTermNumber() != null) {
             logger.error("更新逾期订单出错，更新逾期订单只处理原来小额来源的订单，借款id: " + loanId);
             return;
         }
@@ -315,8 +316,10 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
             BigDecimal pmoney = getLoanPenalty(loan, loanMoney, overdueDays);
 
             // 如果滞纳金超过本金金额  则滞纳金金额等于本金且不再增加
-            if (pmoney.compareTo(loanMoney) >= 0) {
-                pmoney = loanMoney;
+            if (pmoney != null) {
+                if (pmoney.compareTo(loanMoney) >= 0) {
+                    pmoney = loanMoney;
+                }
             }
 
             //对于逾期了多次还款的状况，还够本金则不算新罚息，计算到上次罚息值即可（如借1000，罚息120，上次还了1100，本次补足剩余20即可，罚息依然是120）
@@ -712,23 +715,24 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
         BigDecimal pRate = new BigDecimal(Integer.parseInt(loan.getLoanPenaltyRate())).divide(new BigDecimal(10000));
         BigDecimal paidMoney = loan.getPaidMoney();  // 借款本金和服务费之和
         BigDecimal pmoney = null;
-        if (loan.getBorrowingType().equals(Constant.BIG)) {
-            pmoney = loanMoney.multiply(new BigDecimal(pday)).multiply(pRate).setScale(2, BigDecimal.ROUND_HALF_UP);
-            return pmoney;
-        }
+//        if (loan.getBorrowingType().equals(Constant.BIG)) {
+//            pmoney = loanMoney.multiply(new BigDecimal(pday)).multiply(pRate).setScale(2, BigDecimal.ROUND_HALF_UP);
+//            return pmoney;
+//        }
 
         // 计算订单罚息
         try {
-            if (paidMoney != null && paidMoney.compareTo(BigDecimal.ZERO) > 0) {
-                // 砍头息滞纳金计算方式
-                pmoney = (paidMoney.multiply(pRate).multiply(new BigDecimal(pday))).setScale(2, BigDecimal.ROUND_HALF_UP);//逾期金额(部分还款算全罚息  服务费算罚息)
+            if (loan.getLoanEndTime().getTime() >= DateUtils.parseDate("2018-03-01", "yyyy-MM-dd").getTime()) {
+                // 按(本金)日费率：首日（5%）、之后每日按千分之6收取
+                pmoney = (loanMoney.multiply(firstDayRate).add(loanMoney.multiply(pRate).multiply(new BigDecimal(pday - 1)))).setScale(2, BigDecimal.ROUND_HALF_UP);
             } else {
-                if(loan.getLoanEndTime().getTime() >= new Date("2018-03-01").getTime()){
-                    // 按(本金)日费率：首日（5%）、之后每日按千分之6收取
-                    pmoney = loanMoney.multiply(firstDayRate).add(loanMoney.multiply(pRate).multiply(new BigDecimal(pday - 1))).setScale(2, BigDecimal.ROUND_HALF_UP);
-                }else {
+                if (paidMoney != null && paidMoney.compareTo(BigDecimal.ZERO) > 0) {
+                    // 砍头息滞纳金计算方式
+                    pmoney = (paidMoney.multiply(pRate).multiply(new BigDecimal(pday))).setScale(2, BigDecimal.ROUND_HALF_UP);//逾期金额(部分还款算全罚息  服务费算罚息)
+                } else {
                     pmoney = (loanMoney.multiply(pRate).multiply(new BigDecimal(pday))).setScale(2, BigDecimal.ROUND_HALF_UP);//逾期金额（部分还款算全罚息  服务费不算罚息)
                 }
+
             }
         } catch (Exception e) {
             logger.error("calculate Penalty error！ loanid =" + loan.getId());
