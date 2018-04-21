@@ -144,6 +144,9 @@
 						借款金额
 					</th>
 					<th align="center" width="50">
+						利息
+					</th>
+					<th align="center" width="50">
 						逾期天数
 					</th>
 					<th align="center" width="50">
@@ -207,6 +210,14 @@
 						</td>
 						<td align="center" width="50">
 							${order.loanMoney}
+						</td>
+						<td align="center" width="50">
+							<c:if test="${order.accrual eq null}">
+								0
+							</c:if>
+							<c:if test="${order.accrual ne null}">
+								${order.accrual}
+							</c:if>
 						</td>
 						<td align="center" width="50">
 							${order.overdueDays}

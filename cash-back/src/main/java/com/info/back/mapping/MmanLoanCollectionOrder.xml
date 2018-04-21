@@ -360,6 +360,7 @@
 			c.`real_money` as returnMoney,
 			c.`update_Date` as currentReturnDay,
 			d.`loan_end_time` as loanEndTime,
+			d.accrual AS accrual,
 			a.`last_collection_time` as lastCollectionTime,
 			bu.user_name as lastUserName,
 			a.`promise_repayment_time` as promiseRepaymentTime,

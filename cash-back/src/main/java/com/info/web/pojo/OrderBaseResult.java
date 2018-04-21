@@ -54,6 +54,8 @@ public class OrderBaseResult {
     // 新老用户
     private Integer customerType;
 
+    private BigDecimal accrual;
+
     public BigDecimal getReductionMoney() {
         return reductionMoney;
     }
@@ -260,5 +262,13 @@ public class OrderBaseResult {
 
     public void setCustomerType(Integer customerType) {
         this.customerType = customerType;
+    }
+
+    public BigDecimal getAccrual() {
+        return accrual;
+    }
+
+    public void setAccrual(BigDecimal accrual) {
+        this.accrual = accrual;
     }
 }
