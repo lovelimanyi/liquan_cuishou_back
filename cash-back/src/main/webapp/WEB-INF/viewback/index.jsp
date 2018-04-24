@@ -114,7 +114,7 @@ $(function(){
 			<div class="headerNav">
 				<a class="logo" href="javascript:void(0)"></a>
 				<ul class="nav">
-					<li id="switchEnvBox"><a href="javascript:"
+					<li id="switchEnvBox"><a href="#" target="dialog" mask="true"
 						style="color: black;">${sessionScope.BACK_USER.userAccount},您好!
 							欢迎登录后台管理平台</a></li>
 					<li><a style="color: black;"

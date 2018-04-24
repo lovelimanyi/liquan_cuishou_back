@@ -27,14 +27,9 @@
 							</label>
 						</dt>
 						<dd>
-							<c:if test="${empty backUser.id }">
 								<input name="userAccount" value="${backUser.userAccount }"
-									minlength="6" maxlength="16" class="required" type="text"
+									minlength="6" maxlength="16" type="text"
 									alt="请输入用户名" size="30" />
-							</c:if>
-							<c:if test="${not empty backUser.id }">
-								${backUser.userAccount }
-							</c:if>
 						</dd>
 					</dl>
 					<dl>

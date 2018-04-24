@@ -135,6 +135,7 @@ public class SyncController {
             loan.setLoanPenalty(String.valueOf(collectionNotifyDto.getLoan().getLoanPenalty()));
             loan.setLoanPenaltyRate(String.valueOf(collectionNotifyDto.getLoan().getLoanPenaltyRate()));
             loan.setLoanEndTime(DateUtil.getDateFormat(new Date(collectionNotifyDto.getLoan().getLoanEndTime()),"yyyy-MM-dd"));
+            loan.setLoanStartTime(DateUtil.getDateFormat(new Date(collectionNotifyDto.getLoan().getLoanStartTime()),"yyyy-MM-dd"));
             loan.setUserId(String.valueOf(collectionNotifyDto.getLoan().getUserId()));
             loan.setTermNumber(String.valueOf(collectionNotifyDto.getLoan().getTermNumber()));
             loan.setOverdueDays(collectionNotifyDto.getLoan().getLateDay());

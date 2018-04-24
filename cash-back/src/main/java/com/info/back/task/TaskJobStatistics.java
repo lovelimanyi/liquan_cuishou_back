@@ -5,6 +5,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
+import com.info.back.dao.IPersonStatisticsDao;
+import com.info.back.service.IPersonStatisticsService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -27,6 +29,9 @@ public class TaskJobStatistics {
 
     @Autowired
     private ICountCollectionManageService countCollectionManageService;
+
+    @Autowired
+    private IPersonStatisticsService personStatisticsService;
 
     public void callProcedure() {
         try {
@@ -76,6 +81,14 @@ public class TaskJobStatistics {
         countCollectionAssessmentService.countCallOrder(params);
         logger.info("催记统计执行完成,完成时间 :" + DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
     }
+
+    //个人统计
+    public void personAndCompanyStatistics(){
+        logger.info("个人-公司统计开始.....");
+        personStatisticsService.doStatistics();
+        logger.info("个人-公司统计执行完成,完成时间 :" + DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
+    }
+
 
     public static void main(String[] args) throws ParseException {
         Date date = new Date();

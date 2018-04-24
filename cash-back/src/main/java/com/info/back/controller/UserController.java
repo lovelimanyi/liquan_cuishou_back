@@ -261,4 +261,26 @@ public class UserController extends BaseController {
         }
         return target;
     }
+
+
+
+    @RequestMapping("updateUserName")
+    public String updateUserName(HttpServletRequest request,
+                                 HttpServletResponse response, Model model){
+        HashMap<String, Object> params = this.getParametersO(request);
+        String url;
+        try {
+            if ("toJsp".equals(String.valueOf(params.get("type")))) {
+                url = "user/updateUserName";
+            } else {
+
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        System.out.println("");
+        return  null;
+
+    }
 }
