@@ -17,6 +17,7 @@ public class BackConstant {
 	public static final Map<String,String> groupNameMap = new LinkedHashMap<String,String>();
 
 	public static final Map<String,String> groupNameTypeMap = new LinkedHashMap<String,String>();
+	public static final Map<String,String> MTypeMap= new LinkedHashMap<String,String>();
 
 	public static final Map<String,String> groupStatusMap = new HashMap<String,String>();//催收员状态
 
@@ -125,6 +126,9 @@ public class BackConstant {
 		groupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_F_M2,"F-M2");
 		groupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_F_M3,"F-M3");
 		groupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_F_M6,"F-M6");
+
+		MTypeMap.put(BackConstant.XJX_OVERDUE_LEVEL_M3P,"M3+");
+		MTypeMap.put(BackConstant.XJX_OVERDUE_LEVEL_M6P,"M6+");
 
 		groupNameTypeMap.put("33","S1");
 		groupNameTypeMap.put("43","S2-S1");
