@@ -447,6 +447,9 @@ public class MyCollectionOrderController extends BaseController {
                 MmanLoanCollectionOrder mmanLoanCollectionOrderOri = mmanLoanCollectionOrderService.getOrderById(params.get("id").toString());
                 if (mmanLoanCollectionOrderOri != null) {
                     MmanUserLoan userLoan = mmanUserLoanService.get(mmanLoanCollectionOrderOri.getLoanId());
+                    if (userLoan.getPaidMoney().compareTo(BigDecimal.ZERO) <= 0){
+                        userLoan.setServiceCharge(BigDecimal.ZERO);
+                    }
                     model.addAttribute("userLoan", userLoan);
                 } else {
                     logger.error("mmanLoanCollectionOrderOri 为null 借款id:" + params.get("id").toString());
