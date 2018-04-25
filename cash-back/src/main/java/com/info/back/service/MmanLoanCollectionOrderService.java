@@ -338,7 +338,11 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
             CreditLoanPay loanPay = new CreditLoanPay();
             loanPay.setId(pay.getId());
             loanPay.setReceivableInterest(znj);  //  剩余应还罚息
-            loanPay.setReceivableMoney(loan.getLoanMoney().add(pmoney)); // 应还总额
+            BigDecimal serviceCharge = BigDecimal.ZERO;
+            if(BigDecimal.ZERO.compareTo(loan.getPaidMoney()) <= 0 ){
+                serviceCharge = loan.getServiceCharge();
+            }
+            loanPay.setReceivableMoney(loan.getLoanMoney().add(pmoney).add(serviceCharge)); // 应还总额
             creditLoanPayDao.updateCreditLoanPay(loanPay);
 
             // 更新订单表信息
