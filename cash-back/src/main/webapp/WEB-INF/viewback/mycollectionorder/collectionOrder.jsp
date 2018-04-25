@@ -181,6 +181,9 @@
                     利息
                 </th>
                 <th align="center" width="50">
+                    服务费
+                </th>
+                <th align="center" width="50">
                     滞纳金
                 </th>
                 <th align="center" width="50">
@@ -264,6 +267,14 @@
                         </c:if>
                         <c:if test="${order.accrual ne null}">
                             ${order.accrual}
+                        </c:if>
+                    </td>
+                    <td align="center" width="50">
+                        <c:if test="${order.paidMoney > 0}">
+                            ${order.serviceCharge}
+                        </c:if>
+                        <c:if test="${order.paidMoney <= 0}">
+                            0
                         </c:if>
                     </td>
                     <td align="center" width="50">

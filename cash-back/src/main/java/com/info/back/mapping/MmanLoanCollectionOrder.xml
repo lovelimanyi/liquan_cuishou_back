@@ -347,6 +347,8 @@
 		    a.`id`,
 			a.`order_id` as orderId,
 			a.`loan_id` loanId,
+			d.paid_money AS paidMoney,
+			d.service_charge AS serviceCharge,
 			e.`title`  as companyTile,
 			b.`group_level` as collectionGroup,
 			a.loan_user_name as realName,

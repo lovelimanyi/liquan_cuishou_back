@@ -56,6 +56,26 @@ public class OrderBaseResult {
 
     private BigDecimal accrual;
 
+    private BigDecimal paidMoney;
+
+    private BigDecimal serviceCharge;
+
+    public BigDecimal getServiceCharge() {
+        return serviceCharge;
+    }
+
+    public void setServiceCharge(BigDecimal serviceCharge) {
+        this.serviceCharge = serviceCharge;
+    }
+
+    public BigDecimal getPaidMoney() {
+        return paidMoney;
+    }
+
+    public void setPaidMoney(BigDecimal paidMoney) {
+        this.paidMoney = paidMoney;
+    }
+
     public BigDecimal getReductionMoney() {
         return reductionMoney;
     }
