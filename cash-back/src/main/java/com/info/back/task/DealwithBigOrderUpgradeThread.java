@@ -6,15 +6,15 @@ import org.apache.log4j.Logger;
 import java.util.Date;
 
 /**
- * 小额订单逾期升级处理
+ * 大额订单逾期升级处理
  */
-public class DealwithOrderUpgradeThread implements Runnable {
+public class DealwithBigOrderUpgradeThread implements Runnable {
 
-    private static Logger logger = Logger.getLogger(DealwithOrderUpgradeThread.class);
+    private static Logger logger = Logger.getLogger(DealwithBigOrderUpgradeThread.class);
     private String loanId;
     private IMmanLoanCollectionOrderService orderService;
 
-    public DealwithOrderUpgradeThread(String loanId, IMmanLoanCollectionOrderService orderService) {
+    public DealwithBigOrderUpgradeThread(String loanId, IMmanLoanCollectionOrderService orderService) {
         this.loanId = loanId;
         this.orderService = orderService;
     }
@@ -24,7 +24,7 @@ public class DealwithOrderUpgradeThread implements Runnable {
         logger.info("处理订单逾期升级开始  " + new Date().toLocaleString() + " 借款id:" + loanId);
 
         try {
-            orderService.orderUpgrade(loanId);
+            orderService.dealwithBigOrderUpgrade(loanId);
         } catch (Exception e) {
             logger.error("处理订单逾期升级出错 " + new Date().toLocaleString() + " 借款id:" + loanId);
             e.printStackTrace();

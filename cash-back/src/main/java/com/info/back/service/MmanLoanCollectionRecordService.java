@@ -67,8 +67,6 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
     private IChannelSwitchingDao channelSwitchingDao;
     @Autowired
     private IFengKongService fengKongService;
-    @Autowired
-    private IMmanUserLoanService mmanUserLoanService;
 
     @Qualifier("mqClient")
     @Autowired
@@ -88,15 +86,15 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
                     allRuleLimitCountMap.put(ruleOri.getCompanyId() + "_" + ruleOri.getCollectionGroup(), ruleOri.getEveryLimit());
                 }
             }
-//            logger.info("allRuleLimitCountMap:" + allRuleLimitCountMap);
 
             //开始分配前,先筛选出有效催收员(手里单子未超出上限的催收员),查询并设置每个催收员今日派到手里的订单数(包括已完成的)
             String currentCompanyGroup = "";//当前公司_组
-            List<MmanLoanCollectionPerson> effectiveCollectionPersonList = new ArrayList<MmanLoanCollectionPerson>();
+            List<MmanLoanCollectionPerson> effectiveCollectionPersonList = new ArrayList<>();
             for (MmanLoanCollectionPerson person : mmanLoanCollectionPersonList) {
                 Integer todayAssignedCount = backUserDao.findTodayAssignedCount(person);//查询当前催收员今日派到手里的订单数(包括已完成的)
                 person.setTodayAssignedCount(todayAssignedCount);
-                Integer limitCount = allRuleLimitCountMap.get(person.getCompanyId() + "_" + person.getGroupLevel());//当前催收组每人每天上限
+                String key = person.getCompanyId() + "_" + person.getGroupLevel();
+                Integer limitCount = allRuleLimitCountMap.get(key);//当前催收组每人每天上限
                 currentCompanyGroup = person.getCompanyName() + "_" + BackConstant.groupNameMap.get(person.getGroupLevel());
                 if (limitCount == null) {
                     limitCount = 0;
@@ -281,11 +279,31 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
             mmanLoanCollectionOrder.setM5OperateStatus(BackConstant.OFF);
 
             mmanLoanCollectionStatusChangeLog.setCurrentCollectionOrderLevel(BackConstant.XJX_OVERDUE_LEVEL_M3P);
+        } else if (BackConstant.XJX_OVERDUE_LEVEL_M6P.equals(person.getGroupLevel())) {
+            mmanLoanCollectionOrder.setM5ApproveId(person.getUserId());
+            mmanLoanCollectionOrder.setM5OperateStatus(BackConstant.OFF);
+
+            mmanLoanCollectionStatusChangeLog.setCurrentCollectionOrderLevel(BackConstant.XJX_OVERDUE_LEVEL_M6P);
+        } else if (BackConstant.XJX_OVERDUE_LEVEL_F_M1.equals(person.getGroupLevel())) {
+            mmanLoanCollectionOrder.setM6ApproveId(person.getUserId());
+            mmanLoanCollectionOrder.setM6OperateStatus(BackConstant.OFF);
+
+            mmanLoanCollectionStatusChangeLog.setCurrentCollectionOrderLevel(BackConstant.XJX_OVERDUE_LEVEL_F_M1);
+        } else if (BackConstant.XJX_OVERDUE_LEVEL_F_M2.equals(person.getGroupLevel())) {
+            mmanLoanCollectionOrder.setM6ApproveId(person.getUserId());
+            mmanLoanCollectionOrder.setM6OperateStatus(BackConstant.OFF);
+
+            mmanLoanCollectionStatusChangeLog.setCurrentCollectionOrderLevel(BackConstant.XJX_OVERDUE_LEVEL_F_M2);
+        } else if (BackConstant.XJX_OVERDUE_LEVEL_F_M3.equals(person.getGroupLevel())) {
+            mmanLoanCollectionOrder.setM6ApproveId(person.getUserId());
+            mmanLoanCollectionOrder.setM6OperateStatus(BackConstant.OFF);
+
+            mmanLoanCollectionStatusChangeLog.setCurrentCollectionOrderLevel(BackConstant.XJX_OVERDUE_LEVEL_F_M3);
         } else {
             mmanLoanCollectionOrder.setM6ApproveId(person.getUserId());
             mmanLoanCollectionOrder.setM6OperateStatus(BackConstant.OFF);
 
-            mmanLoanCollectionStatusChangeLog.setCurrentCollectionOrderLevel(BackConstant.XJX_OVERDUE_LEVEL_M6P);
+            mmanLoanCollectionStatusChangeLog.setCurrentCollectionOrderLevel(BackConstant.XJX_OVERDUE_LEVEL_F_M6);
         }
 
         mmanLoanCollectionStatusChangeLog.setRemark(mmanLoanCollectionStatusChangeLog.getRemark() + ",催收组：" + BackConstant.groupNameMap.get(mmanLoanCollectionStatusChangeLog.getCurrentCollectionOrderLevel()));

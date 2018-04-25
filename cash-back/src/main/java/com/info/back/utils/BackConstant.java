@@ -14,7 +14,7 @@ public class BackConstant {
 
 	public static final String CREDITLOANAPPLY_OVERDUE = "4";// 逾期
 
-	public static final Map<String,String> groupNameMap = new LinkedHashMap<String,String>();
+	public static final Map<String,String> groupNameMap = new LinkedHashMap<>();
 
 	public static final Map<String,String> groupNameTypeMap = new LinkedHashMap<String,String>();
 	public static final Map<String,String> MTypeMap= new LinkedHashMap<String,String>();

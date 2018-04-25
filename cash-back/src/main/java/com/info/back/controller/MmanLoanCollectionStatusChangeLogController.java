@@ -43,8 +43,7 @@ public class MmanLoanCollectionStatusChangeLogController extends BaseController 
 	private IMmanLoanCollectionCompanyService mmanLoanCollectionCompanyService;
 
 	@RequestMapping("/getMmanLoanCollectionStatusChangeLog")
-	public String getView(HttpServletRequest request,
-			HttpServletResponse response, Model model) {
+	public String getView(HttpServletRequest request, Model model) {
 		try {
 			HashMap<String, Object> params = getParametersO(request);
 			BackUser backUser = (BackUser) request.getSession().getAttribute(
