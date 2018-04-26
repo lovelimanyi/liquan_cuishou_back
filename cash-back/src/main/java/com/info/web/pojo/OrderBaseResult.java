@@ -54,6 +54,28 @@ public class OrderBaseResult {
     // 新老用户
     private Integer customerType;
 
+    private BigDecimal accrual;
+
+    private BigDecimal paidMoney;
+
+    private BigDecimal serviceCharge;
+
+    public BigDecimal getServiceCharge() {
+        return serviceCharge;
+    }
+
+    public void setServiceCharge(BigDecimal serviceCharge) {
+        this.serviceCharge = serviceCharge;
+    }
+
+    public BigDecimal getPaidMoney() {
+        return paidMoney;
+    }
+
+    public void setPaidMoney(BigDecimal paidMoney) {
+        this.paidMoney = paidMoney;
+    }
+
     public BigDecimal getReductionMoney() {
         return reductionMoney;
     }
@@ -260,5 +282,13 @@ public class OrderBaseResult {
 
     public void setCustomerType(Integer customerType) {
         this.customerType = customerType;
+    }
+
+    public BigDecimal getAccrual() {
+        return accrual;
+    }
+
+    public void setAccrual(BigDecimal accrual) {
+        this.accrual = accrual;
     }
 }
