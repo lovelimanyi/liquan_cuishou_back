@@ -165,15 +165,21 @@
 						<table class="userTable">
 							<tr>
 								<td class="tdGround" style="width:180px;">欠款金额:</td>
-								<td>${userLoan.loanMoney+userLoan.loanPenalty}</td>
+								<td>${userLoan.loanMoney+userLoan.loanPenalty+userLoan.serviceCharge}</td>
 								<td class="tdGround">欠款本金:</td>
 								<td>${userLoan.loanMoney}</td>
 							</tr>
 							<tr>
 								<td class="tdGround">欠款滞纳金:</td>
 								<td >${userLoan.loanPenalty}</td>
+								<td class="tdGround">欠款服务费:</td>
+								<td >${userLoan.serviceCharge}</td>
+							</tr>
+							<tr>
 								<td class="tdGround">已还金额:</td>
 								<td>${payMonery}</td>
+								<td class="tdGround">逾期天数:</td>
+								<td>${collectionOrder.overdueDays}</td>
 							</tr>
 							<tr>
 								<td class="tdGround">借款时间:</td>
@@ -181,12 +187,7 @@
 								<td class="tdGround">应还时间:</td>
 								<td><fmt:formatDate value="${userLoan.loanEndTime}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
 							</tr>
-							<tr>
-								<td class="tdGround">逾期天数:</td>
-								<td>${collectionOrder.overdueDays}</td>
-								<td class="tdGround">承诺还款时间</td>
-								<td><fmt:formatDate value="${collectionOrder.promiseRepaymentTime}" pattern="yyyy-MM-dd"/></td>
-							</tr>
+
 						</table>
 					</td>
 				</tr>

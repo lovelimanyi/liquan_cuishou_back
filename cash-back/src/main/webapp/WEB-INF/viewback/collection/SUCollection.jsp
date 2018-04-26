@@ -27,11 +27,8 @@
                     </label>
                 </dt>
                 <dd id="userAccount">
-                    <c:if test="${empty collection.id }">
-                        <input name="userAccount" value="${collection.userAccount}" minlength="6" maxlength="16" class="required" type="text"
+                        <input name="userAccount" value="${collection.userAccount}" minlength="6" maxlength="16" type="text"
                                alt="请输入用户名" size="30"/>
-                    </c:if>
-                    <c:if test="${not empty collection.id }"> ${collection.userAccount } </c:if>
                 </dd>
             </dl>
             <dl>
