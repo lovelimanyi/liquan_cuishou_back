@@ -42,6 +42,10 @@
 							<option value="6" <c:if test="${'6' eq params.overdueLevel}">selected = "selected"</c:if>>M2-M3</option>
 							<option value="7" <c:if test="${'7' eq params.overdueLevel}">selected = "selected"</c:if>>M3+</option>
 							<option value="8" <c:if test="${'8' eq params.overdueLevel}">selected = "selected"</c:if>>M6+</option>
+							<option value="11" <c:if test="${'11' eq params.overdueLevel}">selected = "selected"</c:if>>F-M1</option>
+							<option value="12" <c:if test="${'12' eq params.overdueLevel}">selected = "selected"</c:if>>F-M2</option>
+							<option value="13" <c:if test="${'13' eq params.overdueLevel}">selected = "selected"</c:if>>F-M3</option>
+							<option value="16" <c:if test="${'16' eq params.overdueLevel}">selected = "selected"</c:if>>F-M6</option>
 						</select>
 					</td>
 					<td>
@@ -277,6 +281,10 @@
 								<c:if test="${record.collectionGroup == '5'}">M1-M2组</c:if>
 								<c:if test="${record.collectionGroup == '6'}">M2-M3组</c:if>
 								<c:if test="${record.collectionGroup == '7'}">M3+</c:if>
+								<c:if test="${record.collectionGroup == '11'}">F-M1组</c:if>
+								<c:if test="${record.collectionGroup == '12'}">F-M2组</c:if>
+								<c:if test="${record.collectionGroup == '13'}">F-M3组</c:if>
+								<c:if test="${record.collectionGroup == '16'}">F-M6组</c:if>
 							</td>
 							<td>
 								${record.collectionPerson }
