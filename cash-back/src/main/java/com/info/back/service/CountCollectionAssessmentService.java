@@ -30,7 +30,7 @@ public class CountCollectionAssessmentService implements ICountCollectionAssessm
     @Override
     public PageConfig<CountCollectionAssessment> findPage(HashMap<String, Object> params) {
         params.put(Constant.NAME_SPACE, "CountCollectionAssessment");
-        PageConfig<CountCollectionAssessment> pageConfig = new PageConfig<CountCollectionAssessment>();
+        PageConfig<CountCollectionAssessment> pageConfig;
         String listSql = "findAllByCompany";
         String countSql = "findAllCountByCompany";
         if ("MR".equals(params.get("type"))) {
