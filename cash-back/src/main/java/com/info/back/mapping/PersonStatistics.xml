@@ -2,142 +2,35 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.info.back.dao.IPersonStatisticsDao">
     <select id="getPersonStatistics" resultType="com.info.web.pojo.PersonStatistics" parameterType="HashMap">
-        SELECT
-        w.id AS 'backUserId',
-        w.company_id AS 'companyId',
-        w.group_level AS 'groupLevel',
-        w.role_id AS 'roleId',
-        w.user_name AS 'backUserName',
-       (w.`总应还本金(未)`+IFNULL(y.`详情表实收本金和`,0)) AS 'totalPrincipal',
-        (w.`总实收本金(未)`+IFNULL(y.`详情表实收本金和`,0)) AS'realgetTotalPrincipal',
-        w.`剩余应还本金` AS 'remainPrincipal',
-        ROUND((w.`总实收本金(未)`+IFNULL(y.`详情表实收本金和`,0))/(w.`总应还本金(未)`+IFNULL(y.`详情表实收本金和`,0))*100,2) AS 'repaymentProbability',
-        (w.`总应还滞纳金(未)`+ IFNULL(y.`总滞纳金`,0)) AS'totalPenalty',
-        (w.`实收罚息` + IFNULL(y.`总滞纳金`,0)) AS'realgetTotalPenalty',
-        w.`剩余应还滞纳金` AS 'remainPenalty',
-        ROUND((w.`实收罚息` + IFNULL(y.`总滞纳金`,0))/(w.`总应还滞纳金(未)`+ IFNULL(y.`总滞纳金`,0))*100,2) AS 'penaltyProbability',
-
-        (w.`还款未完成个数` + IFNULL(y.doneCount, 0)) AS 'totalOrderCount',
-        w.`还款未完成个数` AS 'undoneOrderCount',
-        y.doneCount AS 'doneOrderCount',
-        ROUND(IFNULL(y.doneCount, 0)/(w.`还款未完成个数` + IFNULL(y.doneCount, 0))*100,2) AS 'orderProbability'
-
-        FROM
-
-
-        (SELECT
-        u.id,
-        u.role_id,
-        u.company_id,
-        u.group_level,
-        u.user_name,
-        u.uuid,
-        sum(l.loan_money)AS '总应还本金(未)',
-        sum(l.loan_penalty)AS'总应还滞纳金(未)',
-        sum(p.receivable_money) AS'总应还金额',
-        sum(p.real_money) AS'总实收',
-        sum(p.realget_principle)AS '总实收本金(未)',
-        sum(p.receivable_principle) as '剩余应还本金',
-        sum(p.receivable_interest) AS '剩余应还滞纳金',
-        sum(p.realget_interest) AS'实收罚息',
-        sum(p.reduction_money) AS'减免金额',
-        count(o.id)AS '还款未完成个数'
-        FROM
-        back_user u
-        LEFT JOIN mman_loan_collection_order o ON u.uuid = o.current_collection_user_id
-        LEFT JOIN credit_loan_pay p ON p.id = o.pay_id
-        LEFT JOIN mman_user_loan l ON o.loan_id = l.id
-        WHERE
-        u.`status` = 1
-        AND <![CDATA[ o.`status` <> '4' ]]>
-        AND u.group_level IN ('7', '8')
-        GROUP BY u.id
-        ORDER BY u.id) w
-        left JOIN
-        (
-        SELECT
-        tt.id,
-        tt.uuid,
-        tt.user_name,
-        count(tt.id) AS doneCount,
-        sum(
-        tt.`详情表实收本金和`
-        ) AS '详情表实收本金和',
-        sum(tt.`实际还款滞纳金`) AS '实际还款滞纳金',
-        sum(tt.`减免滞纳金`) AS '减免滞纳金',
-        sum(tt.`总滞纳金`) AS '总滞纳金'
-        FROM
-        (
-        SELECT
-        u.id,
-        u.uuid,
-        u.user_name,
-        o.loan_id,
-        sum(d.real_money) AS '详情表实收本金和',
-        sum(d.real_penlty) - p.reduction_money AS '实际还款滞纳金',
-        p.reduction_money AS '减免滞纳金',
-        sum(d.real_penlty) AS '总滞纳金'
-        FROM
-        back_user u
-        LEFT JOIN mman_loan_collection_order o ON o.current_collection_user_id = u.uuid
-        LEFT JOIN credit_loan_pay p ON o.pay_id = p.id
-        LEFT JOIN credit_loan_pay_detail d ON o.pay_id = d.pay_id
-        WHERE
-        u.`status` = 1
-        AND o.current_collection_user_id = d.current_collection_user_id
-        -- AND u.user_name = '陆想想'
-        AND o.`status` = '4'
-        AND u.group_level IN ('7', '8')
-
-        <if test="beginTime != null and beginTime != ''">
-            AND DATE_FORMAT(p.update_Date,"%Y-%m-%d") &gt;= #{beginTime}
-        </if>
-        <if test="endTime != null and endTime != ''">
-            AND DATE_FORMAT(p.update_Date,"%Y-%m-%d") &lt;= #{endTime}
-        </if>
-        GROUP BY
-        o.loan_id
-        ORDER BY
-        u.id
-        ) tt
-        GROUP BY
-        tt.id
-        ORDER BY tt.id
-        ) y ON w.id = y.id;
-
-    </select>
-
-    
-    <select id="getCompanyStatistics" resultType="com.info.web.pojo.PersonStatistics" parameterType="HashMap">
      SELECT
+     w.id AS 'backUserId',
      w.company_id AS 'companyId',
+     w.group_level AS 'groupLevel',
+     w.role_id AS 'roleId',
+     w.user_name AS 'backUserName',
+     (w.`总应还本金(未)`+IFNULL(y.`详情表实收本金和`,0)) AS 'totalPrincipal',
+     (w.`总实收本金(未)`+IFNULL(y.`详情表实收本金和`,0)) AS 'realgetTotalPrincipal',
+     w.`剩余应还本金` AS 'remainPrincipal',
+     ROUND((w.`总实收本金(未)`+IFNULL(y.`详情表实收本金和`,0))/(w.`总应还本金(未)`+IFNULL(y.`详情表实收本金和`,0))*100,2) AS 'repaymentProbability',
+     (w.`总应还滞纳金(未)`+ IFNULL(y.`总滞纳金`,0)) AS'totalPenalty',
+     IFNULL((w.`实收罚息` + IFNULL(y.`总滞纳金`,0) - y.`不计入考核的减免滞纳金`),0) AS'realgetTotalPenalty',
+     w.`剩余应还滞纳金` AS 'remainPenalty',
+     ROUND(IFNULL((w.`实收罚息` + IFNULL(y.`总滞纳金`,0) - y.`不计入考核的减免滞纳金`),0)/(w.`总应还滞纳金(未)`+ IFNULL(y.`总滞纳金`,0))*100,2) AS 'penaltyProbability',
+     (w.`还款未完成个数` + IFNULL(y.doneCount, 0)) AS 'totalOrderCount',
+     w.`还款未完成个数` AS 'undoneOrderCount',
+     IFNULL(y.doneCount, 0) AS 'doneOrderCount',
+     ROUND(IFNULL(y.doneCount, 0)/(w.`还款未完成个数` + IFNULL(y.doneCount, 0))*100,2) AS 'orderProbability'
 
-     sum((w.`总应还本金(未)`+IFNULL(y.`详情表实收本金和`,0))) AS 'totalPrincipal',
-     sum((w.`总实收本金(未)`+IFNULL(y.`详情表实收本金和`,0))) AS 'realgetTotalPrincipal',
-     sum(w.`剩余应还本金`) AS 'remainPrincipal',
-
-
-     ROUND(sum((w.`总实收本金(未)`+IFNULL(y.`详情表实收本金和`,0)))/sum((w.`总应还本金(未)`+IFNULL(y.`详情表实收本金和`,0)))*100,2) AS 'repaymentProbability',
-
-
-     sum((w.`总应还滞纳金(未)`+ IFNULL(y.`总滞纳金`,0))) AS'totalPenalty',
-     sum(w.`实收罚息` + IFNULL(y.`总滞纳金`,0)) AS'realgetTotalPenalty',
-     sum(w.`剩余应还滞纳金`) AS 'remainPenalty',
-
-     ROUND(sum(w.`实收罚息` + IFNULL(y.`总滞纳金`,0))/sum((w.`总应还滞纳金(未)`+ IFNULL(y.`总滞纳金`,0)))*100,2) AS 'penaltyProbability',
-
-
-     sum((w.`还款未完成个数` + IFNULL(y.doneCount, 0))) AS 'totalOrderCount',
-     sum(w.`还款未完成个数` )AS 'undoneOrderCount',
-     sum(IFNULL(y.doneCount, 0)) AS 'doneOrderCount',
-     ROUND(sum(IFNULL(y.doneCount, 0))/sum((w.`还款未完成个数` + IFNULL(y.doneCount, 0)))*100,2) AS 'orderProbability'
      FROM
 
 
      (SELECT
      u.id,
+     u.role_id,
      u.company_id,
-
+     u.user_name,
+     u.group_level,
+     u.uuid,
      sum(l.loan_money)AS '总应还本金(未)',
      sum(l.loan_penalty)AS'总应还滞纳金(未)',
      sum(p.receivable_money) AS'总应还金额',
@@ -156,20 +49,26 @@
      WHERE
      u.`status` = 1
      AND <![CDATA[ o.`status` <> '4' ]]>
-     AND u.group_level IN ('7', '8')
+     -- AND u.group_level IN ('7', '8')
      GROUP BY u.id
      ORDER BY u.id) w
      left JOIN
      (
+     SELECT t1.*,t1.`减免滞纳金`-IFNULL(t2.reductionMoneyNo,0) AS '计入考核的减免滞纳金',IFNULL(t2.reductionMoneyNo,0)AS'不计入考核的减免滞纳金' FROM
+     (
+
      SELECT
      tt.id,
+     tt.uuid,
+     tt.user_name,
      count(tt.id) AS doneCount,
      sum(
      tt.`详情表实收本金和`
      ) AS '详情表实收本金和',
+     sum(tt.`总滞纳金`) AS '总滞纳金',
      sum(tt.`实际还款滞纳金`) AS '实际还款滞纳金',
-     sum(tt.`减免滞纳金`) AS '减免滞纳金',
-     sum(tt.`总滞纳金`) AS '总滞纳金'
+     sum(tt.`总减免滞纳金`) AS '减免滞纳金'
+
      FROM
      (
      SELECT
@@ -179,7 +78,7 @@
      o.loan_id,
      sum(d.real_money) AS '详情表实收本金和',
      sum(d.real_penlty) - p.reduction_money AS '实际还款滞纳金',
-     p.reduction_money AS '减免滞纳金',
+     p.reduction_money AS '总减免滞纳金',
      sum(d.real_penlty) AS '总滞纳金'
      FROM
      back_user u
@@ -189,10 +88,15 @@
      WHERE
      u.`status` = 1
      AND o.current_collection_user_id = d.current_collection_user_id
-     -- AND u.user_name = '陆想想'
+     -- AND u.user_name = '王姗姗1'
      AND o.`status` = '4'
-     AND u.group_level IN ('7', '8')
-     AND p.update_Date > '2018-04-01 00:00:00'
+     -- AND u.group_level IN ('7', '8')
+     <if test="beginTime != null and beginTime != ''">
+      AND DATE_FORMAT(p.update_Date,"%Y-%m-%d") &gt;= #{beginTime}
+     </if>
+     <if test="endTime != null and endTime != ''">
+      AND DATE_FORMAT(p.update_Date,"%Y-%m-%d") &lt;= #{endTime}
+     </if>
      GROUP BY
      o.loan_id
      ORDER BY
@@ -201,6 +105,184 @@
      GROUP BY
      tt.id
      ORDER BY tt.id
+
+
+
+
+     ) t1 LEFT JOIN
+     (
+     SELECT
+     u.id,
+     u.uuid,
+     u.user_name,
+     sum(c.reduction_money) AS reductionMoneyNo
+
+     FROM
+     back_user u
+     LEFT JOIN mman_loan_collection_order o ON o.current_collection_user_id = u.uuid
+     LEFT JOIN audit_center c ON o.loan_id = c.loan_id
+     LEFT JOIN credit_loan_pay p ON o.pay_id = p.id
+
+     WHERE
+     u.`status` = 1
+     -- AND u.user_name = '胡任凯1'
+     AND o.`status` = '4'
+     AND c.`status` = '5'
+     AND c.type = '3'
+     -- AND u.group_level IN ('7', '8')
+     <if test="beginTime != null and beginTime != ''">
+      AND DATE_FORMAT(p.update_Date,"%Y-%m-%d") &gt;= #{beginTime}
+     </if>
+     <if test="endTime != null and endTime != ''">
+      AND DATE_FORMAT(p.update_Date,"%Y-%m-%d") &lt;= #{endTime}
+     </if>
+     GROUP BY
+     u.id
+     ORDER BY
+     u.id
+     ) t2 ON t1.id = t2.id
+     ) y ON w.id = y.id;
+
+
+    </select>
+
+    
+    <select id="getCompanyStatistics" resultType="com.info.web.pojo.PersonStatistics" parameterType="HashMap">
+     SELECT
+     w.company_id AS 'companyId',
+     (w.`总应还本金(未)`+IFNULL(y.`详情表实收本金和`,0)) AS 'totalPrincipal',
+     (w.`总实收本金(未)`+IFNULL(y.`详情表实收本金和`,0)) AS 'realgetTotalPrincipal',
+     w.`剩余应还本金` AS 'remainPrincipal',
+     ROUND((w.`总实收本金(未)`+IFNULL(y.`详情表实收本金和`,0))/(w.`总应还本金(未)`+IFNULL(y.`详情表实收本金和`,0))*100,2) AS 'repaymentProbability',
+     (w.`总应还滞纳金(未)`+ IFNULL(y.`总滞纳金`,0)) AS'totalPenalty',
+     IFNULL((w.`实收罚息` + IFNULL(y.`总滞纳金`,0) - y.`不计入考核的减免滞纳金`),0) AS'realgetTotalPenalty',
+     w.`剩余应还滞纳金` AS 'remainPenalty',
+     ROUND(IFNULL((w.`实收罚息` + IFNULL(y.`总滞纳金`,0) - y.`不计入考核的减免滞纳金`),0)/(w.`总应还滞纳金(未)`+ IFNULL(y.`总滞纳金`,0))*100,2) AS 'penaltyProbability',
+     (w.`还款未完成个数` + IFNULL(y.doneCount, 0)) AS 'totalOrderCount',
+     w.`还款未完成个数` AS 'undoneOrderCount',
+     IFNULL(y.doneCount, 0) AS 'doneOrderCount',
+     ROUND(IFNULL(y.doneCount, 0)/(w.`还款未完成个数` + IFNULL(y.doneCount, 0))*100,2) AS 'orderProbability'
+
+     FROM
+
+
+     (SELECT
+     u.id,
+     u.role_id,
+     u.company_id,
+     u.user_name,
+     u.group_level,
+     u.uuid,
+     sum(l.loan_money)AS '总应还本金(未)',
+     sum(l.loan_penalty)AS'总应还滞纳金(未)',
+     sum(p.receivable_money) AS'总应还金额',
+     sum(p.real_money) AS'总实收',
+     sum(p.realget_principle)AS '总实收本金(未)',
+     sum(p.receivable_principle) as '剩余应还本金',
+     sum(p.receivable_interest) AS '剩余应还滞纳金',
+     sum(p.realget_interest) AS'实收罚息',
+     sum(p.reduction_money) AS'减免金额',
+     count(o.id)AS '还款未完成个数'
+     FROM
+     back_user u
+     LEFT JOIN mman_loan_collection_order o ON u.uuid = o.current_collection_user_id
+     LEFT JOIN credit_loan_pay p ON p.id = o.pay_id
+     LEFT JOIN mman_user_loan l ON o.loan_id = l.id
+     WHERE
+     u.`status` = 1
+     AND <![CDATA[ o.`status` <> '4' ]]>
+     -- AND u.group_level IN ('7', '8')
+     GROUP BY u.id
+     ORDER BY u.id) w
+     left JOIN
+     (
+     SELECT t1.*,t1.`减免滞纳金`-IFNULL(t2.reductionMoneyNo,0) AS '计入考核的减免滞纳金',IFNULL(t2.reductionMoneyNo,0)AS'不计入考核的减免滞纳金' FROM
+     (
+
+     SELECT
+     tt.id,
+     tt.uuid,
+     tt.user_name,
+     count(tt.id) AS doneCount,
+     sum(
+     tt.`详情表实收本金和`
+     ) AS '详情表实收本金和',
+     sum(tt.`总滞纳金`) AS '总滞纳金',
+     sum(tt.`实际还款滞纳金`) AS '实际还款滞纳金',
+     sum(tt.`总减免滞纳金`) AS '减免滞纳金'
+
+     FROM
+     (
+     SELECT
+     u.id,
+     u.uuid,
+     u.user_name,
+     o.loan_id,
+     sum(d.real_money) AS '详情表实收本金和',
+     sum(d.real_penlty) - p.reduction_money AS '实际还款滞纳金',
+     p.reduction_money AS '总减免滞纳金',
+     sum(d.real_penlty) AS '总滞纳金'
+     FROM
+     back_user u
+     LEFT JOIN mman_loan_collection_order o ON o.current_collection_user_id = u.uuid
+     LEFT JOIN credit_loan_pay p ON o.pay_id = p.id
+     LEFT JOIN credit_loan_pay_detail d ON o.pay_id = d.pay_id
+     WHERE
+     u.`status` = 1
+     AND o.current_collection_user_id = d.current_collection_user_id
+     -- AND u.user_name = '王姗姗1'
+     AND o.`status` = '4'
+     -- AND u.group_level IN ('7', '8')
+     <if test="beginTime != null and beginTime != ''">
+      AND DATE_FORMAT(p.update_Date,"%Y-%m-%d") &gt;= #{beginTime}
+     </if>
+     <if test="endTime != null and endTime != ''">
+      AND DATE_FORMAT(p.update_Date,"%Y-%m-%d") &lt;= #{endTime}
+     </if>
+     GROUP BY
+     o.loan_id
+     ORDER BY
+     u.id
+     ) tt
+     GROUP BY
+     tt.id
+     ORDER BY tt.id
+
+
+
+
+     ) t1 LEFT JOIN
+     (
+     SELECT
+     u.id,
+     u.uuid,
+     u.user_name,
+     sum(c.reduction_money) AS reductionMoneyNo
+
+     FROM
+     back_user u
+     LEFT JOIN mman_loan_collection_order o ON o.current_collection_user_id = u.uuid
+     LEFT JOIN audit_center c ON o.loan_id = c.loan_id
+     LEFT JOIN credit_loan_pay p ON o.pay_id = p.id
+
+     WHERE
+     u.`status` = 1
+     -- AND u.user_name = '胡任凯1'
+     AND o.`status` = '4'
+     AND c.`status` = '5'
+     AND c.type = '3'
+     -- AND u.group_level IN ('7', '8')
+     <if test="beginTime != null and beginTime != ''">
+      AND DATE_FORMAT(p.update_Date,"%Y-%m-%d") &gt;= #{beginTime}
+     </if>
+     <if test="endTime != null and endTime != ''">
+      AND DATE_FORMAT(p.update_Date,"%Y-%m-%d") &lt;= #{endTime}
+     </if>
+     GROUP BY
+     u.id
+     ORDER BY
+     u.id
+     ) t2 ON t1.id = t2.id
      ) y ON w.id = y.id
      GROUP BY w.company_id;
 

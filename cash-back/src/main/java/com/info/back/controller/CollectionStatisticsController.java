@@ -535,7 +535,7 @@ public class CollectionStatisticsController extends BaseController {
 					companyIds.add(company.getId());
 				}
 				params.put("companyIds",companyIds);
-				model.addAttribute("groupLevelMap", BackConstant.MTypeMap);
+				model.addAttribute("groupLevelMap", BackConstant.groupNameMap);
 				model.addAttribute("groupLevel", String.valueOf(params.get("groupLevel")));
 				model.addAttribute("company",coms);
 				model.addAttribute("dictMap",BackConstant.groupNameMap);
