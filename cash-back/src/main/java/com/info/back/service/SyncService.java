@@ -88,24 +88,6 @@ public class SyncService implements ISyncService {
                 mmanUserLoan.setCustomerType(Integer.valueOf(userInfo.get("customer_type") == null ? "0" : userInfo.get("customer_type").toString()));
             }
             localDataDao.saveMmanUserLoan(mmanUserLoan);
-            //如果还款详情不为空则保存还款详情
-            if(null!=repaymentDetails && 0<repaymentDetails.size()){
-                HashMap<String,String> reMap = new HashMap<String,String>();
-                reMap.put("PAY_ID", payId);
-                List<String> idList = localDataDao.selectCreditLoanPayDetail(reMap);//查询目前插入的还款记录
-                for(RepaymentDetail detail : repaymentDetails) {
-                   if (syncUtils.checkDetailId(idList, detail.getId())){ //判断该详情是否存在，如果不存在则保存
-                       CreditLoanPayDetail repaymentDetail = handleRepaymentDetail(detail,payId,loanId);
-                       localDataDao.saveCreditLoanPayDetail(repaymentDetail);
-                   }
-                }
-                //更新订单表已还金额
-                HashMap<String,Object> repaymentMap = new HashMap<>();
-                repaymentMap.put("user_id",userId);
-                repaymentMap.put("repaymented_amount",repayment.getRealMoney());
-                syncUtils.updateMmanLoanCollectionOrder(localDataDao,loanId,repaymentMap,Constant.STATUS_OVERDUE_ONE);
-            }
-
 
             // 保存还款表-逾期同步
             CreditLoanPay creditLoanPay = handleRCreditLoanPay(repayment,loanId,loan,null);
@@ -117,6 +99,23 @@ public class SyncService implements ISyncService {
             //派单
 //            taskJobMiddleService.dispatchforLoanId(loanId,userInfo.get("id_number").toString(),Constant.BIG);
             orderService.dispatchOrderNew(loanId,userInfo.get("id_number").toString(),Constant.BIG);
+            //如果还款详情不为空则保存还款详情
+            if(null!=repaymentDetails && 0<repaymentDetails.size()){
+                HashMap<String,String> reMap = new HashMap<String,String>();
+                reMap.put("PAY_ID", payId);
+                List<String> idList = localDataDao.selectCreditLoanPayDetail(reMap);//查询目前插入的还款记录
+                for(RepaymentDetail detail : repaymentDetails) {
+                    if (syncUtils.checkDetailId(idList, detail.getId())){ //判断该详情是否存在，如果不存在则保存
+                        CreditLoanPayDetail repaymentDetail = handleRepaymentDetail(detail,payId,loanId);
+                        localDataDao.saveCreditLoanPayDetail(repaymentDetail);
+                    }
+                }
+                //更新订单表已还金额
+                HashMap<String,Object> repaymentMap = new HashMap<>();
+                repaymentMap.put("user_id",userId);
+                repaymentMap.put("repaymented_amount",repayment.getRealMoney());
+                syncUtils.updateMmanLoanCollectionOrder(localDataDao,loanId,repaymentMap,Constant.STATUS_OVERDUE_ONE);
+            }
         }else {
             //每日更新
 
