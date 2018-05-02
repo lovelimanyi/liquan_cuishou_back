@@ -84,11 +84,11 @@ public class SyncController {
                     //逾期同步或者每日更新
                     syncService.handleOverdue(repayment,loan,repaymentDetail);
                 } else {
-                    logger.info("解析json,repayment is null...");
+                    logger.info("loan-order-info,repayment is null...");
                 }
             }
         } catch (Exception e) {
-            logger.error("json字符串解析错误！");
+            logger.error("loan-order-info-exception");
             e.printStackTrace();
         }
     }
@@ -115,11 +115,11 @@ public class SyncController {
                     //还款同步
                     syncService.handleRepay(repayment,loan,repaymentDetailList);
                 } else {
-                    logger.info("解析json,repayment is null...");
+                    logger.info("repayment,repayment is null...");
                 }
             }
         }catch (Exception e){
-            logger.error("json字符串解析错误！");
+            logger.error("repayment-exception");
             e.printStackTrace();
         }
     }
