@@ -176,10 +176,11 @@ public class SyncService implements ISyncService {
             HashMap<String,String> reMap = new HashMap<String,String>();
             reMap.put("PAY_ID", payId);
             List<String> idList = localDataDao.selectCreditLoanPayDetail(reMap);//查询目前插入的还款记录
+            CreditLoanPay creditLoanPay = null;
             for(RepaymentDetail detail : repaymentDetails) {
                 if (syncUtils.checkDetailId(idList, detail.getId())){ //判断该详情是否存在，如果不存在则保存
                     // 还款 --更新还款表
-                    CreditLoanPay creditLoanPay = handleRCreditLoanPay(repayment,loanId,loan,creditLoanPay1);
+                    creditLoanPay = handleRCreditLoanPay(repayment,loanId,loan,creditLoanPay1);
                     localDataDao.updateCreditLoanPay(creditLoanPay);//更新还款表
                     logger.info("更新还款表_还款表数据=" + payId+"----"+creditLoanPay);
 
@@ -193,7 +194,7 @@ public class SyncService implements ISyncService {
             repaymentMap.put("user_id",userId);
             repaymentMap.put("repaymented_amount",repayment.getRealMoney());
             //如果还款完成，则更新借款表,更新订单表，添加催收流转日志
-            if (receivablePrinciple <= 0) {
+            if (creditLoanPay.getReceivablePrinciple().compareTo(BigDecimal.ZERO)==1) {
                 // 更新借款表-还款完成同步
                 MmanUserLoan mmanUserLoan = new MmanUserLoan();
                 mmanUserLoan.setId(loanId);
