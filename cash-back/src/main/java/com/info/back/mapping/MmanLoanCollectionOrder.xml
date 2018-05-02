@@ -90,6 +90,7 @@
         <result column="reduction_money" jdbcType="DECIMAL" property="reductionMoney"/>
         <!--标记订单是否是2号派单-->
         <result column="second_day_flag" property="secondDayFlag" jdbcType="VARCHAR"/>
+        <result column="real_money" property="realMoney" />
     </resultMap>
 
     <!--<select id="getCollectionMyOrderList" resultType="com.info.web.pojo.OrderBaseResult" parameterType="HashMap" >
