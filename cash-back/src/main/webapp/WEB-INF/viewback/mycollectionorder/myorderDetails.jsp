@@ -165,7 +165,7 @@
 						<table class="userTable">
 							<tr>
 								<td class="tdGround" style="width:180px;">欠款金额:</td>
-								<td>${userLoan.loanMoney+userLoan.loanPenalty+userLoan.serviceCharge}</td>
+								<td>${userLoan.loanMoney+userLoan.loanPenalty+userLoan.serviceCharge+userLoan.accrual}</td>
 								<td class="tdGround">欠款本金:</td>
 								<td>${userLoan.loanMoney}</td>
 							</tr>
