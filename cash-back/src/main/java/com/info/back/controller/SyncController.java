@@ -76,7 +76,10 @@ public class SyncController {
                 Loan loan = bigAmount.getLoan();
                 logger.info("order_loanId_termNumber" + loan.getId().toString());
                 Repayment repayment = bigAmount.getRepayment();
-                List<RepaymentDetail> repaymentDetail = bigAmount.getRepaymentDetailList();
+                List<RepaymentDetail> repaymentDetail = null;
+                if (bigAmount.getRepaymentDetailList() != null && bigAmount.getRepaymentDetailList().size()>0){
+                    repaymentDetail = bigAmount.getRepaymentDetailList();
+                }
                 if (loan != null && repayment!= null ) {
                     //逾期同步或者每日更新
                     syncService.handleOverdue(repayment,loan,repaymentDetail);
@@ -165,7 +168,7 @@ public class SyncController {
             repayment.setCreateDate(DateUtil.getDateFormat(new Date(collectionNotifyDto.getRepayment().getCreateDate()),"yyyy-MM-dd"));
             bigAmountRequestParams.setRepayment(repayment);
         }
-        if (collectionNotifyDto.getRepayment()!= null && collectionNotifyDto.getLoan() != null && collectionNotifyDto.getRepaymentDetailList().size()>0 && collectionNotifyDto.getRepaymentDetailList()!= null){
+        if (collectionNotifyDto.getRepayment()!= null && collectionNotifyDto.getLoan() != null && collectionNotifyDto.getRepaymentDetailList()!= null && collectionNotifyDto.getRepaymentDetailList().size()>0){
             String payId =String.valueOf(collectionNotifyDto.getRepayment().getId())+"-0" ;
             List<RepaymentDetail> repaymentDetails = new ArrayList<>();
             for (int i = 0;  i<collectionNotifyDto.getRepaymentDetailList().size() ;i++){
