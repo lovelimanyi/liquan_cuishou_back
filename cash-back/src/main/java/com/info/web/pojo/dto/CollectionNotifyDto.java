@@ -1,10 +1,12 @@
 package com.info.web.pojo.dto;
 
+import java.util.List;
+
 public class CollectionNotifyDto {
 
     private CollectionNotifyLoanDto loan;
     private CollectionNotifyRepaymentDto repayment;
-    private CollectionNotifyRepaymentDetailDto repaymentDetail;
+    private List<CollectionNotifyRepaymentDetailDto> repaymentDetailList;
     private Long scheduleTaskOverdueId;
 
 
@@ -24,12 +26,12 @@ public class CollectionNotifyDto {
         this.repayment = repayment;
     }
 
-    public CollectionNotifyRepaymentDetailDto getRepaymentDetail() {
-        return repaymentDetail;
+    public List<CollectionNotifyRepaymentDetailDto> getRepaymentDetailList() {
+        return repaymentDetailList;
     }
 
-    public void setRepaymentDetail(CollectionNotifyRepaymentDetailDto repaymentDetail) {
-        this.repaymentDetail = repaymentDetail;
+    public void setRepaymentDetailList(List<CollectionNotifyRepaymentDetailDto> repaymentDetailList) {
+        this.repaymentDetailList = repaymentDetailList;
     }
 
     public Long getScheduleTaskOverdueId() {
@@ -45,7 +47,7 @@ public class CollectionNotifyDto {
         return "CollectionNotifyDto{" +
                 "loan=" + loan +
                 ", repayment=" + repayment +
-                ", repaymentDetail=" + repaymentDetail +
+                ", repaymentDetailList=" + repaymentDetailList +
                 ", scheduleTaskOverdueId=" + scheduleTaskOverdueId +
                 '}';
     }

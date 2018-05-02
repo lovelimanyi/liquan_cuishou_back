@@ -1,5 +1,7 @@
 package com.info.vo.bigAmount;
 
+import java.util.List;
+
 /**
  * 类描述：大额分期参数
  * 创建人：yyf
@@ -9,7 +11,7 @@ package com.info.vo.bigAmount;
 public class BigAmountRequestParams {
     private Loan loan;
     private Repayment repayment;
-    private RepaymentDetail repaymentDetail;
+    protected List<RepaymentDetail> repaymentDetailList;
 
     public Loan getLoan() {
         return loan;
@@ -27,11 +29,11 @@ public class BigAmountRequestParams {
         this.repayment = repayment;
     }
 
-    public RepaymentDetail getRepaymentDetail() {
-        return repaymentDetail;
+    public List<RepaymentDetail> getRepaymentDetailList() {
+        return repaymentDetailList;
     }
 
-    public void setRepaymentDetail(RepaymentDetail repaymentDetail) {
-        this.repaymentDetail = repaymentDetail;
+    public void setRepaymentDetailList(List<RepaymentDetail> repaymentDetailList) {
+        this.repaymentDetailList = repaymentDetailList;
     }
 }

@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 
 /**
@@ -74,7 +76,7 @@ public class SyncController {
                 Loan loan = bigAmount.getLoan();
                 logger.info("order_loanId_termNumber" + loan.getId().toString());
                 Repayment repayment = bigAmount.getRepayment();
-                RepaymentDetail repaymentDetail = bigAmount.getRepaymentDetail();
+                List<RepaymentDetail> repaymentDetail = bigAmount.getRepaymentDetailList();
                 if (loan != null && repayment!= null ) {
                     //逾期同步或者每日更新
                     syncService.handleOverdue(repayment,loan,repaymentDetail);
@@ -105,10 +107,10 @@ public class SyncController {
                 Loan loan = bigAmount.getLoan();
                 logger.info("repay_order_loanId_termNumber" + loan.getId().toString());
                 Repayment repayment = bigAmount.getRepayment();
-                RepaymentDetail repaymentDetail = bigAmount.getRepaymentDetail();
-                if (loan != null && repayment!= null && repaymentDetail != null) {
+                List<RepaymentDetail> repaymentDetailList = bigAmount.getRepaymentDetailList();
+                if (loan != null && repayment!= null && repaymentDetailList != null && repaymentDetailList.size()>0) {
                     //还款同步
-                    syncService.handleRepay(repayment,loan,repaymentDetail);
+                    syncService.handleRepay(repayment,loan,repaymentDetailList);
                 } else {
                     logger.info("解析json,repayment is null...");
                 }
@@ -163,22 +165,26 @@ public class SyncController {
             repayment.setCreateDate(DateUtil.getDateFormat(new Date(collectionNotifyDto.getRepayment().getCreateDate()),"yyyy-MM-dd"));
             bigAmountRequestParams.setRepayment(repayment);
         }
-        if (collectionNotifyDto.getRepayment()!= null && collectionNotifyDto.getLoan() != null && collectionNotifyDto.getRepaymentDetail()!= null&&collectionNotifyDto.getRepaymentDetail().getId() != null ){
+        if (collectionNotifyDto.getRepayment()!= null && collectionNotifyDto.getLoan() != null && collectionNotifyDto.getRepaymentDetailList().size()>0 && collectionNotifyDto.getRepaymentDetailList()!= null){
             String payId =String.valueOf(collectionNotifyDto.getRepayment().getId())+"-0" ;
-            RepaymentDetail repaymentDetail = new RepaymentDetail();
-            repaymentDetail.setId(String.valueOf(collectionNotifyDto.getRepaymentDetail().getId()));
-            repaymentDetail.setCreateDate(DateUtil.getDateFormat(new Date(collectionNotifyDto.getRepaymentDetail().getCreateDate()),"yyyy-MM-dd"));
-            repaymentDetail.setPayId(payId);
-            repaymentDetail.setReturnType(String.valueOf(collectionNotifyDto.getRepaymentDetail().getReturnType()));
-            repaymentDetail.setRemark(String.valueOf(collectionNotifyDto.getRepaymentDetail().getRemark()));
+            List<RepaymentDetail> repaymentDetails = new ArrayList<>();
+            for (int i = 0;  i<collectionNotifyDto.getRepaymentDetailList().size() ;i++){
+                RepaymentDetail repaymentDetail = new RepaymentDetail();
+                repaymentDetail.setId(String.valueOf(collectionNotifyDto.getRepaymentDetailList().get(i).getId()));
+                repaymentDetail.setCreateDate(DateUtil.getDateFormat(new Date(collectionNotifyDto.getRepaymentDetailList().get(i).getCreateDate()),"yyyy-MM-dd"));
+                repaymentDetail.setPayId(payId);
+                repaymentDetail.setReturnType(String.valueOf(collectionNotifyDto.getRepaymentDetailList().get(i).getReturnType()));
+                repaymentDetail.setRemark(String.valueOf(collectionNotifyDto.getRepaymentDetailList().get(i).getRemark()));
 
-            repaymentDetail.setRealInterest(String.valueOf(collectionNotifyDto.getRepaymentDetail().getRealInterest()));
-            repaymentDetail.setRealMoney(String.valueOf(collectionNotifyDto.getRepaymentDetail().getRealMoney()));
-            repaymentDetail.setRealPenlty(String.valueOf(collectionNotifyDto.getRepaymentDetail().getRealPenlty()));
-            repaymentDetail.setRealPrinciple(String.valueOf(collectionNotifyDto.getRepaymentDetail().getRealPrinciple()));
-            repaymentDetail.setRealgetAccrual(String.valueOf(collectionNotifyDto.getRepaymentDetail().getRealgetAccrual()));
-            repaymentDetail.setRemainAccrual(String.valueOf(collectionNotifyDto.getRepaymentDetail().getRemainAccrual()));
-            bigAmountRequestParams.setRepaymentDetail(repaymentDetail);
+                repaymentDetail.setRealInterest(String.valueOf(collectionNotifyDto.getRepaymentDetailList().get(i).getRealInterest()));
+                repaymentDetail.setRealMoney(String.valueOf(collectionNotifyDto.getRepaymentDetailList().get(i).getRealMoney()));
+                repaymentDetail.setRealPenlty(String.valueOf(collectionNotifyDto.getRepaymentDetailList().get(i).getRealPenlty()));
+                repaymentDetail.setRealPrinciple(String.valueOf(collectionNotifyDto.getRepaymentDetailList().get(i).getRealPrinciple()));
+                repaymentDetail.setRealgetAccrual(String.valueOf(collectionNotifyDto.getRepaymentDetailList().get(i).getRealgetAccrual()));
+                repaymentDetail.setRemainAccrual(String.valueOf(collectionNotifyDto.getRepaymentDetailList().get(i).getRemainAccrual()));
+                repaymentDetails.add(repaymentDetail);
+            }
+            bigAmountRequestParams.setRepaymentDetailList(repaymentDetails);
         }
         return bigAmountRequestParams;
     }
