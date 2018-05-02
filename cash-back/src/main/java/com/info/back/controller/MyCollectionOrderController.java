@@ -489,13 +489,16 @@ public class MyCollectionOrderController extends BaseController {
                 }
                 List<CreditLoanPayDetail> detailList = creditLoanPayDetailService
                         .findPayDetail(mmanLoanCollectionOrderOri.getPayId());
+                /*
                 BigDecimal payMonery = new BigDecimal(0);
                 if (detailList != null) {
                     for (CreditLoanPayDetail pay : detailList) {
                         payMonery = payMonery.add(pay.getRealMoney()).add(
-                                pay.getRealPenlty());
+                                pay.getRealPenlty().add(pay.getRealgetAccrual()));
                     }
                 }
+                */
+
                 // 银行卡
                 SysUserBankCard userCar = sysUserBankCardService.findUserId(mmanLoanCollectionOrderOri.getUserId());
                 // 代扣记录
@@ -513,7 +516,7 @@ public class MyCollectionOrderController extends BaseController {
                 model.addAttribute("collectionOrder", mmanLoanCollectionOrderOri);
                 model.addAttribute("userInfo", userInfo);
                 model.addAttribute("userCar", userCar);// 银行卡
-                model.addAttribute("payMonery", payMonery);// 已还金额
+                model.addAttribute("payMonery", mmanLoanCollectionOrderOri.getRealMoney());// 已还金额
                 model.addAttribute("detailList", detailList);
                 model.addAttribute("withholdList", withholdList);
                 model.addAttribute("domaiName", PayContents.XJX_DOMAINNAME_URL);

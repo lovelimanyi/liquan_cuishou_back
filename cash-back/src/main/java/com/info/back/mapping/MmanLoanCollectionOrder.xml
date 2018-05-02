@@ -505,7 +505,11 @@
     </update>
     <!-- 根据id获取单条记录 -->
     <select id="getOrderById" resultMap="queryResultMap" parameterType="String">
-	SELECT t.id , t.order_id , t.user_id , t.loan_id , t.pay_id , t.dispatch_name , t.dispatch_time , t.last_collection_user_id , t.current_collection_user_id , t.current_overdue_level , t.overdueDays , t.m1_approve_id , t.m1OperateStatus , t.m2_approve_id , t.m2OperateStatus , t.m3_approve_id , t.m3OperateStatus , t.m4_approve_id , t.m4OperateStatus , t.m5_approve_id , t.m5OperateStatus , t.m6_approve_id , t.status , t.promise_repayment_time , t.last_collection_time , t.create_date , t.update_date , t.operator_name , t.remark , t.outside_person_id , t.before_status , t.outside_company_id , t.jxl_status , t.renew_status , t.jxl_apply_Time , t.jx_audit_ime ,t.s1_flag , t.csstatus , t.loan_user_name , t.loan_user_phone,t.reduction_money,t.id_number FROM mman_loan_collection_order t WHERE t.id = #{id,jdbcType=VARCHAR}</select>
+	SELECT t.id , t.order_id , t.user_id , t.loan_id , t.pay_id , t.dispatch_name , t.dispatch_time , t.last_collection_user_id , t.current_collection_user_id ,
+	t.current_overdue_level , t.overdueDays , t.m1_approve_id , t.m1OperateStatus , t.m2_approve_id , t.m2OperateStatus , t.m3_approve_id , t.m3OperateStatus , t.m4_approve_id ,
+	 t.m4OperateStatus , t.m5_approve_id , t.m5OperateStatus , t.m6_approve_id , t.status , t.promise_repayment_time , t.last_collection_time , t.create_date , t.update_date ,
+	 t.operator_name , t.remark , t.outside_person_id , t.before_status , t.outside_company_id , t.jxl_status , t.renew_status , t.jxl_apply_Time , t.jx_audit_ime ,t.s1_flag ,
+	 t.csstatus , t.loan_user_name , t.loan_user_phone,t.reduction_money,t.id_number,t.real_money FROM mman_loan_collection_order t WHERE t.id = #{id,jdbcType=VARCHAR}</select>
     <select id="getBaseOrderById" resultType="com.info.web.pojo.OrderBaseResult" parameterType="String">
 		SELECT
 			a.`id` AS  id,
