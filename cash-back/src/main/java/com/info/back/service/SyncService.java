@@ -180,19 +180,17 @@ public class SyncService implements ISyncService {
             HashMap<String,String> reMap = new HashMap<String,String>();
             reMap.put("PAY_ID", payId);
             List<String> idList = localDataDao.selectCreditLoanPayDetail(reMap);//查询目前插入的还款记录
-            CreditLoanPay creditLoanPay = new CreditLoanPay();
             for(RepaymentDetail detail : repaymentDetails) {
                 if (syncUtils.checkDetailId(idList, detail.getId())){ //判断该详情是否存在，如果不存在则保存
-                    // 还款 --更新还款表
-                    creditLoanPay = handleRCreditLoanPay(repayment,loanId,loan,creditLoanPay1);
-                    localDataDao.updateCreditLoanPay(creditLoanPay);//更新还款表
-                    logger.info("更新还款表_还款表数据=" + payId+"----"+creditLoanPay);
-
                     CreditLoanPayDetail repaymentDetail = handleRepaymentDetail(detail,payId,loanId);
-
                     localDataDao.saveCreditLoanPayDetail(repaymentDetail);
                 }
             }
+            // 还款 --更新还款表
+            CreditLoanPay creditLoanPay  = handleRCreditLoanPay(repayment,loanId,loan,creditLoanPay1);
+            localDataDao.updateCreditLoanPay(creditLoanPay);//更新还款表
+            logger.info("更新还款表_还款表数据=" + payId+"----"+creditLoanPay);
+
             //更新订单表，催收流转日志表
             HashMap<String,Object> repaymentMap = new HashMap<>();
             repaymentMap.put("user_id",userId);
@@ -259,7 +257,7 @@ public class SyncService implements ISyncService {
         creditLoanPay.setId(repayment.getId());//还款id
         creditLoanPay.setLoanId(loanId);//借款id
         creditLoanPay.setReceivableDate(DateUtil.getDateTimeFormat(repayment.getReceivableDate(),"yyyy-MM-dd"));//应还日期
-        if(creditLoanPay1 == null){//派单
+        if(creditLoanPay1 == null){ //派单
             creditLoanPay.setCreateDate(new Date());
         }
         int receiveMoney = Integer.parseInt(String.valueOf(repayment.getReceiveMoney()));//总应还款金额(本金+服务费+滞纳金)
