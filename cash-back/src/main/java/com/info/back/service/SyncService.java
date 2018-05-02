@@ -180,7 +180,7 @@ public class SyncService implements ISyncService {
             HashMap<String,String> reMap = new HashMap<String,String>();
             reMap.put("PAY_ID", payId);
             List<String> idList = localDataDao.selectCreditLoanPayDetail(reMap);//查询目前插入的还款记录
-            CreditLoanPay creditLoanPay = null;
+            CreditLoanPay creditLoanPay = new CreditLoanPay();
             for(RepaymentDetail detail : repaymentDetails) {
                 if (syncUtils.checkDetailId(idList, detail.getId())){ //判断该详情是否存在，如果不存在则保存
                     // 还款 --更新还款表
