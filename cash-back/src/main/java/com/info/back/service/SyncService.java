@@ -198,7 +198,7 @@ public class SyncService implements ISyncService {
             repaymentMap.put("user_id",userId);
             repaymentMap.put("repaymented_amount",repayment.getRealMoney());
             //如果还款完成，则更新借款表,更新订单表，添加催收流转日志
-            if (creditLoanPay.getReceivablePrinciple().compareTo(BigDecimal.ZERO)==1) {
+            if (creditLoanPay.getReceivablePrinciple().compareTo(BigDecimal.ZERO)==0) {
                 // 更新借款表-还款完成同步
                 MmanUserLoan mmanUserLoan = new MmanUserLoan();
                 mmanUserLoan.setId(loanId);
