@@ -82,7 +82,11 @@ public class SyncService implements ISyncService {
             mmanUserLoan.setMerchantNo(loan.getMerchantNo());
             mmanUserLoan.setLoanPyId(loanId);
             // 标识新老用户 0 新用户  1 老用户
-            mmanUserLoan.setCustomerType(Integer.valueOf(userInfo.get("customer_type") == null ? "0" : userInfo.get("customer_type").toString()));
+            if(userInfo == null){
+                mmanUserLoan.setCustomerType(0);
+            }else {
+                mmanUserLoan.setCustomerType(Integer.valueOf(userInfo.get("customer_type") == null ? "0" : userInfo.get("customer_type").toString()));
+            }
             localDataDao.saveMmanUserLoan(mmanUserLoan);
             //如果还款详情不为空则保存还款详情
             if(null!=repaymentDetails && 0<repaymentDetails.size()){
