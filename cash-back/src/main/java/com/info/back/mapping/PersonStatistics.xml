@@ -95,7 +95,7 @@
       AND DATE_FORMAT(p.update_Date,"%Y-%m-%d") &gt;= #{beginTime}
      </if>
      <if test="endTime != null and endTime != ''">
-      AND DATE_FORMAT(p.update_Date,"%Y-%m-%d") &lt;= #{endTime}
+      AND DATE_FORMAT(p.update_Date,"%Y-%m-%d") &lt; #{endTime}
      </if>
      GROUP BY
      o.loan_id
@@ -134,7 +134,7 @@
       AND DATE_FORMAT(p.update_Date,"%Y-%m-%d") &gt;= #{beginTime}
      </if>
      <if test="endTime != null and endTime != ''">
-      AND DATE_FORMAT(p.update_Date,"%Y-%m-%d") &lt;= #{endTime}
+      AND DATE_FORMAT(p.update_Date,"%Y-%m-%d") &lt; #{endTime}
      </if>
      GROUP BY
      u.id
@@ -237,7 +237,7 @@
       AND DATE_FORMAT(p.update_Date,"%Y-%m-%d") &gt;= #{beginTime}
      </if>
      <if test="endTime != null and endTime != ''">
-      AND DATE_FORMAT(p.update_Date,"%Y-%m-%d") &lt;= #{endTime}
+      AND DATE_FORMAT(p.update_Date,"%Y-%m-%d") &lt; #{endTime}
      </if>
      GROUP BY
      o.loan_id
@@ -276,7 +276,7 @@
       AND DATE_FORMAT(p.update_Date,"%Y-%m-%d") &gt;= #{beginTime}
      </if>
      <if test="endTime != null and endTime != ''">
-      AND DATE_FORMAT(p.update_Date,"%Y-%m-%d") &lt;= #{endTime}
+      AND DATE_FORMAT(p.update_Date,"%Y-%m-%d") &lt; #{endTime}
      </if>
      GROUP BY
      u.id
@@ -367,6 +367,54 @@
     </insert>
 
 
+   <sql id="wherePersonColumn">
+    <where>
+     <if test="createDate != null and createDate != ''">
+      DATE_FORMAT(ps.createDate,"%Y-%m-%d") = #{createDate}
+     </if>
+     <if test="backUserName != null and backUserName != ''">
+      AND ps.backUserName = #{backUserName}
+     </if>
+     <if test="companyId != null and companyId != ''">
+      AND ps.companyId = #{companyId}
+     </if>
+     <if test="groupLevel != null and groupLevel != ''">
+      AND ps.groupLevel = #{groupLevel}
+     </if>
+     <if test="companyIds != null and companyId == null">
+      AND ps.companyId IN
+      <foreach collection="companyIds" open="(" close=")" item="companyId" separator=",">
+       #{companyId}
+      </foreach>
+     </if>
+    </where>
+    <if test="orderBy != null and orderBy != ''">
+     ORDER by ps.${orderBy}
+    </if>
+
+   </sql>
+   <sql id="whereCompanyColumn">
+    <where>
+     <if test="createDate != null and createDate != ''">
+      DATE_FORMAT(cs.createDate,"%Y-%m-%d") = #{createDate}
+     </if>
+     <if test="companyId != null and companyId != ''">
+      AND cs.companyId = #{companyId}
+     </if>
+     <if test="companyIds != null and companyId == null">
+      AND cs.companyId IN
+      <foreach collection="companyIds" open="(" close=")" item="companyId" separator=",">
+       #{companyId}
+      </foreach>
+     </if>
+    </where>
+    <if test="orderBy != null and orderBy != ''">
+     ORDER by cs.${orderBy}
+    </if>
+
+   </sql>
+
+
     <select id="findAll" resultType="com.info.web.pojo.PersonStatistics" parameterType="HashMap">
      SELECT
       backUserId,
@@ -388,35 +436,14 @@
       orderProbability,
       createDate
       FROM person_statistics ps
-      <where>
-          <if test="createDate != null and createDate != ''">
-           DATE_FORMAT(ps.createDate,"%Y-%m-%d") = #{createDate}
-          </if>
-          <if test="backUserName != null and backUserName != ''">
-           AND ps.backUserName = #{backUserName}
-          </if>
-          <if test="companyId != null and companyId != ''">
-           AND ps.companyId = #{companyId}
-          </if>
-          <if test="groupLevel != null and groupLevel != ''">
-           AND ps.groupLevel = #{groupLevel}
-          </if>
-          <if test="companyIds != null">
-           AND ps.companyId IN
-           <foreach collection="companyIds" open="(" close=")" item="companyId" separator=",">
-            #{companyId}
-           </foreach>
-          </if>
-      </where>
-      <if test="orderBy != null and orderBy != ''">
-       ORDER by ps.${orderBy}
-      </if>
+      <include refid="wherePersonColumn"/>
 
 
     </select>
     <select id="findAllCount" resultType="Integer" parameterType="HashMap">
      SELECT COUNT(1)
-     FROM person_statistics
+     FROM person_statistics ps
+     <include refid="wherePersonColumn"/>
     </select>
 
 
@@ -436,30 +463,15 @@
      doneOrderCount,
      orderProbability,
      createDate
-     FROM company_statistics ps
-     <where>
-      <if test="createDate != null and createDate != ''">
-       DATE_FORMAT(ps.createDate,"%Y-%m-%d") = #{createDate}
-      </if>
-      <if test="companyId != null and companyId != ''">
-       AND ps.companyId = #{companyId}
-      </if>
-      <if test="companyIds != null">
-       AND ps.companyId IN
-       <foreach collection="companyIds" open="(" close=")" item="companyId" separator=",">
-        #{companyId}
-       </foreach>
-      </if>
-     </where>
-     <if test="orderBy != null and orderBy != ''">
-      ORDER by ps.${orderBy}
-     </if>
+     FROM company_statistics cs
+     <include refid="whereCompanyColumn"/>
 
 
     </select>
     <select id="findCompanyAllCount" resultType="Integer" parameterType="HashMap">
      SELECT COUNT(1)
-     FROM company_statistics
+     FROM company_statistics cs
+     <include refid="whereCompanyColumn"/>
     </select>
 
 </mapper>
