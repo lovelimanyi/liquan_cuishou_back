@@ -93,7 +93,7 @@ public class SyncService implements ISyncService {
                    if (syncUtils.checkDetailId(idList, detail.getId())){ //判断该详情是否存在，如果不存在则保存
                        CreditLoanPayDetail repaymentDetail = handleRepaymentDetail(detail,payId,loanId);
                        localDataDao.saveCreditLoanPayDetail(repaymentDetail);
-                       //更新订单表，催收流转日志表
+                       //更新订单表已还金额
                        HashMap<String,Object> repaymentMap = new HashMap<>();
                        repaymentMap.put("user_id",userId);
                        repaymentMap.put("repaymented_amount",repayment.getRealMoney());
