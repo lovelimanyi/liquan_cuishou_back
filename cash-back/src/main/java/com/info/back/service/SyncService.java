@@ -168,7 +168,7 @@ public class SyncService implements ISyncService {
         String loanId = loan.getId();
         CreditLoanPay creditLoanPay1 = creditLoanPayDao.get(payId);
         int receivablePrinciple = Integer.parseInt(String.valueOf(repayment.getReceivablePrinciple()));//剩余应还本金
-        if (creditLoanPay1 != null){
+        if (creditLoanPay1 != null && creditLoanPay1.getReceivablePrinciple().compareTo(BigDecimal.ZERO)==0){
             logger.info("order_repayment_begin=" + loanId);
             //保存还款详情
             //如果还款详情不为空则保存还款详情
