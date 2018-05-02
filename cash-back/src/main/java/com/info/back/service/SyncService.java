@@ -187,6 +187,7 @@ public class SyncService implements ISyncService {
             }
             // 还款 --更新还款表
             CreditLoanPay creditLoanPay  = handleRCreditLoanPay(repayment,loanId,loan,creditLoanPay1);
+            creditLoanPay.setUpdateDate(new Date());
             localDataDao.updateCreditLoanPay(creditLoanPay);//更新还款表
             logger.info("更新还款表_还款表数据=" + payId+"----"+creditLoanPay);
 
@@ -236,7 +237,6 @@ public class SyncService implements ISyncService {
         //更新还款表：应还金额，剩余应还本金，剩余应还滞纳金，剩余应还利息，剩余应还服务费
         CreditLoanPay creditLoanPay = new CreditLoanPay();
         creditLoanPay.setId(payId);
-        creditLoanPay.setUpdateDate(new Date());
         creditLoanPay.setReceivableMoney(new BigDecimal(Integer.parseInt(repayment.getReceiveMoney())/100.00));//应还金额(总数)
         creditLoanPay.setRealgetPrinciple(new BigDecimal(Integer.parseInt(repayment.getRealgetPrinciple())/100.00));//实收本金
         creditLoanPay.setReceivablePrinciple(new BigDecimal(Integer.parseInt(repayment.getReceivablePrinciple())/100.00));//剩余应还本金
@@ -282,7 +282,6 @@ public class SyncService implements ISyncService {
         creditLoanPay.setRemainServiceCharge(new BigDecimal(remainServiceCharge/100.00));
         creditLoanPay.setRealgetAccrual(new BigDecimal(realgetAccrual/100.00));
         creditLoanPay.setRemainAccrual(new BigDecimal(remainAccrual/100.00));
-        creditLoanPay.setUpdateDate(new Date());
         return creditLoanPay;
     }
 }
