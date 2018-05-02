@@ -202,8 +202,10 @@
 					<th align="center">序号</th>
 					<th align="left">实还本金</th>
 					<th align="center">实还罚息</th>
+					<th align="center">实还利息</th>
 					<th align="center">剩余应还本金</th>
 					<th align="center">剩余应还罚息</th>
+					<th align="center">剩余应还利息</th>
 					<th align="center">还款方式</th>
 					<th align="center">还款时间</th>
 				</tr>
@@ -219,10 +221,16 @@
 							<fmt:formatNumber type="number" value="${pay.realPenlty}" pattern="0.00" maxFractionDigits="2"/>
 						</td>
 						<td>
+							<fmt:formatNumber type="number" value="${pay.realgetAccrual}" pattern="0.00" maxFractionDigits="2"/>
+						</td>
+						<td>
 							<fmt:formatNumber type="number" value="${pay.realPrinciple}" pattern="0.00" maxFractionDigits="2"/>
 						</td>
 						<td>
 							<fmt:formatNumber type="number" value="${pay.realInterest}" pattern="0.00" maxFractionDigits="2"/>
+						</td>
+						<td>
+							<fmt:formatNumber type="number" value="${pay.remainAccrual}" pattern="0.00" maxFractionDigits="2"/>
 						</td>
 						<td>
 							<c:if test="${pay.returnType eq '1' }">支付宝</c:if>

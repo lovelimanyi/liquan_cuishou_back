@@ -40,6 +40,8 @@
 		select 
 		b.real_money as realMoney,
 		b.real_penlty as realPenlty,
+		b.realget_accrual as realgetAccrual,
+		b.remain_accrual as remainAccrual,
 		b.real_principle as realPrinciple ,
 		b.real_interest as realInterest,
 		b.return_type as returnType,
