@@ -64,7 +64,12 @@
         LEFT JOIN credit_loan_pay p ON o.pay_id = p.id
         LEFT JOIN mman_user_loan l ON o.loan_id = l.id
         WHERE o.`status`=4 AND l.borrowing_type='1'
-        AND <![CDATA[ p.update_Date < '2018-05-01 00:00:00']]>
+        <if test="beginTime != null and beginTime != ''">
+            AND DATE_FORMAT(p.update_Date,"%Y-%m-%d") &gt;= #{beginTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            AND DATE_FORMAT(p.update_Date,"%Y-%m-%d") &lt; #{endTime}
+        </if>
         GROUP BY u.id
         ORDER BY u.id) y ON z.id = y.id;
 
