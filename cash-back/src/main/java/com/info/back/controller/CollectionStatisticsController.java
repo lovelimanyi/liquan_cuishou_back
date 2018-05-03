@@ -47,6 +47,8 @@ public class CollectionStatisticsController extends BaseController {
 	private IBackUserCompanyPermissionService backUserCompanyPermissionService;
 	@Autowired
 	private IPersonStatisticsService personStatisticsService;
+	@Autowired
+	private IBigAmountStatisticsService bigAmountStatisticsService;
 
 
 	/**
@@ -594,9 +596,59 @@ public class CollectionStatisticsController extends BaseController {
 	}
 
 
+	@RequestMapping("bigPersonStatistics")
+	public String bigPersonStatistics(HttpServletRequest request,HttpServletResponse response, Model model){
+		String url = "statistics/bigPersonStatistics";
+		try {
+			HashMap<String, Object> params = getParametersO(request);
+			BackUser backUser = (BackUser) request.getSession().getAttribute(Constant.BACK_USER);
+			if(StringUtils.isEmpty(params.get("createDate")) && StringUtils.isEmpty(params.get("createDate"))){
+				params.put("createDate",DateUtil.getDateFormat(new Date(),"yyyy-MM-dd"));
+			}
+			PageConfig<BigAmountStatistics> pageConfig = null;
+
+			// 如果用户是催收员,只能看自己的相关统计
+			if(backUser.getRoleId().equals(BackConstant.COLLECTION_ROLE_ID.toString())){
+				params.put("backUserId",backUser.getId());
+				params.put("uuid", backUser.getUuid());
+				params.put("roleId", backUser.getRoleId());
+				params.put("backUserName",backUser.getUserName());
+			}else {
+				// 所有公司--系统管理员可以查看所有公司
+				List<MmanLoanCollectionCompany> companys =mmanLoanCollectionCompanyService.selectCompanyList();
+				List<MmanLoanCollectionCompany> coms = new ArrayList<>(); // 存放登录角色权限内可以查看的公司
+				coms = getAccessCompanies(backUser, companys, coms);
+				if (coms.size()<1){
+					return url;
+				}
+				List<String> companyIds = new ArrayList<>();
+				for (MmanLoanCollectionCompany company:coms) {
+					companyIds.add(company.getId());
+				}
+				params.put("companyIds",companyIds);
+				model.addAttribute("groupLevelMap", BackConstant.groupNameMap);
+				model.addAttribute("groupLevel", String.valueOf(params.get("groupLevel")));
+				model.addAttribute("company",coms);
+				model.addAttribute("dictMap",BackConstant.groupNameMap);
+			}
+			pageConfig = bigAmountStatisticsService.findPage(params);
+			model.addAttribute("list",pageConfig.getItems());
+			model.addAttribute("pm", pageConfig);
+			model.addAttribute("params", params);// 用于搜索框保留值
+
+
+		}catch ( Exception e){
+			e.printStackTrace();
+		}
+		return url;
+	}
+
+
+
 	@RequestMapping("doStatistics")
 	public void doStatistics(){
 		personStatisticsService.doStatistics();
+		bigAmountStatisticsService.doStatistics();
 	}
 
 
