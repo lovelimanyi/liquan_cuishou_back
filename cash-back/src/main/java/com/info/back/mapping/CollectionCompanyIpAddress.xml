@@ -14,7 +14,7 @@
     </select>
 
     <select id="listAllIpsCount" resultType="Integer">
-        SELECT count(a.id) FROM collection_company_ip_address a LEFT JOIN mman_loan_collection_company b on
+        SELECT count(a.id) FROM collection_company_ip_address a INNER JOIN mman_loan_collection_company b on
         a.company_id = b.id
         <if test="companyId != null and companyId != ''">
             AND a.company_id = #{companyId}
@@ -46,7 +46,8 @@
     </insert>
 
     <sql id="baseSql">
-		SELECT a.id,a.company_id AS companyId,b.title AS companyName,a.ip_address AS ipAddress FROM collection_company_ip_address a LEFT JOIN mman_loan_collection_company b on
+		SELECT a.id,a.company_id AS companyId,b.title AS companyName,a.ip_address AS ipAddress FROM collection_company_ip_address a
+		INNER JOIN mman_loan_collection_company b on
 		a.company_id = b.id
 	</sql>
 </mapper>

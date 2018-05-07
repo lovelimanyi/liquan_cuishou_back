@@ -1,7 +1,9 @@
 package com.info.back.controller;
 
 import com.info.back.service.ICompanyIpAddressService;
+import com.info.back.service.IMmanLoanCollectionCompanyService;
 import com.info.web.pojo.CompanyIpAddressDto;
+import com.info.web.pojo.MmanLoanCollectionCompany;
 import com.info.web.util.PageConfig;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,9 @@ public class CompanyIpAddressController extends BaseController {
     @Autowired
     private ICompanyIpAddressService companyIpAddressService;
 
+    @Autowired
+    private IMmanLoanCollectionCompanyService mmanLoanCollectionCompanyService;
+
 
     @RequestMapping("/list")
     public String list(HttpServletRequest request, Model model) {
@@ -34,6 +39,8 @@ public class CompanyIpAddressController extends BaseController {
             HashMap<String, Object> params = this.getParametersO(request);
             PageConfig<CompanyIpAddressDto> page = companyIpAddressService.getPage(params);
             model.addAttribute("page", page);
+            model.addAttribute("companyList", mmanLoanCollectionCompanyService.getList(new MmanLoanCollectionCompany()));
+            model.addAttribute("params", params);
         } catch (Exception e) {
             logger.error("company-ip page error!");
             e.printStackTrace();
