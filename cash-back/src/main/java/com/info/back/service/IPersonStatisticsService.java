@@ -14,7 +14,7 @@ import java.util.List;
 
 public interface IPersonStatisticsService {
     List<PersonStatistics> getPersonStatistics(HashMap<String, Object> params);
-    void doStatistics();
+    void doStatistics(String beginTime,String endTime);
 
     PageConfig<PersonStatistics> findPage(HashMap<String, Object> params);
 

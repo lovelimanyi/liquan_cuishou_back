@@ -13,5 +13,7 @@ import java.util.HashMap;
 public interface IBigAmountStatisticsService {
     PageConfig<BigAmountStatistics> findPage(HashMap<String, Object> params);
 
-    void doStatistics();
+    void doStatistics(String beginTime,String endTime);
+
+    PageConfig<BigAmountStatistics> findCompanyPage(HashMap<String, Object> params);
 }

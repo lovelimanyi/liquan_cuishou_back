@@ -6,7 +6,7 @@
     String path = request.getContextPath();
 %>
 
-<form id="pagerForm" onsubmit="return navTabSearch(this);" action="statistics/smallAmountStatistics?Flag=person&myId=${params.myId}">
+<form id="pagerForm" onsubmit="return navTabSearch(this);" action="statistics/bigAmountStatistics?Flag=company&myId=${params.myId}">
 
     <div class="pageHeader">
         <div class="searchBar">
@@ -14,20 +14,20 @@
                 <tr>
                     <td>
                         统计时间:
-                    <input type="text" name="createDate" id="createDate" value="${params.createDate}" class="date textInput readonly" datefmt="yyyy-MM-dd" readonly="readonly" />
+                        <input type="text" name="createDate" id="createDate" value="${params.createDate}" class="date textInput readonly" datefmt="yyyy-MM-dd" readonly="readonly" />
                     </td>
 
                     <c:if test="${params.roleId  != '10021' }">
 
-                    <td>
-                        催收组:
-                        <select name="groupLevel" id="groupLevel">
-                            <option value="">全部</option>
-                            <c:forEach items="${groupLevelMap}" var="map">
-                                <option value="${map.key}" <c:if test="${groupLevel eq map.key}">selected="selected"</c:if> >${map.value}</option>
-                            </c:forEach>
-                        </select>
-                    </td>
+                        <td>
+                            催收组:
+                            <select name="groupLevel" id="groupLevel">
+                                <option value="">全部</option>
+                                <c:forEach items="${groupLevelMap}" var="map">
+                                    <option value="${map.key}" <c:if test="${groupLevel eq map.key}">selected="selected"</c:if> >${map.value}</option>
+                                </c:forEach>
+                            </select>
+                        </td>
 
                         <td>
                             催收公司:
@@ -40,22 +40,17 @@
                         </td>
 
                         <td>
-                            催收员姓名:
-                            <input type="text" name="backUserName" id="backUserName"
-                                   value="${params.backUserName }" />
+                            排序:
+                            <select name="orderBy">
+                                <option value="" <c:if test="${params.orderBy eq ''}">selected="selected"</c:if>>默认排序</option>
+                                <option value="repaymentProbability ASC" <c:if test="${params.orderBy eq 'repaymentProbability ASC'}">selected="selected"</c:if>>按本金催回率升序</option>
+                                <option value="repaymentProbability DESC" <c:if test="${params.orderBy eq 'repaymentProbability DESC'}">selected="selected"</c:if>>按本金催回率降序</option>
+                                <option value="penaltyProbability ASC" <c:if test="${params.orderBy eq 'penaltyProbability ASC'}">selected="selected"</c:if>>按滞纳金催回率升序</option>
+                                <option value="penaltyProbability DESC" <c:if test="${params.orderBy eq 'penaltyProbability DESC'}">selected="selected"</c:if>>按滞纳金催回率降序</option>
+                                <option value="orderProbability ASC" <c:if test="${params.orderBy eq 'orderProbability ASC'}">selected="selected"</c:if>>按订单催回率升序</option>
+                                <option value="orderProbability DESC" <c:if test="${params.orderBy eq 'orderProbability DESC'}">selected="selected"</c:if>>按订单催回率降序</option>
+                            </select>
                         </td>
-                    <td>
-                        排序:
-                        <select name="orderBy">
-                            <option value="" <c:if test="${params.orderBy eq ''}">selected="selected"</c:if>>默认排序</option>
-                            <option value="repaymentProbability ASC" <c:if test="${params.orderBy eq 'repaymentProbability ASC'}">selected="selected"</c:if>>按本金催回率升序</option>
-                            <option value="repaymentProbability DESC" <c:if test="${params.orderBy eq 'repaymentProbability DESC'}">selected="selected"</c:if>>按本金催回率降序</option>
-                            <option value="penaltyProbability ASC" <c:if test="${params.orderBy eq 'penaltyProbability ASC'}">selected="selected"</c:if>>按滞纳金催回率升序</option>
-                            <option value="penaltyProbability DESC" <c:if test="${params.orderBy eq 'penaltyProbability DESC'}">selected="selected"</c:if>>按滞纳金催回率降序</option>
-                            <option value="orderProbability ASC" <c:if test="${params.orderBy eq 'orderProbability ASC'}">selected="selected"</c:if>>按订单催回率升序</option>
-                            <option value="orderProbability DESC" <c:if test="${params.orderBy eq 'orderProbability DESC'}">selected="selected"</c:if>>按订单催回率降序</option>
-                        </select>
-                    </td>
                     </c:if>
 
 
@@ -95,16 +90,16 @@
                     催收组
                 </th>
                 <th align="center" width="100">
-                    催收员姓名
+                    本金总额(含利息)
                 </th>
                 <th align="center" width="100">
-                    本金金额
+                    利息总额
                 </th>
                 <th align="center" width="100">
-                    已还本金
+                    已还本金(含利息)
                 </th>
                 <th align="center" width="100">
-                    未还本金
+                    未还本金(含利息)
                 </th>
                 <th align="center" width="100">
                     本金催回率
@@ -121,13 +116,13 @@
                 <th align="center" width="100">
                     滞纳金催回率
                 </th>
-                <th align="center" width="100">
+                <th align="center" width="50">
                     订单量
                 </th>
-                <th align="center" width="100">
+                <th align="center" width="75">
                     已还订单量
                 </th>
-                <th align="center" width="100">
+                <th align="center" width="75">
                     未还订单量
                 </th>
                 <th align="center" width="100">
@@ -151,13 +146,13 @@
                         </c:forEach>
                     </td>
                     <td>
-                       ${dictMap[list.groupLevel] }
-                    </td>
-                    <td>
-                            ${list.backUserName}
+                            ${dictMap[list.groupLevel] }
                     </td>
                     <td>
                             ${list.totalPrincipal}
+                    </td>
+                    <td>
+                            ${list.totalAccrual}
                     </td>
                     <td>
                             ${list.realgetTotalPrincipal}

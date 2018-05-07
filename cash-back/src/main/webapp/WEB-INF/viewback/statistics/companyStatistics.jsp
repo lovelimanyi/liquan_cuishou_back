@@ -6,7 +6,7 @@
     String path = request.getContextPath();
 %>
 
-<form id="pagerForm" onsubmit="return navTabSearch(this);" action="statistics/companyStatistics?myId=${params.myId}" method="post">
+<form id="pagerForm" onsubmit="return navTabSearch(this);" action="statistics/smallAmountStatistics?Flag=company&myId=${params.myId}">
 
     <div class="pageHeader">
         <div class="searchBar">
@@ -16,15 +16,29 @@
                         统计时间:
                         <input type="text" name="createDate" id="createDate" value="${params.createDate}" class="date textInput readonly" datefmt="yyyy-MM-dd" readonly="readonly" />
                     </td>
-                            <td>
-                                催收公司:
-                                <select name="companyId" id="companyId">
-                                    <option value="">全部</option>
-                                    <c:forEach items="${company}" var="company">
-                                        <option value="${company.id}" <c:if test="${params.companyId == company.id}">selected="selected"</c:if>>${company.title}</option>
-                                    </c:forEach>
-                                </select>
-                            </td>
+
+                    <c:if test="${params.roleId  != '10021' }">
+
+                        <td>
+                            催收组:
+                            <select name="groupLevel" id="groupLevel">
+                                <option value="">全部</option>
+                                <c:forEach items="${groupLevelMap}" var="map">
+                                    <option value="${map.key}" <c:if test="${groupLevel eq map.key}">selected="selected"</c:if> >${map.value}</option>
+                                </c:forEach>
+                            </select>
+                        </td>
+
+                        <td>
+                            催收公司:
+                            <select name="companyId" id="companyId">
+                                <option value="">全部</option>
+                                <c:forEach items="${company}" var="company">
+                                    <option value="${company.id}" <c:if test="${params.companyId == company.id}">selected="selected"</c:if>>${company.title}</option>
+                                </c:forEach>
+                            </select>
+                        </td>
+
                         <td>
                             排序:
                             <select name="orderBy">
@@ -37,6 +51,8 @@
                                 <option value="orderProbability DESC" <c:if test="${params.orderBy eq 'orderProbability DESC'}">selected="selected"</c:if>>按订单催回率降序</option>
                             </select>
                         </td>
+                    </c:if>
+
 
                     <td>
                         <div class="buttonActive">
@@ -61,14 +77,20 @@
                nowrapTD="false">
             <thead>
             <tr>
+                <th align="center" width="40">
+                    序号
+                </th>
                 <th align="center" width="100">
                     统计日期
                 </th>
                 <th align="center" width="100">
                     催收公司
                 </th>
+                <th align="center" width="50">
+                    催收组
+                </th>
                 <th align="center" width="100">
-                    本金金额
+                    本金总额
                 </th>
                 <th align="center" width="100">
                     已还本金
@@ -94,29 +116,34 @@
                 <th align="center" width="50">
                     订单量
                 </th>
-                <th align="center" width="50">
+                <th align="center" width="75">
                     已还订单量
                 </th>
-                <th align="center" width="50">
+                <th align="center" width="75">
                     未还订单量
                 </th>
-                <th align="center" width="50">
+                <th align="center" width="100">
                     订单还款率
                 </th>
             </tr>
             </thead>
             <tbody>
             <c:forEach var="list" items="${list }" varStatus="status">
-                <tr> <!-- target="attendanceId" rel="attendance.id" -->
+                <tr>
+                    <td>
+                            ${status.count}
+                    </td>
                     <td>
                         <fmt:formatDate value="${list.createDate}" pattern="yyyy-MM-dd"/>
                     </td>
-
                     <td>
                         <c:forEach items="${company}" var="company">
                             <c:if test="${list.companyId == company.id}">${company.title}
                             </c:if>
                         </c:forEach>
+                    </td>
+                    <td>
+                            ${dictMap[list.groupLevel] }
                     </td>
                     <td>
                             ${list.totalPrincipal}

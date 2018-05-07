@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 
 import com.info.back.dao.IPersonStatisticsDao;
+import com.info.back.service.IBigAmountStatisticsService;
 import com.info.back.service.IPersonStatisticsService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,9 @@ public class TaskJobStatistics {
 
     @Autowired
     private IPersonStatisticsService personStatisticsService;
+
+    @Autowired
+    private IBigAmountStatisticsService bigAmountStatisticsService;
 
     public void callProcedure() {
         try {
@@ -85,8 +89,13 @@ public class TaskJobStatistics {
     //个人统计
     public void personAndCompanyStatistics(){
         logger.info("个人-公司统计开始.....");
-        personStatisticsService.doStatistics();
+        String beginTime = null;
+        String endTime = null;
+        personStatisticsService.doStatistics(beginTime,endTime);
         logger.info("个人-公司统计执行完成,完成时间 :" + DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
+        logger.info("大额统计开始.....");
+        bigAmountStatisticsService.doStatistics(beginTime,endTime);
+        logger.info("大额统计执行完成,完成时间 :" + DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
     }
 
 

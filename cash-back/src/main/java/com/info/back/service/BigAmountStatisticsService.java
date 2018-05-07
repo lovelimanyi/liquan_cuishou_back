@@ -2,11 +2,12 @@ package com.info.back.service;
 
 import com.info.back.dao.IBigAmountStatisticsDao;
 import com.info.back.dao.IPaginationDao;
+import com.info.back.utils.DateKitUtils;
 import com.info.constant.Constant;
 import com.info.web.pojo.BigAmountStatistics;
-import com.info.web.pojo.PersonStatistics;
 import com.info.web.util.DateUtil;
 import com.info.web.util.PageConfig;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +37,20 @@ public class BigAmountStatisticsService implements IBigAmountStatisticsService {
         pageConfig = paginationDao.findPage("findAll", "findAllCount", params, null);
         params.put("numPerPage", pageConfig.getTotalResultSize());
         PageConfig<BigAmountStatistics> pageAllConfig = paginationDao.findPage("findAll", "findAllCount", params, null);
+        BigAmountStatistics bas = this.handleData(pageAllConfig.getItems());
+        if (bas != null) {
+            pageConfig.getItems().add(0, bas);
+        }
+
+        return pageConfig;
+    }
+    @Override
+    public PageConfig<BigAmountStatistics> findCompanyPage(HashMap<String, Object> params) {
+        params.put(Constant.NAME_SPACE, "BigAmountStatistics");
+        PageConfig<BigAmountStatistics> pageConfig ;
+        pageConfig = paginationDao.findPage("findCompanyAll", "findCompanyAllCount", params, null);
+        params.put("numPerPage", pageConfig.getTotalResultSize());
+        PageConfig<BigAmountStatistics> pageAllConfig = paginationDao.findPage("findCompanyAll", "findCompanyAllCount", params, null);
         BigAmountStatistics bas = this.handleData(pageAllConfig.getItems());
         if (bas != null) {
             pageConfig.getItems().add(0, bas);
@@ -92,31 +107,35 @@ public class BigAmountStatisticsService implements IBigAmountStatisticsService {
     }
 
     @Override
-    public void doStatistics() {
-        HashMap<String, Object> paramss = new HashMap<>();
-        setDefaultDate(paramss);
+    public void doStatistics(String beginTime,String endTime) {
+        HashMap<String, Object> paramss = DateKitUtils.setDefaultDate(beginTime,endTime);
         List<BigAmountStatistics> list = bigAmountStatisticsDao.getBigAmountPersonStatistics(paramss);
+
+        List<BigAmountStatistics> list2 = bigAmountStatisticsDao.getBigAmountCompanyStatistics(paramss);
         //保存至数据库
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         try {
             Date date = sdf.parse(sdf.format(new Date()));
             for (BigAmountStatistics bigAmountStatistics : list){
-                bigAmountStatistics.setCreateDate(date);
-                bigAmountStatisticsDao.insert(bigAmountStatistics);
+                if(StringUtils.isNotBlank(endTime)){
+                    bigAmountStatistics.setCreateDate(DateUtil.getDateTimeFormat(endTime,"yyyy-MM-dd"));
+                }else {
+                    bigAmountStatistics.setCreateDate(date);
+                }
+                bigAmountStatisticsDao.insertPersonStatistics(bigAmountStatistics);
+            }
+            for (BigAmountStatistics bigAmountStatistics : list2){
+                if(StringUtils.isNotBlank(endTime)){
+                    bigAmountStatistics.setCreateDate(DateUtil.getDateTimeFormat(endTime,"yyyy-MM-dd"));
+                }else {
+                    bigAmountStatistics.setCreateDate(date);
+                }
+                bigAmountStatisticsDao.insertCompanyStatistics(bigAmountStatistics);
             }
         } catch (ParseException e) {
             e.printStackTrace();
         }
     }
-    private void setDefaultDate(HashMap<String, Object> params) {
-        //如果当日是1号,展示上个月的1号到最后一天 ; 不是的话展示当月1号到当天
-        if(DateUtil.getDayFirst().equals(new Date())){
-            params.put("beginTime", DateUtil.getDateFormat(DateUtil.getNextMon(-1),"yyyy-MM-dd"));
-            params.put("endTime", DateUtil.getDateForDayBefor(1, "yyyy-MM-dd"));
-        }else{
-            params.put("beginTime", DateUtil.getDateFormat(DateUtil.getDayFirst(),"yyyy-MM-dd"));
-            params.put("endTime", DateUtil.getDateForDayBefor(0, "yyyy-MM-dd"));
-        }
-    }
+
 }
