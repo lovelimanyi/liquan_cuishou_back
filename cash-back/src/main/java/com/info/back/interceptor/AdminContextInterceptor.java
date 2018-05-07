@@ -47,9 +47,10 @@ public class AdminContextInterceptor extends HandlerInterceptorAdapter {
             String uri = getURI(request);
 
             //ip限制
-//            if (!this.getLoginFlag(request)) {
-//                request.getSession().removeAttribute(Constant.BACK_USER);
-//            }
+            if (!this.getLoginFlag(request)) {
+                request.getSession().removeAttribute(Constant.BACK_USER);
+                return false;
+            }
 
             // 不在验证的范围内
             if (exclude(uri)) {
