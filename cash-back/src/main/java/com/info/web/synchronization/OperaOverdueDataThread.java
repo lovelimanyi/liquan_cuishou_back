@@ -81,7 +81,7 @@ public class OperaOverdueDataThread implements Runnable {
 							saveCreditLoanPay(repayment);
 							loger.info("保存还款表");
 							//保存还款详情表
-							syncUtils.saveCreditLoanPayDetail(localDataDao,repayment,payId, repaymentDetailList);
+							syncUtils.saveFirstPayDetail(localDataDao,repayment,payId, repaymentDetailList);
 							loger.info("保存还款详情表");
 							//保存用户信息表--联系人表--银行卡
 							syncUtils.saveUserInfo(localDataDao,payId,userId,userInfo,userContactsList,cardInfo);

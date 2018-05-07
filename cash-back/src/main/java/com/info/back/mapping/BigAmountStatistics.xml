@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.info.back.dao.IBigAmountStatisticsDao">
+
+    <select id="getBigAmountPersonStatistics" resultType="com.info.web.pojo.BigAmountStatistics" parameterType="HashMap">
+        SELECT
+        z.id AS 'backUserId',
+        z.company_id AS 'companyId',
+        z.role_id AS 'roleId',
+        z.user_name AS 'backUserName',
+        z.group_level AS 'groupLevel',
+        z.`总利息` AS totalAccrual,
+        z.`本金+利息(总)` AS 'totalPrincipal',
+        IFNULL(y.`本金+利息(完成)`,0) AS 'realgetTotalPrincipal',
+        (	z.`本金+利息(总)` - IFNULL(	y.`本金+利息(完成)`,0	)) 'remainPrincipal',
+        ROUND((IFNULL(y.`本金+利息(完成)`,0))/(z.`本金+利息(总)`)*100,2 )AS 'repaymentProbability',
+        z.`滞纳金(总)` AS'totalPenalty',
+        IFNULL(y.`滞纳金(完成)`, 0) AS'realgetTotalPenalty',
+        (z.`滞纳金(总)` - IFNULL(y.`滞纳金(完成)`, 0)) AS 'remainPenalty',
+        IFNULL(ROUND((IFNULL(y.`滞纳金(完成)`, 0))/(z.`滞纳金(总)`)*100,2 ),0.00)AS 'penaltyProbability',
+        z.`总订单数` AS 'totalOrderCount',
+        IFNULL(y.`还款完成订单数`,0) AS 'doneOrderCount',
+        (z.`总订单数`- IFNULL(y.`还款完成订单数`,0))AS 'undoneOrderCount',
+        ROUND((IFNULL(y.`还款完成订单数`,0))/(z.`总订单数`)*100,2)AS 'orderProbability'
+
+
+        FROM
+
+        (SELECT
+        u.id,
+        u.uuid,
+        u.company_id,
+        u.user_name,
+        u.role_id,
+        u.group_level,
+
+        sum(l.loan_money + l.accrual+l.loan_penalty) AS'总金额1',
+        sum(l.loan_money + l.accrual) AS '本金+利息(总)',
+        sum(l.accrual) AS '总利息',
+        sum(l.loan_penalty) AS '滞纳金(总)',
+        count(o.id)AS '总订单数'
+        FROM
+        back_user u
+        LEFT JOIN mman_loan_collection_order o ON o.current_collection_user_id = u.uuid
+        LEFT JOIN mman_user_loan l ON o.loan_id = l.id
+        WHERE l.borrowing_type='1'
+        GROUP BY u.id
+        ORDER BY u.id) z
+        LEFT JOIN
+
+
+        (SELECT
+        u.id,
+        u.uuid,
+        u.user_name,
+        u.group_level,
+        sum(p.receivable_money) AS'总金额2',
+        sum(p.realget_principle + p.realget_accrual) AS '本金+利息(完成)',
+        sum(p.realget_interest) AS '滞纳金(完成)',
+        count(o.id) AS '还款完成订单数'
+        FROM
+        back_user u
+        LEFT JOIN mman_loan_collection_order o ON o.current_collection_user_id = u.uuid
+        LEFT JOIN credit_loan_pay p ON o.pay_id = p.id
+        LEFT JOIN mman_user_loan l ON o.loan_id = l.id
+        WHERE o.`status`=4 AND l.borrowing_type='1'
+        <if test="beginTime != null and beginTime != ''">
+            AND DATE_FORMAT(p.update_Date,"%Y-%m-%d") &gt;= #{beginTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            AND DATE_FORMAT(p.update_Date,"%Y-%m-%d") &lt; #{endTime}
+        </if>
+        GROUP BY u.id
+        ORDER BY u.id) y ON z.id = y.id;
+
+    </select>
+
+    <select id="getBigAmountCompanyStatistics" resultType="com.info.web.pojo.BigAmountStatistics" parameterType="HashMap">
+        SELECT
+        z.company_id AS 'companyId',
+        z.group_level AS 'groupLevel',
+        sum(z.`本金+利息(总)`) AS 'totalPrincipal',
+        sum(z.`总利息`) AS totalAccrual,
+        sum(IFNULL(y.`本金+利息(完成)`,0)) AS 'realgetTotalPrincipal',
+        sum((	z.`本金+利息(总)` - IFNULL(	y.`本金+利息(完成)`,0	))) 'remainPrincipal',
+        ROUND(sum(IFNULL(y.`本金+利息(完成)`,0))/sum(z.`本金+利息(总)`)*100,2)AS 'repaymentProbability',
+        sum(z.`滞纳金(总)`) AS'totalPenalty',
+        sum(IFNULL(y.`滞纳金(完成)`, 0)) AS'realgetTotalPenalty',
+        sum((z.`滞纳金(总)` - IFNULL(y.`滞纳金(完成)`, 0))) AS 'remainPenalty',
+        IFNULL(ROUND(sum(IFNULL(y.`滞纳金(完成)`, 0))/sum(z.`滞纳金(总)`)*100,2 ),0.00)AS 'penaltyProbability',
+        sum(z.`总订单数`) AS 'totalOrderCount',
+        sum(IFNULL(y.`还款完成订单数`,0)) AS 'doneOrderCount',
+        sum(z.`总订单数`- IFNULL(y.`还款完成订单数`,0))AS 'undoneOrderCount',
+        ROUND(sum(IFNULL(y.`还款完成订单数`,0))/sum(z.`总订单数`)*100,2)AS 'orderProbability'
+
+        FROM
+
+        (SELECT
+        u.id,
+        u.uuid,
+        u.company_id,
+        u.user_name,
+        u.role_id,
+        u.group_level,
+
+        sum(l.loan_money + l.accrual+l.loan_penalty) AS'总金额1',
+        sum(l.loan_money + l.accrual) AS '本金+利息(总)',
+        sum(l.accrual) AS '总利息',
+        sum(l.loan_penalty) AS '滞纳金(总)',
+        count(o.id)AS '总订单数'
+        FROM
+        back_user u
+        LEFT JOIN mman_loan_collection_order o ON o.current_collection_user_id = u.uuid
+        LEFT JOIN mman_user_loan l ON o.loan_id = l.id
+        WHERE l.borrowing_type='1'
+        GROUP BY u.id
+        ORDER BY u.id) z
+        LEFT JOIN
+
+
+        (SELECT
+        u.id,
+        u.uuid,
+        u.user_name,
+        u.group_level,
+        sum(p.receivable_money) AS'总金额2',
+        sum(p.realget_principle + p.realget_accrual) AS '本金+利息(完成)',
+        sum(p.realget_interest) AS '滞纳金(完成)',
+        count(o.id) AS '还款完成订单数'
+        FROM
+        back_user u
+        LEFT JOIN mman_loan_collection_order o ON o.current_collection_user_id = u.uuid
+        LEFT JOIN credit_loan_pay p ON o.pay_id = p.id
+        LEFT JOIN mman_user_loan l ON o.loan_id = l.id
+        WHERE o.`status`=4 AND l.borrowing_type='1'
+        <if test="beginTime != null and beginTime != ''">
+            AND DATE_FORMAT(p.update_Date,"%Y-%m-%d") &gt;= #{beginTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            AND DATE_FORMAT(p.update_Date,"%Y-%m-%d") &lt; #{endTime}
+        </if>
+        GROUP BY u.id
+        ORDER BY u.id) y ON z.id = y.id
+        GROUP BY z.company_id,z.group_level;
+
+    </select>
+
+
+
+
+    <sql id="whereBigPersonColumn">
+        <where>
+            <if test="createDate != null and createDate != ''">
+                DATE_FORMAT(ps.createDate,"%Y-%m-%d") = #{createDate}
+            </if>
+            <if test="backUserName != null and backUserName != ''">
+                AND ps.backUserName = #{backUserName}
+            </if>
+            <if test="companyId != null and companyId != ''">
+                AND ps.companyId = #{companyId}
+            </if>
+            <if test="groupLevel != null and groupLevel != ''">
+                AND ps.groupLevel = #{groupLevel}
+            </if>
+            <if test="companyIds != null and companyId == null">
+                AND ps.companyId IN
+                <foreach collection="companyIds" open="(" close=")" item="companyId" separator=",">
+                    #{companyId}
+                </foreach>
+            </if>
+        </where>
+        <if test="orderBy != null and orderBy != ''">
+            ORDER by ps.${orderBy}
+        </if>
+
+    </sql>
+
+    <select id="findAll" resultType="com.info.web.pojo.BigAmountStatistics" parameterType="HashMap">
+        SELECT
+        backUserId,
+        roleId,
+        companyId,
+        groupLevel,
+        backUserName,
+        totalPrincipal,
+        realgetTotalPrincipal,
+        remainPrincipal,
+        repaymentProbability,
+        totalAccrual,
+        totalPenalty,
+        realgetTotalPenalty,
+        remainPenalty,
+        penaltyProbability,
+        totalOrderCount,
+        undoneOrderCount,
+        doneOrderCount,
+        orderProbability,
+        createDate
+        FROM big_person_statistics ps
+        <include refid="whereBigPersonColumn"/>
+
+
+    </select>
+
+    <select id="findAllCount" resultType="Integer" parameterType="HashMap">
+        SELECT COUNT(1)
+        FROM big_person_statistics ps
+        <include refid="whereBigPersonColumn"/>
+    </select>
+
+
+    <insert id="insertPersonStatistics" parameterType="com.info.web.pojo.BigAmountStatistics">
+        INSERT INTO big_person_statistics(
+        backUserId,
+        roleId,
+        companyId,
+        groupLevel,
+        backUserName,
+        totalPrincipal,
+        realgetTotalPrincipal,
+        remainPrincipal,
+        repaymentProbability,
+        totalAccrual,
+        totalPenalty,
+        realgetTotalPenalty,
+        remainPenalty,
+        penaltyProbability,
+        totalOrderCount,
+        undoneOrderCount,
+        doneOrderCount,
+        orderProbability,
+        createDate
+        )VALUES (
+        #{backUserId},
+        #{roleId},
+        #{companyId},
+        #{groupLevel},
+        #{backUserName},
+        #{totalPrincipal},
+        #{realgetTotalPrincipal},
+        #{remainPrincipal},
+        #{repaymentProbability},
+        #{totalAccrual},
+        #{totalPenalty},
+        #{realgetTotalPenalty},
+        #{remainPenalty},
+        #{penaltyProbability},
+        #{totalOrderCount},
+        #{undoneOrderCount},
+        #{doneOrderCount},
+        #{orderProbability},
+        #{createDate}
+        )
+
+    </insert>
+
+
+    <sql id="whereBigCompanyColumn">
+        <where>
+            <if test="createDate != null and createDate != ''">
+                DATE_FORMAT(ps.createDate,"%Y-%m-%d") = #{createDate}
+            </if>
+            <if test="companyId != null and companyId != ''">
+                AND ps.companyId = #{companyId}
+            </if>
+            <if test="groupLevel != null and groupLevel != ''">
+                AND ps.groupLevel = #{groupLevel}
+            </if>
+            <if test="companyIds != null and companyId == null">
+                AND ps.companyId IN
+                <foreach collection="companyIds" open="(" close=")" item="companyId" separator=",">
+                    #{companyId}
+                </foreach>
+            </if>
+        </where>
+        <if test="orderBy != null and orderBy != ''">
+            ORDER by ps.${orderBy}
+        </if>
+
+    </sql>
+    <select id="findCompanyAll" resultType="com.info.web.pojo.BigAmountStatistics" parameterType="HashMap">
+        SELECT
+        companyId,
+        groupLevel,
+        totalPrincipal,
+        realgetTotalPrincipal,
+        remainPrincipal,
+        repaymentProbability,
+        totalAccrual,
+        totalPenalty,
+        realgetTotalPenalty,
+        remainPenalty,
+        penaltyProbability,
+        totalOrderCount,
+        undoneOrderCount,
+        doneOrderCount,
+        orderProbability,
+        createDate
+        FROM big_company_statistics ps
+        <include refid="whereBigCompanyColumn"/>
+
+
+    </select>
+
+    <select id="findCompanyAllCount" resultType="Integer" parameterType="HashMap">
+        SELECT COUNT(1)
+        FROM big_company_statistics ps
+        <include refid="whereBigCompanyColumn"/>
+    </select>
+
+    <insert id="insertCompanyStatistics" parameterType="com.info.web.pojo.BigAmountStatistics">
+        INSERT INTO big_company_statistics(
+        companyId,
+        groupLevel,
+        totalPrincipal,
+        realgetTotalPrincipal,
+        remainPrincipal,
+        repaymentProbability,
+        totalAccrual,
+        totalPenalty,
+        realgetTotalPenalty,
+        remainPenalty,
+        penaltyProbability,
+        totalOrderCount,
+        undoneOrderCount,
+        doneOrderCount,
+        orderProbability,
+        createDate
+        )VALUES (
+        #{companyId},
+        #{groupLevel},
+        #{totalPrincipal},
+        #{realgetTotalPrincipal},
+        #{remainPrincipal},
+        #{repaymentProbability},
+        #{totalAccrual},
+        #{totalPenalty},
+        #{realgetTotalPenalty},
+        #{remainPenalty},
+        #{penaltyProbability},
+        #{totalOrderCount},
+        #{undoneOrderCount},
+        #{doneOrderCount},
+        #{orderProbability},
+        #{createDate}
+        )
+
+    </insert>
+
+</mapper>

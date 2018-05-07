@@ -1,5 +1,6 @@
 package com.info.back.controller;
 
+import com.alibaba.druid.sql.ast.statement.SQLIfStatement;
 import com.info.back.service.*;
 import com.info.back.utils.BackConstant;
 import com.info.back.utils.ExcelUtil;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -47,6 +49,8 @@ public class CollectionStatisticsController extends BaseController {
 	private IBackUserCompanyPermissionService backUserCompanyPermissionService;
 	@Autowired
 	private IPersonStatisticsService personStatisticsService;
+	@Autowired
+	private IBigAmountStatisticsService bigAmountStatisticsService;
 
 
 	/**
@@ -503,45 +507,35 @@ public class CollectionStatisticsController extends BaseController {
 			}
 		}
 	}
-	@RequestMapping("personStatistics")
-	public String personAssessment(HttpServletRequest request,HttpServletResponse response, Model model){
-		String url = "statistics/personStatistics";
-		try {
-			HashMap<String, Object> params = getParametersO(request);
-			BackUser backUser = (BackUser) request.getSession().getAttribute(Constant.BACK_USER);
-			if(StringUtils.isEmpty(params.get("createDate")) && StringUtils.isEmpty(params.get("createDate"))){
-				params.put("createDate",DateUtil.getDateFormat(new Date(),"yyyy-MM-dd"));
-			}
-			PageConfig<PersonStatistics> pageConfig = null;
+    /**
+     * 小额统计
+     * @param
+     */
+	@RequestMapping("smallAmountStatistics")
+	public String smallAmountStatistics(@RequestParam(value = "Flag") String Flag,HttpServletRequest request,HttpServletResponse response, Model model){
+        String url = "";
+        try {
+            HashMap<String, Object> params = getParametersO(request);
+            BackUser backUser = (BackUser) request.getSession().getAttribute(Constant.BACK_USER);
+            //设置登录账户可查看的公司权限
+            handleCompanyPermission(backUser,params,model);
 
-			// 如果用户是催收员,只能看自己的相关统计
-			if(backUser.getRoleId().equals(BackConstant.COLLECTION_ROLE_ID.toString())){
-				params.put("backUserId",backUser.getId());
-				params.put("uuid", backUser.getUuid());
-				params.put("roleId", backUser.getRoleId());
-				params.put("backUserName",backUser.getUserName());
-				pageConfig = personStatisticsService.findPage(params);
-			}else {
+            PageConfig<PersonStatistics> pageConfig = new PageConfig<>();
 
-				// 所有公司--系统管理员可以查看所有公司
-				List<MmanLoanCollectionCompany> companys =mmanLoanCollectionCompanyService.selectCompanyList();
-				List<MmanLoanCollectionCompany> coms = new ArrayList<>(); // 存放登录角色权限内可以查看的公司
-				coms = getAccessCompanies(backUser, companys, coms);
-				if (coms.size()<1){
-					return url;
-				}
-				List<String> companyIds = new ArrayList<>();
-				for (MmanLoanCollectionCompany company:coms) {
-					companyIds.add(company.getId());
-				}
-				params.put("companyIds",companyIds);
-				model.addAttribute("groupLevelMap", BackConstant.groupNameMap);
-				model.addAttribute("groupLevel", String.valueOf(params.get("groupLevel")));
-				model.addAttribute("company",coms);
-				model.addAttribute("dictMap",BackConstant.groupNameMap);
-
-				pageConfig = personStatisticsService.findPage(params);
-			}
+            //如果Flag 为person则查看个人统计，如果为 company则查看公司统计
+            if ("person".equals(Flag)){
+                url = "statistics/personStatistics";
+                if (!model.containsAttribute("company")){
+                    return url;
+                }
+                pageConfig = personStatisticsService.findPage(params);
+            }else if("company".equals(Flag)){
+                url = "statistics/companyStatistics";
+                if (!model.containsAttribute("company")){
+                    return url;
+                }
+                pageConfig = personStatisticsService.findCompanyPage(params);
+            }
 
 			model.addAttribute("list",pageConfig.getItems());
 			model.addAttribute("pm", pageConfig);
@@ -554,49 +548,82 @@ public class CollectionStatisticsController extends BaseController {
 		return url;
 	}
 
-	@RequestMapping("companyStatistics")
-	public String companyStatistics(HttpServletRequest request, Model model){
-		String url = "statistics/companyStatistics";
-		try {
-			HashMap<String, Object> params = getParametersO(request);
-			BackUser backUser = (BackUser) request.getSession().getAttribute(Constant.BACK_USER);
-			if(StringUtils.isEmpty(params.get("createDate")) && StringUtils.isEmpty(params.get("createDate"))){
-				params.put("createDate",DateUtil.getDateFormat(new Date(),"yyyy-MM-dd"));
-			}
-			PageConfig<PersonStatistics> pageConfig = null;
+    /**
+     * 大额统计
+     * @param
+     */
+	@RequestMapping("bigAmountStatistics")
+	public String bigAmountStatistics(@RequestParam(value = "Flag") String Flag, HttpServletRequest request, HttpServletResponse response, Model model){
+        String url = "";
+        try {
+            HashMap<String, Object> params = getParametersO(request);
+            BackUser backUser = (BackUser) request.getSession().getAttribute(Constant.BACK_USER);
+            //设置登录账户可查看的公司权限
+            handleCompanyPermission(backUser,params,model);
 
+            PageConfig<BigAmountStatistics>  pageConfig = new PageConfig<>();
 
-			// 所有公司--系统管理员可以查看所有公司
-			List<MmanLoanCollectionCompany> companys =mmanLoanCollectionCompanyService.selectCompanyList();
-			List<MmanLoanCollectionCompany> coms = new ArrayList<>(); // 存放登录角色权限内可以查看的公司
-			coms = getAccessCompanies(backUser, companys, coms);
-			if (coms.size()<1){
-				return url;
-			}
-			List<String> companyIds = new ArrayList<>();
-			for (MmanLoanCollectionCompany company:coms) {
-				companyIds.add(company.getId());
-			}
-			params.put("companyIds",companyIds);
-			model.addAttribute("company",coms);
-
-			pageConfig = personStatisticsService.findCompanyPage(params);
-
+            //如果Flag 为person则查看个人统计，如果为 company则查看公司统计
+            if ("person".equals(Flag)){
+                url = "statistics/bigPersonStatistics";
+                if (!model.containsAttribute("company")){
+                    return url;
+                }
+                pageConfig = bigAmountStatisticsService.findPage(params);
+            }else if("company".equals(Flag)){
+                url = "statistics/bigCompanyStatistics";
+                if (!model.containsAttribute("company")){
+                    return url;
+                }
+                pageConfig = bigAmountStatisticsService.findCompanyPage(params);
+            }
 			model.addAttribute("list",pageConfig.getItems());
 			model.addAttribute("pm", pageConfig);
 			model.addAttribute("params", params);// 用于搜索框保留值
-
-
 		}catch ( Exception e){
 			e.printStackTrace();
 		}
 		return url;
 	}
+
+    public void handleCompanyPermission(BackUser backUser ,HashMap<String, Object> params ,Model model){
+
+        if(StringUtils.isEmpty(params.get("createDate")) && StringUtils.isEmpty(params.get("createDate"))){
+            params.put("createDate",DateUtil.getDateFormat(new Date(),"yyyy-MM-dd"));
+        }
+      // 如果用户是催收员,只能看自己的相关统计
+        if(backUser.getRoleId().equals(BackConstant.COLLECTION_ROLE_ID.toString())){
+            params.put("backUserId",backUser.getId());
+            params.put("uuid", backUser.getUuid());
+            params.put("roleId", backUser.getRoleId());
+            params.put("backUserName",backUser.getUserName());
+        }else {
+            // 所有公司--系统管理员可以查看所有公司
+            List<MmanLoanCollectionCompany> companys =mmanLoanCollectionCompanyService.selectCompanyList();
+            List<MmanLoanCollectionCompany> coms = new ArrayList<>(); // 存放登录角色权限内可以查看的公司
+            coms = getAccessCompanies(backUser, companys, coms);
+            if (coms != null && coms.size()>=1){
+                List<String> companyIds = new ArrayList<>();
+                for (MmanLoanCollectionCompany company:coms) {
+                    companyIds.add(company.getId());
+                }
+                params.put("companyIds",companyIds);
+                model.addAttribute("groupLevelMap", BackConstant.groupNameMap);
+                model.addAttribute("groupLevel", String.valueOf(params.get("groupLevel")));
+                model.addAttribute("dictMap",BackConstant.groupNameMap);
+                model.addAttribute("company",coms);
+            }
+
+        }
+    }
+
+
 
 
 	@RequestMapping("doStatistics")
-	public void doStatistics(){
-		personStatisticsService.doStatistics();
+	public void doStatistics(String beginTime,String endTime){
+		personStatisticsService.doStatistics(beginTime,endTime);
+		bigAmountStatisticsService.doStatistics(beginTime,endTime);
 	}
 
 
