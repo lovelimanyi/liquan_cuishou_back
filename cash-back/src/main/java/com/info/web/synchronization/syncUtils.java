@@ -152,6 +152,45 @@ public class syncUtils {
 		loger.error("end-updateMmanLoanCollectionOrder-order"+order);
 		return order;
 	}
+
+	/**
+	 * 保存用户还款详情表-----（未逾期部分还款本金）不保存当前催收员
+	 * */
+
+	public static void saveFirstPayDetail(ILocalDataDao localDataDao,HashMap<String, Object> repayment,String payId,List<HashMap<String,Object>> repaymentDetailList){
+		loger.error("未逾期部分还款start-saveCreditLoanPayDetail-payId =" + payId);
+		loger.error("repaymentDetailList="+repaymentDetailList);
+
+		List<String> idList = null;
+		if(null!=repaymentDetailList && 0<repaymentDetailList.size()){
+			HashMap<String,String> map = new HashMap<String,String>();
+			map.put("PAY_ID", payId);
+			idList = localDataDao.selectCreditLoanPayDetail(map);//查询目前插入的还款记录
+		}
+		for(int i=0;i<repaymentDetailList.size();i++){
+			HashMap<String,Object> repayDetail = repaymentDetailList.get(i);
+			String detailId = String.valueOf(repayDetail.get("id"));
+			if(checkDetailId(idList, detailId)){
+				CreditLoanPayDetail creditLoanPayDetail = new CreditLoanPayDetail();
+
+				creditLoanPayDetail.setId(detailId);
+				creditLoanPayDetail.setPayId(payId);
+				creditLoanPayDetail.setCreateDate(DateUtil.getDateTimeFormat(String.valueOf(repayDetail.get("created_at")), "yyyy-MM-dd HH:mm:ss"));
+				creditLoanPayDetail.setUpdateDate(new Date());
+				creditLoanPayDetail.setReturnType(String.valueOf(repayDetail.get("repayment_type")));
+				creditLoanPayDetail.setRemark("未逾期部分还款");
+				creditLoanPayDetail = syncUtils.operaRealPenltyDetail(repayment, repayDetail, payId,creditLoanPayDetail,localDataDao);
+				localDataDao.saveCreditLoanPayDetail(creditLoanPayDetail);
+				loger.error("未逾期部分还款end-saveCreditLoanPayDetail-payId =" + payId);
+				loger.error("endDate-saveCreditLoanPayDetail:"+DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
+				loger.error("creditLoanPayDetail="+creditLoanPayDetail);
+			}
+		}
+	}
+
+
+
+
 	/**
 	 * 保存用户还款详情表
 	 *
