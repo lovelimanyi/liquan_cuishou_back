@@ -54,12 +54,6 @@ public class AdminContextInterceptor extends HandlerInterceptorAdapter {
                 return true;
             }
 
-            //ip限制
-            if (!this.getLoginFlag(request)) {
-                request.getSession().removeAttribute(Constant.BACK_USER);
-                return false;
-            }
-
             // 用户为null跳转到登录页面
             if (user == null) {
                 if (request.getHeader("x-requested-with") != null && request.getHeader("x-requested-with").equalsIgnoreCase("XMLHttpRequest"))// 如果是ajax请求响应头会有，x-requested-with；
@@ -212,38 +206,6 @@ public class AdminContextInterceptor extends HandlerInterceptorAdapter {
                     "admin access path not like '/back/...' pattern: " + uri);
         }
         return uri.substring(start);
-    }
-
-    /**
-     * 判断请求过来的ip是否在允许的范围内
-     *
-     * @param request
-     * @return
-     * @throws Exception
-     */
-    public boolean getLoginFlag(HttpServletRequest request) throws Exception {
-//        clientIp = "180.175.163.201";
-        List<String> orayIps = JedisDataClient.getList("orayIps", 0, -1);
-        if (CollectionUtils.isEmpty(orayIps)) {
-            List<CompanyIpAddressDto> companyIps = companyIpAddressService.listAll();
-            for (CompanyIpAddressDto companyIpAddress : companyIps) {
-                String CompanyIps = companyIpAddress.getIpAddress();
-                if (StringUtils.isNotEmpty(CompanyIps)) {
-                    orayIps.add(CompanyIps);
-                }
-            }
-            JedisDataClient.setList("orayIps", orayIps);
-        }
-
-        String clientIp = RequestUtils.getClientIpAddr(request);
-        if (clientIp == null || orayIps == null) {
-            request.getSession().removeAttribute(Constant.BACK_USER);
-        }
-        boolean loginFlag = false;
-        if (orayIps.contains(clientIp)) {
-            loginFlag = true; // 在花生壳范围内可以登录
-        }
-        return loginFlag;
     }
 
 

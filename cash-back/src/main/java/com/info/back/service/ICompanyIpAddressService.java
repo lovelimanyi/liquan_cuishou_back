@@ -61,4 +61,7 @@ public interface ICompanyIpAddressService {
      * @return
      */
     List<CompanyIpAddressDto> listAll();
+
+
+    List<CompanyIpAddressDto> getAllIps();
 }

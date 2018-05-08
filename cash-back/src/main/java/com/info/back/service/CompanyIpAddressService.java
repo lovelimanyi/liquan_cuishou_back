@@ -106,4 +106,9 @@ public class CompanyIpAddressService implements ICompanyIpAddressService {
     public List<CompanyIpAddressDto> listAll() {
         return companyIpAddressDao.listAllIps();
     }
+
+    @Override
+    public List<CompanyIpAddressDto> getAllIps() {
+        return companyIpAddressDao.getAllIps();
+    }
 }

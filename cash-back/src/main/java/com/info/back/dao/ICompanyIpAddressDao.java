@@ -19,6 +19,9 @@ public interface ICompanyIpAddressDao {
      */
     List<CompanyIpAddressDto> listAllIps();
 
+
+    List<CompanyIpAddressDto> getAllIps();
+
     /**
      * 公司公司id获取对应的ip信息
      *
@@ -54,6 +57,7 @@ public interface ICompanyIpAddressDao {
 
     /**
      * 根据id查询
+     *
      * @param id
      * @return
      */
