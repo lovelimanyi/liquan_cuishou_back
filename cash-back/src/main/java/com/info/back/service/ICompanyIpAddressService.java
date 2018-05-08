@@ -1,5 +1,6 @@
 package com.info.back.service;
 
+import com.info.back.result.JsonResult;
 import com.info.web.pojo.CompanyIpAddressDto;
 import com.info.web.util.PageConfig;
 
@@ -19,7 +20,7 @@ public interface ICompanyIpAddressService {
      *
      * @return
      */
-    PageConfig<CompanyIpAddressDto> getPage(HashMap<String,Object> params);
+    PageConfig<CompanyIpAddressDto> getPage(HashMap<String, Object> params);
 
     /**
      * 删除
@@ -27,7 +28,7 @@ public interface ICompanyIpAddressService {
      * @param id
      * @return
      */
-    int deleteIpById(int id);
+    JsonResult deleteIpById(int id);
 
     /**
      * 更新
@@ -35,14 +36,29 @@ public interface ICompanyIpAddressService {
      * @param companyIpAddress
      * @return
      */
-    int updateIpById(CompanyIpAddressDto companyIpAddress);
+    JsonResult updateIpById(CompanyIpAddressDto companyIpAddress);
 
 
     /**
      * 保存
      *
-     * @param companyIpAddress
+     * @param params
      * @return
      */
-    int insert(CompanyIpAddressDto companyIpAddress);
+    JsonResult insert(HashMap<String, Object> params);
+
+    /**
+     * 根据id查询
+     *
+     * @param id
+     * @return
+     */
+    CompanyIpAddressDto getById(Integer id);
+
+    /**
+     * 查询所有的ip信息
+     *
+     * @return
+     */
+    List<CompanyIpAddressDto> listAll();
 }

@@ -59,7 +59,7 @@
             </thead>
             <tbody>
             <c:forEach var="address" items="${page.items }" varStatus="status">
-                <tr target="id" rel="${rule.id }">
+                <tr target="id" rel="${address.id }">
                     <td>
                             ${status.index+1}
                     </td>

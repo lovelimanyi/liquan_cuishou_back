@@ -42,7 +42,7 @@
     </update>
 
     <insert id="insert" parameterType="com.info.web.pojo.CompanyIpAddressDto">
-        INSERT INTO collection_company_ip_address (company_id,ip_address) VALUES (companyId,ipAddress)
+        INSERT INTO collection_company_ip_address (id,company_id,ip_address) VALUES (#{id},#{companyId},#{ipAddress})
     </insert>
 
     <sql id="baseSql">
@@ -50,4 +50,9 @@
 		INNER JOIN mman_loan_collection_company b on
 		a.company_id = b.id
 	</sql>
+
+    <select id="getById" parameterType="Integer" resultType="com.info.web.pojo.CompanyIpAddressDto">
+        <include refid="baseSql"></include>
+        WHERE a.id = #{id}
+    </select>
 </mapper>

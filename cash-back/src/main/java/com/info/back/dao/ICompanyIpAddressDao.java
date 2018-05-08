@@ -51,4 +51,11 @@ public interface ICompanyIpAddressDao {
      * @return
      */
     int insert(CompanyIpAddressDto companyIpAddress);
+
+    /**
+     * 根据id查询
+     * @param id
+     * @return
+     */
+    CompanyIpAddressDto getById(Integer id);
 }

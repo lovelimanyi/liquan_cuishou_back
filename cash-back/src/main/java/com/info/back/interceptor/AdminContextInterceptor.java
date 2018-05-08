@@ -3,14 +3,17 @@ package com.info.back.interceptor;
 import com.info.back.service.IBackModuleService;
 import com.info.back.service.IBackUserService;
 import com.info.back.service.ICollectionCompanyService;
+import com.info.back.service.ICompanyIpAddressService;
 import com.info.back.utils.RequestUtils;
 import com.info.constant.Constant;
 import com.info.web.pojo.BackUser;
+import com.info.web.pojo.CompanyIpAddressDto;
 import com.info.web.pojo.MmanLoanCollectionCompany;
 import com.info.web.util.JedisDataClient;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import org.springframework.web.util.UrlPathHelper;
@@ -34,7 +37,7 @@ public class AdminContextInterceptor extends HandlerInterceptorAdapter {
     @Autowired
     IBackModuleService backModuleService;
     @Autowired
-    private ICollectionCompanyService collectionCompanyService;
+    private ICompanyIpAddressService companyIpAddressService;
 
     @SuppressWarnings("unused")
     @Override
@@ -46,15 +49,15 @@ public class AdminContextInterceptor extends HandlerInterceptorAdapter {
             user = (BackUser) request.getSession().getAttribute(Constant.BACK_USER);
             String uri = getURI(request);
 
-            //ip限制
-//            if (!this.getLoginFlag(request)) {
-//                request.getSession().removeAttribute(Constant.BACK_USER);
-//                return false;
-//            }
-
             // 不在验证的范围内
             if (exclude(uri)) {
                 return true;
+            }
+
+            //ip限制
+            if (!this.getLoginFlag(request)) {
+                request.getSession().removeAttribute(Constant.BACK_USER);
+                return false;
             }
 
             // 用户为null跳转到登录页面
@@ -221,17 +224,15 @@ public class AdminContextInterceptor extends HandlerInterceptorAdapter {
     public boolean getLoginFlag(HttpServletRequest request) throws Exception {
 //        clientIp = "180.175.163.201";
         List<String> orayIps = JedisDataClient.getList("orayIps", 0, -1);
-        if (orayIps == null || orayIps.size() == 0) {
-            List<MmanLoanCollectionCompany> companyIps = collectionCompanyService.getCompanyIps();
-            for (MmanLoanCollectionCompany company : companyIps) {
-                String CompanyIps = company.getCompanyAddress();
+        if (CollectionUtils.isEmpty(orayIps)) {
+            List<CompanyIpAddressDto> companyIps = companyIpAddressService.listAll();
+            for (CompanyIpAddressDto companyIpAddress : companyIps) {
+                String CompanyIps = companyIpAddress.getIpAddress();
                 if (StringUtils.isNotEmpty(CompanyIps)) {
-                    List<String> ips = Arrays.asList(CompanyIps.split(","));
-                    orayIps.addAll(ips);
+                    orayIps.add(CompanyIps);
                 }
             }
-
-            JedisDataClient.setList("orayIps", orayIps, 60 * 60);
+            JedisDataClient.setList("orayIps", orayIps);
         }
 
         String clientIp = RequestUtils.getClientIpAddr(request);
