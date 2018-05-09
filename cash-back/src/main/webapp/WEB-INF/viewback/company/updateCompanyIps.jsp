@@ -9,7 +9,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Insert user</title>
+    <title>更新ip白名单</title>
 </head>
 <body>
 <div class="pageContent">
@@ -44,28 +44,28 @@
                     <input name="ipAddress" value="${companyIpAddress.ipAddress}" minlength="1" maxlength="30" class="required" type="text" alt="请输入ip地址" size="30"/>
                 </dd>
             </dl>
-            <div class="formBar">
-                <ul>
-                    <li>
-                        <div class="buttonActive">
-                            <div class="buttonContent">
-                                <button type="submit" id="submit">
-                                    保存
-                                </button>
-                            </div>
+        </div>
+        <div class="formBar">
+            <ul>
+                <li>
+                    <div class="buttonActive">
+                        <div class="buttonContent">
+                            <button type="submit" id="submit">
+                                保存
+                            </button>
                         </div>
-                    </li>
-                    <li>
-                        <div class="button">
-                            <div class="buttonContent">
-                                <button type="button" class="close">
-                                    取消
-                                </button>
-                            </div>
+                    </div>
+                </li>
+                <li>
+                    <div class="button">
+                        <div class="buttonContent">
+                            <button type="button" class="close">
+                                取消
+                            </button>
                         </div>
-                    </li>
-                </ul>
-            </div>
+                    </div>
+                </li>
+            </ul>
         </div>
     </form>
 </div>

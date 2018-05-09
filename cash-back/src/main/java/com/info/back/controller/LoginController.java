@@ -69,9 +69,7 @@ public class LoginController extends BaseController {
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.GET)
-    public String login(HttpServletRequest request,
-                        HttpServletResponse response, Model model) {
-
+    public String login(HttpServletRequest request, Model model) {
         try {
             String processUrl = request.getParameter(PROCESS_URL);
             String returnUrl = request.getParameter(RETURN_URL);

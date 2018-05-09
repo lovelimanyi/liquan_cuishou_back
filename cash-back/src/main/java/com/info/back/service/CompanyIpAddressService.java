@@ -3,7 +3,6 @@ package com.info.back.service;
 import com.info.back.dao.ICompanyIpAddressDao;
 import com.info.back.dao.IPaginationDao;
 import com.info.back.result.JsonResult;
-import com.info.constant.Constant;
 import com.info.web.pojo.CompanyIpAddressDto;
 import com.info.web.util.PageConfig;
 import org.apache.commons.lang3.StringUtils;
@@ -55,15 +54,45 @@ public class CompanyIpAddressService implements ICompanyIpAddressService {
     public JsonResult updateIpById(CompanyIpAddressDto companyIpAddress) {
         JsonResult result = new JsonResult("-1", "更新公司ip白名单失败");
         try {
+            String companyId = companyIpAddress.getCompanyId();
+            String ipAddress = companyIpAddress.getIpAddress();
+            // 校验用户输入信息的合法性
+            if (checkUserInput(companyId, ipAddress, result)) {
+                return result;
+            }
             int i = companyIpAddressDao.updateIpById(companyIpAddress);
             if (i > 0) {
                 result.setCode("0");
                 result.setMsg("更新成功！");
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
         return result;
+    }
+
+    /**
+     * 校验用户输入信息的合法性
+     *
+     * @param companyId
+     * @param ipAddress
+     * @param result
+     * @return
+     */
+    private boolean checkUserInput(String companyId, String ipAddress, JsonResult result) {
+        Matcher m = ipAddressPattern.matcher(ipAddress);
+        if (!m.matches()) {
+            result.setCode("-1");
+            result.setMsg("ip地址不合法，请重新添加！");
+            return true;
+        }
+        if (StringUtils.isEmpty(companyId)) {
+            result.setCode("-1");
+            result.setMsg("公司错误，请重新选择！");
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -73,15 +102,8 @@ public class CompanyIpAddressService implements ICompanyIpAddressService {
             CompanyIpAddressDto companyIpAddressDto = new CompanyIpAddressDto();
             String companyId = params.get("companyId") == null ? "" : params.get("companyId").toString();
             String ipAddress = params.get("ipAddress") == null ? "" : params.get("ipAddress").toString();
-            Matcher m = ipAddressPattern.matcher(ipAddress);
-            if (!m.matches()) {
-                result.setCode("-1");
-                result.setMsg("ip地址不合法，请重新添加！");
-                return result;
-            }
-            if (StringUtils.isEmpty(companyId)) {
-                result.setCode("-1");
-                result.setMsg("公司错误，请重新选择！");
+            // 校验用户输入信息的合法性
+            if (checkUserInput(companyId, ipAddress, result)) {
                 return result;
             }
             companyIpAddressDto.setCompanyId(companyId);
