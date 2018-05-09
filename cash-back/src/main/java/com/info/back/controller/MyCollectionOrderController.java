@@ -435,8 +435,7 @@ public class MyCollectionOrderController extends BaseController {
      * @return
      */
     @RequestMapping("toxianqin")
-    public String toxianqin(HttpServletRequest request,
-                            HttpServletResponse response, String orderId, Model model) {
+    public String toxianqin(HttpServletRequest request, Model model) {
         HashMap<String, Object> params = this.getParametersO(request);
         String url = "mycollectionorder/toApplyCsDetail";
         try {
@@ -447,7 +446,7 @@ public class MyCollectionOrderController extends BaseController {
                 MmanLoanCollectionOrder mmanLoanCollectionOrderOri = mmanLoanCollectionOrderService.getOrderById(params.get("id").toString());
                 if (mmanLoanCollectionOrderOri != null) {
                     MmanUserLoan userLoan = mmanUserLoanService.get(mmanLoanCollectionOrderOri.getLoanId());
-                    if (userLoan.getPaidMoney().compareTo(BigDecimal.ZERO) <= 0){
+                    if (userLoan.getPaidMoney().compareTo(BigDecimal.ZERO) <= 0) {
                         userLoan.setServiceCharge(BigDecimal.ZERO);
                     }
                     model.addAttribute("userLoan", userLoan);
@@ -582,7 +581,7 @@ public class MyCollectionOrderController extends BaseController {
                 CreditLoanPay creditLoanPay = creditLoanPayService.get(mmanLoanCollectionOrderOri.getPayId());
                 BigDecimal totalPayMonery = creditLoanPay.getReceivablePrinciple().add(
                         creditLoanPay.getReceivableInterest()).add(creditLoanPay.getRemainAccrual() == null ? BigDecimal.ZERO : creditLoanPay.getRemainAccrual());
-                model.addAttribute("totalPayMonery",totalPayMonery);
+                model.addAttribute("totalPayMonery", totalPayMonery);
 
                 // 大额代扣跳转到一个专门的页面
                 MmanUserLoan loan = mmanUserLoanService.get(mmanLoanCollectionOrderOri.getLoanId());
