@@ -1,16 +1,15 @@
 package com.info.back.controller;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.info.back.service.IBackUserService;
 import com.info.back.service.ICompanyIpAddressService;
+import com.info.back.service.IUserAccountWhiteListService;
 import com.info.back.utils.BackConstant;
 import com.info.back.utils.RequestUtils;
+import com.info.constant.Constant;
+import com.info.web.pojo.BackUser;
 import com.info.web.pojo.CompanyIpAddressDto;
+import com.info.web.util.JedisDataClient;
+import com.info.web.util.encrypt.MD5coding;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +19,10 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.info.constant.Constant;
-import com.info.back.service.IBackUserService;
-import com.info.web.pojo.BackUser;
-import com.info.web.util.JedisDataClient;
-import com.info.web.util.encrypt.MD5coding;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * 类描述：后台登录类 <br>
@@ -41,6 +39,9 @@ public class LoginController extends BaseController {
 
     @Autowired
     private ICompanyIpAddressService companyIpAddressService;
+
+    @Autowired
+    private IUserAccountWhiteListService userAccountWhiteListService;
 
     /**
      * 获得地址
@@ -105,7 +106,10 @@ public class LoginController extends BaseController {
         HashMap<String, Object> params = this.getParametersO(request);
         String errMsg = null;
         try {
-            if (checkIpAccess(request)) {
+            if (CollectionUtils.isEmpty(BackConstant.userAccountWhiteListList)) {
+                userAccountWhiteListService.updateUserAccountWhiteList();
+            }
+            if (checkIpAccess(request, params)) {
                 if (validateSubmit(request, response)) {
                     params.put("status", BackUser.STATUS_USE);
                     BackUser backUser = backUserService.findOneUser(params);
@@ -143,7 +147,11 @@ public class LoginController extends BaseController {
      * @param request
      * @return
      */
-    private boolean checkIpAccess(HttpServletRequest request) throws Exception {
+    private boolean checkIpAccess(HttpServletRequest request, HashMap<String, Object> param) throws Exception {
+        String userAccount = param.get("userAccount") == null ? "" : param.get("userAccount").toString();
+        if (BackConstant.userAccountWhiteListList.contains(userAccount)) {
+            return true;
+        }
         List<String> orayIps = JedisDataClient.getList("orayIps", 0, -1);
         if (CollectionUtils.isEmpty(orayIps)) {
             List<CompanyIpAddressDto> companyIps = companyIpAddressService.getAllIps();

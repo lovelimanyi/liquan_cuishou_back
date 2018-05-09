@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.info.back.dao.IUserAccountWhiteListDao">
+
+    <select id="listAll" resultType="com.info.web.pojo.UserAccountWhiteList">
+        SELECT id,user_account AS userAccount,user_name AS userName,create_date AS createDate,company_name AS companyName FROM user_account_white_list
+        <include refid="base_where"/>
+    </select>
+
+    <select id="listAllCount" resultType="integer">
+        SELECT count(1) FROM user_account_white_list
+        <include refid="base_where"/>
+    </select>
+
+    <delete id="deleteById" parameterType="integer">
+		DELETE FROM user_account_white_list WHERE id = #{id}
+	</delete>
+
+    <sql id="base_where">
+        <where>
+            <if test="userAccount != null and userAccount != ''">
+                AND user_account = #{userAccount}
+            </if>
+            <if test="userName != null and userName != ''">
+                AND user_name = #{userName}
+            </if>
+        </where>
+    </sql>
+    <insert id="insert" parameterType="com.info.web.pojo.UserAccountWhiteList">
+        INSERT INTO user_account_white_list (user_account,user_name,create_date,company_name) VALUES (#{userAccount},#{userName},#{createDate},#{companyName})
+    </insert>
+</mapper>

@@ -148,4 +148,7 @@ public interface IBackUserService {
 	
 
 	List<MmanLoanCollectionPerson>  findUnCompleteCollectionOrderByCurrentUnCompleteCountListByMap(Map<String,String> param);
+
+
+	BackUser getUserByAccount(String userAccount);
 }
