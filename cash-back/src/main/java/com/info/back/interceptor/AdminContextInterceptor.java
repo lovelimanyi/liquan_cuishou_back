@@ -3,14 +3,17 @@ package com.info.back.interceptor;
 import com.info.back.service.IBackModuleService;
 import com.info.back.service.IBackUserService;
 import com.info.back.service.ICollectionCompanyService;
+import com.info.back.service.ICompanyIpAddressService;
 import com.info.back.utils.RequestUtils;
 import com.info.constant.Constant;
 import com.info.web.pojo.BackUser;
+import com.info.web.pojo.CompanyIpAddressDto;
 import com.info.web.pojo.MmanLoanCollectionCompany;
 import com.info.web.util.JedisDataClient;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import org.springframework.web.util.UrlPathHelper;
@@ -34,7 +37,7 @@ public class AdminContextInterceptor extends HandlerInterceptorAdapter {
     @Autowired
     IBackModuleService backModuleService;
     @Autowired
-    private ICollectionCompanyService collectionCompanyService;
+    private ICompanyIpAddressService companyIpAddressService;
 
     @SuppressWarnings("unused")
     @Override
@@ -45,11 +48,6 @@ public class AdminContextInterceptor extends HandlerInterceptorAdapter {
             // 正常状态
             user = (BackUser) request.getSession().getAttribute(Constant.BACK_USER);
             String uri = getURI(request);
-
-            //ip限制
-//            if (!this.getLoginFlag(request)) {
-//                request.getSession().removeAttribute(Constant.BACK_USER);
-//            }
 
             // 不在验证的范围内
             if (exclude(uri)) {
@@ -208,40 +206,6 @@ public class AdminContextInterceptor extends HandlerInterceptorAdapter {
                     "admin access path not like '/back/...' pattern: " + uri);
         }
         return uri.substring(start);
-    }
-
-    /**
-     * 判断请求过来的ip是否在允许的范围内
-     *
-     * @param request
-     * @return
-     * @throws Exception
-     */
-    public boolean getLoginFlag(HttpServletRequest request) throws Exception {
-//        clientIp = "180.175.163.201";
-        List<String> orayIps = JedisDataClient.getList("orayIps", 0, -1);
-        if (orayIps == null || orayIps.size() == 0) {
-            List<MmanLoanCollectionCompany> companyIps = collectionCompanyService.getCompanyIps();
-            for (MmanLoanCollectionCompany company : companyIps) {
-                String CompanyIps = company.getCompanyAddress();
-                if (StringUtils.isNotEmpty(CompanyIps)) {
-                    List<String> ips = Arrays.asList(CompanyIps.split(","));
-                    orayIps.addAll(ips);
-                }
-            }
-
-            JedisDataClient.setList("orayIps", orayIps, 60 * 60);
-        }
-
-        String clientIp = RequestUtils.getClientIpAddr(request);
-        if (clientIp == null || orayIps == null) {
-            request.getSession().removeAttribute(Constant.BACK_USER);
-        }
-        boolean loginFlag = false;
-        if (orayIps.contains(clientIp)) {
-            loginFlag = true; // 在花生壳范围内可以登录
-        }
-        return loginFlag;
     }
 
 

@@ -2,10 +2,15 @@ package com.info.back.controller;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.alibaba.fastjson.JSON;
+import jdk.nashorn.internal.runtime.ECMAException;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +33,7 @@ import com.info.web.pojo.BackUserCompanyPermissions;
 import com.info.web.pojo.MmanLoanCollectionCompany;
 import com.info.web.util.PageConfig;
 import com.info.web.util.encrypt.MD5coding;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping("user/")
@@ -263,10 +269,8 @@ public class UserController extends BaseController {
     }
 
 
-
     @RequestMapping("updateUserName")
-    public String updateUserName(HttpServletRequest request,
-                                 HttpServletResponse response, Model model){
+    public String updateUserName(HttpServletRequest request) {
         HashMap<String, Object> params = this.getParametersO(request);
         String url;
         try {
@@ -275,12 +279,29 @@ public class UserController extends BaseController {
             } else {
 
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
         System.out.println("");
-        return  null;
+        return null;
 
+    }
+
+
+    @RequestMapping("/getUserByAccount")
+    @ResponseBody
+    public String getUser(@Param("userAccount") String userAccount) {
+        BackUser user = null;
+        Map<String, Object> map = new HashMap<>();
+        try {
+            user = backUserService.getUserByAccount(userAccount);
+            map.put("userAccount", user.getUserAccount());
+            map.put("userName", user.getUserName());
+            map.put("companyId", user.getCompanyId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return JSON.toJSONString(map);
     }
 }

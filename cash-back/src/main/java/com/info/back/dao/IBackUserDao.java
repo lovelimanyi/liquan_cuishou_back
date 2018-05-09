@@ -164,4 +164,6 @@ public interface IBackUserDao {
      */
     void disableOrEnableCollections(HashMap<String, Object> params);
 
+    BackUser getUserByAccount(String userAccount);
+
 }

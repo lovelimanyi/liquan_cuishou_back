@@ -289,4 +289,9 @@ public class BackUserService implements IBackUserService {
 		return list1;
 		
 	}
+
+	@Override
+	public BackUser getUserByAccount(String userAccount) {
+		return backUserDao.getUserByAccount(userAccount);
+	}
 }
