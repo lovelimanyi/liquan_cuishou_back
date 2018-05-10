@@ -66,8 +66,6 @@
 							<td>
 								<c:if test="${MmanUserRela.contactsKey eq '1' }">直系亲属联系人</c:if>
 								<c:if test="${MmanUserRela.contactsKey eq '2' }">其他联系人</c:if>
-								<c:if test="${MmanUserRela.contactsKey eq '3' }">第一联系人</c:if>
-								<c:if test="${MmanUserRela.contactsKey eq '4' }">第二联系人</c:if>
 							</td>
 							<td>
 								<c:if test="${MmanUserRela.contactsKey eq '1' }">
