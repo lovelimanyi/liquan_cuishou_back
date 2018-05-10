@@ -270,45 +270,6 @@
         </fieldset>
         <!-- 个人信息 -->
         <fieldset>
-            <legend>联系人信息</legend>
-            <table class="detailB" width="100%">
-                <tr>
-                    <th align="center">联系人类型</th>
-                    <th align="center">与借款人关系</th>
-                    <th align="center">姓名</th>
-                    <th align="center">手机号</th>
-                </tr>
-                <tr>
-                    <td>第一联系人</td>
-                    <td>
-                        <c:choose>
-                            <c:when test="${userInfo.fristContactRelation eq 1 }">父亲</c:when>
-                            <c:when test="${userInfo.fristContactRelation eq 2 }">母亲</c:when>
-                            <c:when test="${userInfo.fristContactRelation eq 3 }">儿子</c:when>
-                            <c:when test="${userInfo.fristContactRelation eq 4 }">女儿</c:when>
-                            <c:when test="${userInfo.fristContactRelation eq 5 }">催收中</c:when>
-                            <c:when test="${userInfo.fristContactRelation eq 1 }">配偶</c:when>
-                        </c:choose>
-                    </td>
-                    <td>${userInfo.firstContactName}</td>
-                    <td>${userInfo.firstContactPhone}</td>
-                </tr>
-                <tr>
-                    <td>第二联系人</td>
-                    <td>
-                        <c:choose>
-                            <c:when test="${userInfo.secondContactRelation eq 1 }">父亲</c:when>
-                            <c:when test="${userInfo.secondContactRelation eq 2 }">母亲</c:when>
-                            <c:when test="${userInfo.secondContactRelation eq 3 }">儿子</c:when>
-                            <c:when test="${userInfo.secondContactRelation eq 4 }">女儿</c:when>
-                            <c:when test="${userInfo.secondContactRelation eq 5 }">催收中</c:when>
-                            <c:when test="${userInfo.secondContactRelation eq 1 }">配偶</c:when>
-                        </c:choose>
-                    </td>
-                    <td>${userInfo.secondContactName}</td>
-                    <td>${userInfo.secondContactPhone}</td>
-                </tr>
-            </table>
             <legend>还款详情</legend>
             <table class="detailB" width="100%">
                 <tr>
