@@ -559,11 +559,13 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
                         return;
                     }
                 } else {
+                    /*
                     Calendar cal = Calendar.getInstance();
                     cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), 2);
                     Date date = cal.getTime();
                     personMap.put("beginDispatchTime", DateUtil.getDateFormat(date, "yyyy-MM-dd 00:00:00"));
                     personMap.put("endDispatchTime", DateUtil.getDateFormat((DateUtil.getBeforeOrAfter(new Date(), 1)), "yyyy-MM-dd HH:mm:ss"));
+                    */
                     personMap.put("groupLevel", BackConstant.XJX_OVERDUE_LEVEL_S1_OR_S2);
                     personMap.put("userStatus", BackConstant.ON);
                     personList = backUserDao.findUnCompleteCollectionOrderByCurrentUnCompleteCountListByMap(personMap);
