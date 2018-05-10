@@ -13,10 +13,10 @@
      ww.`剩余应还本金(未)` AS 'remainPrincipal',
      ROUND((IFNULL(ww.`详情表实收本金和(未)`,0)+ IFNULL(yy.`详情表实收本金和`,0))/(ww.`剩余应还本金(未)`+IFNULL(ww.`详情表实收本金和(未)`,0)+ IFNULL(yy.`详情表实收本金和`,0))*100,2) AS 'repaymentProbability',
 
-     (ww.`剩余应还滞纳金(未)`+IFNULL(ww.`详情表实际还款滞纳金(未)`,0)+IFNULL(yy.`总滞纳金`,0)) AS'totalPenalty',
-     (IFNULL(ww.`详情表实际还款滞纳金(未)`,0)+ IFNULL(yy.`实际还款滞纳金`,0) ) AS'realgetTotalPenalty',
-     ww.`剩余应还滞纳金(未)` AS'remainPenalty',
-     ROUND((IFNULL(ww.`详情表实际还款滞纳金(未)`,0)+ IFNULL(yy.`实际还款滞纳金`,0))/(ww.`剩余应还滞纳金(未)`+IFNULL(ww.`详情表实际还款滞纳金(未)`,0)+IFNULL(yy.`总滞纳金`,0))*100,2) AS 'penaltyProbability',
+     IFNULL(yy.`总滞纳金`,0) AS'totalPenalty',
+     (IFNULL(yy.`实际还款滞纳金`,0)+ IFNULL(yy.`不计入考核的减免滞纳金`,0)) AS'realgetTotalPenalty',
+     IFNULL(ww.`剩余应还滞纳金(未)`,0) AS'remainPenalty', 
+     IFNULL(ROUND((IFNULL(yy.`实际还款滞纳金`,0)+ IFNULL(yy.`不计入考核的减免滞纳金`,0))/IFNULL(yy.`总滞纳金`,0)*100,2),0) AS 'penaltyProbability',
 
      (IFNULL(yy.doneCount,0)+IFNULL(ww.`还款未完成个数`,0))AS 'totalOrderCount',
      IFNULL(yy.doneCount,0)AS'doneOrderCount',
