@@ -75,7 +75,7 @@ public class MmanUserRelaController extends BaseController {
 						MmanUserRela mmanUserRelaOne = new MmanUserRela();
 						mmanUserRelaOne.setUserId(order.getUserId());
 						mmanUserRelaOne.setRealName(userInfo.getRealname());
-						mmanUserRelaOne.setContactsKey(userInfo.getFristContactRelation().toString());
+						mmanUserRelaOne.setContactsKey("3");
 						mmanUserRelaOne.setRelaKey(userInfo.getFristContactRelation().toString());
 						mmanUserRelaOne.setInfoName(userInfo.getFirstContactName());
 						mmanUserRelaOne.setInfoValue(userInfo.getFirstContactPhone());
@@ -84,7 +84,7 @@ public class MmanUserRelaController extends BaseController {
 
 						mmanUserRelaTwo.setRealName(userInfo.getRealname());
 						mmanUserRelaTwo.setUserId(order.getUserId());
-						mmanUserRelaTwo.setContactsKey(userInfo.getSecondContactRelation().toString());
+						mmanUserRelaTwo.setContactsKey("4");
 						mmanUserRelaTwo.setRelaKey(userInfo.getSecondContactRelation().toString());
 						mmanUserRelaTwo.setInfoName(userInfo.getSecondContactName());
 						mmanUserRelaTwo.setInfoValue(userInfo.getSecondContactPhone());
