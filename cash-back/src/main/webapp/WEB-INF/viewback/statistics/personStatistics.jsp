@@ -110,24 +110,24 @@
                     本金催回率
                 </th>
                 <th align="center" width="100">
-                    滞纳金金额
+                    完成订单总滞纳金
+                </th>
+                <th align="center" width="120">
+                    完成订单实收滞纳金
                 </th>
                 <th align="center" width="100">
-                    已还滞纳金
-                </th>
-                <th align="center" width="100">
-                    未还滞纳金
+                    总订单未还滞纳金
                 </th>
                 <th align="center" width="100">
                     滞纳金催回率
                 </th>
-                <th align="center" width="100">
+                <th align="center" width="70">
                     订单量
                 </th>
-                <th align="center" width="100">
+                <th align="center" width="90">
                     已还订单量
                 </th>
-                <th align="center" width="100">
+                <th align="center" width="90">
                     未还订单量
                 </th>
                 <th align="center" width="100">
