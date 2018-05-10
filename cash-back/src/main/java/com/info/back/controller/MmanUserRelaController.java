@@ -1,9 +1,11 @@
 package com.info.back.controller;
 
 import com.info.back.service.IMmanLoanCollectionOrderService;
+import com.info.back.service.IMmanUserInfoService;
 import com.info.back.service.IMmanUserRelaService;
 import com.info.back.utils.BackConstant;
 import com.info.web.pojo.MmanLoanCollectionOrder;
+import com.info.web.pojo.MmanUserInfo;
 import com.info.web.pojo.MmanUserRela;
 import com.info.web.util.PageConfig;
 import org.apache.log4j.Logger;
@@ -24,6 +26,8 @@ public class MmanUserRelaController extends BaseController {
 
 	@Autowired
 	private IMmanUserRelaService mmanUserRelaService;
+	@Autowired
+	private IMmanUserInfoService mmanUserInfoService;
 
 	@Autowired
 	private IMmanLoanCollectionOrderService mmanLoanCollectionOrderService;
@@ -43,9 +47,9 @@ public class MmanUserRelaController extends BaseController {
 				if(!BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())){
 					if(overdueDays <= 0){
 //						erroMsg = "逾期2天方可申请查看通讯录";
-						params.put("num",10);
-						List<MmanUserRela> list = mmanUserRelaService.getList(params);
-						model.addAttribute("list", list);
+//						params.put("num",10);
+//						List<MmanUserRela> list = mmanUserRelaService.getList(params);
+//						model.addAttribute("list", list);
 					}
 					// 暂时调整，大于3天可以查看所有的通讯录
 //					else if(overdueDays >= 2 && overdueDays <= 3){
@@ -63,7 +67,30 @@ public class MmanUserRelaController extends BaseController {
 //						model.addAttribute("list", list);
 //					}
 					else{
+						MmanUserInfo userInfo = mmanUserInfoService.getUserInfoById(order.getUserId());
+
+
 						PageConfig<MmanUserRela> pageConfig = mmanUserRelaService.findPage(params);
+						List<MmanUserRela> mmanUserRelaList = pageConfig.getItems();
+						MmanUserRela mmanUserRelaOne = new MmanUserRela();
+						mmanUserRelaOne.setUserId(order.getUserId());
+						mmanUserRelaOne.setRealName(userInfo.getRealname());
+						mmanUserRelaOne.setContactsKey(userInfo.getFristContactRelation().toString());
+						mmanUserRelaOne.setRelaKey(userInfo.getFristContactRelation().toString());
+						mmanUserRelaOne.setInfoName(userInfo.getFirstContactName());
+						mmanUserRelaOne.setInfoValue(userInfo.getFirstContactPhone());
+						MmanUserRela mmanUserRelaTwo = new MmanUserRela();
+
+
+						mmanUserRelaTwo.setRealName(userInfo.getRealname());
+						mmanUserRelaTwo.setUserId(order.getUserId());
+						mmanUserRelaTwo.setContactsKey(userInfo.getSecondContactRelation().toString());
+						mmanUserRelaTwo.setRelaKey(userInfo.getSecondContactRelation().toString());
+						mmanUserRelaTwo.setInfoName(userInfo.getSecondContactName());
+						mmanUserRelaTwo.setInfoValue(userInfo.getSecondContactPhone());
+						mmanUserRelaList.add(0,mmanUserRelaOne);
+						mmanUserRelaList.add(1,mmanUserRelaTwo);
+
 						model.addAttribute("pm", pageConfig);
 					}
 				}else {

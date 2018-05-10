@@ -278,6 +278,10 @@ public class MyCollectionOrderController extends BaseController {
                 if (list.length > 1) {
                     userRelaId = list[0];
                     orderId = list[1];
+                   String infoName = list[2];
+                   String infoVlue = list[3];
+                    params.put("infoVlue", infoVlue);
+                    params.put("infoName", infoName);
 //                    logger.error("CollectionRecordAndAdvice-userRelaId=" + list[0]);
 //                    logger.error("CollectionRecordAndAdvice-orderId=" + list[1]);
                 } else {
