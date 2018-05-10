@@ -109,7 +109,8 @@
 								<option value="母亲">母亲</option>	
 								<option value="亲人">亲人</option>	
 								<option value="朋友">朋友</option>	
-								<option value="同事">同事</option>	
+								<option value="同事">同事</option>
+								<option value="本人">本人</option>
 								<option value="其它">其它</option>	
 							</select>
 						</dd>

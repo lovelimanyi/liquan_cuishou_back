@@ -56,7 +56,7 @@
 				<c:if test="${not empty pm.items }">
 					<tbody>
 					<c:forEach var="MmanUserRela" items="${pm.items }" varStatus="status">
-						<tr target="id" rel="${MmanUserRela.id },${orderId }">
+						<tr target="id" rel="${MmanUserRela.id },${orderId },${MmanUserRela.infoName },${MmanUserRela.infoValue }">
 							<td>
 								${status.index+1}
 							</td>

@@ -68,10 +68,7 @@
 		SELECT count(1) from mman_user_rela ur
 		LEFT JOIN mman_user_info ui
 		ON ur.user_id=ui.id
-		<where>
-			1=1
-		  	and ui.id =#{userId}
-		</where>
+		WHERE ui.id =#{userId}
 		ORDER BY  ur.call_cnt desc
 	</select>
 	<select id="findAll" resultType="com.info.web.pojo.MmanUserRela" parameterType="HashMap">
@@ -81,10 +78,8 @@
 		FROM  mman_user_rela ur
 		LEFT JOIN mman_user_info ui
 		ON ur.user_id=ui.id
-		<where>
-			1=1 
-			and ui.id =#{userId}
-		</where>
+	    WHERE ui.id =#{userId}
+		GROUP BY  ur.info_value
 		ORDER BY  ur.call_cnt desc
 	</select>
 	<!-- 自己 -->
