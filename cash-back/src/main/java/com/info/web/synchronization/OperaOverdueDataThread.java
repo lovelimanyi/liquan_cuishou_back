@@ -88,6 +88,9 @@ public class OperaOverdueDataThread implements Runnable {
 						}
 						this.orderService.dispatchOrderNew(loanId,userInfo.get("id_number").toString(),Constant.SMALL);
 //						this.taskJobMiddleService.dispatchforLoanId(loanId,userInfo.get("id_number").toString(),Constant.SMALL);
+						if (repaymentDetailList != null && repaymentDetailList.size()>0){
+							syncUtils.updateMmanLoanCollectionOrder(localDataDao,loanId,repayment,Constant.STATUS_OVERDUE_ONE);
+						}
 						RedisUtil.delRedisKey(Constant.TYPE_OVERDUE_ + payId);
 					} else {
 						loger.info("loanId:"+loanId);
