@@ -590,16 +590,16 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
     @Override
     @Transactional
     public JsonResult xjxWithholding(Map<String, String> params) {
-        MmanLoanCollectionOrder mmanLoanCollectionOrderOri = mmanLoanCollectionOrderService.getOrderById(params.get("id").toString());//原催收订单
+        MmanLoanCollectionOrder order = mmanLoanCollectionOrderService.getOrderById(params.get("id").toString());//原催收订单
         JsonResult reslut = new JsonResult("-1", "申请代扣款失败");
         try {
-            if (mmanLoanCollectionOrderOri != null) {
+            if (order == null) {
                 reslut.setMsg("该订单不存在");
                 return reslut;
             }
             CollectionWithholdingRecord record = collectionWithholdingRecordDao.getLatestWithholdRecord(params.get("operationUserId").toString());
-            if (BackConstant.XJX_COLLECTION_ORDER_STATE_PAYING.equals(mmanLoanCollectionOrderOri.getStatus()) || BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals
-                    (mmanLoanCollectionOrderOri.getStatus())) {
+            if (BackConstant.XJX_COLLECTION_ORDER_STATE_PAYING.equals(order.getStatus()) || BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals
+                    (order.getStatus())) {
                 reslut.setMsg("续期订单或催收完成订单不允许代扣！！");
                 return reslut;
             }
@@ -609,7 +609,7 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
                 return reslut;
             }
 
-            CreditLoanPay creditLoanPay = creditLoanPayService.get(mmanLoanCollectionOrderOri.getPayId());
+            CreditLoanPay creditLoanPay = creditLoanPayService.get(order.getPayId());
             String payMonery = params.get("payMoney");//扣款金额
             BigDecimal koPayMonery;
             // 剩余应还利息
@@ -620,8 +620,12 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
             } else {
                 koPayMonery = new BigDecimal(params.get("payMoney"));
             }
-            if (CompareUtils.greaterEquals(koPayMonery, maxpayMonery)) {
-                reslut.setMsg("代扣金额不能大于" + creditLoanPay.getReceivablePrinciple().add(creditLoanPay.getReceivableInterest()).add(creditLoanPay.getRemainAccrual()));
+            if (!CompareUtils.greaterEquals(maxpayMonery, koPayMonery)) {
+                reslut.setMsg("本次代扣金额不能大于" + maxpayMonery);
+                return reslut;
+            }
+            if (BackConstant.WITHHELD_LOWER_LIMIT_AMOUNT.compareTo(koPayMonery) > 0) {
+                reslut.setMsg("代扣金额最少不能低于50元！");
                 return reslut;
             }
 
@@ -645,7 +649,7 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
             }
 
             // 判断该笔订单是否有还款中待处理的数据(redis中是否存在对应key)
-            String payId = mmanLoanCollectionOrderOri.getPayId();
+            String payId = order.getPayId();
             String overdueKeys = JedisDataClient.get(Constant.TYPE_OVERDUE_ + payId);
             String repayKeys = JedisDataClient.get(Constant.TYPE_REPAY_ + payId);
             if (StringUtils.isNotEmpty(overdueKeys) || StringUtils.isNotEmpty(repayKeys)) {
@@ -656,27 +660,27 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
 
             long actualPayMonery = koPayMonery.multiply(new BigDecimal(100)).longValue();
             String uuid = IdGen.uuid();
-            String sign = MD5coding.MD5(AESUtil.encrypt(mmanLoanCollectionOrderOri.getUserId() + mmanLoanCollectionOrderOri.getPayId() + actualPayMonery + uuid, PayContents.XJX_WITHHOLDING_NOTIFY_KEY));
+            String sign = MD5coding.MD5(AESUtil.encrypt(order.getUserId() + order.getPayId() + actualPayMonery + uuid, PayContents.XJX_WITHHOLDING_NOTIFY_KEY));
 
             String withholdChannel = getWithholdChannel();
             // 根据渠道区分代扣请求发送地方
             if (BackConstant.CUISHOU_WITHHOLD_CHANNEL_PAYMENTCENTER.equals(withholdChannel)) {
                 logger.info("订单: " + params.get("id").toString() + " 通过支付中心发起代扣...");
-                sendMqMsg(params, mmanLoanCollectionOrderOri, actualPayMonery, uuid, sign);
+                sendMqMsg(params, order, actualPayMonery, uuid, sign);
 
                 //插入一条代扣记录
-                saveWithholdRecord(params, mmanLoanCollectionOrderOri, creditLoanPay, payMonery, uuid);
+                saveWithholdRecord(params, order, creditLoanPay, payMonery, uuid);
                 reslut.setCode("0");
                 reslut.setMsg("代扣请求发送成功，请5分钟后查看处理结果！");
             } else {
                 logger.info("订单: " + params.get("id").toString() + " 通过请求现金侠后台发起代扣...");
                 //2、发送请求
-                String withholdPostUrl = PayContents.XJX_WITHHOLDING_NOTIFY_URL + "/" + mmanLoanCollectionOrderOri.getUserId() + "/" + mmanLoanCollectionOrderOri.getPayId() + "/" + actualPayMonery + "/" + uuid + "/" + sign;
+                String withholdPostUrl = PayContents.XJX_WITHHOLDING_NOTIFY_URL + "/" + order.getUserId() + "/" + order.getPayId() + "/" + actualPayMonery + "/" + uuid + "/" + sign;
                 logger.error("现金侠代扣请求地址：" + withholdPostUrl);
                 String xjxWithholdingStr = HttpUtil.getHttpMess(withholdPostUrl, "", "POST", "UTF-8");
                 //3、解析响应结果封装到Java Bean
                 if (xjxWithholdingStr != null && !"".equals(xjxWithholdingStr)) {
-                    dealwithJsonResult(params, mmanLoanCollectionOrderOri, reslut, creditLoanPay, payMonery, uuid, xjxWithholdingStr);
+                    dealwithJsonResult(params, order, reslut, creditLoanPay, payMonery, uuid, xjxWithholdingStr);
                 }
             }
         } catch (Exception e) {

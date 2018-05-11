@@ -345,6 +345,12 @@
                 <environment>test</environment>
             </properties>
         </profile>
+        <profile>
+            <id>uat</id>
+            <properties>
+                <environment>uat</environment>
+            </properties>
+        </profile>
     </profiles>
 
     <build>
