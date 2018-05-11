@@ -278,8 +278,8 @@ public class MyCollectionOrderController extends BaseController {
                 if (list.length > 1) {
                     userRelaId = list[0];
                     orderId = list[1];
-                   String infoName = list[2];
-                   String infoVlue = list[3];
+                    String infoName = list[2];
+                    String infoVlue = list[3];
                     params.put("infoVlue", infoVlue);
                     params.put("infoName", infoName);
 //                    logger.error("CollectionRecordAndAdvice-userRelaId=" + list[0]);
@@ -288,12 +288,14 @@ public class MyCollectionOrderController extends BaseController {
                     logger.error("前台参数异常，list = " + list);
                 }
                 //根据userRelaId查询联系人
-                MmanUserRela userRela = mmanUserRelaService.getUserRealByUserId(userRelaId);
-                if (userRela != null) {
-                    params.put("infoVlue", userRela.getInfoValue());
-                    params.put("infoName", userRela.getInfoName());
-                } else {
-                    logger.error("userRela is null,userRelaId = " + userRelaId);
+                if (StringUtils.isNotEmpty(userRelaId)) {
+                    MmanUserRela userRela = mmanUserRelaService.getUserRealByUserId(userRelaId);
+                    if (userRela != null) {
+                        params.put("infoVlue", userRela.getInfoValue());
+                        params.put("infoName", userRela.getInfoName());
+                    } else {
+                        logger.error("userRela is null,userRelaId = " + userRelaId);
+                    }
                 }
             } else {
                 //根据orderId查询订单
@@ -583,8 +585,13 @@ public class MyCollectionOrderController extends BaseController {
             MmanLoanCollectionOrder mmanLoanCollectionOrderOri = mmanLoanCollectionOrderService.getOrderById(loanId);
             if (mmanLoanCollectionOrderOri != null) {
                 CreditLoanPay creditLoanPay = creditLoanPayService.get(mmanLoanCollectionOrderOri.getPayId());
-                BigDecimal totalPayMonery = creditLoanPay.getReceivablePrinciple().add(
-                        creditLoanPay.getReceivableInterest()).add(creditLoanPay.getRemainAccrual() == null ? BigDecimal.ZERO : creditLoanPay.getRemainAccrual());
+                // 剩余应还本金和剩余应还服务费之和（小额）
+                BigDecimal remainPrinciple = creditLoanPay.getReceivablePrinciple();
+                // 剩余应还罚息
+                BigDecimal remainInterest = creditLoanPay.getReceivableInterest();
+                // 剩余应还利息
+                BigDecimal remainAccrual = creditLoanPay.getRemainAccrual() == null ? BigDecimal.ZERO : creditLoanPay.getRemainAccrual();
+                BigDecimal totalPayMonery = remainPrinciple.add(remainInterest).add(remainAccrual);
                 model.addAttribute("totalPayMonery", totalPayMonery);
 
                 // 大额代扣跳转到一个专门的页面
@@ -643,7 +650,7 @@ public class MyCollectionOrderController extends BaseController {
     @ResponseBody
     public void dealWithholdResult(String text) {
         try {
-            logger.info("接收到代扣回调请求参数 " + text);
+            logger.info("接收到代扣回调请求参数(小额)： " + text);
             JSONObject obj = JSONObject.parseObject(text);
             String uuid = (String) obj.get("uuid");
             boolean code = (boolean) obj.get("result");
@@ -678,6 +685,7 @@ public class MyCollectionOrderController extends BaseController {
     public void updateWithholdResult(@RequestBody HashMap<String, Object> map) {
         try {
             JSONObject obj = JSONObject.parseObject(JSON.toJSONString(map));
+            logger.info("接收到代扣回调请求参数(大额)： " + JSON.toJSONString(obj));
             String uuid = (String) obj.get("uuid");
             boolean result = (boolean) obj.get("result");
             Object msg = obj.get("msg");
