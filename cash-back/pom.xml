@@ -323,9 +323,9 @@
     <profiles>
         <profile>
             <!-- 开发环境 -->
-            <id>dev</id>
+            <id>uat</id>
             <properties>
-                <environment>dev</environment><!-- 节点名字environment是自己随意取的 -->
+                <environment>uat</environment><!-- 节点名字environment是自己随意取的 -->
             </properties>
             <activation>
                 <activeByDefault>true</activeByDefault><!-- 默认激活该profile节点-->
@@ -343,12 +343,6 @@
             <id>test</id>
             <properties>
                 <environment>test</environment>
-            </properties>
-        </profile>
-        <profile>
-            <id>uat</id>
-            <properties>
-                <environment>uat</environment>
             </properties>
         </profile>
     </profiles>
