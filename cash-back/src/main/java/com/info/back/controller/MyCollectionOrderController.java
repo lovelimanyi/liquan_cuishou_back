@@ -113,21 +113,9 @@ public class MyCollectionOrderController extends BaseController {
         if (CompanyPermissionsList != null && CompanyPermissionsList.size() > 0) {// 指定公司的订单
             params.put("CompanyPermissionsList", CompanyPermissionsList);
         }
-        if (backUser.getRoleId() != null
-                && BackConstant.COLLECTION_ROLE_ID.toString().equals(
-                backUser.getRoleId())) {// 如果是催收员只能看自己的订单
-            params.put("roleUserId", backUser.getUuid());
-            // 催收员查属于自己的组
-            params.put("collectionGroup", backUser.getGroupLevel());
-        } else {
-            // 若组没有 ，则默认查询S1 组
-            if (null == params.get("collectionGroup")
-                    || StringUtils.isBlank(String.valueOf(params
-                    .get("collectionGroup")))) {
-                params.put("collectionGroup", "3");
-            }
 
-        }
+        checkPermission(params, backUser);
+
         params.put("source", BackConstant.OPERATION_RECORD_SOURCE_MY_ORDER);  // 操作來源 我的催收订单
         // 查询公司列表
         MmanLoanCollectionCompany mmanLoanCollectionCompany = new MmanLoanCollectionCompany();
@@ -183,16 +171,9 @@ public class MyCollectionOrderController extends BaseController {
             if (CompanyPermissionsList != null && CompanyPermissionsList.size() > 0) {// 指定公司的订单
                 params.put("CompanyPermissionsList", CompanyPermissionsList);
             }
-            if (backUser.getRoleId() != null && BackConstant.COLLECTION_ROLE_ID.toString().equals(backUser.getRoleId())) {// 如果是催收员只能看自己的订单
-                params.put("roleUserId", backUser.getUuid());
-                // 催收员查属于自己的组
-                params.put("collectionGroup", backUser.getGroupLevel());
-            } else {
-                // 若组没有 ，则默认查询S1 组
-                if (null == params.get("collectionGroup") || StringUtils.isBlank(String.valueOf(params.get("collectionGroup")))) {
-                    params.put("collectionGroup", "3");
-                }
-            }
+
+            checkPermission(params, backUser);
+
             int size = 50000;
             int total = 0;
             params.put(Constant.PAGE_SIZE, size);
@@ -258,14 +239,32 @@ public class MyCollectionOrderController extends BaseController {
     }
 
     /**
+     * 根据操作账号取货其对应的权限信息
+     *
+     * @param params
+     * @param backUser
+     */
+    private void checkPermission(HashMap<String, Object> params, BackUser backUser) {
+        if (backUser.getRoleId() != null && BackConstant.COLLECTION_ROLE_ID.toString().equals(backUser.getRoleId())) {// 如果是催收员只能看自己的订单
+            params.put("roleUserId", backUser.getUuid());
+            // 催收员查属于自己的组
+            params.put("collectionGroup", backUser.getGroupLevel());
+        } else {
+            // 若组没有 ，则默认查询S1 组
+            if (null == params.get("collectionGroup") || StringUtils.isBlank(String.valueOf(params.get("collectionGroup")))) {
+                params.put("collectionGroup", "3");
+            }
+        }
+    }
+
+    /**
      * 添加催记录和催收建议页面
      *
      * @param model
      * @return
      */
     @RequestMapping("toCollectionRecordAndAdvice")
-    public String toAddCollectionRecord(HttpServletRequest request,
-                                        HttpServletResponse response, Model model) {
+    public String toAddCollectionRecord(HttpServletRequest request, Model model) {
         HashMap<String, Object> params = this.getParametersO(request);
         String orderId = null;
         List<SysDict> statulist = null;
@@ -294,7 +293,7 @@ public class MyCollectionOrderController extends BaseController {
                         params.put("infoVlue", userRela.getInfoValue());
                         params.put("infoName", userRela.getInfoName());
                     } else {
-                        logger.error("userRela is null,userRelaId = " + userRelaId);
+//                        logger.error("userRela is null,userRelaId = " + userRelaId);
                     }
                 }
             } else {
@@ -351,8 +350,8 @@ public class MyCollectionOrderController extends BaseController {
         JsonResult result = new JsonResult("-1", "添加催收记录和催收建议失败");
         Map<String, String> params = this.getParameters(request);
         BackUser backUser = this.loginAdminUser(request);
-        MmanLoanCollectionOrder mmanLoanCollectionOrderOri = mmanLoanCollectionOrderService
-                .getOrderById(params.get("id").toString());
+//        MmanLoanCollectionOrder mmanLoanCollectionOrderOri = mmanLoanCollectionOrderService
+//                .getOrderById(params.get("id").toString());
         String recordId = IdGen.uuid();
         params.put("recordId", recordId);
 //		System.out.println("订单状态=【===========================】"+mmanLoanCollectionOrderOri.getStatus());
