@@ -26,11 +26,11 @@
                     </label>
                 </dt>
                 <dd>
-                    <input type="text" name="payMoney" readonly="readonly" maxlength="16" class="number" value="${totalPayMonery}">
+                    <input type="text" name="payMoney" maxlength="16" class="number" value="${totalPayMonery}">
                 </dd>
             </dl>
         </div>
-        <div><span style="color: #cd0a0a"><span style="color: #1b8d0f">温馨提示：</span>大额代扣暂时不支持部分扣款，部分扣款功能开发中...</span></div>
+        <%--<div><span style="color: #cd0a0a"><span style="color: #1b8d0f">温馨提示：</span>大额代扣暂时不支持部分扣款，部分扣款功能开发中...</span></div>--%>
         <div class="formBar">
             <ul>
                 <li>

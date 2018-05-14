@@ -113,21 +113,9 @@ public class MyCollectionOrderController extends BaseController {
         if (CompanyPermissionsList != null && CompanyPermissionsList.size() > 0) {// 指定公司的订单
             params.put("CompanyPermissionsList", CompanyPermissionsList);
         }
-        if (backUser.getRoleId() != null
-                && BackConstant.COLLECTION_ROLE_ID.toString().equals(
-                backUser.getRoleId())) {// 如果是催收员只能看自己的订单
-            params.put("roleUserId", backUser.getUuid());
-            // 催收员查属于自己的组
-            params.put("collectionGroup", backUser.getGroupLevel());
-        } else {
-            // 若组没有 ，则默认查询S1 组
-            if (null == params.get("collectionGroup")
-                    || StringUtils.isBlank(String.valueOf(params
-                    .get("collectionGroup")))) {
-                params.put("collectionGroup", "3");
-            }
 
-        }
+        checkPermission(params, backUser);
+
         params.put("source", BackConstant.OPERATION_RECORD_SOURCE_MY_ORDER);  // 操作來源 我的催收订单
         // 查询公司列表
         MmanLoanCollectionCompany mmanLoanCollectionCompany = new MmanLoanCollectionCompany();
@@ -183,16 +171,9 @@ public class MyCollectionOrderController extends BaseController {
             if (CompanyPermissionsList != null && CompanyPermissionsList.size() > 0) {// 指定公司的订单
                 params.put("CompanyPermissionsList", CompanyPermissionsList);
             }
-            if (backUser.getRoleId() != null && BackConstant.COLLECTION_ROLE_ID.toString().equals(backUser.getRoleId())) {// 如果是催收员只能看自己的订单
-                params.put("roleUserId", backUser.getUuid());
-                // 催收员查属于自己的组
-                params.put("collectionGroup", backUser.getGroupLevel());
-            } else {
-                // 若组没有 ，则默认查询S1 组
-                if (null == params.get("collectionGroup") || StringUtils.isBlank(String.valueOf(params.get("collectionGroup")))) {
-                    params.put("collectionGroup", "3");
-                }
-            }
+
+            checkPermission(params, backUser);
+
             int size = 50000;
             int total = 0;
             params.put(Constant.PAGE_SIZE, size);
@@ -258,14 +239,32 @@ public class MyCollectionOrderController extends BaseController {
     }
 
     /**
+     * 根据操作账号取货其对应的权限信息
+     *
+     * @param params
+     * @param backUser
+     */
+    private void checkPermission(HashMap<String, Object> params, BackUser backUser) {
+        if (backUser.getRoleId() != null && BackConstant.COLLECTION_ROLE_ID.toString().equals(backUser.getRoleId())) {// 如果是催收员只能看自己的订单
+            params.put("roleUserId", backUser.getUuid());
+            // 催收员查属于自己的组
+            params.put("collectionGroup", backUser.getGroupLevel());
+        } else {
+            // 若组没有 ，则默认查询S1 组
+            if (null == params.get("collectionGroup") || StringUtils.isBlank(String.valueOf(params.get("collectionGroup")))) {
+                params.put("collectionGroup", "3");
+            }
+        }
+    }
+
+    /**
      * 添加催记录和催收建议页面
      *
      * @param model
      * @return
      */
     @RequestMapping("toCollectionRecordAndAdvice")
-    public String toAddCollectionRecord(HttpServletRequest request,
-                                        HttpServletResponse response, Model model) {
+    public String toAddCollectionRecord(HttpServletRequest request, Model model) {
         HashMap<String, Object> params = this.getParametersO(request);
         String orderId = null;
         List<SysDict> statulist = null;
@@ -278,8 +277,8 @@ public class MyCollectionOrderController extends BaseController {
                 if (list.length > 1) {
                     userRelaId = list[0];
                     orderId = list[1];
-                   String infoName = list[2];
-                   String infoVlue = list[3];
+                    String infoName = list[2];
+                    String infoVlue = list[3];
                     params.put("infoVlue", infoVlue);
                     params.put("infoName", infoName);
 //                    logger.error("CollectionRecordAndAdvice-userRelaId=" + list[0]);
@@ -288,12 +287,14 @@ public class MyCollectionOrderController extends BaseController {
                     logger.error("前台参数异常，list = " + list);
                 }
                 //根据userRelaId查询联系人
-                MmanUserRela userRela = mmanUserRelaService.getUserRealByUserId(userRelaId);
-                if (userRela != null) {
-                    params.put("infoVlue", userRela.getInfoValue());
-                    params.put("infoName", userRela.getInfoName());
-                } else {
-                    logger.error("userRela is null,userRelaId = " + userRelaId);
+                if (StringUtils.isNotEmpty(userRelaId)) {
+                    MmanUserRela userRela = mmanUserRelaService.getUserRealByUserId(userRelaId);
+                    if (userRela != null) {
+                        params.put("infoVlue", userRela.getInfoValue());
+                        params.put("infoName", userRela.getInfoName());
+                    } else {
+//                        logger.error("userRela is null,userRelaId = " + userRelaId);
+                    }
                 }
             } else {
                 //根据orderId查询订单
@@ -349,8 +350,8 @@ public class MyCollectionOrderController extends BaseController {
         JsonResult result = new JsonResult("-1", "添加催收记录和催收建议失败");
         Map<String, String> params = this.getParameters(request);
         BackUser backUser = this.loginAdminUser(request);
-        MmanLoanCollectionOrder mmanLoanCollectionOrderOri = mmanLoanCollectionOrderService
-                .getOrderById(params.get("id").toString());
+//        MmanLoanCollectionOrder mmanLoanCollectionOrderOri = mmanLoanCollectionOrderService
+//                .getOrderById(params.get("id").toString());
         String recordId = IdGen.uuid();
         params.put("recordId", recordId);
 //		System.out.println("订单状态=【===========================】"+mmanLoanCollectionOrderOri.getStatus());
@@ -583,8 +584,13 @@ public class MyCollectionOrderController extends BaseController {
             MmanLoanCollectionOrder mmanLoanCollectionOrderOri = mmanLoanCollectionOrderService.getOrderById(loanId);
             if (mmanLoanCollectionOrderOri != null) {
                 CreditLoanPay creditLoanPay = creditLoanPayService.get(mmanLoanCollectionOrderOri.getPayId());
-                BigDecimal totalPayMonery = creditLoanPay.getReceivablePrinciple().add(
-                        creditLoanPay.getReceivableInterest()).add(creditLoanPay.getRemainAccrual() == null ? BigDecimal.ZERO : creditLoanPay.getRemainAccrual());
+                // 剩余应还本金和剩余应还服务费之和（小额）
+                BigDecimal remainPrinciple = creditLoanPay.getReceivablePrinciple();
+                // 剩余应还罚息
+                BigDecimal remainInterest = creditLoanPay.getReceivableInterest();
+                // 剩余应还利息
+                BigDecimal remainAccrual = creditLoanPay.getRemainAccrual() == null ? BigDecimal.ZERO : creditLoanPay.getRemainAccrual();
+                BigDecimal totalPayMonery = remainPrinciple.add(remainInterest).add(remainAccrual);
                 model.addAttribute("totalPayMonery", totalPayMonery);
 
                 // 大额代扣跳转到一个专门的页面
@@ -643,7 +649,7 @@ public class MyCollectionOrderController extends BaseController {
     @ResponseBody
     public void dealWithholdResult(String text) {
         try {
-            logger.info("接收到代扣回调请求参数 " + text);
+            logger.info("接收到代扣回调请求参数(小额)： " + text);
             JSONObject obj = JSONObject.parseObject(text);
             String uuid = (String) obj.get("uuid");
             boolean code = (boolean) obj.get("result");
@@ -678,6 +684,7 @@ public class MyCollectionOrderController extends BaseController {
     public void updateWithholdResult(@RequestBody HashMap<String, Object> map) {
         try {
             JSONObject obj = JSONObject.parseObject(JSON.toJSONString(map));
+            logger.info("接收到代扣回调请求参数(大额)： " + JSON.toJSONString(obj));
             String uuid = (String) obj.get("uuid");
             boolean result = (boolean) obj.get("result");
             Object msg = obj.get("msg");

@@ -330,7 +330,7 @@
                     <th align="center">借款人电话</th>
                     <th align="center">催收状态</th>
                     <th align="center">欠款金额</th>
-                    <th align="center">已还金额</th>
+                    <%--<th align="center">已还金额</th>--%>
                     <th align="center">扣款金额</th>
                     <th align="center">扣款状态</th>
                     <th align="center">失败原因</th>
@@ -360,9 +360,9 @@
                         <td>
                                 ${withhold.arrearsMoney}
                         </td>
-                        <td>
+                        <%--<td>
                                 ${withhold.hasalsoMoney }
-                        </td>
+                        </td>--%>
                         <td>
                                 ${withhold.deductionsMoney }
                         </td>

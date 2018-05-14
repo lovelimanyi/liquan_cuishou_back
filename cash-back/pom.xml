@@ -320,6 +320,61 @@
         </dependency>
     </dependencies>
 
+    <profiles>
+        <profile>
+            <!-- 开发环境 -->
+            <id>dev1</id>
+            <properties>
+                <environment>dev1</environment><!-- 节点名字environment是自己随意取的 -->
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault><!-- 默认激活该profile节点-->
+            </activation>
+        </profile>
+        <profile>
+            <!-- 开发环境 -->
+            <id>dev2</id>
+            <properties>
+                <environment>dev2</environment>
+            </properties>
+        </profile>
+        <profile>
+            <!-- 生产环境 -->
+            <id>prod</id>
+            <properties>
+                <environment>prod</environment>
+            </properties>
+        </profile>
+        <profile>
+            <!-- uat环境 -->
+            <id>uat</id>
+            <properties>
+                <environment>uat</environment>
+            </properties>
+        </profile>
+        <profile>
+            <!-- hotfixs环境 -->
+            <id>hotfixs</id>
+            <properties>
+                <environment>hotfixs</environment>
+            </properties>
+        </profile>
+        <profile>
+            <!-- 测试环境 -->
+            <id>test1</id>
+            <properties>
+                <environment>test1</environment>
+            </properties>
+        </profile>
+        <profile>
+            <!-- 测试环境 -->
+            <id>test2</id>
+            <properties>
+                <environment>test2</environment>
+            </properties>
+        </profile>
+    </profiles>
+
     <build>
         <finalName>cuishou</finalName>
         <resources>
@@ -332,6 +387,12 @@
             </resource>
             <resource>
                 <directory>src/main/resources</directory>
+                <excludes>
+                    <exclude>environment/**</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <directory>src/main/resources/environment/${environment}</directory>
             </resource>
         </resources>
     </build>
