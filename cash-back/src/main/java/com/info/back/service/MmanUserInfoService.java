@@ -75,17 +75,6 @@ public class MmanUserInfoService implements IMmanUserInfoService {
 
         try {
             String jxlDetail = userInfo.getJxlDetail();
-//            如果jxlDetail不为空，则从数据库中查出来解析，如果为空，则从Hbase中查出来解析
-            if (StringUtils.isNotBlank(jxlDetail)){ //原始现金侠的聚信立报告-分为两种：从数据库中查出来解析
-                handleCashmanJxl(jxlDetail,model);
-                //返回 现金侠原始聚信立报告页面
-                model.addAttribute("name",userInfo.getRealname());
-                model.addAttribute("gender",userInfo.getUserSex());
-                model.addAttribute("idNumber",userInfo.getIdNumber());
-                model.addAttribute("age",userInfo.getUserAge());
-                returnUrl = "mycollectionorder/jxlReport";
-                return returnUrl;
-            }
             JxlResponse jxlResponse = HttpUtils.get(url,null);
             if (jxlResponse != null){
                 String jxlType = jxlResponse.getJxlType();
@@ -137,11 +126,10 @@ public class MmanUserInfoService implements IMmanUserInfoService {
                     returnUrl = "mycollectionorder/lfReport";
                 }else {
                     //其他情况暂时先返回原始聚信立报告页面
-                    returnUrl = "mycollectionorder/jxlReport";
+                    returnUrl = localJXLReport(jxlDetail,model,userInfo);
                 }
             }else {
-                model.addAttribute(MESSAGE, "暂无此客户的聚信立报告！");
-                returnUrl = "mycollectionorder/jxlReport";
+                returnUrl = localJXLReport(jxlDetail,model,userInfo);
             }
         }catch (Exception e){
             model.addAttribute(MESSAGE, "聚信立请求超时！");
@@ -153,6 +141,26 @@ public class MmanUserInfoService implements IMmanUserInfoService {
         model.addAttribute("age",userInfo.getUserAge());
         return returnUrl;
     }
+    /**
+     * 本地数据库聚信立解析
+     */
+    private String localJXLReport(String jxlDetail, Model model, MmanUserInfo userInfo) {
+        String returnUrl = "";
+        if (StringUtils.isNotBlank(jxlDetail)){ //原始现金侠的聚信立报告-分为两种：从数据库中查出来解析
+            handleCashmanJxl(jxlDetail,model);
+            //返回 现金侠原始聚信立报告页面
+            model.addAttribute("name",userInfo.getRealname());
+            model.addAttribute("gender",userInfo.getUserSex());
+            model.addAttribute("idNumber",userInfo.getIdNumber());
+            model.addAttribute("age",userInfo.getUserAge());
+            returnUrl = "mycollectionorder/jxlReport";
+        }else {
+            model.addAttribute(MESSAGE, "暂无此客户的聚信立报告！");
+            returnUrl = "mycollectionorder/jxlReport";
+        }
+        return returnUrl;
+    }
+
     /**
      * 现金侠聚信立报告的两种解析
      */
