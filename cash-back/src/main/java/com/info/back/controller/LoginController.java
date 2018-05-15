@@ -5,10 +5,14 @@ import com.info.back.service.ICompanyIpAddressService;
 import com.info.back.service.IUserAccountWhiteListService;
 import com.info.back.utils.BackConstant;
 import com.info.back.utils.RequestUtils;
+import com.info.back.utils.ServiceResult;
+import com.info.back.utils.SmsSendUtil;
+import com.info.back.utils.SpringUtils;
 import com.info.constant.Constant;
 import com.info.web.pojo.BackUser;
 import com.info.web.pojo.CompanyIpAddressDto;
 import com.info.web.util.JedisDataClient;
+import com.info.web.util.encrypt.AESUtil;
 import com.info.web.util.encrypt.MD5coding;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -34,6 +38,9 @@ public class LoginController extends BaseController {
     public static final String PROCESS_URL = "processUrl";
     public static final String RETURN_URL = "returnUrl";
     private static Logger logger = Logger.getLogger(LoginController.class);
+	public final static String SMS_SEND_IN_ONE_MINUTE = "SMS_SEND_IN_ONE_MINUTE_";// Redis某个手机号1分钟内已发送验证码key前缀
+	public final static String SMS_REGISTER_PREFIX = "newPhoneCode_";// Redis注册key前缀
+	public final static int INFECTIVE_SMS_TIME = 300;// 短信默认有效时间300秒
     @Autowired
     private IBackUserService backUserService;
 
@@ -100,6 +107,59 @@ public class LoginController extends BaseController {
         return "login";
     }
 
+    @RequestMapping(value = "/sendSmsBack", method = RequestMethod.POST)
+    public void sendSmsBack(HttpServletRequest request, HttpServletResponse response, Model model) {
+        HashMap<String, Object> params = this.getParametersO(request);
+        ServiceResult serviceResult = new ServiceResult("500", "未知异常");
+        try {
+            if (validateSubmit(request, response)) {
+                params.put("status", BackUser.STATUS_USE);
+                BackUser backUser = backUserService.findOneUser(params);
+
+                if (backUser != null) {
+                    Object tmpPwd = params.get("userPassword");
+                    if (tmpPwd != null) {
+                        AESUtil aesEncrypt = new AESUtil();
+
+                        if (backUser.getUserPassword().equals(MD5coding.getInstance().code(String.valueOf(params.get("userPassword"))))) {
+                            String userPhone = backUser.getUserMobile();
+                            String hasSendOneMinKey = SMS_SEND_IN_ONE_MINUTE + userPhone;
+                            if (JedisDataClient.get(hasSendOneMinKey) != null) {
+                                serviceResult.setMsg("请一分钟后再尝试发送");
+                            } else {
+                                String rand = String.valueOf(Math.random()).substring(2).substring(0, 6);// 6位固定长度
+                                if (SmsSendUtil.sendSmsNew(userPhone, rand)) {
+                                	JedisDataClient.set(hasSendOneMinKey, userPhone, 60);
+                                    // 存入redis
+                                	JedisDataClient.set(SMS_REGISTER_PREFIX + userPhone, rand, INFECTIVE_SMS_TIME);
+
+//                                    JedisDataClient.setex(SMS_REGISTER_PREFIX + userPhone, INFECTIVE_SMS_TIME, rand);
+                                    serviceResult = new ServiceResult(ServiceResult.SUCCESS, "发送成功！");
+                                } else {
+                                    serviceResult.setMsg("短信发送失败,请联系技术！");
+                                }
+                            }
+
+                        } else {
+                            serviceResult.setMsg("登录密码错误！");
+                        }
+                    } else {
+                        serviceResult.setMsg("密码不能为空！");
+                    }
+                } else {
+                    serviceResult.setMsg("该用户不存在！");
+                }
+            } else {
+                serviceResult.setMsg("图形验证码错误");
+            }
+        } catch (Exception e) {
+            logger.error("sendSmsBack error params=" + params, e);
+        }
+        
+        SpringUtils.renderJson(response, serviceResult);
+    }
+
+
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public String submit(HttpServletRequest request,
                          HttpServletResponse response, Model model) {
@@ -116,12 +176,12 @@ public class LoginController extends BaseController {
                 return "login";
             }
 
-            if (!validateSubmit(request, response)) {
-                errMsg = "验证码错误";
-                model.addAttribute(MESSAGE, errMsg);
-                return "login";
-            }
-
+//
+//            if (!validateSubmit(request, response)) {
+//                errMsg = "验证码错误";
+//                model.addAttribute(MESSAGE, errMsg);
+//                return "login";
+//            }
             params.put("status", BackUser.STATUS_USE);
             BackUser backUser = backUserService.findOneUser(params);
             if (backUser == null || BackConstant.BACK_USER_STATUS.equals(backUser.getUserStatus().toString())) {
@@ -132,6 +192,24 @@ public class LoginController extends BaseController {
 
             if (!backUser.getUserPassword().equals(MD5coding.getInstance().code(String.valueOf(params.get("userPassword"))))) {
                 errMsg = "密码错误！";
+                model.addAttribute(MESSAGE, errMsg);
+                return "login";
+            }
+
+            String key = SMS_REGISTER_PREFIX + backUser.getUserMobile();
+            String smsCode = params.get("smsCode") + "";
+            //String code = "0000";
+            // 666666 ，测试环境下登录注掉下边这行，取消上边一行的注释
+            String code = JedisDataClient.get(key);
+            if (code != null) {
+                if (code.equals(smsCode)) {
+                } else {
+                    errMsg = "短信验证码错误！";
+                    model.addAttribute(MESSAGE, errMsg);
+                    return "login";
+                }
+            } else {
+                errMsg = "验证码失效或不存在！";
                 model.addAttribute(MESSAGE, errMsg);
                 return "login";
             }
