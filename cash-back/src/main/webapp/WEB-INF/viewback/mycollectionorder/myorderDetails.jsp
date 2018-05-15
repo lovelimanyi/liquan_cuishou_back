@@ -246,8 +246,14 @@
                             <tr>
                                 <td class="tdGround">欠款滞纳金:</td>
                                 <td>${userLoan.loanPenalty}</td>
-                                <td class="tdGround">欠款服务费:</td>
-                                <td>${userLoan.serviceCharge}</td>
+                                <c:if test="${userLoan.borrowingType eq 2}">
+                                    <td class="tdGround">欠款服务费:</td>
+                                    <td>${userLoan.serviceCharge}</td>
+                                </c:if>
+                                <c:if test="${userLoan.borrowingType eq 1}">
+                                    <td class="tdGround">欠款利息:</td>
+                                    <td>${userLoan.accrual}</td>
+                                </c:if>
                             </tr>
                             <tr>
                                 <td class="tdGround">已还金额:</td>
@@ -360,9 +366,9 @@
                         <td>
                                 ${withhold.arrearsMoney}
                         </td>
-                        <%--<td>
-                                ${withhold.hasalsoMoney }
-                        </td>--%>
+                            <%--<td>
+                                    ${withhold.hasalsoMoney }
+                            </td>--%>
                         <td>
                                 ${withhold.deductionsMoney }
                         </td>

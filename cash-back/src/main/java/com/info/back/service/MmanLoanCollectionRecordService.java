@@ -356,10 +356,10 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
         if (user != null) {
             //更新我的催收订单
             Date now = new Date();
-            MmanLoanCollectionOrder mmanLoanCollectionOrderOri = mmanLoanCollectionOrderService.getOrderById(params.get("id").toString());
+            MmanLoanCollectionOrder order = mmanLoanCollectionOrderService.getOrderById(params.get("id").toString());
 
             MmanLoanCollectionOrder mmanLoanCollectionOrder = new MmanLoanCollectionOrder();
-            if (mmanLoanCollectionOrderOri != null && !BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(mmanLoanCollectionOrderOri.getStatus())) {
+            if (order != null && !BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())) {
                 if (params.get("repaymentTime") == null || params.get("repaymentTime") == "") {//不填承诺还款时间为催收中
                     mmanLoanCollectionOrder.setStatus(BackConstant.XJX_COLLECTION_ORDER_STATE_ING);
                     mmanLoanCollectionOrder.setPromiseRepaymentTime(null);
@@ -368,13 +368,15 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
                     mmanLoanCollectionOrder.setPromiseRepaymentTime(DateUtil.formatDate(params.get("repaymentTime"), "yyyy-MM-dd"));
                 }
             }
+            params.put("currentOverdueLevel", order.getCurrentOverdueLevel());
+            params.put("loanId", order.getLoanId());
             mmanLoanCollectionOrder.setLastCollectionTime(now);
             mmanLoanCollectionOrder.setOperatorName(StringUtils.isNotBlank(user.getUserName()) ? user.getUserName() : "");
             //根据等级设置当前催收员某等级操作状态，1代表操作过催收单
             if (BackConstant.XJX_OVERDUE_LEVEL_S1.equals(user.getGroupLevel())) {
                 mmanLoanCollectionOrder.setM1OperateStatus(BackConstant.ON);
             } else if (BackConstant.XJX_OVERDUE_LEVEL_S2.equals(user.getGroupLevel())) {
-                if ("S1".equals(mmanLoanCollectionOrderOri.getS1Flag()) && mmanLoanCollectionOrderOri.getOverdueDays() <= 10) {
+                if ("S1".equals(order.getS1Flag()) && order.getOverdueDays() <= 10) {
                     mmanLoanCollectionOrder.setM1OperateStatus(BackConstant.ON);
                 } else {
                     mmanLoanCollectionOrder.setM2OperateStatus(BackConstant.ON);
@@ -388,37 +390,50 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
             } else {
                 mmanLoanCollectionOrder.setM5OperateStatus(BackConstant.ON);
             }
-            mmanLoanCollectionOrder.setS1Flag(mmanLoanCollectionOrderOri.getS1Flag());
+            mmanLoanCollectionOrder.setS1Flag(order.getS1Flag());
             mmanLoanCollectionOrder.setUpdateDate(now);
-            mmanLoanCollectionOrder.setId(mmanLoanCollectionOrderOri.getId());
+            mmanLoanCollectionOrder.setId(order.getId());
             mmanLoanCollectionOrderService.updateRecord(mmanLoanCollectionOrder);
-            MmanLoanCollectionRecord mmanLoanCollectionRecord = new MmanLoanCollectionRecord();
+
             //添加催收记录
-            mmanLoanCollectionRecord.setStressLevel(params.get("stressLevel"));
-            mmanLoanCollectionRecord.setCollectionType(params.get("collectionType"));
-            mmanLoanCollectionRecord.setContent(params.get("content"));
-            mmanLoanCollectionRecord.setRemark(params.get("remark"));
-            mmanLoanCollectionRecord.setContactType(params.get("contactType") == null ? "" : params.get("contactType"));
-            mmanLoanCollectionRecord.setContactName(params.get("contactName"));
-            mmanLoanCollectionRecord.setRelation(params.get("relation"));
-            mmanLoanCollectionRecord.setContactPhone(params.get("contactPhone"));
-            mmanLoanCollectionRecord.setCollectionDate(now);
-            mmanLoanCollectionRecord.setOrderId(mmanLoanCollectionOrder.getId());
-            mmanLoanCollectionRecord.setCollectionId(user.getUuid());
-            mmanLoanCollectionRecord.setUserId(mmanLoanCollectionOrderOri.getUserId());
-
-            mmanLoanCollectionRecord.setOrderState(mmanLoanCollectionOrderOri.getStatus());
-
-//			mmanLoanCollectionRecord.setId(IdGen.uuid());
-            mmanLoanCollectionRecord.setId(params.get("recordId"));
-            mmanLoanCollectionRecord.setCreateDate(now);
-            mmanLoanCollectionRecord.setUpdateDate(now);
-            mmanLoanCollectionRecordDao.insert(mmanLoanCollectionRecord);
+            saveCollectionRecord(params, user, now, order, mmanLoanCollectionOrder);
         } else {
             result.setCode("-1");
             result.setMsg("登录失效,请重新登录");
         }
         return result;
+    }
+
+    /**
+     * 添加催收记录
+     *
+     * @param params
+     * @param user
+     * @param now
+     * @param mmanLoanCollectionOrderOri
+     * @param mmanLoanCollectionOrder
+     */
+    private void saveCollectionRecord(Map<String, String> params, BackUser user, Date now, MmanLoanCollectionOrder mmanLoanCollectionOrderOri, MmanLoanCollectionOrder mmanLoanCollectionOrder) {
+        MmanLoanCollectionRecord record = new MmanLoanCollectionRecord();
+        record.setStressLevel(params.get("stressLevel"));
+        record.setCollectionType(params.get("collectionType"));
+        record.setContent(params.get("content"));
+        record.setRemark(params.get("remark"));
+        record.setContactType(params.get("contactType") == null ? "" : params.get("contactType"));
+        record.setContactName(params.get("contactName"));
+        record.setRelation(params.get("relation"));
+        record.setContactPhone(params.get("contactPhone"));
+        record.setCollectionDate(now);
+        record.setOrderId(mmanLoanCollectionOrder.getId());
+        record.setCollectionId(user.getUuid());
+        record.setUserId(mmanLoanCollectionOrderOri.getUserId());
+        record.setLoanId(params.get("loanId"));
+        record.setCurrentOverdueLevel(params.get("currentOverdueLevel"));
+        record.setOrderState(mmanLoanCollectionOrderOri.getStatus());
+        record.setId(params.get("recordId"));
+        record.setCreateDate(now);
+        record.setUpdateDate(now);
+        mmanLoanCollectionRecordDao.insert(record);
     }
 
     /**

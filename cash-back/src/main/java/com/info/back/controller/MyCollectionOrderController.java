@@ -434,8 +434,8 @@ public class MyCollectionOrderController extends BaseController {
      * 跳转到订单详情页
      *
      * @param request
-     * @param response
-     * @param orderId
+     * @param
+     * @param
      * @param model
      * @return
      */
