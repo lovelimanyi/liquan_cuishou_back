@@ -60,6 +60,7 @@
                         <value>/sync/repayment</value>
                         <value>/collectionOrder/withhold-callback-big</value>
                         <value>/statistics/doStatistics</value>
+                        <value>/sendSmsBack</value>
                     </list>
                 </property>
             </bean>
