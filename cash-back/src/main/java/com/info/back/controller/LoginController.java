@@ -104,41 +104,46 @@ public class LoginController extends BaseController {
     public String submit(HttpServletRequest request,
                          HttpServletResponse response, Model model) {
         HashMap<String, Object> params = this.getParametersO(request);
-        String errMsg = null;
+        String errMsg;
         try {
             if (CollectionUtils.isEmpty(BackConstant.userAccountWhiteListList)) {
                 userAccountWhiteListService.updateUserAccountWhiteList();
             }
-            if (checkIpAccess(request, params)) {
-                if (validateSubmit(request, response)) {
-                    params.put("status", BackUser.STATUS_USE);
-                    BackUser backUser = backUserService.findOneUser(params);
-                    if (backUser != null && !BackConstant.BACK_USER_STATUS.equals(backUser.getUserStatus().toString())) {
-                        if (backUser.getUserPassword().equals(MD5coding.getInstance().code(String.valueOf(params.get("userPassword"))))) {
-                            request.getSession(true).setAttribute(Constant.BACK_USER, backUser);
-                            request.getSession(true).setMaxInactiveInterval(1800);
-                        } else {
-                            errMsg = "密码错误！";
-                        }
-                    } else {
-                        errMsg = "该用户不存在！";
-                    }
-                } else {
-                    errMsg = "验证码错误";
-                }
-            } else {
+
+            if (!checkIpAccess(request, params)) {
                 errMsg = "非法ip,请联系管理员。";
+                model.addAttribute(MESSAGE, errMsg);
+                return "login";
             }
+
+            if (!validateSubmit(request, response)) {
+                errMsg = "验证码错误";
+                model.addAttribute(MESSAGE, errMsg);
+                return "login";
+            }
+
+            params.put("status", BackUser.STATUS_USE);
+            BackUser backUser = backUserService.findOneUser(params);
+            if (backUser == null || BackConstant.BACK_USER_STATUS.equals(backUser.getUserStatus().toString())) {
+                errMsg = "该用户不存在！";
+                model.addAttribute(MESSAGE, errMsg);
+                return "login";
+            }
+
+            if (!backUser.getUserPassword().equals(MD5coding.getInstance().code(String.valueOf(params.get("userPassword"))))) {
+                errMsg = "密码错误！";
+                model.addAttribute(MESSAGE, errMsg);
+                return "login";
+            }
+
+            request.getSession(true).setAttribute(Constant.BACK_USER, backUser);
+            request.getSession(true).setMaxInactiveInterval(1800);
         } catch (Exception e) {
             errMsg = "服务器异常，稍后重试！";
+            model.addAttribute(MESSAGE, errMsg);
             logger.error("post login error params=" + params, e);
         }
-        if (errMsg != null) {
-            model.addAttribute(MESSAGE, errMsg);
-            return "login";
-        } else {
-            return "redirect:indexBack";
-        }
+        return "redirect:indexBack";
     }
 
     /**
