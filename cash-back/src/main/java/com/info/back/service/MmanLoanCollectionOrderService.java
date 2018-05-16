@@ -234,7 +234,7 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
                     BigDecimal realMoney = pay.getRealMoney();
                     //可减免金额
                     BigDecimal deductibleMoney = null;
-                    if (realMoney.intValue() >= loanMoney.intValue()) {
+                    if (realMoney.compareTo(loanMoney) >= 0) {
                         deductibleMoney = receivableMoney.subtract(realMoney);
                     } else {
                         deductibleMoney = new BigDecimal(0);
@@ -480,7 +480,7 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
             loanPay.setId(pay.getId());
             loanPay.setReceivableInterest(znj);  //  剩余应还罚息
             BigDecimal serviceCharge = BigDecimal.ZERO;
-            if(BigDecimal.ZERO.compareTo(loan.getPaidMoney()) < 0 ){
+            if (BigDecimal.ZERO.compareTo(loan.getPaidMoney()) < 0) {
                 serviceCharge = loan.getServiceCharge();
             }
             loanPay.setReceivableMoney(loan.getLoanMoney().add(pmoney).add(serviceCharge)); // 应还总额
