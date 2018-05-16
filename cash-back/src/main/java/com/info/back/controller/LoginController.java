@@ -132,7 +132,7 @@ public class LoginController extends BaseController {
                                     JedisDataClient.set(hasSendOneMinKey, userPhone, 60);
                                     // 存入redis
                                     JedisDataClient.set(SMS_REGISTER_PREFIX + userPhone, rand, INFECTIVE_SMS_TIME);
-                                    logger.info("手机号 " + userPhone + ",本次验证码为 " + rand);
+                                    logger.info("手机号 " + userPhone + "  本次验证码为 " + rand);
 //                                    JedisDataClient.setex(SMS_REGISTER_PREFIX + userPhone, INFECTIVE_SMS_TIME, rand);
                                     serviceResult = new ServiceResult(ServiceResult.SUCCESS, "发送成功！");
                                 } else {
