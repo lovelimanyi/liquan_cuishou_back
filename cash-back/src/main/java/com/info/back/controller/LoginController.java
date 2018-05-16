@@ -198,9 +198,9 @@ public class LoginController extends BaseController {
 
             String key = SMS_REGISTER_PREFIX + backUser.getUserMobile();
             String smsCode = params.get("smsCode") + "";
-            //String code = "0000";
+            String code = "0000";
             // 666666 ，测试环境下登录注掉下边这行，取消上边一行的注释
-            String code = JedisDataClient.get(key);
+//            String code = JedisDataClient.get(key);
             if (code != null) {
                 if (code.equals(smsCode)) {
                 } else {
@@ -215,7 +215,7 @@ public class LoginController extends BaseController {
             }
 
             request.getSession(true).setAttribute(Constant.BACK_USER, backUser);
-            request.getSession(true).setMaxInactiveInterval(1800);
+            request.getSession(true).setMaxInactiveInterval(3600);
         } catch (Exception e) {
             errMsg = "服务器异常，稍后重试！";
             model.addAttribute(MESSAGE, errMsg);
