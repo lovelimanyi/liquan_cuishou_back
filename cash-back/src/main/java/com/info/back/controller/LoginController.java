@@ -215,7 +215,7 @@ public class LoginController extends BaseController {
             }
 
             request.getSession(true).setAttribute(Constant.BACK_USER, backUser);
-            request.getSession(true).setMaxInactiveInterval(1800);
+            request.getSession(true).setMaxInactiveInterval(3600);
         } catch (Exception e) {
             errMsg = "服务器异常，稍后重试！";
             model.addAttribute(MESSAGE, errMsg);
