@@ -38,9 +38,9 @@ public class LoginController extends BaseController {
     public static final String PROCESS_URL = "processUrl";
     public static final String RETURN_URL = "returnUrl";
     private static Logger logger = Logger.getLogger(LoginController.class);
-	public final static String SMS_SEND_IN_ONE_MINUTE = "SMS_SEND_IN_ONE_MINUTE_";// Redis某个手机号1分钟内已发送验证码key前缀
-	public final static String SMS_REGISTER_PREFIX = "newPhoneCode_";// Redis注册key前缀
-	public final static int INFECTIVE_SMS_TIME = 300;// 短信默认有效时间300秒
+    public final static String SMS_SEND_IN_ONE_MINUTE = "SMS_SEND_IN_ONE_MINUTE_";// Redis某个手机号1分钟内已发送验证码key前缀
+    public final static String SMS_REGISTER_PREFIX = "newPhoneCode_";// Redis注册key前缀
+    public final static int INFECTIVE_SMS_TIME = 300;// 短信默认有效时间300秒
     @Autowired
     private IBackUserService backUserService;
 
@@ -129,10 +129,10 @@ public class LoginController extends BaseController {
                             } else {
                                 String rand = String.valueOf(Math.random()).substring(2).substring(0, 6);// 6位固定长度
                                 if (SmsSendUtil.sendSmsNew(userPhone, rand)) {
-                                	JedisDataClient.set(hasSendOneMinKey, userPhone, 60);
+                                    JedisDataClient.set(hasSendOneMinKey, userPhone, 60);
                                     // 存入redis
-                                	JedisDataClient.set(SMS_REGISTER_PREFIX + userPhone, rand, INFECTIVE_SMS_TIME);
-
+                                    JedisDataClient.set(SMS_REGISTER_PREFIX + userPhone, rand, INFECTIVE_SMS_TIME);
+                                    logger.info("手机号 " + userPhone + ",本次验证码为 " + rand);
 //                                    JedisDataClient.setex(SMS_REGISTER_PREFIX + userPhone, INFECTIVE_SMS_TIME, rand);
                                     serviceResult = new ServiceResult(ServiceResult.SUCCESS, "发送成功！");
                                 } else {
@@ -155,7 +155,7 @@ public class LoginController extends BaseController {
         } catch (Exception e) {
             logger.error("sendSmsBack error params=" + params, e);
         }
-        
+
         SpringUtils.renderJson(response, serviceResult);
     }
 
