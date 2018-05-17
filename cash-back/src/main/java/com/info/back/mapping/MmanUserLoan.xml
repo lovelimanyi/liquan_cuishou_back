@@ -241,4 +241,15 @@
             </if>
         </where>
     </select>
+
+    <select id="selectCollectionCountByLoanEndTime" parameterType="java.util.Date" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM loan_end_time WHERE loan_end_time=#{overDate}
+    </select>
+
+    <select id="selectCollectionCountBetweenLoanEndTime" parameterType="Map" resultType="HashMap">
+        <![CDATA[ SELECT
+                  loan_end_time as loadEndTime,
+                  COUNT(*) as orderCount,
+                  SUM(loan_money) loanMoney FROM mman_user_loan WHERE loan_end_time>=#{startDate} and loan_end_time<#{endDate} and borrowing_type=#{borrowingType} GROUP BY loan_end_time]]>
+    </select>
 </mapper>

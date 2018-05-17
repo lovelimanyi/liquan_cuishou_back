@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import com.info.web.pojo.BackUser;
@@ -166,4 +167,5 @@ public interface IBackUserDao {
 
     BackUser getUserByAccount(String userAccount);
 
+    Integer selectUserCount4Estimate(@Param("groupLevel")String groupLevel);
 }

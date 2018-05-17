@@ -928,4 +928,11 @@
 		    o.update_date=#{updateDate}
 		WHERE o.loan_id = #{loanId}
 	</update>
+
+    <select id="selectOrderCount4SmallEstemate" parameterType="String" resultType="java.lang.Integer">
+        <![CDATA[ SELECT count(*) FROM mman_loan_collection_order WHERE status<>4 and current_overdue_level={groupLevel}]]>
+    </select>
+    <select id="selectOrderCount4BigEstemate" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        <![CDATA[ SELECT count(*) FROM mman_loan_collection_order WHERE status<>4 and overdueDays=${overdueDays}]]>
+    </select>
 </mapper>

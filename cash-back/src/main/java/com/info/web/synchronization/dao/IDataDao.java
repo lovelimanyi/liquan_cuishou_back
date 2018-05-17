@@ -42,5 +42,10 @@ public interface IDataDao {
 	 * @return
 	 */
 	public HashMap<String,Object> getAssetBorrowOrder(HashMap<String,String> map);
-
+	/**
+	 * 获取即将逾期订单
+	 * @param map
+	 * @return
+	 */
+	List<HashMap<String, Object>> getEstimateOrder(HashMap<String,Object> map);
 }

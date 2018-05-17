@@ -3,6 +3,7 @@ package com.info.back.dao;
 import com.info.web.pojo.MmanLoanCollectionOrder;
 import com.info.web.pojo.OrderBaseResult;
 import com.info.web.pojo.OrderInfo;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
@@ -111,4 +112,7 @@ public interface IMmanLoanCollectionOrderDao {
 
     List<String> getOverdueOrderIds(Map<String, Object> map);
     void updateOverdueDays(MmanLoanCollectionOrder order);
+
+    Integer selectOrderCount4SmallEstemate(@Param("groupLevel")String groupLevel);
+    Integer selectOrderCount4BigEstemate(@Param("overdueDays")Integer overdueDays);
 }

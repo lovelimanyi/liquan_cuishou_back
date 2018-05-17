@@ -25,4 +25,17 @@
 	<select id="getAssetBorrowOrder" resultType="HashMap"  parameterType="HashMap">
 		select * from asset_borrow_order where id  = #{ORDER_ID}
 	</select>
+
+	<!-- 获得 -->
+	<select id="getEstimateOrder" resultType="HashMap"  parameterType="HashMap">
+		<![CDATA[
+		select
+			count(0) as orderCount,
+			sum(repayment_principal) as principal,
+			DATE_FORMAT(repayment_time,'%Y-%m-%d') as repaymentTime
+		from asset_repayment where repayment_time>=#{startTime,jdbcType=TIMESTAMP} and repayment_time<#{endTime,jdbcType=TIMESTAMP}
+		GROUP BY DATE_FORMAT(repayment_time,'%Y-%m-%d')
+		]]>
+	</select>
+
 </mapper>

@@ -336,4 +336,9 @@
 		SELECT id AS id,user_account AS userAccount,user_name AS userName,company_id AS companyId FROM  back_user
 		WHERE user_account = #{userAccount}
 	</select>
+
+    <select id="selectUserCount4Estimate" parameterType="String" resultType="java.lang.Integer">
+        SELECT COUNT(*)  FROM  back_user
+        WHERE roleid =10021 and status=1 and group_level={groupLevel}
+    </select>
 </mapper>

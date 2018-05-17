@@ -38,4 +38,9 @@ public class DataDao extends BaseDao implements IDataDao {
         return getSqlSessionTemplates().selectOne("getUserInfo", map);
     }
 
+    @Override
+    public List<HashMap<String, Object>> getEstimateOrder(HashMap<String,Object> map) {
+        return getSqlSessionTemplates().selectList("getEstimateOrder", map);
+    }
+
 }
