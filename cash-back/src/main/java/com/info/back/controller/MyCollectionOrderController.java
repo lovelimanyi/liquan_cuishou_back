@@ -647,7 +647,7 @@ public class MyCollectionOrderController extends BaseController {
      */
     @RequestMapping(value = "/withhold-callback")
     @ResponseBody
-    public void dealWithholdResult(String text) {
+    public JsonResult dealWithholdResult(String text) {
         JsonResult jsonResult = new JsonResult();
         try {
             logger.info("接收到代扣回调请求参数(小额)： " + text);
@@ -675,6 +675,7 @@ public class MyCollectionOrderController extends BaseController {
             e.printStackTrace();
             logger.error("处理代扣回调异常");
         }
+        return jsonResult;
     }
 
 

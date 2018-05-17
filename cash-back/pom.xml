@@ -373,6 +373,13 @@
                 <environment>test2</environment>
             </properties>
         </profile>
+        <profile>
+            <!-- 测试环境 -->
+            <id>docker5</id>
+            <properties>
+                <environment>docker5</environment>
+            </properties>
+        </profile>
     </profiles>
 
     <build>
