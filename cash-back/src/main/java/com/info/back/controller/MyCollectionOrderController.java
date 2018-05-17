@@ -1210,8 +1210,7 @@ public class MyCollectionOrderController extends BaseController {
      * @author yyf
      */
     @RequestMapping("jianmian")
-    public String toReductionPage(HttpServletRequest request,
-                                  HttpServletResponse response, String orderId, Model model) {
+    public String toReductionPage(HttpServletRequest request, Model model) {
 
         HashMap<String, Object> params = this.getParametersO(request);
         params = mmanLoanCollectionOrderService.toReductionPage(params);

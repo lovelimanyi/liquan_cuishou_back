@@ -11,7 +11,10 @@ import javax.servlet.http.HttpServletResponse;
 import com.alibaba.fastjson.JSON;
 import com.info.back.service.*;
 import com.info.web.pojo.BackUserCompanyPermissions;
+import com.info.web.util.JedisDataClient;
+import jdk.nashorn.internal.runtime.ECMAException;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,7 +78,9 @@ public class CollectionController extends BaseController {
             PageConfig<Collection> pageConfig = collectionService.findPage(params);
             model.addAttribute("pm", pageConfig);
             model.addAttribute("params", params);// 用于搜索框保留值
-            HashMap<String, Object> map = new HashMap<>();
+
+            String verifyCodePermission = collectionService.verifyCodeAccess(request) ? "1" : "0";
+            model.addAttribute("verifyCodePermission", verifyCodePermission);
 
             List<MmanLoanCollectionCompany> companyList = collectionCompanyService.getCompanyList(params);
             model.addAttribute("groupNameMap", BackConstant.groupNameMap);
@@ -208,5 +213,31 @@ public class CollectionController extends BaseController {
             e.printStackTrace();
         }
         return s;
+    }
+
+    /**
+     * 获取手机号验证码
+     *
+     * @param phone
+     * @param model
+     * @return
+     */
+    @RequestMapping("/getVerifyCode")
+    public String getVerifyCode(@Param("phone") String phone, Model model, HttpServletRequest request) {
+        try {
+            if (collectionService.verifyCodeAccess(request)) {
+                String code = JedisDataClient.get(BackConstant.SMS_REGISTER_PREFIX + phone);
+                if (StringUtils.isEmpty(code)) {
+                    model.addAttribute("msg", "暂无该手机号验证码，请重新发送后查询。");
+                }
+                model.addAttribute("phoneNumber", phone);
+                model.addAttribute("code", code);
+            } else {
+                model.addAttribute("msg", "暂无该手机号验证码，请重新发送后查询。");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "collection/verifyCodePage";
     }
 }

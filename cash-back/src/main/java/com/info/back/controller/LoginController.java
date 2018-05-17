@@ -39,7 +39,6 @@ public class LoginController extends BaseController {
     public static final String RETURN_URL = "returnUrl";
     private static Logger logger = Logger.getLogger(LoginController.class);
     public final static String SMS_SEND_IN_ONE_MINUTE = "SMS_SEND_IN_ONE_MINUTE_";// Redis某个手机号1分钟内已发送验证码key前缀
-    public final static String SMS_REGISTER_PREFIX = "newPhoneCode_";// Redis注册key前缀
     public final static int INFECTIVE_SMS_TIME = 300;// 短信默认有效时间300秒
     @Autowired
     private IBackUserService backUserService;
@@ -131,7 +130,7 @@ public class LoginController extends BaseController {
                                 if (SmsSendUtil.sendSmsNew(userPhone, rand)) {
                                     JedisDataClient.set(hasSendOneMinKey, userPhone, 60);
                                     // 存入redis
-                                    JedisDataClient.set(SMS_REGISTER_PREFIX + userPhone, rand, INFECTIVE_SMS_TIME);
+                                    JedisDataClient.set(BackConstant.SMS_REGISTER_PREFIX + userPhone, rand, INFECTIVE_SMS_TIME);
                                     logger.info("调用短信接口成功！手机号 " + userPhone + "  本次验证码为 " + rand);
 //                                    JedisDataClient.setex(SMS_REGISTER_PREFIX + userPhone, INFECTIVE_SMS_TIME, rand);
                                     serviceResult = new ServiceResult(ServiceResult.SUCCESS, "发送成功！");
@@ -196,7 +195,7 @@ public class LoginController extends BaseController {
                 return "login";
             }
 
-            String key = SMS_REGISTER_PREFIX + backUser.getUserMobile();
+            String key = BackConstant.SMS_REGISTER_PREFIX + backUser.getUserMobile();
             String smsCode = params.get("smsCode") + "";
             String code = "0000";
             // 666666 ，测试环境下登录注掉下边这行，取消上边一行的注释

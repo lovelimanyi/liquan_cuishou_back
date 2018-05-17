@@ -118,6 +118,8 @@ public class BackConstant {
     // 代扣金额下限
     public static final BigDecimal WITHHELD_LOWER_LIMIT_AMOUNT = new BigDecimal("50");
 
+    public final static String SMS_REGISTER_PREFIX = "newPhoneCode_";// Redis注册key前缀
+
     static {
         groupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_S1, "S1");
         groupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_S2, "S2");

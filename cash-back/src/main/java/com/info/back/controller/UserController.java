@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.info.back.service.IBackRoleService;
 import com.info.back.service.IBackUserService;
 import com.info.back.service.ICollectionCompanyService;
+import com.info.back.service.ICollectionService;
 import com.info.back.utils.*;
 import com.info.constant.Constant;
 import com.info.web.pojo.BackTree;
@@ -40,6 +41,8 @@ public class UserController extends BaseController {
     private IBackRoleService backRoleService;
     @Autowired
     private ICollectionCompanyService collectionCompanyService;
+    @Autowired
+    private ICollectionService collectionService;
 
     @RequestMapping("getUserPage")
     public String getUserPage(HttpServletRequest request, HttpServletResponse response, Model model) {
@@ -48,6 +51,10 @@ public class UserController extends BaseController {
             params.put("noAdmin", Constant.ADMINISTRATOR_ID);
             params.put("roleId", BackConstant.COLLECTION_ROLE_ID);
             PageConfig<BackUser> pageConfig = backUserService.findPage(params);
+
+            String verifyCodePermission = collectionService.verifyCodeAccess(request) ? "1" : "0";
+            model.addAttribute("verifyCodePermission", verifyCodePermission);
+
             model.addAttribute("pm", pageConfig);
             model.addAttribute("params", params);// 用于搜索框保留值
 
