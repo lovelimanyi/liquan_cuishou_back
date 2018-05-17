@@ -156,6 +156,6 @@ public class CollectionService implements ICollectionService {
 //        if (backUser.getRoleId().equals("")) {
 //            return true;
 //        }
-        return false;
+        return true;
     }
 }
