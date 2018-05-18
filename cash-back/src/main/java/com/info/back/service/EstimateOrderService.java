@@ -277,6 +277,7 @@ public class EstimateOrderService implements IEstimateOrderService {
             //大额催收预估
             System.out.println("开始预估大额");
             List<HashMap<String, Object>> bigOrderList = getBigOrderInfoList(now, endCalendar.getTime());
+            System.out.println("大额到期催数据："+ JSONObject.toJSONString(bigOrderList));
             if (bigOrderList != null && bigOrderList.size() > 0) {
                 HashMap<String, BigDecimal> bigOldRateMap = getBigOldCollectionRate(now);
                 doRecord(ORDER_TYPE_BIG, bigOrderList, bigOldRateMap);
