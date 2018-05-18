@@ -18,9 +18,17 @@
    }
 
     </c:if>
-   .mingtianpaidan tr td{
-       padding:5px;
+   .mingtianpaidan{
+    background: #F5F5F5;
+       width: 100%;
    }
+   .mingtianpaidan tr td{
+       padding:12px;padding-left: 20px;padding-top:12px;
+
+   }
+    .dataTr td{
+        height: 30px;
+    }
 </style>
 <form id="myPagerForm" onsubmit="return navTabSearch(this);" action="estimate/list?myId=${params.myId}" method="post">
     <div class="pageHeader">
@@ -33,10 +41,10 @@
         <jsp:include page="${BACK_URL}/rightSubList">
             <jsp:param value="${params.myId}" name="parentId"/>
         </jsp:include>
-        <div style="background: #CCCCCC">
+        <div style="padding:5px">
         <table class="mingtianpaidan">
             <tr>
-                <td>明日派单预估</td>
+                <td style="padding:20px;">明日派单预估</td>
             </tr>
             <c:if test="${orderType == 1}">
                 <tr>
@@ -48,7 +56,7 @@
                 <tr>
                     <td>F-M3+组共${dispatchInfo.m3.userCount}人，人均${dispatchInfo.m3.orderCount}单</td>
                 </tr>
-                <tr>
+                <tr style="padding-bottom: 20px">
                     <td>F-M6+组共${dispatchInfo.m6.userCount}人，人均${dispatchInfo.m6.orderCount}单</td>
                 </tr>
             </c:if>
@@ -66,10 +74,23 @@
                     <td>M3+组共${dispatchInfo.m3.userCount}人，人均${dispatchInfo.m3.orderCount}单</td>
                 </tr>
                 <tr>
-                    <td>M6+组共0人，人均0单</td>
+                    <td style="padding-bottom: 20px">M6+组共0人，人均0单</td>
                 </tr>
             </c:if>
         </table>
+        </div>
+        <div style="padding-right:5px;padding-left: 5px;margin-top:15px;">
+            <div style="background: #87CEFA;height: 30px;line-height: 30px;padding:3px; color: #FFFFFF;">
+                未来几天入催情况：近七天本金平均入催率：
+                <span style="color: red">
+                    <fmt:formatNumber value="${oldAmountRate/100}" pattern="##.##" minFractionDigits="2" ></fmt:formatNumber>%
+                </span>，
+                订单平均入催率：
+                <span style="color: red">
+                    <fmt:formatNumber value="${oldOrderRate/100}" pattern="##.##" minFractionDigits="2" ></fmt:formatNumber>%
+                </span>
+            </div>
+
         </div>
         <table class="table" style="width: 100%;" layoutH="160"
                nowrapTD="false">
@@ -103,7 +124,7 @@
             </thead>
             <tbody>
             <c:forEach var="order" items="${estimateList}" varStatus="status">
-                <tr target="id" rel="${order.id }">
+                <tr target="id" rel="${order.id }" class="dataTr">
 
                     <td align="center" width="50">
                             <fmt:formatDate value="${order.overDate}" pattern="yyyy-MM-dd"/>
@@ -118,7 +139,7 @@
                            <fmt:formatDate value="${order.collectionDate}" pattern="yyyy-MM-dd"/>
                     </td>
                     <td align="center" width="50">
-                            ${order.orderAge}
+                            ${ORDER_AGE_MAP[order.orderAge]}
                     </td>
                     <td align="center" width="50">
                             ${order.estimateOrderCount}

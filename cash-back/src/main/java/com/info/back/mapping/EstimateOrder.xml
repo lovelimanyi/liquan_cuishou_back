@@ -17,6 +17,7 @@
 		<result column="orderType" property="orderType" jdbcType="TINYINT" />
 		<result column="real_collection_order_count" property="realCollectionOrderCount" jdbcType="INTEGER" />
 		<result column="old_collection_rate" property="oldCollectionRate" jdbcType="INTEGER" />
+		<result column="old_collection_amount_rate" property="oldCollectionAmountRate" jdbcType="INTEGER" />
 	</resultMap>
 	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="com.info.web.pojo.EstimateOrder">
 		insert into estimate_order (over_date,
@@ -27,7 +28,10 @@
 		order_age,
 		estimate_order_count,
 		estimate_amount_count,
-		orderType)
+		orderType,
+		old_collection_rate,
+		old_collection_rate,
+		old_collection_amount_rate)
 		values ( #{overDate,jdbcType=TIMESTAMP},
 		 #{orderCount,jdbcType=INTEGER},
 		#{amountTotal,jdbcType=BIGINT},
@@ -36,7 +40,9 @@
 		#{orderAge,jdbcType=INTEGER},
 		#{estimateOrderCount,jdbcType=INTEGER},
 		#{estimateAmountCount,jdbcType=BIGINT},
-		#{orderType,jdbcType=TINYINT})
+		#{orderType,jdbcType=TINYINT},
+		#{oldCollectionRate,jdbcType=INTEGER},
+		#{oldCollectionAmountRate,jdbcType=INTEGER})
 	</insert>
 	<update id="updateById" parameterType="com.info.web.pojo.EstimateOrder">
 		update
@@ -50,7 +56,8 @@
 			estimate_order_count=#{estimateOrderCount,jdbcType=INTEGER},
 			estimate_amount_count=#{estimateAmountCount,jdbcType=BIGINT},
 			real_collection_order_count=#{realCollectionOrderCount,jdbcType=INTEGER},
-			old_collection_rate=#{oldCollectionRate,jdbcType=INTEGER}
+			old_collection_rate=#{oldCollectionRate,jdbcType=INTEGER},
+			old_collection_amount_rate=#{oldCollectionAmountRate,jdbcType=INTEGER}
 		where id = #{id,jdbcType=BIGINT}
 
 	</update>
@@ -68,7 +75,8 @@
 		create_time,
 		orderType,
 		real_collection_order_count,
-		old_collection_rate
+		old_collection_rate,
+		old_collection_amount_rate
 		<include refid="selectWhere"></include>
 	</select>
 
@@ -106,7 +114,8 @@
 			estimate_amount_count,
 			create_time,
 			real_collection_order_count,
-			old_collection_rate
+			old_collection_rate,
+			old_collection_amount_rate
 		from estimate_order
 		where over_date =#{overDate,jdbcType=TIMESTAMP} and orderType = #{orderType,jdbcType=VARCHAR}
 	</select>

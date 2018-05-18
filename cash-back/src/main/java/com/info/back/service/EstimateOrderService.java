@@ -39,8 +39,8 @@ public class EstimateOrderService implements IEstimateOrderService {
     private static final BigDecimal AVG_DAYS = new BigDecimal(7);
     private static final String BIG_SUCCESS_CODE = "00";
 
-    //    private static final String BIG_PATH = "http://118.31.47.225:8082/be/getRepaymentOrderForCollection";//预生产
-    private static final String BIG_PATH = "http://192.168.5.46:8082/be/getRepaymentOrderForCollection";
+    private static final String BIG_PATH = "http://118.31.47.225:8082/be/getRepaymentOrderForCollection";//预生产
+    //    private static final String BIG_PATH = "http://192.168.5.46:8082/be/getRepaymentOrderForCollection";
     private static final Integer TIME_DAY = 60 * 60 * 24;
 
     @Override
@@ -75,16 +75,27 @@ public class EstimateOrderService implements IEstimateOrderService {
 
                 Byte orderType = (Byte) params.get("orderType");
                 resultMap.put("estimateList", estimateOrderList);
+                Integer oldOrderRate = 0;
+                Integer oldAmountRate = 0;
                 Integer firstDayEstimateOrder = 0;
                 if (estimateOrderList != null && estimateOrderList.size() > 0) {
-                    for (EstimateOrder estimateOrder : estimateOrderList) {
-                        Calendar overCalendar = Calendar.getInstance();
-                        overCalendar.add(Calendar.DAY_OF_MONTH, 1);
-                        if (overCalendar.get(Calendar.DAY_OF_MONTH) == 1) {
-                            firstDayEstimateOrder = estimateOrder.getEstimateOrderCount();
+                    EstimateOrder firstEstimateOrder = estimateOrderList.get(0);
+                    oldOrderRate = firstEstimateOrder.getOldCollectionRate();
+                    oldAmountRate = firstEstimateOrder.getOldCollectionAmountRate();
+                    if(orderType == ORDER_TYPE_BIG){
+                        firstDayEstimateOrder = firstEstimateOrder.getEstimateOrderCount();
+                    }else if(orderType == ORDER_TYPE_SMALL){
+                        for (EstimateOrder estimateOrder : estimateOrderList) {
+                            Calendar overCalendar = Calendar.getInstance();
+                            overCalendar.add(Calendar.DAY_OF_MONTH, 1);
+                            if (overCalendar.get(Calendar.DAY_OF_MONTH) == 1) {
+                                firstDayEstimateOrder = estimateOrder.getEstimateOrderCount();
+                            }
                         }
                     }
                 }
+                resultMap.put("oldOrderRate", oldOrderRate);
+                resultMap.put("oldAmountRate", oldAmountRate);
 
                 if (firstDayEstimateOrder == null || firstDayEstimateOrder < 0) {
                     firstDayEstimateOrder = 0;
@@ -225,6 +236,7 @@ public class EstimateOrderService implements IEstimateOrderService {
                 now = yyyyMMddSdf.parse(pullDate);
             }
             //小额催收预估
+            System.out.println("开始预估小额");
             HashMap<String, Object> param = new HashMap<>();
             param.put("startTime", now);
             Calendar endCalendar = Calendar.getInstance();
@@ -236,13 +248,16 @@ public class EstimateOrderService implements IEstimateOrderService {
                 HashMap<String, BigDecimal> smallOldRateMap = getSmallOldCollectionRate(now);
                 doRecord(ORDER_TYPE_SMALL, smallOrderList, smallOldRateMap);
             }
+            System.out.println("结束预估小额");
 
             //大额催收预估
+            System.out.println("开始预估大额");
             List<HashMap<String, Object>> bigOrderList = getBigOrderInfoList(now, endCalendar.getTime());
             if (bigOrderList != null && bigOrderList.size() > 0) {
                 HashMap<String, BigDecimal> bigOldRateMap = getBigOldCollectionRate(now);
                 doRecord(ORDER_TYPE_BIG, bigOrderList, bigOldRateMap);
             }
+            System.out.println("结束预估大额");
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -303,7 +318,7 @@ public class EstimateOrderService implements IEstimateOrderService {
         estimateOrder.setEstimateAmountCount(principal.multiply(moneyRate).longValue());
 
         estimateOrder.setOldCollectionRate(orderRate.multiply(PERCENT).multiply(PERCENT).intValue());
-
+        estimateOrder.setOldCollectionAmountRate(moneyRate.multiply(PERCENT).multiply(PERCENT).intValue());
         if (estimateOrder.getId() == null || estimateOrder.getId() < 1) {
             estimateOrderDao.insert(estimateOrder);
         } else {

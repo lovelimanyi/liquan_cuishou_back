@@ -2,6 +2,7 @@ package com.info.back.controller;
 
 import com.info.back.service.EstimateOrderService;
 import com.info.back.service.IEstimateOrderService;
+import com.info.web.pojo.EstimateOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -38,6 +39,7 @@ public class EstimateOrderController extends BaseController {
         model.addAttribute("orderAge", orderAge);
         model.addAttribute("params", params);
         model.addAttribute("testDate", testDate);
+        model.addAttribute("ORDER_AGE_MAP", EstimateOrder.ORDER_AGE_MAP);
         return "estimate/list";
     }
 
