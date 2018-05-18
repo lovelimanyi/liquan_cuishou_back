@@ -171,7 +171,7 @@ public class SyncService implements ISyncService {
         String loanId = loan.getId();
         CreditLoanPay creditLoanPay1 = creditLoanPayDao.get(payId);
         int receivablePrinciple = Integer.parseInt(String.valueOf(repayment.getReceivablePrinciple()));//剩余应还本金
-        if (creditLoanPay1 != null && creditLoanPay1.getReceivablePrinciple().compareTo(BigDecimal.ZERO)==1){
+        if (creditLoanPay1 != null && creditLoanPay1.getReceivableInterest().compareTo(BigDecimal.ZERO)==1){
             logger.info("order_repayment_begin=" + loanId);
             //保存还款详情
             //如果还款详情不为空则保存还款详情
@@ -201,12 +201,24 @@ public class SyncService implements ISyncService {
                     BigDecimal.ZERO.compareTo(creditLoanPay.getRemainAccrual())==0
                     ) {
                 // 更新借款表-还款完成同步
+                logger.info("update_mmanUserLoan=" + loanId + loan );
+
                 MmanUserLoan mmanUserLoan = new MmanUserLoan();
                 mmanUserLoan.setId(loanId);
+                Integer loanPenalty = Integer.parseInt(loan.getLoanPenalty()); //滞纳金
+                mmanUserLoan.setLoanPenalty(new BigDecimal(loanPenalty).divide(new BigDecimal(100)));
+                Integer accrual = Integer.parseInt(loan.getAccrual());//利息
+                mmanUserLoan.setAccrual(new BigDecimal(accrual).divide(new BigDecimal(100)));
                 mmanUserLoan.setLoanStatus(Constant.STATUS_OVERDUE_FIVE);//借款状态5 还款完成
                 mmanUserLoan.setUpdateTime(new Date());
                 localDataDao.updateMmanUserLoan(mmanUserLoan);
                 syncUtils.updateOrderAndLog(loanId,repaymentMap,localDataDao,payId);
+                //更新逾期天数
+                MmanLoanCollectionOrder order = new MmanLoanCollectionOrder();
+                order.setOverdueDays(loan.getOverdueDays());
+                order.setUpdateDate(new Date());
+                orderService.updateOverdueDays(order);
+
             }else {//如果部分还款，只更新订单表
                 syncUtils.updateMmanLoanCollectionOrder(localDataDao,loanId,repaymentMap,Constant.STATUS_OVERDUE_ONE);
             }
