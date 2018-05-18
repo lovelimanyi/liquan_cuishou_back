@@ -1,6 +1,7 @@
 package com.info.back.controller;
 
 import com.info.back.service.ISyncService;
+import com.info.back.utils.MQResponse;
 import com.info.vo.bigAmount.BigAmountRequestParams;
 import com.info.vo.bigAmount.Loan;
 import com.info.vo.bigAmount.Repayment;
@@ -68,7 +69,7 @@ public class SyncController {
      */
     @RequestMapping(value = "/loan-order-info",method = RequestMethod.POST,consumes = "application/json")
     @ResponseBody
-    public void dealwithOverdueOrder(HttpServletRequest request,@RequestBody CollectionNotifyDto collectionNotifyDto) {
+    public MQResponse dealwithOverdueOrder(HttpServletRequest request, @RequestBody CollectionNotifyDto collectionNotifyDto) {
         try {
             logger.info("accept_overdue_order_or_update=" + collectionNotifyDto);
             if (collectionNotifyDto != null) {
@@ -83,13 +84,17 @@ public class SyncController {
                 if (loan != null && repayment!= null ) {
                     //逾期同步或者每日更新
                     syncService.handleOverdue(repayment,loan,repaymentDetail);
+                    return new MQResponse(MQResponse.Code.SUCCESS);
                 } else {
                     logger.info("loan-order-info,repayment is null...");
+                    return new MQResponse(MQResponse.Code.ERROR) ;
                 }
             }
+            return new MQResponse(MQResponse.Code.ERROR) ;
         } catch (Exception e) {
             logger.error("loan-order-info-exception");
             e.printStackTrace();
+            return new MQResponse(MQResponse.Code.ERROR) ;
         }
     }
 
@@ -101,7 +106,7 @@ public class SyncController {
      */
     @RequestMapping(value = "/repayment" ,method = RequestMethod.POST)
     @ResponseBody
-    public void dealwithRepayment(@RequestBody CollectionNotifyDto collectionNotifyDto){
+    public MQResponse dealwithRepayment(@RequestBody CollectionNotifyDto collectionNotifyDto){
         logger.info("order_repayment=" + collectionNotifyDto);
         try{
 
@@ -114,13 +119,17 @@ public class SyncController {
                 if (loan != null && repayment!= null && repaymentDetailList != null && repaymentDetailList.size()>0) {
                     //还款同步
                     syncService.handleRepay(repayment,loan,repaymentDetailList);
+                    return new MQResponse(MQResponse.Code.SUCCESS);
                 } else {
                     logger.info("repayment,repayment is null...");
+                    return new MQResponse(MQResponse.Code.ERROR) ;
                 }
             }
+            return new MQResponse(MQResponse.Code.ERROR) ;
         }catch (Exception e){
             logger.error("repayment-exception");
             e.printStackTrace();
+            return new MQResponse(MQResponse.Code.ERROR) ;
         }
     }
 

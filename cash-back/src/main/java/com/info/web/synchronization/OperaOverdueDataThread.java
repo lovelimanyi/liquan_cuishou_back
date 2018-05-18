@@ -47,13 +47,15 @@ public class OperaOverdueDataThread implements Runnable {
 			map.put("ID", payId);//还款id
 			//还款信息--app端
 			HashMap<String,Object> repayment = this.dataDao.getAssetRepayment(map);
-//			loger.info("sync-borrowOrders:"+repayment);
+			loger.info("sync-borrowOrders:"+repayment);
 			String loanId = String.valueOf(repayment.get("asset_order_id"));//借款id
 			String userId  = String.valueOf(repayment.get("user_id"));    	//用户id
 			map.put("ORDER_ID", loanId);
 			map.put("USER_ID", userId);
 			String repaymentMoney =String.valueOf(repayment.get("repayment_amount"));
 			String repaymentedMoney = String.valueOf(repayment.get("repaymented_amount"));
+			loger.info("sync-repaymentMoney:"+payId+":"+repaymentMoney);
+            loger.info("sync-repaymentedMoney:"+payId+":"+repaymentedMoney);
 			if (null != repayment &&(!repaymentMoney.equals(repaymentedMoney))) {
 				try {
 					HashMap<String, Object> borrowOrder = null;					//借款信息--app端
@@ -88,7 +90,8 @@ public class OperaOverdueDataThread implements Runnable {
 						}
 						this.orderService.dispatchOrderNew(loanId,userInfo.get("id_number").toString(),Constant.SMALL);
 //						this.taskJobMiddleService.dispatchforLoanId(loanId,userInfo.get("id_number").toString(),Constant.SMALL);
-						if (repaymentDetailList != null && repaymentDetailList.size()>0){
+                        if (repaymentDetailList != null && repaymentDetailList.size()>0){
+                            loger.info("未逾期部分还款:"+loanId);
 							syncUtils.updateMmanLoanCollectionOrder(localDataDao,loanId,repayment,Constant.STATUS_OVERDUE_ONE);
 						}
 						RedisUtil.delRedisKey(Constant.TYPE_OVERDUE_ + payId);

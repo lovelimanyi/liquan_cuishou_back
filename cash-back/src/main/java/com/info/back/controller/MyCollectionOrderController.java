@@ -434,8 +434,8 @@ public class MyCollectionOrderController extends BaseController {
      * 跳转到订单详情页
      *
      * @param request
-     * @param response
-     * @param orderId
+     * @param
+     * @param
      * @param model
      * @return
      */
@@ -647,7 +647,8 @@ public class MyCollectionOrderController extends BaseController {
      */
     @RequestMapping(value = "/withhold-callback")
     @ResponseBody
-    public void dealWithholdResult(String text) {
+    public JsonResult dealWithholdResult(String text) {
+        JsonResult jsonResult = new JsonResult();
         try {
             logger.info("接收到代扣回调请求参数(小额)： " + text);
             JSONObject obj = JSONObject.parseObject(text);
@@ -669,10 +670,12 @@ public class MyCollectionOrderController extends BaseController {
             } else {
                 obj.put("1", "更新失败！");
             }
+            jsonResult.setCode("00");
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("处理代扣回调异常");
         }
+        return jsonResult;
     }
 
 
@@ -681,7 +684,8 @@ public class MyCollectionOrderController extends BaseController {
      */
     @RequestMapping(value = "/withhold-callback-big")
     @ResponseBody
-    public void updateWithholdResult(@RequestBody HashMap<String, Object> map) {
+    public JsonResult updateWithholdResult(@RequestBody HashMap<String, Object> map) {
+        JsonResult jsonResult = new JsonResult();
         try {
             JSONObject obj = JSONObject.parseObject(JSON.toJSONString(map));
             logger.info("接收到代扣回调请求参数(大额)： " + JSON.toJSONString(obj));
@@ -699,10 +703,12 @@ public class MyCollectionOrderController extends BaseController {
             parammMap.put("updateDate", new Date());
             // 更新代扣记录状态
             collectionWithholdingRecordService.updateWithholdStatus(parammMap);
+            jsonResult.setCode("00");
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("处理代扣回调异常");
         }
+        return jsonResult;
     }
 
 
