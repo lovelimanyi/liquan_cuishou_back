@@ -11,5 +11,5 @@ public interface IEstimateOrderService {
 
     Map<String, Object> getEstimateOrderList(HashMap<String, Object> params);
 
-    void pullEstimateOrder(Date pullDate, String pullType);
+    void pullEstimateOrder(String pullDate);
 }

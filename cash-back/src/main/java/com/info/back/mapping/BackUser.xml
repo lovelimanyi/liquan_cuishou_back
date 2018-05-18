@@ -339,6 +339,6 @@
 
     <select id="selectUserCount4Estimate" parameterType="String" resultType="java.lang.Integer">
         SELECT COUNT(*)  FROM  back_user
-        WHERE roleid =10021 and status=1 and group_level={groupLevel}
+        WHERE role_id =10021 and status=1 and group_level=${groupLevel}
     </select>
 </mapper>

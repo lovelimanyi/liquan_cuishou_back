@@ -22,7 +22,7 @@ public class EstimateOrderController extends BaseController {
     private IEstimateOrderService estimateOrderService;
 
     @RequestMapping("list")
-    public String list(Byte orderType, Integer orderAge, HttpServletRequest request, HttpServletResponse response, Model model) {
+    public String list(Byte orderType, Integer orderAge, String testDate, HttpServletRequest request, HttpServletResponse response, Model model) {
         HashMap<String, Object> params = this.getParametersO(request);
         HashMap<String, Object> objParams = new HashMap<>();
         objParams.put("orderAge", orderAge);
@@ -30,19 +30,21 @@ public class EstimateOrderController extends BaseController {
             orderType = 1;
         }
         objParams.put("orderType", orderType);
+        objParams.put("testDate", testDate);
         Map<String, Object> resultMap = estimateOrderService.getEstimateOrderList(objParams);
         model.addAllAttributes(resultMap);
 
         model.addAttribute("orderType", orderType);
         model.addAttribute("orderAge", orderAge);
         model.addAttribute("params", params);
+        model.addAttribute("testDate", testDate);
         return "estimate/list";
     }
 
     @RequestMapping("pull")
     @ResponseBody
-    public String pull(Byte orderType, Integer orderAge, HttpServletRequest request, HttpServletResponse response, Model model) {
-        estimateOrderService.pullEstimateOrder(null,null);
+    public String pull(String testDate, HttpServletRequest request, HttpServletResponse response, Model model) {
+        estimateOrderService.pullEstimateOrder(testDate);
         return "ok";
     }
 }

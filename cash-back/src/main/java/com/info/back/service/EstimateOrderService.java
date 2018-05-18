@@ -47,7 +47,13 @@ public class EstimateOrderService implements IEstimateOrderService {
     public Map<String, Object> getEstimateOrderList(HashMap<String, Object> params) {
         Map<String, Object> resultMap = new HashMap<String, Object>();
         try {
-            Date now = yyyyMMddSdf.parse(yyyyMMddSdf.format(new Date()));
+            Date now = null;
+            String testDate = MapUtils.getString(params, "testDate");
+            if (StringUtils.isBlank(testDate)) {
+                now = yyyyMMddSdf.parse(yyyyMMddSdf.format(new Date()));
+            } else {
+                now = yyyyMMddSdf.parse(testDate);
+            }
             String redisKey = "cuishou:estimate:" + yyyyMMddSdf.format(now);
             String estimateInfoStr = null;
             JSONObject estimateInfoJSON = null;
@@ -66,15 +72,17 @@ public class EstimateOrderService implements IEstimateOrderService {
                 endCalendar.add(Calendar.DAY_OF_MONTH, 7);
                 params.put("endOverDate", endCalendar.getTime());
                 List<EstimateOrder> estimateOrderList = estimateOrderDao.findAll(params);
+
                 Byte orderType = (Byte) params.get("orderType");
                 resultMap.put("estimateList", estimateOrderList);
                 Integer firstDayEstimateOrder = 0;
-                for (EstimateOrder estimateOrder : estimateOrderList) {
-                    Date overdDate = estimateOrder.getOverDate();
-                    Calendar overCalendar = Calendar.getInstance();
-                    overCalendar.add(Calendar.DAY_OF_MONTH, 1);
-                    if (overCalendar.get(Calendar.DAY_OF_MONTH) == 1) {
-                        firstDayEstimateOrder = estimateOrder.getEstimateOrderCount();
+                if (estimateOrderList != null && estimateOrderList.size() > 0) {
+                    for (EstimateOrder estimateOrder : estimateOrderList) {
+                        Calendar overCalendar = Calendar.getInstance();
+                        overCalendar.add(Calendar.DAY_OF_MONTH, 1);
+                        if (overCalendar.get(Calendar.DAY_OF_MONTH) == 1) {
+                            firstDayEstimateOrder = estimateOrder.getEstimateOrderCount();
+                        }
                     }
                 }
 
@@ -91,7 +99,7 @@ public class EstimateOrderService implements IEstimateOrderService {
                 } else if (ORDER_TYPE_BIG.equals(orderType)) {
                     dispatchInfo = getBigEstimateInfo(firstDayEstimateOrder);
                 }
-                resultMap.put("dispatchInfo",dispatchInfo);
+                resultMap.put("dispatchInfo", dispatchInfo);
                 JedisDataClient.set(redisKey, JSONObject.toJSONString(resultMap), TIME_DAY);
             }
         } catch (Exception e) {
@@ -208,10 +216,15 @@ public class EstimateOrderService implements IEstimateOrderService {
     }
 
     @Override
-    public void pullEstimateOrder(Date pullDate, String pullType) {
+    public void pullEstimateOrder(String pullDate) {
         try {
+            Date now = null;
+            if (StringUtils.isBlank(pullDate)) {
+                now = yyyyMMddSdf.parse(yyyyMMddSdf.format(new Date()));
+            } else {
+                now = yyyyMMddSdf.parse(pullDate);
+            }
             //小额催收预估
-            Date now = yyyyMMddSdf.parse(yyyyMMddSdf.format(new Date()));
             HashMap<String, Object> param = new HashMap<>();
             param.put("startTime", now);
             Calendar endCalendar = Calendar.getInstance();
@@ -220,14 +233,14 @@ public class EstimateOrderService implements IEstimateOrderService {
             param.put("endTime", endCalendar.getTime());
             List<HashMap<String, Object>> smallOrderList = dataDao.getEstimateOrder(param);
             if (smallOrderList != null && smallOrderList.size() > 0) {
-                HashMap<String, BigDecimal> smallOldRateMap = getSmallOldCollectionRate();
+                HashMap<String, BigDecimal> smallOldRateMap = getSmallOldCollectionRate(now);
                 doRecord(ORDER_TYPE_SMALL, smallOrderList, smallOldRateMap);
             }
 
             //大额催收预估
             List<HashMap<String, Object>> bigOrderList = getBigOrderInfoList(now, endCalendar.getTime());
             if (bigOrderList != null && bigOrderList.size() > 0) {
-                HashMap<String, BigDecimal> bigOldRateMap = getBigOldCollectionRate();
+                HashMap<String, BigDecimal> bigOldRateMap = getBigOldCollectionRate(now);
                 doRecord(ORDER_TYPE_BIG, bigOrderList, bigOldRateMap);
             }
 
@@ -299,14 +312,13 @@ public class EstimateOrderService implements IEstimateOrderService {
     }
 
     //计算小额历史入催率
-    private HashMap<String, BigDecimal> getSmallOldCollectionRate() {
+    private HashMap<String, BigDecimal> getSmallOldCollectionRate(Date now) {
         HashMap<String, BigDecimal> rateMap = new HashMap<>();
         BigDecimal orderRate = new BigDecimal(0);
         BigDecimal moneyRate = new BigDecimal(0);
         try {
             HashMap<String, HashMap<String, BigDecimal>> collectionCountMap = getCollectionInfo(ORDER_TYPE_SMALL);
             if (!(collectionCountMap == null || collectionCountMap.isEmpty())) {
-                Date now = yyyyMMddSdf.parse(yyyyMMddSdf.format(new Date()));
                 HashMap<String, Object> param = new HashMap<>();
                 param.put("endTime", now);
                 Calendar endCalendar = Calendar.getInstance();
@@ -383,12 +395,11 @@ public class EstimateOrderService implements IEstimateOrderService {
     }
 
     //获得大额预估入催率
-    private HashMap<String, BigDecimal> getBigOldCollectionRate() {
+    private HashMap<String, BigDecimal> getBigOldCollectionRate(Date now) {
         HashMap<String, BigDecimal> rateMap = new HashMap<>();
         try {
             HashMap<String, HashMap<String, BigDecimal>> collectionCountMap = getCollectionInfo(ORDER_TYPE_BIG);
             if (!(collectionCountMap == null || collectionCountMap.isEmpty())) {
-                Date now = yyyyMMddSdf.parse(yyyyMMddSdf.format(new Date()));
                 Calendar startCalendar = Calendar.getInstance();
                 startCalendar.setTime(now);
                 startCalendar.add(Calendar.DAY_OF_MONTH, -7);

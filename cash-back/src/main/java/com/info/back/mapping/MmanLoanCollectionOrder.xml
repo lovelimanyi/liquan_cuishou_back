@@ -930,9 +930,11 @@
 	</update>
 
     <select id="selectOrderCount4SmallEstemate" parameterType="String" resultType="java.lang.Integer">
-        <![CDATA[ SELECT count(*) FROM mman_loan_collection_order WHERE status<>4 and current_overdue_level={groupLevel}]]>
+        <![CDATA[ SELECT count(*) FROM mman_loan_collection_order WHERE status<>4 and current_overdue_level=${groupLevel}]]>
     </select>
     <select id="selectOrderCount4BigEstemate" parameterType="java.lang.Integer" resultType="java.lang.Integer">
-        <![CDATA[ SELECT count(*) FROM mman_loan_collection_order WHERE status<>4 and overdueDays=${overdueDays}]]>
+        <![CDATA[ SELECT count(*) FROM mman_loan_collection_order mlco
+            left join mman_user_loan mul ON mul.id = mlco.loan_id
+            WHERE mlco.status<>4 and mul.borrowing_type=1 and mlco.overdueDays=${overdueDays}]]>
     </select>
 </mapper>
