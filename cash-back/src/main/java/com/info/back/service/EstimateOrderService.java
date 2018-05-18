@@ -1,5 +1,6 @@
 package com.info.back.service;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.info.back.dao.IBackUserDao;
@@ -66,14 +67,37 @@ public class EstimateOrderService implements IEstimateOrderService {
                 }
             }
             if (estimateInfoJSON == null) {
-                params.put("startOverDate", now);
-                Calendar endCalendar = Calendar.getInstance();
-                endCalendar.setTime(now);
-                endCalendar.add(Calendar.DAY_OF_MONTH, 7);
-                params.put("endOverDate", endCalendar.getTime());
-                List<EstimateOrder> estimateOrderList = estimateOrderDao.findAll(params);
-
                 Byte orderType = (Byte) params.get("orderType");
+                List<EstimateOrder> estimateOrderList = new ArrayList<>();
+                Calendar overDateCalendar = Calendar.getInstance();
+                overDateCalendar.setTime(now);
+                for(int i=1;i<8;i++){
+                    Date curDate = overDateCalendar.getTime();
+                    params.put("overDate", curDate);
+                    List<EstimateOrder> tempList = estimateOrderDao.findAll(params);
+                    if(tempList!=null && tempList.size()>0){
+                        estimateOrderList.add(tempList.get(0));
+                    }else{
+                        EstimateOrder estimateOrder = new EstimateOrder();
+                        estimateOrder.setOverDate(curDate);
+                        estimateOrder.setOrderCount(0);
+                        estimateOrder.setAmountTotal(0L);
+                        Calendar tmp = Calendar.getInstance();
+                        tmp.setTime(curDate);
+                        tmp.add(Calendar.DAY_OF_MONTH,1);
+                        estimateOrder.setCollectionDate(tmp.getTime());
+                        if(ORDER_TYPE_SMALL.equals(orderType)){
+                            estimateOrder.setOrderAge(3);
+                        }else{
+                            estimateOrder.setOrderAge(11);
+                        }
+                        estimateOrder.setEstimateAmountCount(0L);
+                        estimateOrder.setEstimateOrderCount(0);
+                        estimateOrderList.add(estimateOrder);
+                    }
+                    overDateCalendar.add(Calendar.DAY_OF_MONTH,1);
+                }
+
                 resultMap.put("estimateList", estimateOrderList);
                 Integer oldOrderRate = 0;
                 Integer oldAmountRate = 0;
@@ -333,6 +357,7 @@ public class EstimateOrderService implements IEstimateOrderService {
         BigDecimal moneyRate = new BigDecimal(0);
         try {
             HashMap<String, HashMap<String, BigDecimal>> collectionCountMap = getCollectionInfo(ORDER_TYPE_SMALL);
+            System.out.println("小额入催数据："+ JSONObject.toJSONString(collectionCountMap));
             if (!(collectionCountMap == null || collectionCountMap.isEmpty())) {
                 HashMap<String, Object> param = new HashMap<>();
                 param.put("endTime", now);
@@ -341,6 +366,7 @@ public class EstimateOrderService implements IEstimateOrderService {
                 endCalendar.add(Calendar.DAY_OF_MONTH, -7);
                 param.put("startTime", endCalendar.getTime());
                 List<HashMap<String, Object>> orderList = dataDao.getEstimateOrder(param);
+                System.out.println("小额到期数据："+ JSONObject.toJSONString(orderList));
                 rateMap = getRateMap(orderList, collectionCountMap);
             }
         } catch (Exception e) {
@@ -414,11 +440,13 @@ public class EstimateOrderService implements IEstimateOrderService {
         HashMap<String, BigDecimal> rateMap = new HashMap<>();
         try {
             HashMap<String, HashMap<String, BigDecimal>> collectionCountMap = getCollectionInfo(ORDER_TYPE_BIG);
+            System.out.println("大额历史入催数据："+ JSONObject.toJSONString(collectionCountMap));
             if (!(collectionCountMap == null || collectionCountMap.isEmpty())) {
                 Calendar startCalendar = Calendar.getInstance();
                 startCalendar.setTime(now);
                 startCalendar.add(Calendar.DAY_OF_MONTH, -7);
                 List<HashMap<String, Object>> bigOrderList = getBigOrderInfoList(startCalendar.getTime(), now);
+                System.out.println("大额历史到期催数据："+ JSONObject.toJSONString(bigOrderList));
                 rateMap = getRateMap(bigOrderList, collectionCountMap);
             }
         } catch (Exception e) {
@@ -445,21 +473,21 @@ public class EstimateOrderService implements IEstimateOrderService {
                     BigDecimal orderCountBig = new BigDecimal(orderInfo.get("orderCount").toString());
                     if (orderCountBig.longValue() > 0) {
                         BigDecimal collectionOrderCountBig = collectionInfo.get("orderCount");
-                        BigDecimal tmp = collectionOrderCountBig.divide(orderCountBig, 2, BigDecimal.ROUND_HALF_UP);
+                        BigDecimal tmp = collectionOrderCountBig.divide(orderCountBig, 4, BigDecimal.ROUND_HALF_UP);
                         orderRate = orderRate.add(tmp);
                     }
 
                     BigDecimal orderMoneyCountBig = new BigDecimal(MapUtils.getString(orderInfo, "principal", "0"));
                     if (orderMoneyCountBig.doubleValue() > 0) {
                         BigDecimal collectionMoney = collectionInfo.get("loanMoney").multiply(PERCENT);
-                        BigDecimal tmp = collectionMoney.divide(orderMoneyCountBig, 2, BigDecimal.ROUND_HALF_UP);
+                        BigDecimal tmp = collectionMoney.divide(orderMoneyCountBig, 4, BigDecimal.ROUND_HALF_UP);
                         moneyRate = moneyRate.add(tmp);
                     }
                 }
             }
         }
-        rateMap.put("orderRate", orderRate.divide(AVG_DAYS, 2, BigDecimal.ROUND_HALF_UP));
-        rateMap.put("moneyRate", moneyRate.divide(AVG_DAYS, 2, BigDecimal.ROUND_HALF_UP));
+        rateMap.put("orderRate", orderRate.divide(AVG_DAYS, 4, BigDecimal.ROUND_HALF_UP));
+        rateMap.put("moneyRate", moneyRate.divide(AVG_DAYS, 4, BigDecimal.ROUND_HALF_UP));
         return rateMap;
     }
 }

@@ -24,6 +24,7 @@ public class EstimateOrderController extends BaseController {
 
     @RequestMapping("list")
     public String list(Byte orderType, Integer orderAge, String testDate, HttpServletRequest request, HttpServletResponse response, Model model) {
+        System.out.println("estimate-list");
         HashMap<String, Object> params = this.getParametersO(request);
         HashMap<String, Object> objParams = new HashMap<>();
         objParams.put("orderAge", orderAge);

@@ -30,7 +30,6 @@
 		estimate_amount_count,
 		orderType,
 		old_collection_rate,
-		old_collection_rate,
 		old_collection_amount_rate)
 		values ( #{overDate,jdbcType=TIMESTAMP},
 		 #{orderCount,jdbcType=INTEGER},
@@ -83,6 +82,9 @@
 	<sql id="selectWhere">
 		from estimate_order
 		<where>
+			<if test="overDate != null">
+				<![CDATA[ over_date =#{overDate,jdbcType=TIMESTAMP} ]]>
+			</if>
 			<if test="startOverDate != null">
 				<![CDATA[ over_date >=#{startOverDate,jdbcType=TIMESTAMP} ]]>
 			</if>

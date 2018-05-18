@@ -81,14 +81,15 @@
         </div>
         <div style="padding-right:5px;padding-left: 5px;margin-top:15px;">
             <div style="background: #87CEFA;height: 30px;line-height: 30px;padding:3px; color: #FFFFFF;">
-                未来几天入催情况：近七天本金平均入催率：
-                <span style="color: red">
-                    <fmt:formatNumber value="${oldAmountRate/100}" pattern="##.##" minFractionDigits="2" ></fmt:formatNumber>%
-                </span>，
-                订单平均入催率：
+                未来7天入催情况：(近7天订单平均入催率：
                 <span style="color: red">
                     <fmt:formatNumber value="${oldOrderRate/100}" pattern="##.##" minFractionDigits="2" ></fmt:formatNumber>%
-                </span>
+                </span>，
+                金额平均入催率：
+                <span style="color: red">
+                    <fmt:formatNumber value="${oldAmountRate/100}" pattern="##.##" minFractionDigits="2" ></fmt:formatNumber>%
+                </span>)
+
             </div>
 
         </div>

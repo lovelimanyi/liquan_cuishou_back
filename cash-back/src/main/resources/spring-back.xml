@@ -61,6 +61,7 @@
                         <value>/collectionOrder/withhold-callback-big</value>
                         <value>/statistics/doStatistics</value>
                         <value>/sendSmsBack</value>
+                        <value>/estimate/pull</value>
                     </list>
                 </property>
             </bean>
