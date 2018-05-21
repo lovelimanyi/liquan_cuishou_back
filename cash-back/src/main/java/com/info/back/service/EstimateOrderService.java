@@ -41,7 +41,8 @@ public class EstimateOrderService implements IEstimateOrderService {
     private static final String BIG_SUCCESS_CODE = "00";
 
 //    private static final String BIG_PATH = "http://118.31.47.225:8082/be/getRepaymentOrderForCollection";//预生产
-    private static final String BIG_PATH = "http://192.168.5.46:8082/be/getRepaymentOrderForCollection";
+    private static final String BIG_PATH = "http://10.81.168.96:8083/be/getRepaymentOrderForCollection";//线上
+    //    private static final String BIG_PATH = "http://192.168.5.46:8082/be/getRepaymentOrderForCollection";
     private static final Integer TIME_DAY = 60 * 60 * 24;
 
     @Override
