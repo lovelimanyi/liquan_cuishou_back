@@ -1,18 +1,22 @@
 package com.info.back.controller;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import com.alibaba.fastjson.JSON;
-import com.info.back.service.*;
+import com.info.back.result.JsonResult;
+import com.info.back.service.IBackUserCompanyPermissionService;
+import com.info.back.service.ICollectionCompanyService;
+import com.info.back.service.ICollectionService;
+import com.info.back.utils.BackConstant;
+import com.info.back.utils.DwzResult;
+import com.info.back.utils.IdGen;
+import com.info.back.utils.SpringUtils;
+import com.info.constant.Constant;
+import com.info.web.pojo.BackUser;
 import com.info.web.pojo.BackUserCompanyPermissions;
+import com.info.web.pojo.Collection;
+import com.info.web.pojo.MmanLoanCollectionCompany;
 import com.info.web.util.JedisDataClient;
-import jdk.nashorn.internal.runtime.ECMAException;
+import com.info.web.util.PageConfig;
+import com.info.web.util.encrypt.MD5coding;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
@@ -21,19 +25,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import com.info.back.result.JsonResult;
-import com.info.back.utils.BackConstant;
-import com.info.back.utils.DwzResult;
-import com.info.back.utils.IdGen;
-import com.info.back.utils.SpringUtils;
-import com.info.constant.Constant;
-import com.info.web.pojo.BackUser;
-import com.info.web.pojo.Collection;
-import com.info.web.pojo.MmanLoanCollectionCompany;
-import com.info.web.util.PageConfig;
-import com.info.web.util.encrypt.MD5coding;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 催收员管理Controller
