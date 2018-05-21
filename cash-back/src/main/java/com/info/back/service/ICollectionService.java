@@ -6,6 +6,8 @@ import com.info.back.result.JsonResult;
 import com.info.web.pojo.Collection;
 import com.info.web.util.PageConfig;
 
+import javax.servlet.http.HttpServletRequest;
+
 public interface ICollectionService {
 	/**
 	 * 查询催收员记录
@@ -53,5 +55,7 @@ public interface ICollectionService {
 	 * @return
 	 */
 	Collection getCollectionByUserAccount(String userAccount);
+
+	boolean verifyCodeAccess(HttpServletRequest request);
 
 }
