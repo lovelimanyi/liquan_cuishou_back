@@ -206,15 +206,18 @@ public class AuditCenterController extends BaseController{
 			mapParamm.put("id", uuid);
 			// status: 2 通过  5通过不计考核  -1减免失败
 			if(result){
+				mapParamm.put("auditId", uuid);
 				mapParamm.put("status", obj.get("status"));
 				mapParamm.put("orderStatus",Constant.STATUS_OVERDUE_FOUR);
-				mapParamm.put("reduction",new BigDecimal(reductionMoney).divide(new BigDecimal(100)));
+				mapParamm.put("reductionMoney",new BigDecimal(reductionMoney).divide(new BigDecimal(100)));
 			}else {
 				mapParamm.put("status", "-1");
 				mapParamm.put("orderStatus",Constant.STATUS_OVERDUE_ONE);
 				mapParamm.put("reductionMoney",0);
 			}
-			auditCenterDao.updateAuditStatus(map);
+			auditCenterDao.updateAuditStatus(mapParamm);
+		    AuditCenter auditCenter = auditCenterDao.findAuditId(uuid);
+			mapParamm.put("orderId",auditCenter.getOrderid());
 			manLoanCollectionOrderDao.updateReductionOrder(mapParamm);
 
 		} catch (Exception e) {
@@ -222,7 +225,7 @@ public class AuditCenterController extends BaseController{
 			logger.error("减免回调异常"+msg);
 			return new MQResponse(MQResponse.Code.ERROR) ;
 		}
-		return new MQResponse(MQResponse.Code.SUCCESS);
+		return new MQResponse();
 	}
 
 
