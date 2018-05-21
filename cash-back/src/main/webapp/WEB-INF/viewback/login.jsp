@@ -9,7 +9,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<title>现金侠催收管理系统</title>
 	<link rel='icon' href='<%=path %>/admin-favicon.ico' type=‘image/x-ico’ />
-	<!--<script type="text/javascript" src="<%=path %>/resources/js/jquery.js"></script>-->
+	<script type="text/javascript" src="<%=path %>/common/back/js/jquery-1.7.2.js"></script>
 	<script type="text/javascript" src="<%=path %>/resources/js/DD_belatedPNG.js"></script>
 	<!--<script type="text/javascript" src="<%=path %>/common/js/desencrypt.js"></script>-->
 	<!--<script type="text/javascript" src="<%=path %>/common/js/tripledes.js"></script>-->
@@ -83,6 +83,15 @@
 											</td>
 										</tr>
 										<tr>
+											<td height="40" align="right"><strong>短信验证码：</strong></td>
+											<td>
+												<input name="smsCode" type="text" id="smsCode" maxlength="32"  class="input" style="width: 100px;" />
+												<a href="javascript:;" id="sendCode" onclick="sendCode();"
+												   style="display:inline-block; background: #fff; color: #ff0000; width: 74px; font-size: 12px; font-size: 12px; line-height: 30px; text-align: center;" >
+													获取验证码</a>
+											</td>
+										</tr>
+										<tr>
 											<td height="80" colspan="2" align="center" class="sub">
 												<input type="image" src="<%=path %>/common/back/images/login.png" name="submit" />&nbsp; &nbsp;&nbsp;</td>
 										</tr>
@@ -98,6 +107,7 @@
 </div>
 </body>
 <script>
+
     function login(){
         if (jvForm.userAccount.value==""){
             alert("用户名不能为空！");
@@ -108,9 +118,63 @@
         }else if (jvForm.captcha.value==""){
             alert("验证码不能为空！");
             return false;
+        }else if (jvForm.smsCode.value==""){
+            alert("短信验证码不能为空！");
+            return false;
         }
         <!--    jvForm.password.value=encryptByDES(jvForm.password.value, jvForm.publickey.value);-->
     }
+    var wait = 60;
+    function time(htmlId, click) {
+        if (wait == 0) {
+            $("#" + htmlId).attr("onclick", click);
+            $("#" + htmlId).text("获取验证码");
+            wait = 60;
+        } else {
+            $("#" + htmlId).text(wait + "秒后重试");
+            $("#" + htmlId).removeAttr("onclick");
+            wait--;
+            setTimeout(function() {
+                time(htmlId, click);
+            }, 1000);
+        }
+    }
+    function sendCode() {
+        if (jvForm.userAccount.value==""){
+            alert("用户名不能为空！");
+            return false;
+        }else if (jvForm.userPassword.value==""){
+            alert("密码不能为空！");
+            return false;
+        }else if (jvForm.captcha.value==""){
+            alert("验证码不能为空！");
+            return false;
+        }else{
+            $.ajax({
+                type : "post",
+                data:{
+                    "userAccount":$("[name='userAccount']").val(),
+                    "userPassword":$("[name='userPassword']").val(),
+                    "RCaptchaKey":$("[name='RCaptchaKey']").val(),
+                    "captcha":$("[name='captcha']").val()
+                },
+                url : "sendSmsBack",
+                success : function(ret) {
+                    if(ret.code == '200'){
+                        time('sendCode','sendCode()');
+                        alert(ret.msg);
+                    }else{
+                        $("#imgCap").trigger("click");
+                        alert(ret.msg);
+                    }
+                },
+                error:function(ret){
+                    $("#imgCap").trigger("click");
+                }
+            });
+        }
+    }
+
     var msg="${message}";
     if(msg){
         alert(msg);

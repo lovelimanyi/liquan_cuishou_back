@@ -109,7 +109,7 @@
         <task:scheduled ref="taskDealWithSpecialOrder" method="updateOrderInfo" cron="0 0 7 2 * ?"/>   <!-- 应产品需求，修改每月1号完成订单至指定催收员(每月2号7点执行) -->
         <task:scheduled ref="taskUpdateOrderInfo" method="updateOrderInfo" cron="0 0 3 * * ?"/>
         <task:scheduled ref="taskDealwithOrderUpgrade" method="orderUpgrade" cron="0 16 17 * * ?"/>
-        <task:scheduled ref="taskEstimateOrder" method="pullEstimateOrder" cron="0 0 2 * * ?"/>
+        <task:scheduled ref="taskEstimateOrder" method="pullEstimateOrder" cron="0 30 7 * * ?"/>
     </task:scheduled-tasks>
     <!--最多 5个定时任务线程-->
     <task:scheduler id="myScheduler" pool-size="6"/>
