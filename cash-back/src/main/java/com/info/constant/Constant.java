@@ -111,13 +111,14 @@ public class Constant {
      */
     public static final String ADVERT = "advert";
     /**
-     * 审核状态类型status    0 审核中，2审核通过 3，拒绝 ,4失效 5,通过不计入考核
+     * 审核状态类型status    0 审核中，2审核通过 3，拒绝 ,4失效 5,通过不计入考核  6处理中
      */
     public static final String AUDIT_CHECKING = "0";
     public static final String AUDIT_PASS = "2";
     public static final String AUDIT_REFUSE = "3";
     public static final String AUDIT_INVALID = "4";
     public static final String AUDIT_PASS_NO_CHECK = "5";
+    public static final String AUDIT_DOING = "6";
     /**
      * 审核type  1:聚信立，2 催收建议 ,3 减免 , 4 催收详情
      */
@@ -245,9 +246,21 @@ public class Constant {
      * 催收代扣队列名----大额
      */
     public static final String CUISHOU_WITHHOLD_QUEUE_BIG = "collection_withhold_push_queue";
+    /**
+     * 催收减免队列----大额
+     */
+    public static final String CUISHOU_BIG_REDUCTION_QUEUE="collection_deduct_push_queue";
 
     /**
      * 区分大小额订单标识符（大额订单借款id、还款id皆带有此标识）
      */
     public static final String SEPARATOR_FOR_ORDER_SOURCE = "-";
+
+    /**
+     * 减免订单类型  1大额  2小额  3分期商城
+     */
+    public static final String ORDER_TYPE_BIG = "1";
+    public static final String ORDER_TYPE_SMALL = "2";
+    public static final String ORDER_TYPE_Fen = "3";
+
 }

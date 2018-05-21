@@ -1,30 +1,37 @@
 package com.info.back.controller;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import com.info.back.service.*;
-import com.info.back.utils.MaskCodeUtil;
-import com.info.web.pojo.*;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.info.back.dao.IAuditCenterDao;
+import com.info.back.dao.IMmanLoanCollectionOrderDao;
+import com.info.back.result.JsonResult;
+import com.info.back.service.IAuditCenterService;
+import com.info.back.service.ICollectionCompanyService;
+import com.info.back.service.IMmanLoanCollectionCompanyService;
+import com.info.back.service.ISysDictService;
+import com.info.back.utils.*;
+import com.info.constant.Constant;
+import com.info.web.pojo.AuditCenter;
+import com.info.web.pojo.BackUser;
+import com.info.web.pojo.MmanLoanCollectionCompany;
+import com.info.web.pojo.SysDict;
 import com.info.web.util.DateUtil;
+import com.info.web.util.PageConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.info.back.result.JsonResult;
-import com.info.back.utils.BackConstant;
-import com.info.back.utils.DwzResult;
-import com.info.back.utils.SpringUtils;
-import com.info.constant.Constant;
-import com.info.web.util.PageConfig;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 信息审核
@@ -44,6 +51,10 @@ public class AuditCenterController extends BaseController{
 	// 公司
 	@Autowired
 	private IMmanLoanCollectionCompanyService mmanLoanCollectionCompanyService;
+	@Autowired
+	private IAuditCenterDao auditCenterDao;
+	@Autowired
+	private IMmanLoanCollectionOrderDao manLoanCollectionOrderDao;
 	/**
 	 * 查询信息审核列表
 	 * @param request
@@ -89,9 +100,9 @@ public class AuditCenterController extends BaseController{
 		}
 		return "auditCenter/auditCenterList";
 	}
-	
-	
-	
+
+
+
 	@RequestMapping("addAuditCenter")
 	public String addAuditCenter(HttpServletRequest request,HttpServletResponse response,Model model){
 		String erroMsg = null;
@@ -108,16 +119,16 @@ public class AuditCenterController extends BaseController{
 		model.addAttribute("params", params);
 		return null;
 	}
-	
+
 	@RequestMapping("toUpdateAuditCenter")
 	public String toUpdateAuditCenter(HttpServletRequest request,HttpServletResponse response,Model model){
 		Map<String, String> params =this.getParameters(request);
 		model.addAttribute("params", params);
 		return "auditCenter/updateAudit";
 	}
-	
-	
-	
+
+
+
 	@RequestMapping("updateAuditCenter")
 	public String updateAuditCenter(HttpServletRequest request,HttpServletResponse response,Model model){
 		JsonResult result=new JsonResult("-1","操作失败");
@@ -131,27 +142,27 @@ public class AuditCenterController extends BaseController{
 		model.addAttribute("params", params);
 		return null;
 	}
-		@RequestMapping("toUpdateAuditCenterStatus")
-		public String toUpdateAuditCenterStatus(HttpServletRequest request,HttpServletResponse response,Model model){
-			Map<String, String> params =this.getParameters(request);
-			model.addAttribute("params", params);
-			return "auditCenter/statusUpdate";
-		}
+	@RequestMapping("toUpdateAuditCenterStatus")
+	public String toUpdateAuditCenterStatus(HttpServletRequest request,HttpServletResponse response,Model model){
+		Map<String, String> params =this.getParameters(request);
+		model.addAttribute("params", params);
+		return "auditCenter/statusUpdate";
+	}
 
-	 @RequestMapping("updateAuditCenterStatus")
-	 public String updateAuditCenterStatus(HttpServletRequest request,HttpServletResponse response,Model model) {
-		 String erroMsg = null;
-		 JsonResult result = new JsonResult("-1", "操作失败");
-		 Map<String, String> params = this.getParameters(request);
-		 try {
-			 result = auditCenterService.updateAuditCenter(params);
-		 } catch (Exception e) {
-			 e.printStackTrace();
-		 }
-		 SpringUtils.renderDwzResult(response, "0".equals(result.getCode()), result.getMsg(), DwzResult.CALLBACK_CLOSECURRENT, params.get("parentId").toString());
-		 model.addAttribute("params", params);
-		 return null;
-	 }
+	@RequestMapping("updateAuditCenterStatus")
+	public String updateAuditCenterStatus(HttpServletRequest request,HttpServletResponse response,Model model) {
+		String erroMsg = null;
+		JsonResult result = new JsonResult("-1", "操作失败");
+		Map<String, String> params = this.getParameters(request);
+		try {
+			result = auditCenterService.updateAuditCenter(params);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		SpringUtils.renderDwzResult(response, "0".equals(result.getCode()), result.getMsg(), DwzResult.CALLBACK_CLOSECURRENT, params.get("parentId").toString());
+		model.addAttribute("params", params);
+		return null;
+	}
 	@RequestMapping("fingAllPageList")
 	public String fingAllPageList(HttpServletRequest request,HttpServletResponse response, Model model) {
 		try {
@@ -175,4 +186,44 @@ public class AuditCenterController extends BaseController{
 		}
 		return "mycollectionorder/getorderPage";
 	}
+
+	/**
+	 * 异步处理（减免回调）
+	 */
+	@RequestMapping(value = "/reduction-callback-big")
+	@ResponseBody
+	public MQResponse updateReductionResult(@RequestBody HashMap<String, Object> map) {
+		String msg = "";
+		try {
+			JSONObject obj = JSONObject.parseObject(JSON.toJSONString(map));
+			logger.info("接收到减免回调请求参数(大额)： " +obj.get("repaymentId").toString()+ JSON.toJSONString(obj));
+			String uuid = (String) obj.get("uuid");
+			boolean result = (boolean) obj.get("result");
+			msg = obj.get("msg").toString();
+			Integer reductionMoney = (Integer) obj.get("reductionMoney");
+			HashMap<String, Object> mapParamm = new HashMap<>();
+			mapParamm.put("id", uuid);
+			// status: 2 通过  5通过不计考核  -1减免失败
+			if(result){
+				mapParamm.put("status", obj.get("status"));
+				mapParamm.put("orderStatus",Constant.STATUS_OVERDUE_FOUR);
+				mapParamm.put("reduction",new BigDecimal(reductionMoney).divide(new BigDecimal(100)));
+			}else {
+				mapParamm.put("status", "-1");
+				mapParamm.put("orderStatus",Constant.STATUS_OVERDUE_ONE);
+				mapParamm.put("reductionMoney",0);
+			}
+			auditCenterDao.updateAuditStatus(map);
+			manLoanCollectionOrderDao.updateReductionOrder(mapParamm);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("减免回调异常"+msg);
+			return new MQResponse(MQResponse.Code.ERROR) ;
+		}
+		return new MQResponse(MQResponse.Code.SUCCESS);
+	}
+
+
+
 }

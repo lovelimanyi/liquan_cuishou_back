@@ -219,33 +219,39 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
                     CreditLoanPay pay = creditLoanPayDao.findByLoanId(order.getLoanId());
                     MmanUserLoan loan = mmanUserLoanDao.get(order.getLoanId());
 
-
                     //应还金额
                     BigDecimal receivableMoney = pay.getReceivableMoney();
-                    //本金--后期变为 本金+服务费
-                    BigDecimal loanMoney = null;
-                    if (loan.getPaidMoney() != null && loan.getPaidMoney().intValue() > 0) {
-                        loanMoney = loan.getPaidMoney();
+                    // 借款利息
+                    BigDecimal accrual = loan.getAccrual() == null ? BigDecimal.ZERO : loan.getAccrual();
+                    //本金--后期变为 本金+服务费（大额为本金+利息）
+                    BigDecimal loanMoney;
+                    if (loan.getPaidMoney() != null && loan.getPaidMoney().compareTo(BigDecimal.ZERO) == 1) {
+                        loanMoney = loan.getPaidMoney().add(accrual);
                     } else {
-                        loanMoney = loan.getLoanMoney();
+                        loanMoney = loan.getLoanMoney().add(accrual);
                     }
-                    //滞纳金
+                    // 滞纳金
                     BigDecimal loanPenalty = loan.getLoanPenalty();
-                    //已还金额
+                    // 已还金额
                     BigDecimal realMoney = pay.getRealMoney();
-                    //可减免金额
-                    BigDecimal deductibleMoney = null;
-                    if (realMoney.compareTo(loanMoney) >= 0) {
+                    // 可减免金额
+                    BigDecimal deductibleMoney;
+                    if (realMoney.compareTo(loanMoney) == 1 || realMoney.compareTo(loanMoney) == 0) {
                         deductibleMoney = receivableMoney.subtract(realMoney);
                     } else {
                         deductibleMoney = new BigDecimal(0);
                     }
+//                    if (Constant.BIG.equals(loan.getBorrowingType())) {
+//                        params.put("type", Constant.BIG);
+//                    }
+                    params.put("accrual", accrual);
                     params.put("receivableMoney", receivableMoney);//应还金额
-                    params.put("loanMoney", loanMoney);//本金
+                    params.put("loanMoney", loanMoney.subtract(accrual));//本金
                     params.put("loanPenalty", loanPenalty);//滞纳金
                     params.put("realMoney", realMoney);//已还金额
                     params.put("deductibleMoney", deductibleMoney);//可减免金额
                     params.put("loanId", order.getLoanId());//借款id
+                    params.put("type", loan.getBorrowingType());
                 } else {
                     logger.info("toReductionPage,order is null,请核实id = " + params.get("id"));
                 }

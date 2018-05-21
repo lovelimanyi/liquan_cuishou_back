@@ -47,7 +47,8 @@
 		ac.loan_id,
 		ac.pay_id,
 		ac.orderId,
-		ac.type,
+		ac.type
+		ac.order_type AS orderType,
 		ac.status,
 		ac.audittime,
 		ac.createtime,
@@ -99,6 +100,7 @@
 		ac.`operation_user_id` as operationUserId,
 		co.title as companyName,
 		ac.`type`,
+		ac.`order_type` AS orderType,
 		ac.`status`,
 		ac.`audittime`,
 		ac.`remark`,
@@ -146,6 +148,7 @@
 		ac.`createtime`,
 		ac.`operation_user_id` AS operationUserId,
 		ac.`type`,
+		ac.`order_type` AS orderType,
 		ac.`status`,
 		ac.`audittime`,
 		ac.`remark`,
@@ -198,6 +201,9 @@
       <if test="type != null">
         type,
       </if>
+	<if test="orderType != null">
+		order_type,
+	</if>
       <if test="status != null">
         status,
       </if>
@@ -257,6 +263,9 @@
       <if test="type != null">
         #{type,jdbcType=VARCHAR},
       </if>
+		<if test="orderType != null">
+			#{orderType,jdbcType=VARCHAR},
+		</if>
       <if test="status != null">
         #{status,jdbcType=VARCHAR},
       </if>

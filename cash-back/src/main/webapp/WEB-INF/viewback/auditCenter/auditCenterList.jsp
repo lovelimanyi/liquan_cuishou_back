@@ -23,6 +23,7 @@
 							<option value='3' <c:if test="${params.status eq '3'}">selected="selected"</c:if>>拒绝</option>
 							<option value='4' <c:if test="${params.status eq '4'}">selected="selected"</c:if>>失效</option>
 							<option value='5' <c:if test="${params.status eq '5'}">selected="selected"</c:if>>通过不计入绩效</option>
+							<option value='6' <c:if test="${params.status eq '6'}">selected="selected"</c:if>>处理中，稍后查看处理状态</option>
 						</select>
 					</td>
 					<td>
@@ -157,6 +158,7 @@
 									<c:when test="${audit.status eq '3'}">拒绝</c:when>
 									<c:when  test="${audit.status eq '4'}"> <span style="color:red;">失效</c:when>
 									<c:when  test="${audit.status eq '5'}">通过不计入考核</c:when>
+									<c:when  test="${audit.status eq '6'}">处理中，稍后查看处理状态</c:when>
 								</c:choose>
 							</td>
 							<td>

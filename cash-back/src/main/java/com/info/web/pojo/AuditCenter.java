@@ -23,6 +23,9 @@ public class AuditCenter {
     private BigDecimal reductionMoney;
     //0:聚信立，1 催收建议 3订单减免
     private String type;
+	//1大额，2小额，3分期商城
+	private String orderType;
+
     //状态 0 申请中，2审核通过 3，拒绝 ,4失效 5,通过不计入考核
     private String status;
     //审核时间
@@ -60,6 +63,14 @@ public class AuditCenter {
 	private String companyName;
 	// 催收状态
 	private String collectionStatus;
+
+	public String getOrderType() {
+		return orderType;
+	}
+
+	public void setOrderType(String orderType) {
+		this.orderType = orderType;
+	}
 
 	public String getCompanyName() {
 		return companyName;

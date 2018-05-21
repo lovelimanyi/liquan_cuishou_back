@@ -62,6 +62,7 @@
                         <value>/statistics/doStatistics</value>
                         <value>/sendSmsBack</value>
                         <value>/estimate/pull</value>
+                        <value>/auditCenter/reduction-callback-big</value>
                     </list>
                 </property>
             </bean>

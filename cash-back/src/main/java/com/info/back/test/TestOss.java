@@ -12,6 +12,7 @@ import com.info.back.vo.jxl_jlm.JlmReport;
 import com.info.constant.Constant;
 import com.info.web.util.DateUtil;
 import com.liquan.oss.OSSUpload;
+import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -33,6 +34,10 @@ public class TestOss {
 
     @Test
     public void test() {
+
+        String payId = StringUtils.substringBefore("1111-0",Constant.SEPARATOR_FOR_ORDER_SOURCE);
+        System.out.println(payId);
+
 
         BigDecimal aaa = new BigDecimal(2);
         BigDecimal bb = aaa.divide(new BigDecimal(10000));

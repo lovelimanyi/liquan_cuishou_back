@@ -9,10 +9,14 @@ import com.info.web.pojo.AuditCenter;
 import com.info.web.pojo.BackUser;
 import com.info.web.pojo.MmanLoanCollectionOrder;
 import com.info.web.util.HttpUtil;
+import com.info.web.util.JSONUtil;
 import com.info.web.util.PageConfig;
 import com.info.web.util.encrypt.AESUtil;
 import com.info.web.util.encrypt.MD5coding;
+import com.xjx.mqclient.pojo.MqMessage;
+import com.xjx.mqclient.service.MqClient;
 import net.sf.json.JSONObject;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +49,8 @@ public class AuditCenterService implements IAuditCenterService {
     @Autowired
     private ICreditLoanPayDao iCreditLoanPayDao;
     private MmanLoanCollectionOrder order;
+    @Autowired
+    private MqClient mqClient;
 
     @Override
     public JsonResult svueAuditCenter(Map<String, String> params) {
@@ -151,8 +157,34 @@ public class AuditCenterService implements IAuditCenterService {
                             BigDecimal reductionMoneyBig = auditCenter.getReductionMoney();
                             BigDecimal big100 = new BigDecimal(100);
                             int reductionMoney = reductionMoneyBig.multiply(big100).intValue();//减免滞纳金
+                            //如果是大额的  需要处理还款id
+                            if (auditCenter.getPayId().contains(Constant.SEPARATOR_FOR_ORDER_SOURCE)){
+                                String payId = StringUtils.substringBefore(auditCenter.getPayId(),Constant.SEPARATOR_FOR_ORDER_SOURCE);
+                                auditCenter.setPayId(payId);
+                            }
 
                             String sign = MD5coding.MD5(AESUtil.encrypt(auditCenter.getLoanUserId()+auditCenter.getPayId()+reductionMoney+auditCenter.getId(),PayContents.XJX_WITHHOLDING_NOTIFY_KEY));
+                            //TODO 如果是大额或者分期商城订单减免，调用大额减免接口
+                            if(Constant.ORDER_TYPE_BIG.equals(auditCenter.getOrderType()) ||Constant.ORDER_TYPE_Fen.equals(auditCenter.getOrderType())){
+                                MqMessage msg = new MqMessage();
+                                msg.setQueueName(Constant.CUISHOU_BIG_REDUCTION_QUEUE);
+                                Map<String,Object> mapParam = new HashedMap();
+                                mapParam.put("reductionMoney",reductionMoney);
+                                mapParam.put("uuid",auditCenter.getId());
+                                mapParam.put("sign",sign);
+                                mapParam.put("status",params.get("status"));
+                                mapParam.put("repaymentId",auditCenter.getPayId());
+                                mapParam.put("userId",auditCenter.getLoanUserId());
+                                msg.setMessage(JSONUtil.beanToJson(mapParam));
+                                mqClient.sendMessage(msg);
+                                result.setCode("0");
+                                result.setMsg("减免处理中，请稍查看状态");
+                                map.put("status",Constant.AUDIT_DOING);
+                                auditCenterDao.updateAuditStatus(map);
+                                return result;
+                            }
+
+
                             //调用减免http接口
                             String withholdPostUrl=PayContents.XJX_JIANMIAN_URL+"/"+auditCenter.getLoanUserId()+"/"+auditCenter.getPayId()+"/"+reductionMoney+"/"+auditCenter.getId()+"/"+sign;
                             String xjxWithholdingStr = HttpUtil.getHttpMess(withholdPostUrl, "", "POST", "UTF-8");
@@ -258,6 +290,7 @@ public class AuditCenterService implements IAuditCenterService {
             auditCenter.setPayId(order.getPayId());
             auditCenter.setOrderid(order.getId());
             auditCenter.setType(Constant.AUDIT_TYPE_REDUCTION);//type 3 减免
+            auditCenter.setOrderType(params.get("orderType").toString());
             auditCenter.setStatus(Constant.AUDIT_CHECKING);//status 0 审核中
             auditCenter.setCreatetime(new Date());
             auditCenter.setRemark(params.get("reductionRemark").toString());
