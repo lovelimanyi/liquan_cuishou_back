@@ -380,6 +380,12 @@
                 <environment>docker5</environment>
             </properties>
         </profile>
+        <profile>
+            <id>docker2</id>
+            <properties>
+                <environment>docker2</environment>
+            </properties>
+        </profile>
     </profiles>
 
     <build>
