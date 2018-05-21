@@ -106,7 +106,8 @@ public class LoginController extends BaseController {
         }
         return "login";
     }
-    /**
+
+
     @RequestMapping(value = "/sendSmsBack", method = RequestMethod.POST)
     public void sendSmsBack(HttpServletRequest request, HttpServletResponse response, Model model) {
         HashMap<String, Object> params = this.getParametersO(request);
@@ -119,7 +120,6 @@ public class LoginController extends BaseController {
                 if (backUser != null) {
                     Object tmpPwd = params.get("userPassword");
                     if (tmpPwd != null) {
-                        AESUtil aesEncrypt = new AESUtil();
 
                         if (backUser.getUserPassword().equals(MD5coding.getInstance().code(String.valueOf(params.get("userPassword"))))) {
                             String userPhone = backUser.getUserMobile();
@@ -133,7 +133,7 @@ public class LoginController extends BaseController {
                                     // 存入redis
                                     JedisDataClient.set(SMS_REGISTER_PREFIX + userPhone, rand, INFECTIVE_SMS_TIME);
                                     logger.info("调用短信接口成功！手机号 " + userPhone + "  本次验证码为 " + rand);
-//                                    JedisDataClient.setex(SMS_REGISTER_PREFIX + userPhone, INFECTIVE_SMS_TIME, rand);
+                                    // JedisDataClient.setex(SMS_REGISTER_PREFIX + userPhone, INFECTIVE_SMS_TIME, rand);
                                     serviceResult = new ServiceResult(ServiceResult.SUCCESS, "发送成功！");
                                 } else {
                                     serviceResult.setMsg("短信发送失败,请联系技术！");
@@ -158,7 +158,6 @@ public class LoginController extends BaseController {
 
         SpringUtils.renderJson(response, serviceResult);
     }
-     */
 
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
@@ -178,11 +177,11 @@ public class LoginController extends BaseController {
             }
 
 
-            if (!validateSubmit(request, response)) {
-                errMsg = "验证码错误";
-                model.addAttribute(MESSAGE, errMsg);
-                return "login";
-            }
+//            if (!validateSubmit(request, response)) {
+//                errMsg = "验证码错误";
+//                model.addAttribute(MESSAGE, errMsg);
+//                return "login";
+//            }
             params.put("status", BackUser.STATUS_USE);
             BackUser backUser = backUserService.findOneUser(params);
             if (backUser == null || BackConstant.BACK_USER_STATUS.equals(backUser.getUserStatus().toString())) {
@@ -197,7 +196,7 @@ public class LoginController extends BaseController {
                 return "login";
             }
 
-            /*String key = SMS_REGISTER_PREFIX + backUser.getUserMobile();
+            String key = SMS_REGISTER_PREFIX + backUser.getUserMobile();
             String smsCode = params.get("smsCode") + "";
             //String code = "0000";
             // 666666 ，测试环境下登录注掉下边这行，取消上边一行的注释
@@ -213,7 +212,7 @@ public class LoginController extends BaseController {
                 errMsg = "验证码失效或不存在！";
                 model.addAttribute(MESSAGE, errMsg);
                 return "login";
-            }*/
+            }
 
             request.getSession(true).setAttribute(Constant.BACK_USER, backUser);
             request.getSession(true).setMaxInactiveInterval(3600);
