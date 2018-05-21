@@ -107,17 +107,18 @@ public class EstimateOrderService implements IEstimateOrderService {
                     EstimateOrder firstEstimateOrder = estimateOrderList.get(0);
                     oldOrderRate = firstEstimateOrder.getOldCollectionRate();
                     oldAmountRate = firstEstimateOrder.getOldCollectionAmountRate();
-                    if(orderType == ORDER_TYPE_BIG){
-                        firstDayEstimateOrder = firstEstimateOrder.getEstimateOrderCount();
-                    }else if(orderType == ORDER_TYPE_SMALL){
-                        for (EstimateOrder estimateOrder : estimateOrderList) {
-                            Calendar overCalendar = Calendar.getInstance();
-                            overCalendar.add(Calendar.DAY_OF_MONTH, 1);
-                            if (overCalendar.get(Calendar.DAY_OF_MONTH) == 1) {
-                                firstDayEstimateOrder = estimateOrder.getEstimateOrderCount();
-                            }
-                        }
-                    }
+                    firstDayEstimateOrder = firstEstimateOrder.getEstimateOrderCount();
+//                    if(orderType == ORDER_TYPE_BIG){
+//                        firstDayEstimateOrder = firstEstimateOrder.getEstimateOrderCount();
+//                    }else if(orderType == ORDER_TYPE_SMALL){
+//                        for (EstimateOrder estimateOrder : estimateOrderList) {
+//                            Calendar overCalendar = Calendar.getInstance();
+//                            overCalendar.add(Calendar.DAY_OF_MONTH, 1);
+//                            if (overCalendar.get(Calendar.DAY_OF_MONTH) != 1) {
+//                                firstDayEstimateOrder = estimateOrder.getEstimateOrderCount();
+//                            }
+//                        }
+//                    }
                 }
                 resultMap.put("oldOrderRate", oldOrderRate);
                 resultMap.put("oldAmountRate", oldAmountRate);
