@@ -118,7 +118,6 @@ public class LoginController extends BaseController {
                 if (backUser != null) {
                     Object tmpPwd = params.get("userPassword");
                     if (tmpPwd != null) {
-                        AESUtil aesEncrypt = new AESUtil();
 
                         if (backUser.getUserPassword().equals(MD5coding.getInstance().code(String.valueOf(params.get("userPassword"))))) {
                             String userPhone = backUser.getUserMobile();
@@ -196,9 +195,9 @@ public class LoginController extends BaseController {
 
             String key = BackConstant.SMS_REGISTER_PREFIX + backUser.getUserMobile();
             String smsCode = params.get("smsCode") + "";
-            String code = "0000";
-            // 666666 ，测试环境下登录注掉下边这行，取消上边一行的注释
-//            String code = JedisDataClient.get(key);
+//            String code = "0000";
+            // 测试环境下登录注掉下边这行，取消上边一行的注释
+            String code = JedisDataClient.get(key);
             if (code != null) {
                 if (code.equals(smsCode)) {
                 } else {
