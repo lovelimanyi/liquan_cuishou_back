@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import com.info.web.pojo.BackUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -152,10 +153,15 @@ public class CollectionService implements ICollectionService {
      * @return
      */
     public boolean verifyCodeAccess(HttpServletRequest request) {
-//        BackUser backUser = (BackUser) request.getSession().getAttribute(Constant.BACK_USER);
-//        if (backUser.getRoleId().equals("")) {
-//            return true;
-//        }
+        BackUser backUser = (BackUser) request.getSession().getAttribute(Constant.BACK_USER);
+        String roleId = backUser.getRoleId();
+        List<String> roleList = new ArrayList<>();
+        roleList.add(BackConstant.SURPER_MANAGER_ROLE_ID.toString()); // 超级管理员
+        roleList.add(BackConstant.SUPER_MANAGE_ROLE_ID.toString()); // 高级经理
+        roleList.add(BackConstant.OUTSOURCE_MANAGER_ROLE_ID.toString()); // 委外经理
+        if (roleList.contains(roleId)) {
+            return true;
+        }
         return true;
     }
 }

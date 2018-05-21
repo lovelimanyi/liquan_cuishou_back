@@ -107,7 +107,7 @@ public class LoginController extends BaseController {
     }
 
     @RequestMapping(value = "/sendSmsBack", method = RequestMethod.POST)
-    public void sendSmsBack(HttpServletRequest request, HttpServletResponse response, Model model) {
+    public void sendSmsBack(HttpServletRequest request, HttpServletResponse response) {
         HashMap<String, Object> params = this.getParametersO(request);
         ServiceResult serviceResult = new ServiceResult("500", "未知异常");
         try {
@@ -160,8 +160,7 @@ public class LoginController extends BaseController {
 
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public String submit(HttpServletRequest request,
-                         HttpServletResponse response, Model model) {
+    public String submit(HttpServletRequest request, Model model) {
         HashMap<String, Object> params = this.getParametersO(request);
         String errMsg;
         try {
@@ -258,8 +257,7 @@ public class LoginController extends BaseController {
     }
 
     @RequestMapping(value = "/logout")
-    public String logout(HttpServletRequest request,
-                         HttpServletResponse response) {
+    public String logout(HttpServletRequest request) {
         request.getSession().removeAttribute(Constant.BACK_USER);
         return "redirect:login";
     }
