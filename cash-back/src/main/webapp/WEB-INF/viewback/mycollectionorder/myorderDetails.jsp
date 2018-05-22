@@ -318,7 +318,7 @@
                             <c:if test="${pay.returnType eq '3' }">代扣</c:if>
                             <c:if test="${pay.returnType eq '4' }">对公银行卡转账</c:if>
                             <c:if test="${pay.returnType eq '5' }">线下还款</c:if>
-                            <c:if test="${pay.returnType eq '6' }">减免</c:if>
+                            <c:if test="${pay.returnType eq '6' }">小额减免</c:if>
                             <c:if test="${pay.returnType eq '99' }">大额减免</c:if>
                         </td>
                         <td>
