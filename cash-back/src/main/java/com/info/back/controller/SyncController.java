@@ -37,7 +37,7 @@ public class SyncController {
     @Autowired
     private ISyncService syncService;
     /**
-     * 每日更新滞纳金，罚息。
+     * 每日更新滞纳金，罚息。 -- 暂时未用
      * @param
      */
     @RequestMapping(value = "/loan-order-update",method = RequestMethod.POST,consumes = "application/json")
@@ -84,7 +84,7 @@ public class SyncController {
                 if (loan != null && repayment!= null ) {
                     //逾期同步或者每日更新
                     syncService.handleOverdue(repayment,loan,repaymentDetail);
-                    return new MQResponse(MQResponse.Code.SUCCESS);
+                    return new MQResponse();
                 } else {
                     logger.info("loan-order-info,repayment is null...");
                     return new MQResponse(MQResponse.Code.ERROR) ;
@@ -119,7 +119,7 @@ public class SyncController {
                 if (loan != null && repayment!= null && repaymentDetailList != null && repaymentDetailList.size()>0) {
                     //还款同步
                     syncService.handleRepay(repayment,loan,repaymentDetailList);
-                    return new MQResponse(MQResponse.Code.SUCCESS);
+                    return new MQResponse();
                 } else {
                     logger.info("repayment,repayment is null...");
                     return new MQResponse(MQResponse.Code.ERROR) ;
