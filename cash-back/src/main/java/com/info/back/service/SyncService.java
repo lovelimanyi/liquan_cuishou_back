@@ -14,6 +14,7 @@ import com.info.web.synchronization.dao.IDataDao;
 import com.info.web.synchronization.syncUtils;
 import com.info.web.util.DateUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.event.EventListenerSupport;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -106,6 +107,7 @@ public class SyncService implements ISyncService {
                 List<String> idList = localDataDao.selectCreditLoanPayDetail(reMap);//查询目前插入的还款记录
                 for(RepaymentDetail detail : repaymentDetails) {
                     if (syncUtils.checkDetailId(idList, detail.getId())){ //判断该详情是否存在，如果不存在则保存
+                        detail.setRemark("大额未逾期部分还款");
                         CreditLoanPayDetail repaymentDetail = handleRepaymentDetail(detail,payId,loanId);
                         localDataDao.saveCreditLoanPayDetail(repaymentDetail);
                     }
@@ -135,13 +137,23 @@ public class SyncService implements ISyncService {
         creditLoanPayDetail.setPayId(repaymentDetail.getPayId());
         creditLoanPayDetail.setUpdateDate(new Date());
         creditLoanPayDetail.setReturnType(repaymentDetail.getReturnType());
-        creditLoanPayDetail.setRemark(repaymentDetail.getRemark());
         creditLoanPayDetail.setRealMoney(new BigDecimal(Integer.parseInt(repaymentDetail.getRealMoney())/100.00));
-        creditLoanPayDetail.setRealPenlty(new BigDecimal(Integer.parseInt(repaymentDetail.getRealPenlty())/100.00));
+        Integer realPenlty = Integer.parseInt(repaymentDetail.getRealPenlty());//滞纳金
+        creditLoanPayDetail.setRealPenlty(new BigDecimal(realPenlty).divide(new BigDecimal(100)));
         creditLoanPayDetail.setRealPrinciple(new BigDecimal(Integer.parseInt(repaymentDetail.getRealPrinciple())/100.00));
         creditLoanPayDetail.setRealInterest(new BigDecimal(Integer.parseInt(repaymentDetail.getRealInterest())/100.00));
         creditLoanPayDetail.setRealgetAccrual(new BigDecimal(Integer.parseInt(repaymentDetail.getRealgetAccrual())/100.00));
         creditLoanPayDetail.setRemainAccrual(new BigDecimal(Integer.parseInt(repaymentDetail.getRemainAccrual())/100.00));
+        if ("99".equals(repaymentDetail.getReturnType())) {
+            creditLoanPayDetail.setRemark("大额订单减免");
+            //更新还款表的reductionMoney
+            CreditLoanPay creditLoanPay = new CreditLoanPay();
+            creditLoanPay.setId(repaymentDetail.getPayId());
+            creditLoanPay.setReductionMoney(new BigDecimal(realPenlty).divide(new BigDecimal(100)));
+            localDataDao.updateCreditLoanPay(creditLoanPay);
+        }else {
+            creditLoanPayDetail.setRemark(repaymentDetail.getRemark());
+        }
         HashMap<String,Object> repayDetail = new HashMap<>();
         repayDetail.put("asset_repayment_id",payId);
         repayDetail.put("asset_order_id",loanId);
