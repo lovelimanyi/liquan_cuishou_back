@@ -50,13 +50,13 @@
                     </label>
                 </dt>
                 <dd>
-                    <textarea id="msgContent" name="msgContent" style="width: 450px;height: 60px;">${msgContent}</textArea>
+                    <textarea id="msgContent" name="msgContent" readonly="readonly" style="width: 450px;height: 60px;">${msgContent}</textArea>
                 </dd>
 
             </dl>
-            <c:if test="${not empty refreshMsg}">
+            <%--<c:if test="${not empty refreshMsg}">--%>
                 <button id="refreshMsg" name="refreshMsg" type="button">更换短信</button>
-            </c:if>
+            <%--</c:if>--%>
             <%--<dl>
                 <dt style="width: 120px;">
                     <label>
