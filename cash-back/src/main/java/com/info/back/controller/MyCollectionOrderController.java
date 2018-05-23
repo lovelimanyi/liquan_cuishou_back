@@ -2,7 +2,6 @@ package com.info.back.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.info.back.dao.ISmsUserDao;
 import com.info.back.dao.ITemplateSmsDao;
 import com.info.back.result.JsonResult;
 import com.info.back.service.*;
@@ -12,7 +11,6 @@ import com.info.constant.Constant;
 import com.info.web.pojo.*;
 import com.info.web.util.*;
 import com.liquan.oss.OSSUpload;
-import jdk.nashorn.internal.runtime.regexp.joni.Regex;
 import net.sf.json.JSONArray;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.RandomUtils;
@@ -25,7 +23,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import redis.clients.jedis.Jedis;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -90,8 +87,6 @@ public class MyCollectionOrderController extends BaseController {
     @Autowired
     private IMmanUserRelaService mmanUserRelaService;
     @Autowired
-    private ISmsUserDao iSmsUserDao;
-    @Autowired
     private IMman_loan_collection_orderdeductionService collection_orderdeductionService;
     @Autowired
     private ICountCollectionAssessmentService countCollectionAssessmentService;
@@ -110,8 +105,7 @@ public class MyCollectionOrderController extends BaseController {
      * @return
      */
     @RequestMapping("getListCollectionOrder")
-    public String getListCollectionOrder(HttpServletRequest request,
-                                         HttpServletResponse response, Model model) {
+    public String getListCollectionOrder(HttpServletRequest request, Model model) {
         HashMap<String, Object> params = this.getParametersO(request);
 
         BackUser backUser = (BackUser) request.getSession().getAttribute(
@@ -131,7 +125,7 @@ public class MyCollectionOrderController extends BaseController {
         List<MmanLoanCollectionCompany> ListMmanLoanCollectionCompany = mmanLoanCollectionCompanyService
                 .getList(mmanLoanCollectionCompany);
         // 分页的订单信息
-        PageConfig<OrderBaseResult> page = new PageConfig<OrderBaseResult>();
+        PageConfig<OrderBaseResult> page;
         if (!BackConstant.COLLECTION_ROLE_ID.equals(backUser.getRoleId())) {
             page = mmanLoanCollectionOrderService.getPage(params);
         } else {
@@ -169,10 +163,9 @@ public class MyCollectionOrderController extends BaseController {
      *
      * @param request
      * @param response
-     * @param model
      */
     @RequestMapping("exportCollectionOrder")
-    public void exportCollectionOrder(HttpServletRequest request, HttpServletResponse response, Model model) {
+    public void exportCollectionOrder(HttpServletRequest request, HttpServletResponse response) {
         HashMap<String, Object> params = this.getParametersO(request);
         try {
             BackUser backUser = (BackUser) request.getSession().getAttribute(Constant.BACK_USER);
@@ -214,7 +207,7 @@ public class MyCollectionOrderController extends BaseController {
                 PageConfig<OrderBaseResult> pm = mmanLoanCollectionOrderService.getPage(params);
                 List<OrderBaseResult> list = pm.getItems();
 //				System.out.println("list>>>>>>>>="+list.size());
-                List<Object[]> contents = new ArrayList<Object[]>();
+                List<Object[]> contents = new ArrayList<>();
                 for (OrderBaseResult r : list) {
                     String[] conList = new String[titles.length];
                     conList[0] = r.getLoanId();
@@ -404,13 +397,11 @@ public class MyCollectionOrderController extends BaseController {
      * 催收流转日志
      *
      * @param request
-     * @param response
      * @param model
      * @return
      */
     @RequestMapping("getlistlog")
-    public String getCollectionStatusChangeLog(HttpServletRequest request,
-                                               HttpServletResponse response, Model model) {
+    public String getCollectionStatusChangeLog(HttpServletRequest request, Model model) {
         Map<String, String> params = this.getParameters(request);
         List<MmanLoanCollectionStatusChangeLog> list = null;
         try {
@@ -548,14 +539,12 @@ public class MyCollectionOrderController extends BaseController {
      * 催收记录表
      *
      * @param request
-     * @param response
      * @param //orderId
      * @param model
      * @return
      */
     @RequestMapping("collectionRecordList")
-    public String getloanCollectionRecordList(HttpServletRequest request,
-                                              HttpServletResponse response, Model model) {
+    public String getloanCollectionRecordList(HttpServletRequest request, Model model) {
         List<MmanLoanCollectionRecord> list = null;
         Map<String, String> params = this.getParameters(request);
         try {
@@ -725,14 +714,12 @@ public class MyCollectionOrderController extends BaseController {
      * 跳转转派页面
      *
      * @param request
-     * @param response
      * @param model
      * @return
      */
     // 第一步 选择转派公司
     @RequestMapping("toOrderDistibute")
-    public String toOrderDistibute(HttpServletRequest request,
-                                   HttpServletResponse response, Model model) {
+    public String toOrderDistibute(HttpServletRequest request, Model model) {
         HashMap<String, Object> params = getParametersO(request);
         BackUser backUser = (BackUser) request.getSession().getAttribute(Constant.BACK_USER);
         try {
@@ -784,13 +771,11 @@ public class MyCollectionOrderController extends BaseController {
      * @param //mmanLoanCollectionOrder
      * @param request
      * @param response
-     * @param model
      * @return
      */
     @RequestMapping("findPerson")
     @ResponseBody
-    public void orderDisBackUser(HttpServletRequest request,
-                                 HttpServletResponse response, Model model) {
+    public void orderDisBackUser(HttpServletRequest request, HttpServletResponse response) {
         try {
             HashMap<String, Object> params = getParametersO(request);
             BackUser backUser = new BackUser();
@@ -813,9 +798,7 @@ public class MyCollectionOrderController extends BaseController {
 
     // 转派
     @RequestMapping(value = "doDispatch")
-    public String doDispatch(MmanLoanCollectionOrder order,
-                             HttpServletRequest request, HttpServletResponse response,
-                             Model model) {
+    public String doDispatch(MmanLoanCollectionOrder order, HttpServletRequest request, HttpServletResponse response, Model model) {
         JsonResult json = new JsonResult("-1", "转派失败");
         HashMap<String, Object> params = this.getParametersO(request);
         try {
@@ -861,7 +844,7 @@ public class MyCollectionOrderController extends BaseController {
      * @return
      */
     private static Map<String, String> ReadCookieMap(HttpServletRequest request) {
-        Map<String, String> cookieMap = new HashMap<String, String>();
+        Map<String, String> cookieMap = new HashMap<>();
         Cookie[] cookies = request.getCookies();
         if (null != cookies) {
             for (Cookie cookie : cookies) {
@@ -1125,12 +1108,11 @@ public class MyCollectionOrderController extends BaseController {
      * 分期还款计算
      *
      * @param request
-     * @param response
      * @param model
      * @return
      */
     @RequestMapping("installmentPay")
-    public String getInstallmentPay(HttpServletRequest request, HttpServletResponse response, Model model) {
+    public String getInstallmentPay(HttpServletRequest request, Model model) {
         Map<String, String> params = this.getParameters(request);
         model.addAttribute("params", params);
 
@@ -1167,7 +1149,7 @@ public class MyCollectionOrderController extends BaseController {
         if (count > 4) {
             count = 2; // 分期最多为4期
         }
-        List<InstallmentPayInfoVo> list = new ArrayList<InstallmentPayInfoVo>();
+        List<InstallmentPayInfoVo> list = new ArrayList<>();
         InstallmentPayInfoVo installmentPayInfoVo = null;
 
         for (int i = 0; i < count; i++) {
@@ -1202,15 +1184,14 @@ public class MyCollectionOrderController extends BaseController {
      *
      * @param request
      * @param response
-     * @param model
      * @return
      */
     @RequestMapping("insertInstallmentPayRecord")
-    public void insertInstallmentPayRecord(HttpServletRequest request, HttpServletResponse response, Model model) {
+    public void insertInstallmentPayRecord(HttpServletRequest request, HttpServletResponse response) {
         String url = null;
         String erroMsg = null;
         List<InstallmentPayRecord> installmentPayRecordList = null;
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         JsonResult result = new JsonResult("-1", "创建分期失败");
         map.put("code", "-1");
         Map<String, String> params = this.getParameters(request);
@@ -1255,8 +1236,8 @@ public class MyCollectionOrderController extends BaseController {
     }
 
     @RequestMapping("fqWithholding")
-    public void fqWithholding(HttpServletRequest request, HttpServletResponse response, Model model) {
-        Map<String, Object> map = new HashMap<String, Object>();
+    public void fqWithholding(HttpServletRequest request, HttpServletResponse response) {
+        Map<String, Object> map = new HashMap<>();
         map.put("code", "-1");
         Map<String, String> params = this.getParameters(request);
         BackUser backUser = (BackUser) request.getSession().getAttribute(Constant.BACK_USER);
@@ -1275,8 +1256,7 @@ public class MyCollectionOrderController extends BaseController {
     }
 
     @RequestMapping("getContactInfo")
-    private String gotoGetContactInfoPage(HttpServletRequest request,
-                                          HttpServletResponse response, Model model) {
+    private String gotoGetContactInfoPage(HttpServletRequest request, Model model) {
         HashMap<String, Object> params = this.getParametersO(request);
         String phoneNum = request.getParameter("phoneNum");
         if (phoneNum != "" && phoneNum != null) {
@@ -1309,7 +1289,7 @@ public class MyCollectionOrderController extends BaseController {
      * @author yyf
      */
     @RequestMapping("doReduction")
-    public void doReduction(HttpServletRequest request, HttpServletResponse response, Model model) {
+    public void doReduction(HttpServletRequest request, HttpServletResponse response) {
         JsonResult result = new JsonResult("-1", "申请减免失败");
         HashMap<String, Object> params = this.getParametersO(request);
 
@@ -1336,7 +1316,7 @@ public class MyCollectionOrderController extends BaseController {
 
 
     @RequestMapping("getorderPage")
-    public String getorderPage(HttpServletRequest request, HttpServletResponse response, Model model) {
+    public String getorderPage(HttpServletRequest request, Model model) {
         try {
             HashMap<String, Object> params = getParametersO(request);
             //add  减免列表默认申请中状态
@@ -1355,7 +1335,7 @@ public class MyCollectionOrderController extends BaseController {
     }
 
     @RequestMapping("testKh")
-    public String testKh(HttpServletRequest request, HttpServletResponse response, Model model) {
+    public String testKh(HttpServletRequest request) {
         try {
             Date date = new Date();
             HashMap<String, Object> params = new HashMap<String, Object>();
@@ -1373,7 +1353,7 @@ public class MyCollectionOrderController extends BaseController {
     }
 
     @RequestMapping("testGl")
-    public String testGl(HttpServletRequest request, HttpServletResponse response, Model model) {
+    public String testGl(HttpServletRequest request) {
         try {
             Date date = new Date();
             HashMap<String, Object> params = new HashMap<String, Object>();
@@ -1391,7 +1371,7 @@ public class MyCollectionOrderController extends BaseController {
     }
 
     @RequestMapping("testCj")
-    public String testCj(HttpServletRequest request, HttpServletResponse response, Model model) {
+    public String testCj() {
         try {
             Date date = new Date();
             HashMap<String, Object> params = new HashMap<String, Object>();
