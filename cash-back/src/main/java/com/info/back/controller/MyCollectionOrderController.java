@@ -874,6 +874,9 @@ public class MyCollectionOrderController extends BaseController {
                 String content = MessageFormat.format(msg.getContenttext(), StringUtils.split(getMsgParam(order), ','));
                 // 是否显示更换短信按钮
 //                model.addAttribute("refreshMsg", JedisDataClient.get("cuishou:refreshMsg"));
+                if(BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())){
+                    content = "该订单已还款完成，请核实！";
+                }
                 model.addAttribute("msgContent", content);
                 model.addAttribute("msgId", msg.getId());
                 model.addAttribute("orderId", id);
@@ -1103,6 +1106,9 @@ public class MyCollectionOrderController extends BaseController {
             int code = RandomUtils.nextInt(0, msgs.size());
             TemplateSms msg = msgs.get(code);
             String content = MessageFormat.format(msg.getContenttext(), StringUtils.split(getMsgParam(order), ','));
+            if(BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())){
+                content = "该订单已还款完成，请核实！";
+            }
             map.put("msgContent", content);
             map.put("msgId", msg.getId());
         }
