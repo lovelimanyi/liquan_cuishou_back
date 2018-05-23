@@ -41,6 +41,8 @@ public class LoginController extends BaseController {
     public final static String SMS_SEND_IN_ONE_MINUTE = "SMS_SEND_IN_ONE_MINUTE_";// Redis某个手机号1分钟内已发送验证码key前缀
     public final static String SMS_REGISTER_PREFIX = "newPhoneCode_";// Redis注册key前缀
     public final static int INFECTIVE_SMS_TIME = 300;// 短信默认有效时间300秒
+    private static final String WHITE_LIST_REDIS_KEY = "orayIps";
+
     @Autowired
     private IBackUserService backUserService;
 
@@ -69,7 +71,6 @@ public class LoginController extends BaseController {
         } else if (!StringUtils.isBlank(returnUrl)) {
             StringBuilder sb = new StringBuilder("redirect:");
             sb.append(returnUrl);
-
             return sb.toString();
         } else {
             return null;
@@ -88,7 +89,6 @@ public class LoginController extends BaseController {
                 if (view != null) {
                     return view;
                 } else {
-
                     return "index";
                 }
             }
@@ -235,7 +235,8 @@ public class LoginController extends BaseController {
         if (BackConstant.userAccountWhiteListList.contains(userAccount)) {
             return true;
         }
-        List<String> orayIps = JedisDataClient.getList("orayIps", 0, -1);
+        String redisKey = "cuishou:" + WHITE_LIST_REDIS_KEY;
+        List<String> orayIps = JedisDataClient.getList(redisKey, 0, -1);
         if (CollectionUtils.isEmpty(orayIps)) {
             List<CompanyIpAddressDto> companyIps = companyIpAddressService.getAllIps();
             for (CompanyIpAddressDto companyIpAddress : companyIps) {
@@ -244,7 +245,7 @@ public class LoginController extends BaseController {
                     orayIps.add(CompanyIps);
                 }
             }
-            JedisDataClient.setList("orayIps", orayIps);
+            JedisDataClient.setList(redisKey, orayIps);
         }
 
         String clientIp = RequestUtils.getClientIpAddr(request);
