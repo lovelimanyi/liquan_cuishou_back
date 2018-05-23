@@ -873,7 +873,7 @@ public class MyCollectionOrderController extends BaseController {
 
                 String content = MessageFormat.format(msg.getContenttext(), StringUtils.split(getMsgParam(order), ','));
                 // 是否显示更换短信按钮
-                model.addAttribute("refreshMsg", JedisDataClient.get("cuishou:refreshMsg"));
+//                model.addAttribute("refreshMsg", JedisDataClient.get("cuishou:refreshMsg"));
                 model.addAttribute("msgContent", content);
                 model.addAttribute("msgId", msg.getId());
                 model.addAttribute("orderId", id);
@@ -948,20 +948,26 @@ public class MyCollectionOrderController extends BaseController {
             }
             MmanLoanCollectionOrder order = mmanLoanCollectionOrderService.getOrderById(orderId);
             if (order == null) {
-                result.setCode("-1");
+                result.setCode("-2");
                 result.setMsg("订单异常！");
                 logger.error("订单为null,loanId : " + orderId);
                 return getServiceResult(response, model, result, params);
             }
+            if (BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())) {
+                result.setCode("-3");
+                result.setMsg("催收成功订单不能发送催收短信！");
+                logger.error("催收成功订单不能发送催收短信！" + orderId);
+                return getServiceResult(response, model, result, params);
+            }
             String mobile = request.getParameter("phoneNumber") == null ? "" : request.getParameter("phoneNumber").trim();
             if (StringUtils.isEmpty(mobile)) {
-                result.setCode("-2");
+                result.setCode("-4");
                 result.setMsg("手机号不能为空！");
                 return getServiceResult(response, model, result, params);
             }
             Matcher matcher = MOBILE_PATTERN.matcher(mobile);
             if (!matcher.matches()) {
-                result.setCode("-3");
+                result.setCode("-5");
                 result.setMsg("手机号异常！");
                 return getServiceResult(response, model, result, params);
             }
@@ -974,14 +980,14 @@ public class MyCollectionOrderController extends BaseController {
                 msgCountLimit = 2;
             }
             if (msgCountLimit <= count) {
-                result.setCode("-4");
+                result.setCode("-6");
                 result.setMsg("今日该订单发送短信已达上限" + (msgCountLimit) + "条！");
                 return getServiceResult(response, model, result, params);
             }
             String msgParam = getMsgParam(order);
             String msgCode = params.get("msgId") + "";
             if (msgParam == null || msgCode.length() <= 0) {
-                result.setCode("-5");
+                result.setCode("-7");
                 result.setMsg("短信参数异常！");
                 return getServiceResult(response, model, result, params);
             }
@@ -992,7 +998,7 @@ public class MyCollectionOrderController extends BaseController {
                 // 插入短信记录
                 insertMsg(mobile, order, mobile, msgCode, request);
             } else {
-                result.setCode("-6");
+                result.setCode("-8");
                 result.setMsg("发送失败！");
             }
         } catch (Exception e) {
