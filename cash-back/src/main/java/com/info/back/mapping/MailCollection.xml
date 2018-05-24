@@ -17,7 +17,7 @@ LEFT JOIN back_user u ON o.current_collection_user_id = u.uuid
 LEFT JOIN mman_loan_collection_company c ON c.id = u.company_id
 INNER JOIN mman_user_loan l on l.id = o.loan_id
 WHERE
- DATE_FORMAT(o.dispatch_time, "%Y-%m-%d") &lt; DATE_FORMAT("2018-04-01 09:54:41", "%Y-%m-%d")
+ DATE_FORMAT(o.dispatch_time, "%Y-%m-%d") &gt;= DATE_FORMAT(now(), "%Y-%m-%d")
 GROUP BY
  u.group_level,u.company_id
 ORDER BY
