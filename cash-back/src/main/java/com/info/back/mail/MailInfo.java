@@ -141,6 +141,7 @@ public class MailInfo {
         p.put("mail.smtp.port", this.mailServerPort);
         p.put("mail.smtp.auth", authValidate ? "true" : "false");
         p.put("mail.smtp.starttls.enable", "true");
+        p.put("mail.smtp.ssl.enable","true");
         return p;
     }
 
