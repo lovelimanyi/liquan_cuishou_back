@@ -142,7 +142,7 @@
                     <td>
                         <c:forEach items="${company}" var="company">
                             <c:if test="${list.companyId == company.id}">${company.title}</c:if>
-                            <c:if test="${list.companyId != company.id}">********</c:if>
+                            <%--<c:if test="${list.companyId != company.id}">********</c:if>--%>
                         </c:forEach>
                     </td>
                     <td>
