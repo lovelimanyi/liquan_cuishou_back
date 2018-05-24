@@ -15,7 +15,7 @@ public class CollectionNotifyLoanDto{
     private Integer lateDay; //逾期天数
     private Integer accrual; //利息
     private String merchantNo; //商户号
-    private String borrowingType;//借款类型  2 大额，3分期商城
+//    private String borrowingType;//借款类型  2 大额，3分期商城
 
     public String getMerchantNo() {
         return merchantNo;
@@ -129,13 +129,13 @@ public class CollectionNotifyLoanDto{
         this.termNumber = termNumber;
     }
 
-    public String getBorrowingType() {
-        return borrowingType;
-    }
-
-    public void setBorrowingType(String borrowingType) {
-        this.borrowingType = borrowingType;
-    }
+//    public String getBorrowingType() {
+//        return borrowingType;
+//    }
+//
+//    public void setBorrowingType(String borrowingType) {
+//        this.borrowingType = borrowingType;
+//    }
 
     @Override
     public String toString() {
@@ -154,7 +154,6 @@ public class CollectionNotifyLoanDto{
                 ", lateDay=" + lateDay +
                 ", accrual=" + accrual +
                 ", merchantNo='" + merchantNo + '\'' +
-                ", borrowingType='" + borrowingType + '\'' +
                 '}';
     }
 }
