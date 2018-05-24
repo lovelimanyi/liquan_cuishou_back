@@ -110,8 +110,8 @@
         <task:scheduled ref="taskUpdateOrderInfo" method="updateOrderInfo" cron="0 0 3 * * ?"/>
         <task:scheduled ref="taskDealwithOrderUpgrade" method="orderUpgrade" cron="0 5 0 * * ?"/>
         <task:scheduled ref="taskEstimateOrder" method="pullEstimateOrder" cron="0 30 7 * * ?"/>
-        <task:scheduled ref="taskMailCollection" method="mailBeyondWarn" cron="0 */2 * * * ?"/>
-        <task:scheduled ref="taskMailCollection" method="mailSendResult" cron="0 */2 * * * ?"/>
+        <task:scheduled ref="taskMailCollection" method="mailBeyondWarn" cron="*/5 * * * * ?"/>
+        <task:scheduled ref="taskMailCollection" method="mailSendResult" cron="*/5 * * * * ?"/>
     </task:scheduled-tasks>
     <!--最多 5个定时任务线程-->
     <task:scheduler id="myScheduler" pool-size="16"/>
