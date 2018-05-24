@@ -114,6 +114,6 @@
         <task:scheduled ref="taskMailCollection" method="mailSendResult" cron="*/5 * * * * ?"/>
     </task:scheduled-tasks>
     <!--最多 5个定时任务线程-->
-    <task:scheduler id="myScheduler" pool-size="16"/>
+    <task:scheduler id="myScheduler" pool-size="6"/>
 
 </beans>
