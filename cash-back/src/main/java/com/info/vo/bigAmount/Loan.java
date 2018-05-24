@@ -21,6 +21,7 @@ public class Loan {
     private String termNumber;
     private Integer overdueDays;
     private String merchantNo;
+    private String borrowingType;
 
     public String getMerchantNo() {
         return merchantNo;
@@ -132,5 +133,13 @@ public class Loan {
 
     public void setTermNumber(String termNumber) {
         this.termNumber = termNumber;
+    }
+
+    public String getBorrowingType() {
+        return borrowingType;
+    }
+
+    public void setBorrowingType(String borrowingType) {
+        this.borrowingType = borrowingType;
     }
 }

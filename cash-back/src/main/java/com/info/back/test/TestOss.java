@@ -2,6 +2,7 @@ package com.info.back.test;
 
 import com.alibaba.fastjson.JSONObject;
 import com.info.back.utils.HttpUtils;
+import com.info.back.utils.MQResponse;
 import com.info.back.vo.JxlResponse;
 import com.info.back.vo.jxl.UserReport;
 import com.info.back.vo.jxl2.JxlUserReport;
@@ -34,7 +35,14 @@ public class TestOss {
 
     @Test
     public void test() {
+        MQResponse mqResponse = null;
+        mqResponse = new MQResponse();
+        JSONObject jsonResult = (JSONObject) JSONObject.toJSON(mqResponse);
+        jsonResult.toString();
 
+        System.out.println(jsonResult.toString());
+        JSONObject jsonResult2 = (JSONObject) JSONObject.toJSON(new MQResponse(MQResponse.Code.ERROR));
+        System.out.println(jsonResult2);
         String payId = StringUtils.substringBefore("1111-0",Constant.SEPARATOR_FOR_ORDER_SOURCE);
         System.out.println(payId);
 

@@ -1,5 +1,6 @@
 package com.info.back.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.info.back.service.ISyncService;
 import com.info.back.utils.MQResponse;
 import com.info.vo.bigAmount.BigAmountRequestParams;
@@ -69,7 +70,8 @@ public class SyncController {
      */
     @RequestMapping(value = "/loan-order-info",method = RequestMethod.POST,consumes = "application/json")
     @ResponseBody
-    public MQResponse dealwithOverdueOrder(HttpServletRequest request, @RequestBody CollectionNotifyDto collectionNotifyDto) {
+    public String dealwithOverdueOrder(HttpServletRequest request, @RequestBody CollectionNotifyDto collectionNotifyDto) {
+        JSONObject errorResult = (JSONObject) JSONObject.toJSON(new MQResponse(MQResponse.Code.ERROR));
         try {
             logger.info("accept_overdue_order_or_update=" + collectionNotifyDto);
             if (collectionNotifyDto != null) {
@@ -84,17 +86,18 @@ public class SyncController {
                 if (loan != null && repayment!= null ) {
                     //逾期同步或者每日更新
                     syncService.handleOverdue(repayment,loan,repaymentDetail);
-                    return new MQResponse();
+                    JSONObject okResult = (JSONObject) JSONObject.toJSON(new MQResponse());
+                    return okResult.toString();
                 } else {
                     logger.info("loan-order-info,repayment is null...");
-                    return new MQResponse(MQResponse.Code.ERROR) ;
+                    return errorResult.toString();
                 }
             }
-            return new MQResponse(MQResponse.Code.ERROR) ;
+            return errorResult.toString();
         } catch (Exception e) {
             logger.error("loan-order-info-exception");
             e.printStackTrace();
-            return new MQResponse(MQResponse.Code.ERROR) ;
+            return errorResult.toString();
         }
     }
 
@@ -106,8 +109,9 @@ public class SyncController {
      */
     @RequestMapping(value = "/repayment" ,method = RequestMethod.POST)
     @ResponseBody
-    public MQResponse dealwithRepayment(@RequestBody CollectionNotifyDto collectionNotifyDto){
+    public String dealwithRepayment(@RequestBody CollectionNotifyDto collectionNotifyDto){
         logger.info("order_repayment=" + collectionNotifyDto);
+        JSONObject errorResult = (JSONObject) JSONObject.toJSON(new MQResponse(MQResponse.Code.ERROR));
         try{
 
             if (collectionNotifyDto != null) {
@@ -119,17 +123,18 @@ public class SyncController {
                 if (loan != null && repayment!= null && repaymentDetailList != null && repaymentDetailList.size()>0) {
                     //还款同步
                     syncService.handleRepay(repayment,loan,repaymentDetailList);
-                    return new MQResponse();
+                    JSONObject okResult = (JSONObject) JSONObject.toJSON(new MQResponse());
+                    return okResult.toString();
                 } else {
                     logger.info("repayment,repayment is null...");
-                    return new MQResponse(MQResponse.Code.ERROR) ;
+                    return errorResult.toString();
                 }
             }
-            return new MQResponse(MQResponse.Code.ERROR) ;
+            return errorResult.toString();
         }catch (Exception e){
             logger.error("repayment-exception");
             e.printStackTrace();
-            return new MQResponse(MQResponse.Code.ERROR) ;
+            return errorResult.toString();
         }
     }
 
