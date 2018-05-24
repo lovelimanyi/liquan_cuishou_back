@@ -64,6 +64,12 @@ public class SyncService implements ISyncService {
             //保存借款表-逾期同步
             MmanUserLoan mmanUserLoan = new MmanUserLoan();
             mmanUserLoan.setId(loanId);
+            //TODO 对接分期商城
+//            if (Constant.FEN.equals(loan.getBorrowingType())){
+//                mmanUserLoan.setBorrowingType(Constant.FEN);
+//            }else {
+//                mmanUserLoan.setBorrowingType(Constant.BIG);
+//            }
             mmanUserLoan.setBorrowingType(Constant.BIG);
             mmanUserLoan.setTermNumber(loan.getTermNumber());
             mmanUserLoan.setUserId(loan.getUserId());
@@ -182,8 +188,7 @@ public class SyncService implements ISyncService {
         String userId = loan.getUserId();
         String loanId = loan.getId();
         CreditLoanPay creditLoanPay1 = creditLoanPayDao.get(payId);
-        int receivablePrinciple = Integer.parseInt(String.valueOf(repayment.getReceivablePrinciple()));//剩余应还本金
-        if (creditLoanPay1 != null && creditLoanPay1.getReceivableInterest().compareTo(BigDecimal.ZERO)==1){
+        if (creditLoanPay1 != null && creditLoanPay1.getReceivableMoney().compareTo(creditLoanPay1.getRealMoney()) == 1){
             logger.info("order_repayment_begin=" + loanId);
             //保存还款详情
             //如果还款详情不为空则保存还款详情
@@ -278,7 +283,6 @@ public class SyncService implements ISyncService {
 
 
     private CreditLoanPay handleRCreditLoanPay(Repayment repayment, String loanId, Loan loan, CreditLoanPay creditLoanPay1) {
-        //TODO 根据大额规则还款
         CreditLoanPay creditLoanPay = new CreditLoanPay();
         creditLoanPay.setId(repayment.getId());//还款id
         creditLoanPay.setLoanId(loanId);//借款id

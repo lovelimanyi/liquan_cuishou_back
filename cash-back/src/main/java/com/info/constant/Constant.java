@@ -237,6 +237,7 @@ public class Constant {
      */
     public static final String BIG = "1";//大额
     public static final String SMALL = "2";//小额
+    public static final String FEN = "3";//分期商城（商品分期）
 
     /**
      * 催收代扣队列名----小额

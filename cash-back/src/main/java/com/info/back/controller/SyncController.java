@@ -143,6 +143,8 @@ public class SyncController {
 
             loan.setId(loanId);
             loan.setLoanMoney(String.valueOf(collectionNotifyDto.getLoan().getLoanMoney()));
+            //TODO 订单类型
+//            loan.setBorrowingType(collectionNotifyDto.getLoan().getBorrowingType());
             loan.setLoanRate(String.valueOf(collectionNotifyDto.getLoan().getLoanRate()));
             loan.setServiceCharge(String.valueOf(collectionNotifyDto.getLoan().getServiceCharge()));
             loan.setPaidMoney(String.valueOf(collectionNotifyDto.getLoan().getPaidMoney()));
