@@ -2,7 +2,6 @@ package com.info.back.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.info.back.dao.ISmsUserDao;
 import com.info.back.dao.ITemplateSmsDao;
 import com.info.back.result.JsonResult;
 import com.info.back.service.*;
@@ -10,13 +9,11 @@ import com.info.back.utils.*;
 import com.info.config.PayContents;
 import com.info.constant.Constant;
 import com.info.web.pojo.*;
-import com.info.web.util.CompareUtils;
-import com.info.web.util.DateUtil;
-import com.info.web.util.JSONUtil;
-import com.info.web.util.PageConfig;
+import com.info.web.util.*;
 import com.liquan.oss.OSSUpload;
 import net.sf.json.JSONArray;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -33,7 +30,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 我的催收订单控制层
@@ -45,6 +45,12 @@ import java.util.*;
 public class MyCollectionOrderController extends BaseController {
 
     private static Logger logger = Logger.getLogger(MyCollectionOrderController.class);
+
+    private static final Pattern MOBILE_PATTERN = Pattern.compile("^1([358][0-9]|4[579]|66|7[0135678]|9[89])[0-9]{8}$");
+
+    private static final String SHORT_MESSAGE_LIST_REDIS_KEY = "msgs";
+
+    private static final String SHORT_MESSAGE_LIMIT_COUNT_REDIS_KEY = "msgCountLimit";
 
     // 公司
     @Autowired
@@ -81,8 +87,6 @@ public class MyCollectionOrderController extends BaseController {
     @Autowired
     private IMmanUserRelaService mmanUserRelaService;
     @Autowired
-    private ISmsUserDao iSmsUserDao;
-    @Autowired
     private IMman_loan_collection_orderdeductionService collection_orderdeductionService;
     @Autowired
     private ICountCollectionAssessmentService countCollectionAssessmentService;
@@ -101,8 +105,7 @@ public class MyCollectionOrderController extends BaseController {
      * @return
      */
     @RequestMapping("getListCollectionOrder")
-    public String getListCollectionOrder(HttpServletRequest request,
-                                         HttpServletResponse response, Model model) {
+    public String getListCollectionOrder(HttpServletRequest request, Model model) {
         HashMap<String, Object> params = this.getParametersO(request);
 
         BackUser backUser = (BackUser) request.getSession().getAttribute(
@@ -122,7 +125,7 @@ public class MyCollectionOrderController extends BaseController {
         List<MmanLoanCollectionCompany> ListMmanLoanCollectionCompany = mmanLoanCollectionCompanyService
                 .getList(mmanLoanCollectionCompany);
         // 分页的订单信息
-        PageConfig<OrderBaseResult> page = new PageConfig<OrderBaseResult>();
+        PageConfig<OrderBaseResult> page;
         if (!BackConstant.COLLECTION_ROLE_ID.equals(backUser.getRoleId())) {
             page = mmanLoanCollectionOrderService.getPage(params);
         } else {
@@ -160,10 +163,9 @@ public class MyCollectionOrderController extends BaseController {
      *
      * @param request
      * @param response
-     * @param model
      */
     @RequestMapping("exportCollectionOrder")
-    public void exportCollectionOrder(HttpServletRequest request, HttpServletResponse response, Model model) {
+    public void exportCollectionOrder(HttpServletRequest request, HttpServletResponse response) {
         HashMap<String, Object> params = this.getParametersO(request);
         try {
             BackUser backUser = (BackUser) request.getSession().getAttribute(Constant.BACK_USER);
@@ -205,7 +207,7 @@ public class MyCollectionOrderController extends BaseController {
                 PageConfig<OrderBaseResult> pm = mmanLoanCollectionOrderService.getPage(params);
                 List<OrderBaseResult> list = pm.getItems();
 //				System.out.println("list>>>>>>>>="+list.size());
-                List<Object[]> contents = new ArrayList<Object[]>();
+                List<Object[]> contents = new ArrayList<>();
                 for (OrderBaseResult r : list) {
                     String[] conList = new String[titles.length];
                     conList[0] = r.getLoanId();
@@ -395,13 +397,11 @@ public class MyCollectionOrderController extends BaseController {
      * 催收流转日志
      *
      * @param request
-     * @param response
      * @param model
      * @return
      */
     @RequestMapping("getlistlog")
-    public String getCollectionStatusChangeLog(HttpServletRequest request,
-                                               HttpServletResponse response, Model model) {
+    public String getCollectionStatusChangeLog(HttpServletRequest request, Model model) {
         Map<String, String> params = this.getParameters(request);
         List<MmanLoanCollectionStatusChangeLog> list = null;
         try {
@@ -539,14 +539,12 @@ public class MyCollectionOrderController extends BaseController {
      * 催收记录表
      *
      * @param request
-     * @param response
      * @param //orderId
      * @param model
      * @return
      */
     @RequestMapping("collectionRecordList")
-    public String getloanCollectionRecordList(HttpServletRequest request,
-                                              HttpServletResponse response, Model model) {
+    public String getloanCollectionRecordList(HttpServletRequest request, Model model) {
         List<MmanLoanCollectionRecord> list = null;
         Map<String, String> params = this.getParameters(request);
         try {
@@ -716,14 +714,12 @@ public class MyCollectionOrderController extends BaseController {
      * 跳转转派页面
      *
      * @param request
-     * @param response
      * @param model
      * @return
      */
     // 第一步 选择转派公司
     @RequestMapping("toOrderDistibute")
-    public String toOrderDistibute(HttpServletRequest request,
-                                   HttpServletResponse response, Model model) {
+    public String toOrderDistibute(HttpServletRequest request, Model model) {
         HashMap<String, Object> params = getParametersO(request);
         BackUser backUser = (BackUser) request.getSession().getAttribute(Constant.BACK_USER);
         try {
@@ -775,13 +771,11 @@ public class MyCollectionOrderController extends BaseController {
      * @param //mmanLoanCollectionOrder
      * @param request
      * @param response
-     * @param model
      * @return
      */
     @RequestMapping("findPerson")
     @ResponseBody
-    public void orderDisBackUser(HttpServletRequest request,
-                                 HttpServletResponse response, Model model) {
+    public void orderDisBackUser(HttpServletRequest request, HttpServletResponse response) {
         try {
             HashMap<String, Object> params = getParametersO(request);
             BackUser backUser = new BackUser();
@@ -804,9 +798,7 @@ public class MyCollectionOrderController extends BaseController {
 
     // 转派
     @RequestMapping(value = "doDispatch")
-    public String doDispatch(MmanLoanCollectionOrder order,
-                             HttpServletRequest request, HttpServletResponse response,
-                             Model model) {
+    public String doDispatch(MmanLoanCollectionOrder order, HttpServletRequest request, HttpServletResponse response, Model model) {
         JsonResult json = new JsonResult("-1", "转派失败");
         HashMap<String, Object> params = this.getParametersO(request);
         try {
@@ -852,7 +844,7 @@ public class MyCollectionOrderController extends BaseController {
      * @return
      */
     private static Map<String, String> ReadCookieMap(HttpServletRequest request) {
-        Map<String, String> cookieMap = new HashMap<String, String>();
+        Map<String, String> cookieMap = new HashMap<>();
         Cookie[] cookies = request.getCookies();
         if (null != cookies) {
             for (Cookie cookie : cookies) {
@@ -865,51 +857,30 @@ public class MyCollectionOrderController extends BaseController {
     /**
      * 跳转到发送短信页面
      *
-     * @param model 需要发短信的手机号
+     * @param model
      * @return
      */
-    @RequestMapping("gotoSendMsg")
-    public String gotoSendMsg(HttpServletRequest request,
-                              HttpServletResponse response, Model model) {
+    @RequestMapping("/gotoSendMsg")
+    public String gotoSendMsg(HttpServletRequest request, Model model) {
         HashMap<String, Object> params = this.getParametersO(request);
-        HashMap<String, Object> map = new HashMap<String, Object>();
         try {
-            if (StringUtils.isNotBlank(params.get("id") + "")) {
-                MmanLoanCollectionOrder mmanLoanCollectionOrderOri = mmanLoanCollectionOrderService
-                        .getOrderById(params.get("id").toString());
-                MmanUserInfo userInfo = mmanUserInfoService
-                        .getUserInfoById(mmanLoanCollectionOrderOri.getUserId());
-                model.addAttribute("loanOrderId",
-                        mmanLoanCollectionOrderOri.getLoanId());
-                model.addAttribute("userPhone", userInfo.getUserPhone());
-                model.addAttribute("orderId",
-                        mmanLoanCollectionOrderOri.getUserId());
-                model.addAttribute("userId", userInfo.getId());
-                model.addAttribute("originalNum", userInfo.getUserPhone());
-                model.addAttribute("msgCount", iSmsUserDao
-                        .getSendTotalMsgCount(mmanLoanCollectionOrderOri
-                                .getLoanId()));
-                String msgType = mmanLoanCollectionOrderOri.getCurrentOverdueLevel();
-                if ("5".equals(msgType)) {
-                    List<String> list = new ArrayList<String>();
-                    list.add("3");
-                    list.add("4");
-                    list.add("5");
-                    map.put("msgType", list);
-                } else if ("6".equals(msgType) || "7".equals(msgType)) {
-                    List<String> list = new ArrayList<String>();
-                    list.add("5");
-                    map.put("msgType", list);
-                } else if ("3".equals(msgType)) {
-                    List<String> list = new ArrayList<String>();
-                    list.add("3");
-                    map.put("msgType", list);
-                } else {
-                    List<String> list = new ArrayList<String>();
-                    list.add("4");
-                    map.put("msgType", list);
+            String id = params.get("id") + "";
+            if (StringUtils.isNotBlank(id)) {
+                MmanLoanCollectionOrder order = mmanLoanCollectionOrderService.getOrderById(id);
+                List<TemplateSms> msgs = getAllMsg();
+                int code = RandomUtils.nextInt(0, msgs.size());
+                TemplateSms msg = msgs.get(code);
+
+                String content = MessageFormat.format(msg.getContenttext(), StringUtils.split(getMsgParam(order), ','));
+                // 是否显示更换短信按钮
+//                model.addAttribute("refreshMsg", JedisDataClient.get("cuishou:refreshMsg"));
+                if(BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())){
+                    content = "该订单已还款完成，请核实！";
                 }
-                model.addAttribute("msgs", templateSmsDao.getType(map));
+                model.addAttribute("msgContent", content);
+                model.addAttribute("msgId", msg.getId());
+                model.addAttribute("orderId", id);
+                model.addAttribute("phoneNumber", order.getLoanUserPhone());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -919,6 +890,47 @@ public class MyCollectionOrderController extends BaseController {
     }
 
     /**
+     * 查询所有的短信模板
+     *
+     * @return
+     */
+    private List<TemplateSms> getAllMsg() {
+        List<TemplateSms> msgs = JedisDataClient.getList("cuishou:", SHORT_MESSAGE_LIST_REDIS_KEY);
+        if (CollectionUtils.isEmpty(msgs)) {
+            msgs = templateSmsDao.getMsgs();
+            JedisDataClient.setList("cuishou:", SHORT_MESSAGE_LIST_REDIS_KEY, msgs, 5 * 60);
+        }
+        return msgs;
+    }
+
+    /**
+     * 拼接短信模板中需要的参数
+     *
+     * @param order
+     * @return
+     */
+    private String getMsgParam(MmanLoanCollectionOrder order) {
+        if (order == null) {
+            return null;
+        }
+        MmanUserInfo userInfo = mmanUserInfoService.getUserInfoById(order.getUserId());
+        StringBuilder msgParam = new StringBuilder();
+        if (StringUtils.isNotEmpty(userInfo.getUserSex())) {
+            if ("男".equals(userInfo.getUserSex())) {
+                msgParam.append(order.getLoanUserName() + "先生");
+            } else {
+                msgParam.append(order.getLoanUserName() + "女士");
+            }
+        }
+        CreditLoanPay pay = creditLoanPayService.findByLoanId(order.getLoanId());
+        BigDecimal remainMoney = pay.getReceivableMoney().subtract(pay.getRealMoney());
+        msgParam.append(",");
+        msgParam.append(order.getOverdueDays()).append(",").append(remainMoney);
+        return msgParam.toString();
+    }
+
+
+    /**
      * 发送催收短信
      *
      * @param //mobiles        需要发送短信的手机号
@@ -926,76 +938,89 @@ public class MyCollectionOrderController extends BaseController {
      * @param //isSendSmsToAll 是否发送给所有人
      * @return
      */
-    @RequestMapping("sendMsg")
-    public ServiceResult SendSms(HttpServletRequest request,
-                                 HttpServletResponse response, Model model) {
+    @RequestMapping("/sendMsg")
+    public ServiceResult SendSms(HttpServletRequest request, HttpServletResponse response, Model model) {
         JsonResult result = new JsonResult("-1", "发送短信失败");
         HashMap<String, Object> params = this.getParametersO(request);
         try {
-            String mobiles = request.getParameter("phoneNumber");
-            String msgId = request.getParameter("msgId");
-            // String smsContent =
-            // templateSmsDao.getTemplateSmsById(msgId).getContenttext();
-            String smsContent = null;
-            if (msgId == null || msgId == "") {
-                result.setMsg("请选择需要发送的短信内容!");
+            String orderId = params.get("orderId") + "";
+            if (StringUtils.isBlank(orderId)) {
+                result.setCode("-1");
+                result.setMsg("订单异常！");
+                return getServiceResult(response, model, result, params);
+            }
+            MmanLoanCollectionOrder order = mmanLoanCollectionOrderService.getOrderById(orderId);
+            if (order == null) {
+                result.setCode("-2");
+                result.setMsg("订单异常！");
+                logger.error("订单为null,loanId : " + orderId);
+                return getServiceResult(response, model, result, params);
+            }
+            if (BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())) {
+                result.setCode("-3");
+                result.setMsg("催收成功订单不能发送催收短信！");
+                logger.error("催收成功订单不能发送催收短信！" + orderId);
+                return getServiceResult(response, model, result, params);
+            }
+            String mobile = request.getParameter("phoneNumber") == null ? "" : request.getParameter("phoneNumber").trim();
+            if (StringUtils.isEmpty(mobile)) {
+                result.setCode("-4");
+                result.setMsg("手机号不能为空！");
+                return getServiceResult(response, model, result, params);
+            }
+            Matcher matcher = MOBILE_PATTERN.matcher(mobile);
+            if (!matcher.matches()) {
+                result.setCode("-5");
+                result.setMsg("手机号异常！");
+                return getServiceResult(response, model, result, params);
+            }
+            // 查询出该订单当天已发短信的次数
+            int count = smsUserService.getSendMsgCount(order.getLoanId());
+            String msgLimitCountKey = "cuishou:" + SHORT_MESSAGE_LIMIT_COUNT_REDIS_KEY;
+            int msgCountLimit = JedisDataClient.get(msgLimitCountKey) == null ? 0 : Integer.valueOf(JedisDataClient.get(msgLimitCountKey));
+            if (msgCountLimit == 0) {
+                // 默认短信发送上限为2条
+                msgCountLimit = 2;
+            }
+            if (msgCountLimit <= count) {
+                result.setCode("-6");
+                result.setMsg("今日该订单发送短信已达上限" + (msgCountLimit) + "条！");
+                return getServiceResult(response, model, result, params);
+            }
+            String msgParam = getMsgParam(order);
+            String msgCode = params.get("msgId") + "";
+            if (msgParam == null || msgCode.length() <= 0) {
+                result.setCode("-7");
+                result.setMsg("短信参数异常！");
+                return getServiceResult(response, model, result, params);
+            }
+            boolean smsResult = SmsSendUtil.sendSmsNew(mobile, msgParam, msgCode);
+            if (smsResult) {
+                result.setCode("0");
+                result.setMsg("发送成功！");
+                // 插入短信记录
+                insertMsg(mobile, order, mobile, msgCode, request);
             } else {
-                smsContent = templateSmsDao.getTemplateSmsById(msgId)
-                        .getContenttext();
-                String orderId = request.getParameter("loanOrderId");
-                String userName = mmanUserInfoService.getUserInfoById(
-                        request.getParameter("orderId")).getRealname();
-                String originalNum = request.getParameter("originalNum");
-                String userId = request.getParameter("userId");
-                smsContent = userName + smsContent;
-                // 查询出该借款人所有的联系人
-                List<MmanUserRela> userReal = mmanUserRelaService
-                        .getContactPhones(userId);
-                List<String> phones = new ArrayList<String>();
-                for (MmanUserRela mmanUserRela : userReal) {
-                    phones.add(mmanUserRela.getInfoValue());
-                }
-                if (phones.contains(mobiles) || mobiles.equals(originalNum)) {
-                    // 查询出对应借款订单信息
-                    MmanLoanCollectionOrder order = mmanLoanCollectionOrderService
-                            .getOrderWithId(orderId);
-                    // 查询出该订单当天已发短信的次数
-                    int count = smsUserService.getSendMsgCount(orderId);
-                    int overdueDays = order.getOverdueDays();
-                    // System.out.println("***********************************");
-                    // System.out.println("手机号:" + mobiles);
-                    // System.out.println("短息内容:" + smsContent);
-                    // System.out.println("借款编号:" + orderId);
-                    // System.out.println("订单逾期天数:" + overdueDays);
-                    // System.out.println("今日已发短信次数:" + count);
-                    // System.out.println("***********************************");
-                    // 逾期10天以内(包括10) 可发短信的数量为每天3条
-                    if (overdueDays <= 10) {
-                        if (count < 3) {
-                            sendMsg(result, mobiles, orderId, userName,
-                                    smsContent, request);
-                        } else {
-                            result.setCode("3");
-                            result.setMsg("今日该订单短信已达上限");
-                        }
-                    } else {
-                        // 逾期10天以上(不包括10) 可发短信的数量为每天5条
-                        if (count < 5) {
-                            sendMsg(result, mobiles, orderId, userName,
-                                    smsContent, request);
-                        } else {
-                            result.setCode("3");
-                            result.setMsg("今日该订单短信已达上限");
-                        }
-                    }
-                } else {
-                    result.setCode("5");
-                    result.setMsg("请检查您输入的手机号码!");
-                }
+                result.setCode("-8");
+                result.setMsg("发送失败！");
             }
         } catch (Exception e) {
+            logger.error("发送短信失败，订单id：" + params.get("id"));
             e.printStackTrace();
         }
+        return getServiceResult(response, model, result, params);
+    }
+
+    /**
+     * 处理相应数据
+     *
+     * @param response
+     * @param model
+     * @param result
+     * @param params
+     * @return
+     */
+    private ServiceResult getServiceResult(HttpServletResponse response, Model model, JsonResult result, HashMap<String, Object> params) {
         model.addAttribute("params", params);
         SpringUtils.renderDwzResult(response, "0".equals(result.getCode()),
                 result.getMsg(), DwzResult.CALLBACK_CLOSECURRENT,
@@ -1026,15 +1051,7 @@ public class MyCollectionOrderController extends BaseController {
                 result.setMsg("发送成功");
                 result.setCode("0");
                 // 新增一条短信发送记录
-                SmsUser msg = new SmsUser();
-                BackUser user = this.loginAdminUser(request);
-                msg.setSendUserId(user.getUuid());
-                msg.setAddTime(new Date());
-                msg.setLoanOrderId(orderId);
-                msg.setSmsContent(smsContent);
-                msg.setUserPhone(mobiles);
-                msg.setUserName(userName);
-                this.smsUserService.insert(msg);
+//                insertMsg(mobiles, orderId, userName, smsContent, request);
                 // 每个数据包发送后等待一秒 云峰短信有频率限制
                 Thread.sleep(1000);
             }
@@ -1044,15 +1061,70 @@ public class MyCollectionOrderController extends BaseController {
     }
 
     /**
+     * 插入发送的短信记录
+     *
+     * @param mobiles
+     * @param
+     * @param userName
+     * @param
+     * @param request
+     */
+    private void insertMsg(String mobiles, MmanLoanCollectionOrder order, String userName, String msgCode, HttpServletRequest request) {
+        SmsUser msg = new SmsUser();
+        BackUser user = this.loginAdminUser(request);
+        msg.setSendUserId(user.getUuid());
+        msg.setAddTime(new Date());
+        msg.setLoanOrderId(order.getLoanId());
+        List<TemplateSms> msgs = getAllMsg();
+        TemplateSms sms = null;
+        for (TemplateSms s : msgs) {
+            if (s.getId().equals(msgCode)) {
+                sms = s;
+            }
+        }
+        String msgContent = MessageFormat.format(sms.getContenttext(), StringUtils.split(getMsgParam(order), ','));
+        msg.setSmsContent(msgContent);
+        msg.setUserPhone(mobiles);
+        msg.setUserName(userName);
+        this.smsUserService.insert(msg);
+    }
+
+    /**
+     * 更换短信内容
+     *
+     * @return
+     */
+    @RequestMapping("/refreshMsg")
+    @ResponseBody
+    public String refreshMsg(HttpServletRequest request) {
+        Map<String, String> params = this.getParameters(request);
+        String id = params.get("id") + "";
+        Map<String, Object> map = new HashMap<>();
+        if (StringUtils.isNotBlank(id)) {
+            MmanLoanCollectionOrder order = mmanLoanCollectionOrderService.getOrderById(id);
+            List<TemplateSms> msgs = getAllMsg();
+            int code = RandomUtils.nextInt(0, msgs.size());
+            TemplateSms msg = msgs.get(code);
+            String content = MessageFormat.format(msg.getContenttext(), StringUtils.split(getMsgParam(order), ','));
+            if(BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())){
+                content = "该订单已还款完成，请核实！";
+            }
+            map.put("msgContent", content);
+            map.put("msgId", msg.getId());
+        }
+        return JSON.toJSONString(map);
+    }
+
+
+    /**
      * 分期还款计算
      *
      * @param request
-     * @param response
      * @param model
      * @return
      */
     @RequestMapping("installmentPay")
-    public String getInstallmentPay(HttpServletRequest request, HttpServletResponse response, Model model) {
+    public String getInstallmentPay(HttpServletRequest request, Model model) {
         Map<String, String> params = this.getParameters(request);
         model.addAttribute("params", params);
 
@@ -1089,7 +1161,7 @@ public class MyCollectionOrderController extends BaseController {
         if (count > 4) {
             count = 2; // 分期最多为4期
         }
-        List<InstallmentPayInfoVo> list = new ArrayList<InstallmentPayInfoVo>();
+        List<InstallmentPayInfoVo> list = new ArrayList<>();
         InstallmentPayInfoVo installmentPayInfoVo = null;
 
         for (int i = 0; i < count; i++) {
@@ -1124,15 +1196,14 @@ public class MyCollectionOrderController extends BaseController {
      *
      * @param request
      * @param response
-     * @param model
      * @return
      */
     @RequestMapping("insertInstallmentPayRecord")
-    public void insertInstallmentPayRecord(HttpServletRequest request, HttpServletResponse response, Model model) {
+    public void insertInstallmentPayRecord(HttpServletRequest request, HttpServletResponse response) {
         String url = null;
         String erroMsg = null;
         List<InstallmentPayRecord> installmentPayRecordList = null;
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = new HashMap<>();
         JsonResult result = new JsonResult("-1", "创建分期失败");
         map.put("code", "-1");
         Map<String, String> params = this.getParameters(request);
@@ -1177,8 +1248,8 @@ public class MyCollectionOrderController extends BaseController {
     }
 
     @RequestMapping("fqWithholding")
-    public void fqWithholding(HttpServletRequest request, HttpServletResponse response, Model model) {
-        Map<String, Object> map = new HashMap<String, Object>();
+    public void fqWithholding(HttpServletRequest request, HttpServletResponse response) {
+        Map<String, Object> map = new HashMap<>();
         map.put("code", "-1");
         Map<String, String> params = this.getParameters(request);
         BackUser backUser = (BackUser) request.getSession().getAttribute(Constant.BACK_USER);
@@ -1197,8 +1268,7 @@ public class MyCollectionOrderController extends BaseController {
     }
 
     @RequestMapping("getContactInfo")
-    private String gotoGetContactInfoPage(HttpServletRequest request,
-                                          HttpServletResponse response, Model model) {
+    private String gotoGetContactInfoPage(HttpServletRequest request, Model model) {
         HashMap<String, Object> params = this.getParametersO(request);
         String phoneNum = request.getParameter("phoneNum");
         if (phoneNum != "" && phoneNum != null) {
@@ -1231,7 +1301,7 @@ public class MyCollectionOrderController extends BaseController {
      * @author yyf
      */
     @RequestMapping("doReduction")
-    public void doReduction(HttpServletRequest request, HttpServletResponse response, Model model) {
+    public void doReduction(HttpServletRequest request, HttpServletResponse response) {
         JsonResult result = new JsonResult("-1", "申请减免失败");
         HashMap<String, Object> params = this.getParametersO(request);
 
@@ -1258,7 +1328,7 @@ public class MyCollectionOrderController extends BaseController {
 
 
     @RequestMapping("getorderPage")
-    public String getorderPage(HttpServletRequest request, HttpServletResponse response, Model model) {
+    public String getorderPage(HttpServletRequest request, Model model) {
         try {
             HashMap<String, Object> params = getParametersO(request);
             //add  减免列表默认申请中状态
@@ -1277,7 +1347,7 @@ public class MyCollectionOrderController extends BaseController {
     }
 
     @RequestMapping("testKh")
-    public String testKh(HttpServletRequest request, HttpServletResponse response, Model model) {
+    public String testKh(HttpServletRequest request) {
         try {
             Date date = new Date();
             HashMap<String, Object> params = new HashMap<String, Object>();
@@ -1295,7 +1365,7 @@ public class MyCollectionOrderController extends BaseController {
     }
 
     @RequestMapping("testGl")
-    public String testGl(HttpServletRequest request, HttpServletResponse response, Model model) {
+    public String testGl(HttpServletRequest request) {
         try {
             Date date = new Date();
             HashMap<String, Object> params = new HashMap<String, Object>();
@@ -1313,7 +1383,7 @@ public class MyCollectionOrderController extends BaseController {
     }
 
     @RequestMapping("testCj")
-    public String testCj(HttpServletRequest request, HttpServletResponse response, Model model) {
+    public String testCj() {
         try {
             Date date = new Date();
             HashMap<String, Object> params = new HashMap<String, Object>();

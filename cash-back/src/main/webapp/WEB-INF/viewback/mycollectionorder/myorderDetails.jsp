@@ -60,76 +60,23 @@
             list-style: none;
         }
 
-        #content {
-            width: 500px;
-            height: 170px;
-            margin: 100px auto;
-        }
-
-        #imgbox-loading {
-            position: absolute;
-            top: 0;
-            left: 0;
-            cursor: pointer;
-            display: none;
-            z-index: 90;
-        }
-
         #imgbox-loading div {
             background: #FFF;
             width: 100%;
             height: 100%;
         }
 
-        #imgbox-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #000;
-            display: none;
-            z-index: 80;
+        #imgZ, #imgF {
+            margin-top: 7px;
+            width: 435px;
+            height: 232px;
         }
 
-        .imgbox-wrap {
-            position: absolute;
-            top: 0;
-            left: 0;
-            background: #FFF;
-            display: none;
-            z-index: 90;
-        }
-
-        .imgbox-img {
-            padding: 0;
-            margin: 0;
-            border: none;
-            width: 250%;
-            height: 250%;
-            vertical-align: top;
-        }
-
-        .imgbox-title {
-            padding-top: 0px;
-            font-size: 11px;
-            text-align: center;
-            font-family: Arial;
-            color: #333;
-            display: none;
-        }
-
-        .imgbox-bg-wrap {
-            position: absolute;
-            padding: 0;
-            margin: 0;
-            display: none;
-        }
-
-        .imgbox-bg {
-            position: absolute;
-            width: 20px;
-            height: 20px;
+        #imgHead {
+            width: 232px;
+            height: 232px;
+            display: block;
+            margin: 2px 103px 2px;
         }
     </style>
 </head>
@@ -146,7 +93,7 @@
                     <td>
                         <table class="userTable">
                             <tr>
-                                <td class="tdGround" style="width:180px;">借款人姓名:</td>
+                                <td class="tdGround" style="width:80px;">借款人姓名:</td>
                                 <td>${userInfo.realname}</td>
                                 <td class="tdGround">借款人手机号码:</td>
                                 <td>${userInfo.userPhone}</td>
@@ -204,20 +151,22 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td class="tdGround" style="height: 100px;">身份证图片:</td>
-                                <td colspan="2">
+                                <td class="tdGround" style="height: 232px;">身份证图片:</td>
+                                <td colspan="1">
                                     <c:if test="${userInfo.idcardImgZ!=null}">
-                                        <a id="img1" href="${userInfo.idcardImgZ}"><img src="${userInfo.idcardImgZ}"/></a>
+                                        <img id="imgZ" src="${userInfo.idcardImgZ}"/>
+                                        <%--<a id="img1" href="${userInfo.idcardImgZ}"><img src="${userInfo.idcardImgZ}"/></a>--%>
                                     </c:if>
                                     <c:if test="${userInfo.idcardImgF!=null}">
-                                        <a id="img2" href="${userInfo.idcardImgF}"><img src="${userInfo.idcardImgF}"/></a>
+                                        <img id="imgF" src="${userInfo.idcardImgF}"/>
+                                        <%--<a id="img2" href="${userInfo.idcardImgF}"><img src="${userInfo.idcardImgF}"/></a>--%>
                                     </c:if>
 
                                 </td>
-                                <td class="tdGround" style="height: 100px;">个人名片:</td>
-                                <td colspan="2">
+                                <td class="tdGround" style="height: 210px;">个人名片:</td>
+                                <td colspan="3">
                                     <c:if test="${userInfo.headPortrait!=null}">
-                                        <img src="${userInfo.headPortrait}"/>
+                                        <img id="imgHead" src="${userInfo.headPortrait}"/>
                                     </c:if>
                                 </td>
                             </tr>
@@ -397,29 +346,31 @@
 </html>
 
 <script type="text/javascript">
-    $(document).ready(function () {
-        $("#img1").imgbox({
-            'speedIn': 0,
-            'speedOut': 0,
-            'alignment': 'top',
-            'overlayShow': true,
-            'allowMultiple': false
-        });
+    /*
+     $(document).ready(function () {
+     $("#img1").imgbox({
+     'speedIn': 0,
+     'speedOut': 0,
+     'alignment': 'top',
+     'overlayShow': true,
+     'allowMultiple': false
+     });
 
-        $("#img2").imgbox({
-            'speedIn': 0,
-            'speedOut': 0,
-            'alignment': 'top',
-            'overlayShow': true,
-            'allowMultiple': false
-        });
-        if (${empty userInfo.idcardImgZ}) {
-            $("#img1").hide();
-        }
-        if (${empty userInfo.idcardImgF}) {
-            $("#img2").hide();
-        }
-    });
+     $("#img2").imgbox({
+     'speedIn': 0,
+     'speedOut': 0,
+     'alignment': 'top',
+     'overlayShow': true,
+     'allowMultiple': false
+     });
+     if (${empty userInfo.idcardImgZ}) {
+     $("#img1").hide();
+     }
+     if (${empty userInfo.idcardImgF}) {
+     $("#img2").hide();
+     }
+     });
+     */
     //var a = 'asdfsdfsdfsadf';
     //a=a.split('');  //将a字符串转换成数组
     //a.splice(1,1,'xxxxx'); //将1这个位置的字符，替换成'xxxxx'. 用的是原生js的splice方法。
