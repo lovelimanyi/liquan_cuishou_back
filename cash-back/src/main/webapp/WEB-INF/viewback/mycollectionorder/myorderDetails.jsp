@@ -224,6 +224,33 @@
             </table>
         </fieldset>
         <!-- 个人信息 -->
+
+        <!-- 还款信息 -->
+        <%--<fieldset>--%>
+            <%--<legend>还款信息</legend>--%>
+            <%--<table class="userTable">--%>
+                <%--<tbody>--%>
+                <%--<tr>--%>
+                    <%--<td class="tdGround">用户基本信息</td>--%>
+                    <%--<td>abc</td>--%>
+                    <%--<td class="tdGround">用户基本信息</td>--%>
+                    <%--<td>abc</td>--%>
+                    <%--<td class="tdGround">用户基本信息</td>--%>
+                    <%--<td>abc</td>--%>
+                    <%--<td class="tdGround">用户基本信息</td>--%>
+                    <%--<td>abc</td>--%>
+                <%--</tr>--%>
+                <%--</tbody>--%>
+            <%--</table>--%>
+        <%--</fieldset>--%>
+
+
+
+
+
+
+
+
         <fieldset>
             <legend>还款详情</legend>
             <table class="detailB" width="100%">

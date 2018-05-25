@@ -618,7 +618,7 @@ public class MyCollectionOrderController extends BaseController {
 
                 // 大额代扣跳转到一个专门的页面
                 MmanUserLoan loan = mmanUserLoanService.get(mmanLoanCollectionOrderOri.getLoanId());
-                if (loan != null && Constant.BIG.equals(loan.getBorrowingType())) {
+                if (loan != null && !Constant.SMALL.equals(loan.getBorrowingType())) {
                     url = "mycollectionorder/toBigkoukuan";
                 }
 
