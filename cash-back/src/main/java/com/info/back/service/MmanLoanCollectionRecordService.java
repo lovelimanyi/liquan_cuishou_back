@@ -30,6 +30,8 @@ import java.util.*;
 public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecordService {
     private static Logger logger = Logger.getLogger(MmanLoanCollectionRecordService.class);
 
+    private final String WITHHOLD_CHANNEL_KEY = "WITHHOLD_CHANNEL";
+
     @Autowired
     private IMmanLoanCollectionRecordDao mmanLoanCollectionRecordDao;
 
@@ -845,12 +847,11 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
     }
 
     private String getWithholdChannel() throws Exception {
-        String withholdChannel;
-        if (StringUtils.isNotBlank(JedisDataClient.get("WITHHOLD_CHANNEL"))) {
-            withholdChannel = JedisDataClient.get("WITHHOLD_CHANNEL");
-        } else {
+        String realKey = "cuishou:" + WITHHOLD_CHANNEL_KEY;
+        String withholdChannel = JedisDataClient.get(realKey);
+        if (StringUtils.isBlank(withholdChannel)) {
             withholdChannel = channelSwitchingDao.getChannelValue("cuishou_withhold_channel").getChannelValue();
-            JedisDataClient.set("WITHHOLD_CHANNEL", withholdChannel, 60 * 60);
+            JedisDataClient.set(realKey, withholdChannel, 60 * 60);
         }
         return withholdChannel;
     }
