@@ -113,6 +113,7 @@
         <task:scheduled ref="taskEstimateOrder" method="pullEstimateOrder" cron="0 30 7 * * ?"/>
         <task:scheduled ref="taskMailCollection" method="mailBeyondWarn" cron="0 0 8 * * ?"/>
         <task:scheduled ref="taskMailCollection" method="mailSendResult" cron="0 30 8 2-31 * ?"/>
+        <!-- 每月1号订单较多，派单结果邮件发送时间延后 -->
         <task:scheduled ref="taskMailCollection" method="mailSendResult" cron="0 0 17 1 * ?"/>
     </task:scheduled-tasks>
     <!--最多 5个定时任务线程-->
