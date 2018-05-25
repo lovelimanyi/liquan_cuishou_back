@@ -165,7 +165,7 @@ public class AuditCenterService implements IAuditCenterService {
 
                             String sign = MD5coding.MD5(AESUtil.encrypt(auditCenter.getLoanUserId()+auditCenter.getPayId()+reductionMoney+auditCenter.getId(),PayContents.XJX_WITHHOLDING_NOTIFY_KEY));
                             //TODO 如果是大额或者分期商城订单减免，调用大额减免接口
-                            if(Constant.ORDER_TYPE_BIG.equals(auditCenter.getOrderType()) ||Constant.ORDER_TYPE_Fen.equals(auditCenter.getOrderType())){
+                            if(Constant.ORDER_TYPE_BIG.equals(auditCenter.getOrderType()) ||Constant.ORDER_TYPE_FEN.equals(auditCenter.getOrderType())){
                                 MqMessage msg = new MqMessage();
                                 msg.setQueueName(Constant.CUISHOU_BIG_REDUCTION_QUEUE);
                                 Map<String,Object> mapParam = new HashedMap();

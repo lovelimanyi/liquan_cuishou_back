@@ -88,6 +88,9 @@ public class MmanLoanCollectionOrder {
     //减免滞纳金金额
     private BigDecimal reductionMoney;
 
+    //分期商城商品名称
+    private String productName;
+
     public BigDecimal getReductionMoney() {
         return reductionMoney;
     }
@@ -558,5 +561,13 @@ public class MmanLoanCollectionOrder {
 
     public void setSecondDayFlag(String secondDayFlag) {
         this.secondDayFlag = secondDayFlag;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 }

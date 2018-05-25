@@ -144,4 +144,6 @@ public interface IMmanLoanCollectionOrderService {
 	void updateOverdueDays(MmanLoanCollectionOrder order);
 
 	void dealwithBigOrderUpgrade(String loanId);
+
+    void updateProductName(MmanLoanCollectionOrder order);
 }

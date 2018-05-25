@@ -538,9 +538,18 @@ public class CollectionStatisticsController extends BaseController {
 //                    return url;
 //                }
 				pageConfig = personStatisticsService.findCompanyPage(params);
-				handleCompanyPermission(backUser,params,model);
+				List<String> companyIds = getCompanyIds(backUser);
+				if(pageConfig.getItems() != null && pageConfig.getItems().size() > 0){
+					for (int i = 1; i < pageConfig.getItems().size(); i ++) {
+						if(!companyIds.contains(pageConfig.getItems().get(i).getCompanyId())){
+							pageConfig.getItems().get(i).setCompanyName("* * * * * * * * ");
+						}
+					}
+				}
 			}
-
+			model.addAttribute("groupLevelMap", BackConstant.groupNameMap);
+			model.addAttribute("groupLevel", String.valueOf(params.get("groupLevel")));
+			model.addAttribute("dictMap",BackConstant.groupNameMap);
 			model.addAttribute("list",pageConfig.getItems());
 			model.addAttribute("pm", pageConfig);
 			model.addAttribute("params", params);// 用于搜索框保留值
@@ -584,8 +593,19 @@ public class CollectionStatisticsController extends BaseController {
 //                    return url;
 //                }
 				pageConfig = bigAmountStatisticsService.findCompanyPage(params);
-				handleCompanyPermission(backUser,params,model);
+
+				List<String> companyIds = getCompanyIds(backUser);
+				if(pageConfig.getItems() != null && pageConfig.getItems().size() > 0){
+					for (int i = 1; i < pageConfig.getItems().size(); i ++) {
+						if(!companyIds.contains(pageConfig.getItems().get(i).getCompanyId())){
+							pageConfig.getItems().get(i).setCompanyName("* * * * * * * * ");
+						}
+					}
+				}
 			}
+			model.addAttribute("groupLevelMap", BackConstant.groupNameMap);
+			model.addAttribute("groupLevel", String.valueOf(params.get("groupLevel")));
+			model.addAttribute("dictMap",BackConstant.groupNameMap);
 			model.addAttribute("list",pageConfig.getItems());
 			model.addAttribute("pm", pageConfig);
 			model.addAttribute("params", params);// 用于搜索框保留值
@@ -593,6 +613,19 @@ public class CollectionStatisticsController extends BaseController {
 			e.printStackTrace();
 		}
 		return url;
+	}
+
+	private List<String> getCompanyIds(BackUser backUser) {
+		List<MmanLoanCollectionCompany> companys =mmanLoanCollectionCompanyService.selectCompanyList();
+		List<MmanLoanCollectionCompany> coms = new ArrayList<>(); // 存放登录角色权限内可以查看的公司
+		coms = getAccessCompanies(backUser, companys, coms);
+		List<String> companyIds = new ArrayList<>();
+		if (coms != null && coms.size()>=1) {
+			for (MmanLoanCollectionCompany company : coms) {
+				companyIds.add(company.getId());
+			}
+		}
+		return companyIds;
 	}
 
 	public void handleCompanyPermission(BackUser backUser ,HashMap<String, Object> params ,Model model){

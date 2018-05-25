@@ -18,4 +18,6 @@ public class PayContents {
     public static final String XJX_SMS_SEND_URL_NEW = propertiesLoader.getProperty("XJX.sms_send_url_new");//短信调用地址
 
     public static final String JXL_OSS_SERVER_URL = propertiesLoader.getProperty("jxl.oss.server.rul");//oss地址
+    //获取商品名称
+    public static final String PRODUCT_NAME_URL = propertiesLoader.getProperty("productName.rul");//获取商品名地址
 }
