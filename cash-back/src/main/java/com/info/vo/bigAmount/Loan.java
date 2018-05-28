@@ -142,4 +142,25 @@ public class Loan {
     public void setBorrowingType(String borrowingType) {
         this.borrowingType = borrowingType;
     }
+
+    @Override
+    public String toString() {
+        return "Loan{" +
+                "id='" + id + '\'' +
+                ", loanEndTime='" + loanEndTime + '\'' +
+                ", loanMoney='" + loanMoney + '\'' +
+                ", loanPenalty='" + loanPenalty + '\'' +
+                ", loanPenaltyRate='" + loanPenaltyRate + '\'' +
+                ", loanRate='" + loanRate + '\'' +
+                ", loanStartTime='" + loanStartTime + '\'' +
+                ", paidMoney='" + paidMoney + '\'' +
+                ", accrual='" + accrual + '\'' +
+                ", serviceCharge='" + serviceCharge + '\'' +
+                ", userId='" + userId + '\'' +
+                ", termNumber='" + termNumber + '\'' +
+                ", overdueDays=" + overdueDays +
+                ", merchantNo='" + merchantNo + '\'' +
+                ", borrowingType='" + borrowingType + '\'' +
+                '}';
+    }
 }
