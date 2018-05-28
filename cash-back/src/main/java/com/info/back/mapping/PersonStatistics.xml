@@ -566,22 +566,24 @@
 
  <select id="findCompanyAll" resultType="com.info.web.pojo.PersonStatistics" parameterType="HashMap">
   SELECT
-  companyId,
-  groupLevel,
-  totalPrincipal,
-  realgetTotalPrincipal,
-  remainPrincipal,
-  repaymentProbability,
-  totalPenalty,
-  realgetTotalPenalty,
-  remainPenalty,
-  penaltyProbability,
-  totalOrderCount,
-  undoneOrderCount,
-  doneOrderCount,
-  orderProbability,
-  createDate
+  cs.companyId,
+  cs.groupLevel,
+  cs.totalPrincipal,
+  cs.realgetTotalPrincipal,
+  cs.remainPrincipal,
+  cs.repaymentProbability,
+  cs.totalPenalty,
+  cs.realgetTotalPenalty,
+  cs.remainPenalty,
+  cs.penaltyProbability,
+  cs.totalOrderCount,
+  cs.undoneOrderCount,
+  cs.doneOrderCount,
+  cs.orderProbability,
+  cc.title AS companyName,
+  cs.createDate
   FROM company_statistics cs
+  LEFT JOIN mman_loan_collection_company cc ON cs.companyId = cc.id
   <include refid="whereCompanyColumn"/>
 
 

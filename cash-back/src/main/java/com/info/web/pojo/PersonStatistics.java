@@ -29,6 +29,7 @@ public class PersonStatistics {
     private int doneOrderCount;//完成订单数
     private BigDecimal orderProbability;//订单完成率
     private Date createDate;
+    private String companyName;
 
     public Date getCreateDate() {
         return createDate;
@@ -180,5 +181,13 @@ public class PersonStatistics {
 
     public void setGroupLevel(String groupLevel) {
         this.groupLevel = groupLevel;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
     }
 }

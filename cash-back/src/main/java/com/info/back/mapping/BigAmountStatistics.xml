@@ -585,23 +585,25 @@
     </sql>
     <select id="findCompanyAll" resultType="com.info.web.pojo.BigAmountStatistics" parameterType="HashMap">
         SELECT
-        companyId,
-        groupLevel,
-        totalPrincipal,
-        realgetTotalPrincipal,
-        remainPrincipal,
-        repaymentProbability,
-        totalAccrual,
-        totalPenalty,
-        realgetTotalPenalty,
-        remainPenalty,
-        penaltyProbability,
-        totalOrderCount,
-        undoneOrderCount,
-        doneOrderCount,
-        orderProbability,
-        createDate
+        ps.companyId,
+        ps.groupLevel,
+        ps.totalPrincipal,
+        ps.realgetTotalPrincipal,
+        ps.remainPrincipal,
+        ps.repaymentProbability,
+        ps.totalAccrual,
+        ps.totalPenalty,
+        ps.realgetTotalPenalty,
+        ps.remainPenalty,
+        ps.penaltyProbability,
+        ps.totalOrderCount,
+        ps.undoneOrderCount,
+        ps.doneOrderCount,
+        ps.orderProbability,
+        cc.title AS companyName,
+        ps.createDate
         FROM big_company_statistics ps
+        LEFT JOIN mman_loan_collection_company cc ON ps.companyId = cc.id
         <include refid="whereBigCompanyColumn"/>
 
 

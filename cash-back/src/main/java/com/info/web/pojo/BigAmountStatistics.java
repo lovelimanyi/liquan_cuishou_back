@@ -30,6 +30,7 @@ public class BigAmountStatistics {
     private int doneOrderCount;//完成订单数
     private BigDecimal orderProbability;//订单完成率
     private Date createDate;
+    private String companyName;
 
     public BigDecimal getTotalAccrual() {
         return totalAccrual;
@@ -189,5 +190,13 @@ public class BigAmountStatistics {
 
     public void setCreateDate(Date createDate) {
         this.createDate = createDate;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
     }
 }

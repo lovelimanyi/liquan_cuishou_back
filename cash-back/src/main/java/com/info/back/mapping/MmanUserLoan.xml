@@ -41,6 +41,7 @@
         <result column="loan_sys_status" property="loanSysStatus" jdbcType="VARCHAR"/>
         <!-- 这里不用 -->
         <result column="loan_sys_remark" property="loanSysRemark" jdbcType="VARCHAR"/>
+        <result column="term_number" property="termNumber" jdbcType="VARCHAR"/>
         <result column="borrowing_type" property="borrowingType" jdbcType="VARCHAR"/>
         <result column="merchant_no" property="merchantNo" jdbcType="VARCHAR"/>
     </resultMap>

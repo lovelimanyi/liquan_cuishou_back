@@ -22,6 +22,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import javax.sound.midi.Soundbank;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -35,6 +37,20 @@ public class TestOss {
 
     @Test
     public void test() {
+        String firstDate =  DateUtil.getDateFormat(DateUtil.getDayFirst(),"yyyy-MM-dd 00:00:00");
+        System.out.println(firstDate);
+        String date1 = DateUtil.getDateFormat(new Date(),"yyyy-MM-dd HH:45:00");
+        System.out.println(date1);
+        SimpleDateFormat format3 = new SimpleDateFormat("yyyy-MM-dd HH:45:00");
+        String time3 = format3.format(Calendar.getInstance().getTime());
+        System.out.println(time3);
+
+        String endTime = "2018-05-28 14:45:00";
+        Date da = DateUtil.getDateTimeFormat(endTime,"yyyy-MM-dd HH:mm:ss");
+
+
+//        DateUtil.getDateFormat();
+// <task:scheduled ref="taskJobStatistics" method="personAndCompanyStatistics" cron="0 45 7-23 * * ?"/> 每天7点到23点的45分跑一次
         MQResponse mqResponse = null;
         mqResponse = new MQResponse();
         JSONObject jsonResult = (JSONObject) JSONObject.toJSON(mqResponse);

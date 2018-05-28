@@ -65,12 +65,12 @@ public class SyncService implements ISyncService {
             MmanUserLoan mmanUserLoan = new MmanUserLoan();
             mmanUserLoan.setId(loanId);
             //TODO 对接分期商城
-//            if (Constant.FEN.equals(loan.getBorrowingType())){
-//                mmanUserLoan.setBorrowingType(Constant.FEN);
-//            }else {
-//                mmanUserLoan.setBorrowingType(Constant.BIG);
-//            }
-            mmanUserLoan.setBorrowingType(Constant.BIG);
+            if (Constant.FEN.equals(loan.getBorrowingType())){
+                mmanUserLoan.setBorrowingType(Constant.FEN);
+            }else {
+                mmanUserLoan.setBorrowingType(Constant.BIG);
+            }
+//            mmanUserLoan.setBorrowingType(Constant.BIG);
             mmanUserLoan.setTermNumber(loan.getTermNumber());
             mmanUserLoan.setUserId(loan.getUserId());
             mmanUserLoan.setLoanMoney(new BigDecimal(Integer.parseInt(loan.getLoanMoney())/100.00));
