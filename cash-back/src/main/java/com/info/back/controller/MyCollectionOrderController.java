@@ -541,11 +541,12 @@ public class MyCollectionOrderController extends BaseController {
                         withholdingRecord.setLoanUserPhone(MaskCodeUtil.getMaskCode(withholdingRecord.getLoanUserPhone()));
                     }
                 }
+                CreditLoanPay creditLoanPay = creditLoanPayService.get(mmanLoanCollectionOrderOri.getPayId());
 
                 model.addAttribute("collectionOrder", mmanLoanCollectionOrderOri);
                 model.addAttribute("userInfo", userInfo);
                 model.addAttribute("userCar", userCar);// 银行卡
-                model.addAttribute("payMonery", mmanLoanCollectionOrderOri.getRealMoney());// 已还金额
+                model.addAttribute("payMonery", creditLoanPay.getRealMoney());// 已还金额
                 model.addAttribute("detailList", detailList);
                 model.addAttribute("withholdList", withholdList);
                 model.addAttribute("domaiName", PayContents.XJX_DOMAINNAME_URL);
