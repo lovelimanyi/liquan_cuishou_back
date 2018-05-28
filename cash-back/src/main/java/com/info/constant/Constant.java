@@ -262,6 +262,6 @@ public class Constant {
      */
     public static final String ORDER_TYPE_BIG = "1";
     public static final String ORDER_TYPE_SMALL = "2";
-    public static final String ORDER_TYPE_Fen = "3";
+    public static final String ORDER_TYPE_FEN = "3";
 
 }

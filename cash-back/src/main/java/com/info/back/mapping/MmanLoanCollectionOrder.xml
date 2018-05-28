@@ -510,7 +510,7 @@
 	t.current_overdue_level , t.overdueDays , t.m1_approve_id , t.m1OperateStatus , t.m2_approve_id , t.m2OperateStatus , t.m3_approve_id , t.m3OperateStatus , t.m4_approve_id ,
 	 t.m4OperateStatus , t.m5_approve_id , t.m5OperateStatus , t.m6_approve_id , t.status , t.promise_repayment_time , t.last_collection_time , t.create_date , t.update_date ,
 	 t.operator_name , t.remark , t.outside_person_id , t.before_status , t.outside_company_id , t.jxl_status , t.renew_status , t.jxl_apply_Time , t.jx_audit_ime ,t.s1_flag ,
-	 t.csstatus , t.loan_user_name , t.loan_user_phone,t.reduction_money,t.id_number,t.real_money FROM mman_loan_collection_order t WHERE t.id = #{id,jdbcType=VARCHAR}</select>
+	 t.csstatus , t.loan_user_name , t.loan_user_phone,t.reduction_money,t.id_number,t.real_money,t.product_name FROM mman_loan_collection_order t WHERE t.id = #{id,jdbcType=VARCHAR}</select>
     <select id="getBaseOrderById" resultType="com.info.web.pojo.OrderBaseResult" parameterType="String">
 		SELECT
 			a.`id` AS  id,
@@ -928,6 +928,14 @@
 		    o.update_date=#{updateDate}
 		WHERE o.loan_id = #{loanId}
 	</update>
+
+    <update id="updateProductName" parameterType="com.info.web.pojo.MmanLoanCollectionOrder">
+        UPDATE mman_loan_collection_order o
+        SET o.product_name = #{productName}
+        WHERE o.loan_id = #{loanId}
+    </update>
+
+
 
     <select id="selectOrderCount4SmallEstemate" parameterType="String" resultType="java.lang.Integer">
         <![CDATA[ SELECT count(*) FROM mman_loan_collection_order WHERE status<>4 and current_overdue_level=${groupLevel}]]>

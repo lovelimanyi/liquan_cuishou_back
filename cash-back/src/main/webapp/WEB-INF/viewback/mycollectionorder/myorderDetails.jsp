@@ -32,6 +32,13 @@
             width: 100%;
             line-height: 21px;
         }
+        .repayTable {
+            padding: 1px;
+            border:solid 1px #928989;
+            width: 100%;
+            line-height: 21px;
+            font-size: 14px;
+        }
 
         .tdGround {
             background-color: #ededed;
@@ -78,6 +85,30 @@
             display: block;
             margin: 2px 103px 2px;
         }
+        .htd {
+            text-align: right;
+            padding: 7px 2px 2px 2px;
+            font-size: 14px;
+            border-bottom:solid 1px #928989;
+        }
+        .ttd{
+            text-align: left;
+            padding: 7px 2px 2px 2px;
+            font-size: 14px;
+            border-bottom:solid 1px #928989;
+        }
+        .hhtd {
+            text-align: right;
+            padding: 7px 2px 2px 2px;
+            font-size: 14px;
+        }
+        .tttd{
+            text-align: left;
+            padding: 7px 2px 2px 2px;
+            font-size: 14px;
+        }
+
+
     </style>
 </head>
 <body>
@@ -101,19 +132,12 @@
                                 <td>${userInfo.idNumber}</td>
                             </tr>
                             <tr>
-                                <td class="tdGround">银行名称:</td>
-                                <td>${userCar.depositBank}</td>
-                                <td class="tdGround">银行卡号:</td>
-                                <td>${userCar.bankCard}</td>
+                                <td class="tdGround">性别:</td>
+                                <td>${userInfo.userSex}</td>
                                 <td class="tdGround">预留手机号码:</td>
                                 <td>${userCar.mobile}</td>
-                            </tr>
-
-                            <tr>
-                                <td class="tdGround">性别:</td>
-                                <td colspan="2">${userInfo.userSex}</td>
                                 <td class="tdGround">现居时长</td>
-                                <td colspan="2">
+                                <td>
                                     <c:choose>
                                         <c:when test="${userInfo.presentPeriod eq 1}">1~6个月</c:when>
                                         <c:when test="${userInfo.presentPeriod eq 2}">6~12个月</c:when>
@@ -125,7 +149,7 @@
                             </tr>
                             <tr>
                                 <td class="tdGround">婚姻:</td>
-                                <td colspan="2">
+                                <td>
                                     <c:choose>
                                         <c:when test="${userInfo.maritalStatus eq 1}">未婚</c:when>
                                         <c:when test="${userInfo.maritalStatus eq 2}">已婚未育</c:when>
@@ -137,7 +161,7 @@
                                 </td>
                                 <td class="tdGround">学历</td>
 
-                                <td colspan="2">
+                                <td colspan="3">
                                     <c:choose>
                                         <c:when test="${userInfo.education eq 1}">博士</c:when>
                                         <c:when test="${userInfo.education eq 2}">硕士</c:when>
@@ -182,54 +206,99 @@
                         </table>
                     </td>
                 </tr>
-                <tr>
-                    <td style="font-weight:bold">借款信息</td>
-                    <td>
-                        <table class="userTable">
-                            <tr>
-                                <td class="tdGround" style="width:180px;">欠款金额:</td>
-                                <td>${userLoan.loanMoney+userLoan.loanPenalty+userLoan.serviceCharge+userLoan.accrual}</td>
-                                <td class="tdGround">欠款本金:</td>
-                                <td>${userLoan.loanMoney}</td>
-                            </tr>
-                            <tr>
-                                <td class="tdGround">欠款滞纳金:</td>
-                                <td>${userLoan.loanPenalty}</td>
-                                <c:if test="${userLoan.borrowingType eq 2}">
-                                    <td class="tdGround">欠款服务费:</td>
-                                    <td>${userLoan.serviceCharge}</td>
-                                </c:if>
-                                <c:if test="${userLoan.borrowingType eq 1}">
-                                    <td class="tdGround">欠款利息:</td>
-                                    <td>${userLoan.accrual}</td>
-                                </c:if>
-                            </tr>
-                            <tr>
-                                <td class="tdGround">已还金额:</td>
-                                <td>${payMonery}</td>
-                                <td class="tdGround">逾期天数:</td>
-                                <td>${collectionOrder.overdueDays}</td>
-                            </tr>
-                            <tr>
-                                <td class="tdGround">借款时间:</td>
-                                <td><fmt:formatDate value="${userLoan.loanStartTime}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
-                                <td class="tdGround">应还时间:</td>
-                                <td><fmt:formatDate value="${userLoan.loanEndTime}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
-                            </tr>
 
-                        </table>
-                    </td>
-                </tr>
                 </tbody>
             </table>
         </fieldset>
         <!-- 个人信息 -->
+
+        <!-- 还款信息 -->
+        <fieldset>
+            <legend>还款信息</legend>
+            <table class="repayTable">
+                <tbody>
+                <tr>
+                    <td class="htd">借款编号:</td>
+                    <td class="ttd">${collectionOrder.loanId}</td>
+                    <c:if test="${userLoan.borrowingType eq '2'}">
+                        <td class="ttd" colspan="8"></td>
+                    </c:if>
+                    <c:if test="${userLoan.borrowingType eq '1'}">
+                        <td class="htd">分期类型:</td>
+                        <td class="ttd" colspan="7">现金分期</td>
+                    </c:if>
+                    <c:if test="${userLoan.borrowingType eq '3'}">
+                        <td class="htd">分期类型:</td>
+                        <td class="ttd">商品分期</td>
+                        <td class="htd">分期产品:</td>
+                        <td colspan="5" class="ttd">${collectionOrder.productName}</td>
+                    </c:if>
+                </tr>
+                <tr>
+                    <td class="htd">借款时间:</td>
+                    <td class="ttd"><fmt:formatDate value="${userLoan.loanStartTime}" pattern="yyyy-MM-dd"/></td>
+                    <td class="htd">到期本金:</td>
+                    <td class="ttd">${userLoan.loanMoney}</td>
+                    <c:if test="${userLoan.borrowingType eq '2'}">
+                        <td class="htd">服&nbsp&nbsp务&nbsp&nbsp费:</td>
+                        <td class="ttd">${userLoan.serviceCharge}</td>
+                    </c:if>
+                    <c:if test="${userLoan.borrowingType ne '2'}">
+                        <td class="htd">到期利息:</td>
+                        <td class="ttd">${userLoan.accrual}</td>
+                    </c:if>
+                    <td class="htd">滞&nbsp&nbsp纳&nbsp&nbsp金:</td>
+                    <td class="ttd">${userLoan.loanPenalty}</td>
+                    <td class="htd">逾期天数:</td>
+                    <td class="ttd">${collectionOrder.overdueDays}</td>
+                </tr>
+                <tr>
+                    <td class="htd">应还时间:</td>
+                    <td class="ttd"><fmt:formatDate value="${userLoan.loanEndTime}" pattern="yyyy-MM-dd"/></td>
+                    <td class="htd">应还总额:</td>
+                    <td class="ttd" colspan="7">${userLoan.loanMoney+userLoan.loanPenalty+userLoan.serviceCharge+userLoan.accrual}</td>
+                </tr>
+                <tr>
+                    <td class="hhtd">扣款银行:</td>
+                    <td class="tttd">${userCar.depositBank}</td>
+                    <td class="hhtd">银行卡号:</td>
+                    <td class="tttd">${userCar.bankCard}</td>
+                    <c:if test="${userLoan.borrowingType eq '2'}">
+                        <td class="hhtd">已还金额:</td>
+                        <td class="tttd"><font color="red">${payMonery}</font></td>
+                        <td class="hhtd">剩余应还:</td>
+                        <td class="tttd" colspan="3"><font color="red">${userLoan.loanMoney+userLoan.loanPenalty+userLoan.serviceCharge+userLoan.accrual-payMonery}</font></td>
+                    </c:if>
+                    <c:if test="${userLoan.borrowingType ne '2'}">
+                        <td class="hhtd">逾期期数:</td>
+                        <td class="tttd"><font color="red">${userLoan.termNumber}</font></td>
+                        <td class="hhtd">已还金额:</td>
+                        <td class="tttd"><font color="red">${payMonery}</font></td>
+                        <td class="hhtd">剩余应还:</td>
+                        <td class="tttd"><font color="red">${userLoan.loanMoney+userLoan.loanPenalty+userLoan.serviceCharge+userLoan.accrual-payMonery}</font></td>
+                    </c:if>
+
+
+
+
+                </tr>
+                </tbody>
+            </table>
+        </fieldset>
+
+
+
+
+
+
+
+
         <fieldset>
             <legend>还款详情</legend>
             <table class="detailB" width="100%">
                 <tr>
                     <th align="center">序号</th>
-                    <th align="left">实还本金</th>
+                    <th align="center">实还本金</th>
                     <th align="center">实还罚息</th>
                     <th align="center">实还利息</th>
                     <th align="center">剩余应还本金</th>

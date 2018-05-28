@@ -336,6 +336,13 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
         }
     }
 
+    @Override
+    public void updateProductName(MmanLoanCollectionOrder order) {
+        manLoanCollectionOrderDao.updateProductName(order);
+
+
+    }
+
     /**
      * 记录订单流转状态数据
      *

@@ -450,19 +450,32 @@ public class MyCollectionOrderController extends BaseController {
                 //该条订单是否已审//			int count = auditCenterService.findAuditStatus(params);
 //			if(count != 0 || !BackConstant.COLLECTION_ROLE_ID.toString().equals(backUser.getRoleId())){
                 MmanLoanCollectionOrder mmanLoanCollectionOrderOri = mmanLoanCollectionOrderService.getOrderById(params.get("id").toString());
-//                String LoanId = StringUtils.substringBefore(mmanLoanCollectionOrderOri.getLoanId(),Constant.SEPARATOR_FOR_ORDER_SOURCE);
-//                Map<String, String> paramMap = new HashedMap();
-//                paramMap.put("id",LoanId);
-//                String result = HttpUtil.get("",paramMap);
-//                if (result != null){
-//                    JSONObject jsonResult = JSONObject.parseObject(result);
-//                    if ("00".equals(jsonResult.get("code"))){
-//                        String goodName = jsonResult.get("productName").toString();
-//                    }
-//                }
 
                 if (mmanLoanCollectionOrderOri != null) {
                     MmanUserLoan userLoan = mmanUserLoanService.get(mmanLoanCollectionOrderOri.getLoanId());
+                    //如果是分期商城的订单则判断是否获取商品名称
+                    if (Constant.ORDER_TYPE_FEN.equals(userLoan.getBorrowingType())){
+                        if (StringUtils.isBlank(mmanLoanCollectionOrderOri.getProductName())){
+                            String LoanId = StringUtils.substringBefore(mmanLoanCollectionOrderOri.getLoanId(),Constant.SEPARATOR_FOR_ORDER_SOURCE);
+                            Map<String, String> paramMap = new HashedMap();
+                            paramMap.put("id",LoanId);
+                            //TODO 分期商城上线后更改地址
+//                            String result = HttpUtil.get(PayContents.PRODUCT_NAME_URL,paramMap);
+                            String result =  "{\"code\":\"00\",\"productName\":\"分期商城\"}";
+                            logger.error("productName:"+LoanId+result);
+
+                            if (result != null){
+                                JSONObject jsonResult = JSONObject.parseObject(result);
+                                if ("00".equals(jsonResult.get("code"))){
+                                    String productName = jsonResult.get("productName").toString();
+                                    mmanLoanCollectionOrderOri.setProductName(productName);
+                                    mmanLoanCollectionOrderService.updateProductName(mmanLoanCollectionOrderOri);
+                                }
+                            }
+                        }
+                    }
+
+
                     if (userLoan.getPaidMoney().compareTo(BigDecimal.ZERO) <= 0) {
                         userLoan.setServiceCharge(BigDecimal.ZERO);
                     }
@@ -528,11 +541,12 @@ public class MyCollectionOrderController extends BaseController {
                         withholdingRecord.setLoanUserPhone(MaskCodeUtil.getMaskCode(withholdingRecord.getLoanUserPhone()));
                     }
                 }
+                CreditLoanPay creditLoanPay = creditLoanPayService.get(mmanLoanCollectionOrderOri.getPayId());
 
                 model.addAttribute("collectionOrder", mmanLoanCollectionOrderOri);
                 model.addAttribute("userInfo", userInfo);
                 model.addAttribute("userCar", userCar);// 银行卡
-                model.addAttribute("payMonery", mmanLoanCollectionOrderOri.getRealMoney());// 已还金额
+                model.addAttribute("payMonery", creditLoanPay.getRealMoney());// 已还金额
                 model.addAttribute("detailList", detailList);
                 model.addAttribute("withholdList", withholdList);
                 model.addAttribute("domaiName", PayContents.XJX_DOMAINNAME_URL);
@@ -605,7 +619,7 @@ public class MyCollectionOrderController extends BaseController {
 
                 // 大额代扣跳转到一个专门的页面
                 MmanUserLoan loan = mmanUserLoanService.get(mmanLoanCollectionOrderOri.getLoanId());
-                if (loan != null && Constant.BIG.equals(loan.getBorrowingType())) {
+                if (loan != null && !Constant.SMALL.equals(loan.getBorrowingType())) {
                     url = "mycollectionorder/toBigkoukuan";
                 }
 
