@@ -81,6 +81,7 @@ public class SyncController {
             if (collectionNotifyDto != null) {
                 BigAmountRequestParams bigAmount = handleCollectionNotifyDto(collectionNotifyDto);
                 Loan loan = bigAmount.getLoan();
+                logger.info("accept_overdue_order_Loan=" + loan.getId().toString());
                 logger.info("order_loanId_termNumber" + loan.getId().toString());
                 Repayment repayment = bigAmount.getRepayment();
                 List<RepaymentDetail> repaymentDetail = null;
