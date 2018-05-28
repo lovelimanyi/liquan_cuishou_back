@@ -13,6 +13,22 @@ import java.util.HashMap;
  */
 
 public class DateKitUtils {
+    public static HashMap<String, Object> defaultDate(String beginTime, String endTime) {
+        HashMap<String, Object> params = new HashMap<>();
+        if (StringUtils.isNoneBlank(beginTime)&& StringUtils.isNotBlank(endTime)){
+            params.put("beginTime",beginTime);
+            params.put("endTime",endTime);
+        }else {
+            String firstDate =  DateUtil.getDateFormat(DateUtil.getDayFirst(),"yyyy-MM-dd 00:00:00");
+            params.put("beginTime",firstDate);
+            String nowTime = DateUtil.getDateFormat(new Date(),"yyyy-MM-dd HH:45:00");
+            params.put("endTime",nowTime);
+        }
+        return params;
+    }
+
+
+
 
     public static HashMap<String, Object> setDefaultDate(String beginTime, String endTime) {
         HashMap<String, Object> params = new HashMap<>();
