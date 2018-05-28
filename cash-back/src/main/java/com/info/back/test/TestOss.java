@@ -67,9 +67,9 @@ public class TestOss {
         BigDecimal bb = aaa.divide(new BigDecimal(10000));
         System.out.println(bb);
 
-        Long da =DateUtil.getDateTimeFormat("2018-01-22","yyyy-MM-dd").getTime();
+        Long das =DateUtil.getDateTimeFormat("2018-01-22","yyyy-MM-dd").getTime();
 //        String dd = da.toString();
-        System.out.println(da);
+        System.out.println(das);
 
 
 
