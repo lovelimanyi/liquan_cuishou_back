@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import com.info.back.utils.ObjectTranscoderUtil;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 
 import redis.clients.jedis.Jedis;
@@ -647,10 +648,12 @@ public class JedisDataClient {
     public static <T> void setList(String keyPrefix, String key, List<T> list, int expireTime) {
         Jedis jedisMaster = null;
         try {
-            jedisMaster = getMasterJedis();
-            String realKey = keyPrefix + key;
-            jedisMaster.set(realKey.getBytes(), ObjectTranscoderUtil.serialize(list));
-            expire(realKey, expireTime);
+            if (!CollectionUtils.isEmpty(list)) {
+                jedisMaster = getMasterJedis();
+                String realKey = keyPrefix + key;
+                jedisMaster.set(realKey.getBytes(), ObjectTranscoderUtil.serialize(list));
+                expire(realKey, expireTime);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

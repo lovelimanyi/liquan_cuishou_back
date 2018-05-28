@@ -2,6 +2,7 @@ package com.info.back.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.info.back.dao.IMerchantInfoDao;
 import com.info.back.dao.ITemplateSmsDao;
 import com.info.back.result.JsonResult;
 import com.info.back.service.*;
@@ -53,6 +54,8 @@ public class MyCollectionOrderController extends BaseController {
 
     private static final String SHORT_MESSAGE_LIMIT_COUNT_REDIS_KEY = "msgCountLimit";
 
+    private static final String MERCHANT_INFO_REDIS_KEY = "merchants";
+
     // 公司
     @Autowired
     private IMmanLoanCollectionCompanyService mmanLoanCollectionCompanyService;
@@ -98,6 +101,9 @@ public class MyCollectionOrderController extends BaseController {
     private IFengKongService fengKongService;
     @Autowired
     private ICollectionWithholdingRecordService collectionWithholdingRecordService;
+
+    @Autowired
+    private IMerchantInfoDao merchantInfoDao;
 
     /**
      * 我的订单初始化加载查询
@@ -880,17 +886,29 @@ public class MyCollectionOrderController extends BaseController {
             if (StringUtils.isNotBlank(id)) {
                 MmanLoanCollectionOrder order = mmanLoanCollectionOrderService.getOrderById(id);
                 List<TemplateSms> msgs = getAllMsg();
-                int code = RandomUtils.nextInt(0, msgs.size());
-                TemplateSms msg = msgs.get(code);
 
-                String content = MessageFormat.format(msg.getContenttext(), StringUtils.split(getMsgParam(order), ','));
+//                int code = RandomUtils.nextInt(0, msgs.size());
+//                TemplateSms msg = msgs.get(code);
+//                String content = MessageFormat.format(msg.getContenttext(), StringUtils.split(getMsgParam(order), ','));
                 // 是否显示更换短信按钮
 //                model.addAttribute("refreshMsg", JedisDataClient.get("cuishou:refreshMsg"));
-                if(BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())){
-                    content = "该订单已还款完成，请核实！";
+//                if (BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())) {
+//                    content = "该订单已还款完成，请核实！";
+//                }
+//                model.addAttribute("msgContent", content);
+//                model.addAttribute("msgId", msg.getId());
+                // 查询当日该订单已发短信条数
+                int count = smsUserService.getSendMsgCount(order.getLoanId());
+                String msgLimitCountKey = "cuishou:" + SHORT_MESSAGE_LIMIT_COUNT_REDIS_KEY;
+                int msgCountLimit = JedisDataClient.get(msgLimitCountKey) == null ? 0 : Integer.valueOf(JedisDataClient.get(msgLimitCountKey));
+                if (msgCountLimit == 0) {
+                    // 默认短信发送上限为2条
+                    msgCountLimit = 2;
                 }
-                model.addAttribute("msgContent", content);
-                model.addAttribute("msgId", msg.getId());
+                int remainCount = msgCountLimit - count > 0 ? msgCountLimit - count : 0;
+                model.addAttribute("remainMsgCount", remainCount);
+                model.addAttribute("msgCountLimit", msgCountLimit);
+                model.addAttribute("msgs", msgs);
                 model.addAttribute("orderId", id);
                 model.addAttribute("phoneNumber", order.getLoanUserPhone());
             }
@@ -926,6 +944,8 @@ public class MyCollectionOrderController extends BaseController {
             return null;
         }
         MmanUserInfo userInfo = mmanUserInfoService.getUserInfoById(order.getUserId());
+        // 获取所有商户信息
+        String merchantName = getMerchantName(order);
         StringBuilder msgParam = new StringBuilder();
         if (StringUtils.isNotEmpty(userInfo.getUserSex())) {
             if ("男".equals(userInfo.getUserSex())) {
@@ -934,13 +954,43 @@ public class MyCollectionOrderController extends BaseController {
                 msgParam.append(order.getLoanUserName() + "女士");
             }
         }
+        msgParam.append(",");
+        msgParam.append(merchantName).append(",");
         CreditLoanPay pay = creditLoanPayService.findByLoanId(order.getLoanId());
         BigDecimal remainMoney = pay.getReceivableMoney().subtract(pay.getRealMoney());
-        msgParam.append(",");
         msgParam.append(order.getOverdueDays()).append(",").append(remainMoney);
         return msgParam.toString();
     }
 
+    /**
+     * 获取订单对应的商户名
+     *
+     * @param order
+     * @return
+     */
+    private String getMerchantName(MmanLoanCollectionOrder order) {
+        // 获取所有商户信息
+        List<MerchantInfo> list = new ArrayList<>(8);
+        String merchantNanme = null;
+        try {
+            list = JedisDataClient.getList("cuishou:", MERCHANT_INFO_REDIS_KEY);
+            if (CollectionUtils.isEmpty(list)) {
+                list = merchantInfoDao.getAll();
+                JedisDataClient.setList("cuishou:", MERCHANT_INFO_REDIS_KEY, list, 10 * 60);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("获取商户信息失败...");
+        }
+        MmanUserLoan mmanUserLoan = mmanUserLoanService.get(order.getLoanId());
+        for (MerchantInfo merchantInfo : list) {
+            if (merchantInfo.getMerchantId().equals(mmanUserLoan.getMerchantNo())) {
+                merchantNanme = merchantInfo.getMerchantName();
+                break;
+            }
+        }
+        return merchantNanme;
+    }
 
     /**
      * 发送催收短信
@@ -968,6 +1018,7 @@ public class MyCollectionOrderController extends BaseController {
                 logger.error("订单为null,loanId : " + orderId);
                 return getServiceResult(response, model, result, params);
             }
+
             if (BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())) {
                 result.setCode("-3");
                 result.setMsg("催收成功订单不能发送催收短信！");
@@ -986,6 +1037,18 @@ public class MyCollectionOrderController extends BaseController {
                 result.setMsg("手机号异常！");
                 return getServiceResult(response, model, result, params);
             }
+            String msgCode = params.get("msgId") + "";
+            if (StringUtils.isEmpty(msgCode)) {
+                result.setCode("-7");
+                result.setMsg("请选择正确的短信模板！");
+                return getServiceResult(response, model, result, params);
+            }
+            String msgParam = getMsgParam(order);
+            if (msgParam == null) {
+                result.setCode("-8");
+                result.setMsg("短信参数异常！");
+                return getServiceResult(response, model, result, params);
+            }
             // 查询出该订单当天已发短信的次数
             int count = smsUserService.getSendMsgCount(order.getLoanId());
             String msgLimitCountKey = "cuishou:" + SHORT_MESSAGE_LIMIT_COUNT_REDIS_KEY;
@@ -997,13 +1060,6 @@ public class MyCollectionOrderController extends BaseController {
             if (msgCountLimit <= count) {
                 result.setCode("-6");
                 result.setMsg("今日该订单发送短信已达上限" + (msgCountLimit) + "条！");
-                return getServiceResult(response, model, result, params);
-            }
-            String msgParam = getMsgParam(order);
-            String msgCode = params.get("msgId") + "";
-            if (msgParam == null || msgCode.length() <= 0) {
-                result.setCode("-7");
-                result.setMsg("短信参数异常！");
                 return getServiceResult(response, model, result, params);
             }
             boolean smsResult = SmsSendUtil.sendSmsNew(mobile, msgParam, msgCode);
@@ -1115,14 +1171,20 @@ public class MyCollectionOrderController extends BaseController {
         if (StringUtils.isNotBlank(id)) {
             MmanLoanCollectionOrder order = mmanLoanCollectionOrderService.getOrderById(id);
             List<TemplateSms> msgs = getAllMsg();
-            int code = RandomUtils.nextInt(0, msgs.size());
-            TemplateSms msg = msgs.get(code);
-            String content = MessageFormat.format(msg.getContenttext(), StringUtils.split(getMsgParam(order), ','));
-            if(BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())){
-                content = "该订单已还款完成，请核实！";
+            TemplateSms templateSms = null;
+            String msgId = params.get("msgId") + "";
+            for (TemplateSms msg : msgs) {
+                if (msg.getId().equals(msgId)) {
+                    templateSms = msg;
+                    break;
+                }
             }
+            String content = MessageFormat.format(templateSms.getContenttext(), StringUtils.split(getMsgParam(order), ','));
+//            if (BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())) {
+//                content = "该订单已还款完成，请核实！";
+//            }
             map.put("msgContent", content);
-            map.put("msgId", msg.getId());
+            map.put("msgId", templateSms.getId());
         }
         return JSON.toJSONString(map);
     }

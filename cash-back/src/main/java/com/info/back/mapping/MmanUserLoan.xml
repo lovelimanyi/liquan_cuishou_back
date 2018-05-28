@@ -42,6 +42,7 @@
         <!-- 这里不用 -->
         <result column="loan_sys_remark" property="loanSysRemark" jdbcType="VARCHAR"/>
         <result column="borrowing_type" property="borrowingType" jdbcType="VARCHAR"/>
+        <result column="merchant_no" property="merchantNo" jdbcType="VARCHAR"/>
     </resultMap>
     <!-- 保存,保存不为NULL的字段 -->
     <insert id="saveNotNull" parameterType="com.info.web.pojo.MmanUserLoan">
@@ -111,7 +112,8 @@
     <!-- 根据主键获取单条记录 -->
     <select id="get" resultMap="queryResultMap" parameterType="com.info.web.pojo.MmanUserLoan">
     SELECT t.id , t.user_id , t.loan_py_id , t.loan_money ,t.paid_money,t.loan_rate ,t.service_charge,t.paid_money, t.loan_penalty , t.loan_penalty_rate , t.loan_start_time , t.loan_end_time
-     , t.loan_status , t.create_time , t.update_time , t.del_flag , t.loan_penalty_time , t.loan_sys_status , t.loan_sys_remark, t.borrowing_type,t.term_number,t.accrual FROM
+     , t.loan_status , t.create_time , t.update_time , t.del_flag , t.loan_penalty_time , t.loan_sys_status , t.loan_sys_remark,
+     t.borrowing_type,t.term_number,t.accrual,t.merchant_no FROM
      mman_user_loan t WHERE
      id = #{id,jdbcType=VARCHAR}</select>
     <!-- 根据主键删除记录 -->
@@ -247,9 +249,15 @@
     </select>
 
     <select id="selectCollectionCountBetweenLoanEndTime" parameterType="Map" resultType="HashMap">
-        <![CDATA[ SELECT
+        <![CDATA[
+
+
+         SELECT
                   loan_end_time as loadEndTime,
                   COUNT(*) as orderCount,
-                  SUM(loan_money) loanMoney FROM mman_user_loan WHERE loan_end_time>=#{startDate} and loan_end_time<#{endDate} and borrowing_type=#{borrowingType} GROUP BY loan_end_time]]>
+                  SUM(loan_money) loanMoney FROM mman_user_loan WHERE loan_end_time>=#{startDate} and loan_end_time<#{endDate} and borrowing_type=#{borrowingType} GROUP BY loan_end_time
+
+
+        ]]>
     </select>
 </mapper>
