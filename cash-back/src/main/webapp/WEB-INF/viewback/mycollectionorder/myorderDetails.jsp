@@ -220,11 +220,11 @@
                 <tr>
                     <td class="htd">订&nbsp&nbsp&nbsp单&nbsp&nbsp&nbspID:</td>
                     <td class="ttd">${collectionOrder.loanId}</td>
-                    <td class="htd">订单类型:</td>
-                    <c:if test="${userLoan.borrowingType eq '2'}"><td class="ttd">小额</td></c:if>
-                    <c:if test="${userLoan.borrowingType eq '1'}"><td class="ttd">大额现金分期</td></c:if>
-                    <c:if test="${userLoan.borrowingType eq '3'}"><td class="ttd">大额商品分期</td></c:if>
                     <td class="htd">分期类型:</td>
+                    <c:if test="${userLoan.borrowingType eq '2'}"><td class="ttd">无</td></c:if>
+                    <c:if test="${userLoan.borrowingType eq '1'}"><td class="ttd">现金分期</td></c:if>
+                    <c:if test="${userLoan.borrowingType eq '3'}"><td class="ttd">商品分期</td></c:if>
+                    <td class="htd">分期产品:</td>
                     <c:if test="${userLoan.borrowingType eq '3'}">
                         <td colspan="5" class="ttd">${collectionOrder.productName}</td>
                     </c:if>
