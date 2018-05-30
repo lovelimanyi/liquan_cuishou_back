@@ -65,7 +65,7 @@
         AND <![CDATA[ o.`status` <> '4' ]]>
         -- AND <![CDATA[ u.group_level <> '3' ]]>
         <if test="endTime != null and endTime != ''">
-            AND DATE_FORMAT(l.create_time,"%Y-%m-%d") &lt; #{endTime}
+            AND <![CDATA[ l.create_time <= #{endTime} ]]>
         </if>
         GROUP BY
         u.id
@@ -85,10 +85,10 @@
         AND d.remain_accrual IS NOT NULL -- AND u.user_name='许娇'
         AND <![CDATA[ o.`status` <> '4' ]]>
         <if test="beginTime != null and beginTime != ''">
-            AND DATE_FORMAT(d.update_Date,"%Y-%m-%d") >= #{beginTime}
+            AND <![CDATA[ d.update_Date >= #{beginTime} ]]>
         </if>
         <if test="endTime != null and endTime != ''">
-            AND DATE_FORMAT(d.update_Date,"%Y-%m-%d") &lt; #{endTime}
+            AND <![CDATA[ d.update_Date <= #{endTime} ]]>
         </if>
         GROUP BY
         o.current_collection_user_id
@@ -141,10 +141,10 @@
         AND o.`status` = '4'
         AND p.remain_accrual IS NOT NULL -- AND u.group_level IN ('5')
         <if test="beginTime != null and beginTime != ''">
-            AND DATE_FORMAT(d.update_Date,"%Y-%m-%d") >= #{beginTime}
+            AND <![CDATA[ d.update_Date >= #{beginTime} ]]>
         </if>
         <if test="endTime != null and endTime != ''">
-            AND DATE_FORMAT(d.update_Date,"%Y-%m-%d") &lt; #{endTime}
+            AND <![CDATA[ d.update_Date <= #{endTime} ]]>
         </if>
         GROUP BY
         o.loan_id
@@ -174,10 +174,10 @@
         AND c.`status` = '5'
         AND c.type = '3'
         <if test="beginTime != null and beginTime != ''">
-            AND DATE_FORMAT(p.update_Date,"%Y-%m-%d") >= #{beginTime}
+            AND <![CDATA[ p.update_Date >= #{beginTime} ]]>
         </if>
         <if test="endTime != null and endTime != ''">
-            AND DATE_FORMAT(p.update_Date,"%Y-%m-%d") &lt; #{endTime}
+            AND <![CDATA[ p.update_Date <= #{endTime} ]]>
         </if>
         GROUP BY
         u.id
@@ -202,10 +202,10 @@
         u.`status` = 1
         AND u.role_id = '10021'
         <if test="beginTime != null and beginTime != ''">
-            AND DATE_FORMAT(d.update_Date,"%Y-%m-%d") >= #{beginTime}
+            AND <![CDATA[ d.update_Date >= #{beginTime} ]]>
         </if>
         <if test="endTime != null and endTime != ''">
-            AND DATE_FORMAT(d.update_Date,"%Y-%m-%d") &lt; #{endTime}
+            AND <![CDATA[ d.update_Date <= #{endTime} ]]>
         </if>
         GROUP BY
         u.uuid
@@ -220,7 +220,7 @@
         WHERE
         r.current_company_id IS NOT NULL
         <if test="endTime != null and endTime != ''">
-            AND DATE_FORMAT(r.create_date,"%Y-%m-%d") &lt; #{endTime}
+            AND <![CDATA[ r.create_date <= #{endTime} ]]>
         </if>
         GROUP BY
         r.current_user_id
@@ -287,7 +287,7 @@
         AND <![CDATA[ u.group_level <> '3' ]]>
         -- AND u.user_name='许娇'
         <if test="endTime != null and endTime != ''">
-            AND DATE_FORMAT(l.create_time,"%Y-%m-%d") &lt; #{endTime}
+            AND <![CDATA[ l.create_time <= #{endTime} ]]>
         </if>
         GROUP BY
         u.id
@@ -307,10 +307,10 @@
         AND d.remain_accrual IS NOT NULL -- AND u.user_name='许娇'
         AND <![CDATA[ o.`status` <> '4' ]]>
         <if test="beginTime != null and beginTime != ''">
-            AND DATE_FORMAT(d.update_Date,"%Y-%m-%d") >= #{beginTime}
+            AND <![CDATA[ d.update_Date >= #{beginTime} ]]>
         </if>
         <if test="endTime != null and endTime != ''">
-            AND DATE_FORMAT(d.update_Date,"%Y-%m-%d") &lt; #{endTime}
+            AND <![CDATA[ d.update_Date <= #{endTime} ]]>
         </if>
         GROUP BY
         o.current_collection_user_id
@@ -363,10 +363,10 @@
         AND o.`status` = '4'
         AND p.remain_accrual IS NOT NULL -- AND u.group_level IN ('5')
         <if test="beginTime != null and beginTime != ''">
-            AND DATE_FORMAT(d.update_Date,"%Y-%m-%d") >= #{beginTime}
+            AND <![CDATA[ d.update_Date >= #{beginTime} ]]>
         </if>
         <if test="endTime != null and endTime != ''">
-            AND DATE_FORMAT(d.update_Date,"%Y-%m-%d") &lt; #{endTime}
+            AND <![CDATA[ d.update_Date <= #{endTime} ]]>
         </if>
         GROUP BY
         o.loan_id
@@ -396,10 +396,10 @@
         AND c.`status` = '5'
         AND c.type = '3'
         <if test="beginTime != null and beginTime != ''">
-            AND DATE_FORMAT(p.update_Date,"%Y-%m-%d") >= #{beginTime}
+            AND <![CDATA[ p.update_Date >= #{beginTime} ]]>
         </if>
         <if test="endTime != null and endTime != ''">
-            AND DATE_FORMAT(p.update_Date,"%Y-%m-%d") &lt; #{endTime}
+            AND <![CDATA[ p.update_Date <= #{endTime} ]]>
         </if>
         GROUP BY
         u.id
@@ -424,10 +424,10 @@
         u.`status` = 1
         AND u.role_id = '10021'
         <if test="beginTime != null and beginTime != ''">
-            AND DATE_FORMAT(d.update_Date,"%Y-%m-%d") >= #{beginTime}
+            AND <![CDATA[ d.update_Date >= #{beginTime} ]]>
         </if>
         <if test="endTime != null and endTime != ''">
-            AND DATE_FORMAT(d.update_Date,"%Y-%m-%d") &lt; #{endTime}
+            AND <![CDATA[ d.update_Date <= #{endTime} ]]>
         </if>
         GROUP BY
         u.uuid
@@ -442,7 +442,7 @@
         WHERE
         r.current_company_id IS NOT NULL
         <if test="endTime != null and endTime != ''">
-            AND DATE_FORMAT(r.create_date,"%Y-%m-%d") &lt; #{endTime}
+            AND <![CDATA[ r.create_date <= #{endTime} ]]>
         </if>
         GROUP BY
         r.current_user_id
@@ -653,5 +653,17 @@
         )
 
     </insert>
+
+
+    <delete id="delBigAmountPersonStatistics" parameterType="HashMap">
+        DELETE bps FROM big_person_statistics bps
+        WHERE <![CDATA[ bps.createDate >= #{beginTime} ]]>
+        <![CDATA[ AND bps.createDate <= #{endTime}  ]]>
+    </delete>
+    <delete id="delBigAmountCompanyStatistics" parameterType="HashMap">
+        DELETE bcs FROM big_company_statistics bcs
+        WHERE <![CDATA[ bcs.createDate >= #{beginTime} ]]>
+        <![CDATA[ AND bcs.createDate <= #{endTime}  ]]>
+    </delete>
 
 </mapper>

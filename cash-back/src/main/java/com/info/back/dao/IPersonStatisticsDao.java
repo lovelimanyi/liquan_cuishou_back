@@ -20,4 +20,8 @@ public interface IPersonStatisticsDao {
     List<PersonStatistics> getCompanyStatistics(HashMap<String, Object> paramss);
 
     void insertCompanyStatistics(PersonStatistics personStatistics);
+
+    void delPersonStatistics(HashMap<String, Object> delParam);
+
+    void delCompanyStatistics(HashMap<String, Object> delParam);
 }

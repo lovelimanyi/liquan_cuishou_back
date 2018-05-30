@@ -43,34 +43,37 @@ public class PersonStatisticsService implements IPersonStatisticsService {
 
     @Override
     public void doStatistics(String beginTime,String endTime) {
-        HashMap<String, Object> paramss = DateKitUtils.setDefaultDate(beginTime,endTime);
+        //先删除本日的统计
+        HashMap<String, Object> delParam = DateKitUtils.delDate();
+        personStatisticsDao.delPersonStatistics(delParam);
+        personStatisticsDao.delCompanyStatistics(delParam);
 
+        //进行统计
+        HashMap<String, Object> paramss = DateKitUtils.defaultDate(beginTime,endTime);
         List<PersonStatistics> list = personStatisticsDao.getPersonStatistics(paramss);
-
         List<PersonStatistics> list2 = personStatisticsDao.getCompanyStatistics(paramss);
 
-        //保存至数据库
+        //将统计数据保存至数据库
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         try {
-            Date date = sdf.parse(sdf.format(new Date()));
+            String endTimes = paramss.get("endTime").toString();
             for (PersonStatistics personStatistics : list){
                 if(StringUtils.isNotBlank(endTime)){
-                    personStatistics.setCreateDate(DateUtil.getDateTimeFormat(endTime,"yyyy-MM-dd"));
+                    personStatistics.setCreateDate(DateUtil.getDateTimeFormat(endTime,"yyyy-MM-dd HH:mm:ss"));
                 }else {
-                    personStatistics.setCreateDate(date);
+                    personStatistics.setCreateDate(DateUtil.getDateTimeFormat(endTimes,"yyyy-MM-dd HH:mm:ss"));
                 }
                 personStatisticsDao.insert(personStatistics);
             }
             for (PersonStatistics personStatistics : list2){
                 if(StringUtils.isNotBlank(endTime)){
-                    personStatistics.setCreateDate(DateUtil.getDateTimeFormat(endTime,"yyyy-MM-dd"));
+                    personStatistics.setCreateDate(DateUtil.getDateTimeFormat(endTime,"yyyy-MM-dd HH:mm:ss"));
                 }else {
-                    personStatistics.setCreateDate(date);
+                    personStatistics.setCreateDate(DateUtil.getDateTimeFormat(endTimes,"yyyy-MM-dd HH:mm:ss"));
                 }
                 personStatisticsDao.insertCompanyStatistics(personStatistics);
             }
-        } catch (ParseException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

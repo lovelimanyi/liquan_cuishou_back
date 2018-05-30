@@ -99,26 +99,26 @@ public class TaskJobStatistics {
     }
 
 
-    public static void main(String[] args) throws ParseException {
-        Date date = new Date();
-        HashMap<String, Object> params = new HashMap<String, Object>();
-        params.put("currDate", DateUtil.getBeforeOrAfter(date, -1));
-        params.put("begDate", DateUtil.getDateFormat(DateUtil.getBeforeOrAfter(date, -1), "yyyy-MM-dd"));
-        params.put("endDate", DateUtil.getDateFormat("yyyy-MM-dd"));
-        params.put("isFirstDay", date.getDate());   //获取当前日
-
-//		System.out.println(params.get("currDate"));
-        System.out.println("begDate :" + params.get("begDate"));
-        System.out.println(params.get("endDate"));
-//		System.out.println(params.get("isFirstDay"));
-        System.out.println(DateUtil.getDateFormat(DateUtil.getDayFirst(), "yyyy-MM-dd"));
-
-        int count = DateUtil.daysBetween(DateUtil.getDayFirst(), new Date());
-//		System.out.println("天数："+count);
-        for (int i = count; i >= 0; i--) {
-//			System.out.println(DateUtil.getBeforeOrAfter(date,-i));
-        }
-    }
+//    public static void main(String[] args) throws ParseException {
+//        Date date = new Date();
+//        HashMap<String, Object> params = new HashMap<String, Object>();
+//        params.put("currDate", DateUtil.getBeforeOrAfter(date, -1));
+//        params.put("begDate", DateUtil.getDateFormat(DateUtil.getBeforeOrAfter(date, -1), "yyyy-MM-dd"));
+//        params.put("endDate", DateUtil.getDateFormat("yyyy-MM-dd"));
+//        params.put("isFirstDay", date.getDate());   //获取当前日
+//
+////		System.out.println(params.get("currDate"));
+//        System.out.println("begDate :" + params.get("begDate"));
+//        System.out.println(params.get("endDate"));
+////		System.out.println(params.get("isFirstDay"));
+//        System.out.println(DateUtil.getDateFormat(DateUtil.getDayFirst(), "yyyy-MM-dd"));
+//
+//        int count = DateUtil.daysBetween(DateUtil.getDayFirst(), new Date());
+////		System.out.println("天数："+count);
+//        for (int i = count; i >= 0; i--) {
+////			System.out.println(DateUtil.getBeforeOrAfter(date,-i));
+//        }
+//    }
 
 
 }

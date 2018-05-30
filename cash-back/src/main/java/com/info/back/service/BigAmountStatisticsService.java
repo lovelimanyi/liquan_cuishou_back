@@ -108,32 +108,36 @@ public class BigAmountStatisticsService implements IBigAmountStatisticsService {
 
     @Override
     public void doStatistics(String beginTime,String endTime) {
-        HashMap<String, Object> paramss = DateKitUtils.setDefaultDate(beginTime,endTime);
+        //先删除本日的统计
+        HashMap<String, Object> delParam = DateKitUtils.delDate();
+        bigAmountStatisticsDao.delBigAmountPersonStatistics(delParam);
+        bigAmountStatisticsDao.delBigAmountCompanyStatistics(delParam);
+
+        //进行统计
+        HashMap<String, Object> paramss = DateKitUtils.defaultDate(beginTime,endTime);
         List<BigAmountStatistics> list = bigAmountStatisticsDao.getBigAmountPersonStatistics(paramss);
-
         List<BigAmountStatistics> list2 = bigAmountStatisticsDao.getBigAmountCompanyStatistics(paramss);
-        //保存至数据库
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        //保存至数据库
         try {
-            Date date = sdf.parse(sdf.format(new Date()));
+            String endTimes = paramss.get("endTime").toString();
             for (BigAmountStatistics bigAmountStatistics : list){
                 if(StringUtils.isNotBlank(endTime)){
-                    bigAmountStatistics.setCreateDate(DateUtil.getDateTimeFormat(endTime,"yyyy-MM-dd"));
+                    bigAmountStatistics.setCreateDate(DateUtil.getDateTimeFormat(endTime,"yyyy-MM-dd HH:mm:ss"));
                 }else {
-                    bigAmountStatistics.setCreateDate(date);
+                    bigAmountStatistics.setCreateDate(DateUtil.getDateTimeFormat(endTimes,"yyyy-MM-dd HH:mm:ss"));
                 }
                 bigAmountStatisticsDao.insertPersonStatistics(bigAmountStatistics);
             }
             for (BigAmountStatistics bigAmountStatistics : list2){
                 if(StringUtils.isNotBlank(endTime)){
-                    bigAmountStatistics.setCreateDate(DateUtil.getDateTimeFormat(endTime,"yyyy-MM-dd"));
+                    bigAmountStatistics.setCreateDate(DateUtil.getDateTimeFormat(endTime,"yyyy-MM-dd HH:mm:ss"));
                 }else {
-                    bigAmountStatistics.setCreateDate(date);
+                    bigAmountStatistics.setCreateDate(DateUtil.getDateTimeFormat(endTimes,"yyyy-MM-dd HH:mm:ss"));
                 }
                 bigAmountStatisticsDao.insertCompanyStatistics(bigAmountStatistics);
             }
-        } catch (ParseException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

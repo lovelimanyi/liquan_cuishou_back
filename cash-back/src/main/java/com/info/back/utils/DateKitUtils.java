@@ -50,4 +50,13 @@ public class DateKitUtils {
 
 
     }
+
+    public static HashMap<String,Object> delDate() {
+        HashMap<String, Object> params = new HashMap<>();
+        String todayDate =  DateUtil.getDateFormat(new Date(),"yyyy-MM-dd 00:00:00");
+        params.put("beginTime",todayDate);
+        String nowTime = DateUtil.getDateFormat(new Date(),"yyyy-MM-dd HH:45:00");
+        params.put("endTime",nowTime);
+        return params;
+    }
 }
