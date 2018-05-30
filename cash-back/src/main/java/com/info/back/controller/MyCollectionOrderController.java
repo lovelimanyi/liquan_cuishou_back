@@ -451,28 +451,29 @@ public class MyCollectionOrderController extends BaseController {
         HashMap<String, Object> params = this.getParametersO(request);
         String url = "mycollectionorder/toApplyCsDetail";
         try {
-            if (StringUtils.isNotBlank(params.get("id") + "")) {
+            String id = params.get("id") + "";
+            if (StringUtils.isNotBlank(id)) {
                 BackUser backUser = this.loginAdminUser(request);
                 //该条订单是否已审//			int count = auditCenterService.findAuditStatus(params);
 //			if(count != 0 || !BackConstant.COLLECTION_ROLE_ID.toString().equals(backUser.getRoleId())){
-                MmanLoanCollectionOrder mmanLoanCollectionOrderOri = mmanLoanCollectionOrderService.getOrderById(params.get("id").toString());
+                MmanLoanCollectionOrder mmanLoanCollectionOrderOri = mmanLoanCollectionOrderService.getOrderById(id);
 
                 if (mmanLoanCollectionOrderOri != null) {
                     MmanUserLoan userLoan = mmanUserLoanService.get(mmanLoanCollectionOrderOri.getLoanId());
                     //如果是分期商城的订单则判断是否获取商品名称
-                    if (Constant.ORDER_TYPE_FEN.equals(userLoan.getBorrowingType())){
-                        if (StringUtils.isBlank(mmanLoanCollectionOrderOri.getProductName())){
-                            String LoanId = StringUtils.substringBefore(mmanLoanCollectionOrderOri.getLoanId(),Constant.SEPARATOR_FOR_ORDER_SOURCE);
+                    if (Constant.ORDER_TYPE_FEN.equals(userLoan.getBorrowingType())) {
+                        if (StringUtils.isBlank(mmanLoanCollectionOrderOri.getProductName())) {
+                            String LoanId = StringUtils.substringBefore(mmanLoanCollectionOrderOri.getLoanId(), Constant.SEPARATOR_FOR_ORDER_SOURCE);
                             Map<String, String> paramMap = new HashedMap();
-                            paramMap.put("id",LoanId);
+                            paramMap.put("id", LoanId);
                             //TODO 分期商城上线后更改地址
 //                            String result = HttpUtil.get(PayContents.PRODUCT_NAME_URL,paramMap);
-                            String result =  "{\"code\":\"00\",\"productName\":\"分期商城\"}";
-                            logger.error("productName:"+LoanId+result);
+                            String result = "{\"code\":\"00\",\"productName\":\"分期商城\"}";
+                            logger.error("productName:" + LoanId + result);
 
-                            if (result != null){
+                            if (result != null) {
                                 JSONObject jsonResult = JSONObject.parseObject(result);
-                                if ("00".equals(jsonResult.get("code"))){
+                                if ("00".equals(jsonResult.get("code"))) {
                                     String productName = jsonResult.get("productName").toString();
                                     mmanLoanCollectionOrderOri.setProductName(productName);
                                     mmanLoanCollectionOrderService.updateProductName(mmanLoanCollectionOrderOri);
@@ -548,7 +549,9 @@ public class MyCollectionOrderController extends BaseController {
                     }
                 }
                 CreditLoanPay creditLoanPay = creditLoanPayService.get(mmanLoanCollectionOrderOri.getPayId());
-
+                // 催收记录
+                List<MmanLoanCollectionRecord> list = mmanLoanCollectionRecordService.findListRecord(id);
+                model.addAttribute("recordList", list);
                 model.addAttribute("collectionOrder", mmanLoanCollectionOrderOri);
                 model.addAttribute("userInfo", userInfo);
                 model.addAttribute("userCar", userCar);// 银行卡
@@ -580,8 +583,7 @@ public class MyCollectionOrderController extends BaseController {
         List<MmanLoanCollectionRecord> list = null;
         Map<String, String> params = this.getParameters(request);
         try {
-            list = mmanLoanCollectionRecordService.findListRecord(params
-                    .get("id"));
+            list = mmanLoanCollectionRecordService.findListRecord(params.get("id"));
             model.addAttribute("listRecord", list);
             // 跟进等级
             List<SysDict> levellist = sysDictService
