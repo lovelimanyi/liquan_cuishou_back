@@ -116,7 +116,6 @@ public class CollectionCompanyController extends BaseController {
     public String updateDateCompany(HttpServletRequest request, HttpServletResponse response, Model model) {
         String url = null;
         String erroMsg = null;
-        MmanLoanCollectionCompany mmanLoanCollectionCompany = new MmanLoanCollectionCompany();
         JsonResult result = new JsonResult("-1", "修改公司信息失败");
         Map<String, String> params = this.getParameters(request);
         try {

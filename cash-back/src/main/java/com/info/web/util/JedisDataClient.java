@@ -656,6 +656,8 @@ public class JedisDataClient {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            returnResource(jedisMaster, poolMaster);
         }
     }
 
@@ -679,6 +681,8 @@ public class JedisDataClient {
             return list;
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            returnResource(jedisMaster, poolMaster);
         }
         return null;
     }
@@ -697,6 +701,8 @@ public class JedisDataClient {
             jedisMaster.set(key.getBytes(), ObjectTranscoderUtil.serialize(map));
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            returnResource(jedisMaster, poolMaster);
         }
     }
 
@@ -720,6 +726,8 @@ public class JedisDataClient {
             return map;
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            returnResource(jedisMaster, poolMaster);
         }
         return null;
     }
