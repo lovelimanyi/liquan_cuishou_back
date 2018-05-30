@@ -1,12 +1,12 @@
 package com.info.back.test;
 
-import com.info.back.dao.IMmanUserInfoDao;
 import com.info.back.dao.ITemplateSmsDao;
 import com.info.back.service.*;
 import com.info.constant.Constant;
 import com.info.web.pojo.*;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +18,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.info.back.utils.JavaMailUtils.sendEmail;
-
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"file:src/main/resources/applicationContext.xml"})
 public class TestAutoDispatch {
 
+    private static Logger log = Logger.getLogger(TestAutoDispatch.class);
     @Autowired
     private ICreditLoanPayService payService;
     @Autowired
@@ -42,23 +41,14 @@ public class TestAutoDispatch {
     //
     @Test
     public void testdispachForLoanId() {
-
-        String loadIds = "545257745";
+        String loadIds = "";
         for (String loadId : loadIds.split(",")) {
             System.err.println("===================testdispachForLoanId start" + loadId);
 //            orderService.dispatchOrderNew("545258552", "123456789", "2");
-            MmanLoanCollectionOrder order = orderService.getOrderByLoanId(loadId);
-            if (order != null) {
-//                taskJobMiddleService.dispatchforLoanId(order.getLoanId(), null, "1");
-//                mmanLoanCollectionOrderService.orderUpgrade(loadId);
-            } else {
-                System.out.println("借款订单对象为空，借款id = " + loadId);
-            }
+//            MmanLoanCollectionOrder order = orderService.getOrderByLoanId(loadId);
 
-            System.err.println("===================testdispachForLoanId end");
+            orderService.dispatchOrderNew(loadId, null, Constant.SMALL);
 
-
-            System.out.println("*******************");
         }
     }
 

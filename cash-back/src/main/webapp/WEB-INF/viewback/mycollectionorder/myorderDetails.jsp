@@ -533,7 +533,7 @@
             <ul>
                 <li class="selected"><a href="#"><span>催收记录</span></a></li>
                 <li><a href="#"><span>通话记录</span></a></li>
-                <li class="#"><a href="#"><span>通讯录</span></a></li>
+                <li><a href="/mmanUserRela/getMmanUserRelaPage?id=${params.id}"><span>通讯录</span></a></li>
                 <li><a href="#"><span>聚信立报告</span></a></li>
             </ul>
         </div>
