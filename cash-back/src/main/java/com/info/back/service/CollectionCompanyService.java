@@ -133,6 +133,7 @@ public class CollectionCompanyService implements ICollectionCompanyService{
 					result.setMsg("修改公司信息成功");
 				}
 			}
+			/*
 			List<BackUser> backUserList=mmanLoanCollectionCompanyDao.findcomapyIdUser(params.get("id"));
 			List<String> UUIdlist=new ArrayList<String>(); 
 			if(backUserList!=null){
@@ -147,6 +148,7 @@ public class CollectionCompanyService implements ICollectionCompanyService{
 				//删除催收员
 				mmanLoanCollectionCompanyDao.delUser(map);
 			}
+			*/
 		}else{
 			result.setMsg("参数不正确");
 		}

@@ -143,6 +143,9 @@
         </div>
     </div>
     <div class="pageContent">
+        <c:set var="page" value="${page}"></c:set>
+        <!-- 分页 -->
+        <%@ include file="/WEB-INF/viewback/page.jsp" %>
         <jsp:include page="${BACK_URL}/rightSubList">
             <jsp:param value="${params.myId}" name="parentId"/>
         </jsp:include>
