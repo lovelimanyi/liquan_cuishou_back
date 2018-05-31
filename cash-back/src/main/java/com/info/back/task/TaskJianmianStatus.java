@@ -47,7 +47,12 @@ public class TaskJianmianStatus {
 				if (!order.getStatus().equals(Constant.STATUS_OVERDUE_FOUR)){//订单此时未还款完成
 					map.put("orderId",auditCenter.getOrderid());
 					map.put("orderStatus",auditCenter.getOrderStatus());
-					mmanLoanCollectionOrderDao.updateReductionOrder(map);
+					try {
+						mmanLoanCollectionOrderDao.updateReductionOrder(map);
+					}catch (Exception e){
+						e.printStackTrace();
+					}
+
 				}
 			}
 		} catch (Exception e) {

@@ -39,6 +39,8 @@
 		<result column="loan_user_phone" jdbcType="VARCHAR" property="loanUserPhone" />
 
 		<result column="order_status" jdbcType="VARCHAR" property="orderStatus" />
+		<result column="order_type" jdbcType="VARCHAR" property="orderType" />
+
 	</resultMap>
 	<sql id="sqlAuditCenterColumns">
 		ac.id,
@@ -47,7 +49,7 @@
 		ac.loan_id,
 		ac.pay_id,
 		ac.orderId,
-		ac.type
+		ac.type,
 		ac.order_type AS orderType,
 		ac.status,
 		ac.audittime,
@@ -428,6 +430,6 @@
 	<select id="getAuditCheckingList" resultMap="queryResultMap" parameterType="HashMap">
 		SELECT  <include refid="sqlAuditCenterColumns" />
 		FROM audit_center ac
-		WHERE ac.type = #{type} AND ac.status = #{status}
+		WHERE ac.type = #{type} AND (ac.status = '0' or ac.status = '6')
 	</select>
 </mapper>
