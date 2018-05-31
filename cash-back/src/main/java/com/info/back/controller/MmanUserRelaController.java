@@ -1,5 +1,6 @@
 package com.info.back.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.info.back.service.IMmanLoanCollectionOrderService;
 import com.info.back.service.IMmanUserInfoService;
 import com.info.back.service.IMmanUserRelaService;
@@ -21,7 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 
 @Controller
-@RequestMapping("mmanUserRela/")
+@RequestMapping("/mmanUserRela")
 public class MmanUserRelaController extends BaseController {
     private static Logger logger = Logger.getLogger(MmanUserRelaController.class);
 
@@ -33,12 +34,11 @@ public class MmanUserRelaController extends BaseController {
     @Autowired
     private IMmanLoanCollectionOrderService mmanLoanCollectionOrderService;
 
-    @RequestMapping("getMmanUserRelaPage")
+    @RequestMapping("/getMmanUserRelaPage")
     @ResponseBody
-    public PageConfig<MmanUserRela> getMmanUserRelaPage(HttpServletRequest request, Model model) {
+    public String getMmanUserRelaPage(HttpServletRequest request, Model model) {
         HashMap<String, Object> params = this.getParametersO(request);
         String orderId = params.get("id").toString();
-        String erroMsg = null;
         PageConfig<MmanUserRela> pageConfig = null;
         try {
             MmanLoanCollectionOrder order = mmanLoanCollectionOrderService.getOrderById(orderId);
@@ -48,81 +48,37 @@ public class MmanUserRelaController extends BaseController {
                 int overdueDays = order.getOverdueDays();//逾期天数
                 params.put("overdueDays", overdueDays);
                 if (!BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())) {
-                    if (overdueDays <= 0) {
-//						erroMsg = "逾期2天方可申请查看通讯录";
-//						params.put("num",10);
-//						List<MmanUserRela> list = mmanUserRelaService.getList(params);
-//						model.addAttribute("list", list);
-                    }
-                    // 暂时调整，大于3天可以查看所有的通讯录
-//					else if(overdueDays >= 2 && overdueDays <= 3){
-//						params.put("num",2);
-//						List<MmanUserRela> list = mmanUserRelaService.getList(params);
-//						model.addAttribute("list", list);
-//					}
-//					else if(overdueDays >= 4 && overdueDays <= 5){
-//						params.put("num",5);
-//						List<MmanUserRela> list = mmanUserRelaService.getList(params);
-//						model.addAttribute("list", list);
-//					}else if(overdueDays >= 6 && overdueDays <= 10){
-//						params.put("num",15);
-//						List<MmanUserRela> list = mmanUserRelaService.getList(params);
-//						model.addAttribute("list", list);
-//					}
-                    else {
-                        MmanUserInfo userInfo = mmanUserInfoService.getUserInfoById(order.getUserId());
+                    MmanUserInfo userInfo = mmanUserInfoService.getUserInfoById(order.getUserId());
 
 
-                        pageConfig = mmanUserRelaService.findPage(params);
-                        List<MmanUserRela> mmanUserRelaList = pageConfig.getItems();
-                        MmanUserRela mmanUserRelaOne = new MmanUserRela();
-                        mmanUserRelaOne.setUserId(order.getUserId());
-                        mmanUserRelaOne.setRealName(userInfo.getRealname());
-                        mmanUserRelaOne.setContactsKey(userInfo.getFristContactRelation().toString());
-                        mmanUserRelaOne.setRelaKey(userInfo.getFristContactRelation().toString());
-                        mmanUserRelaOne.setInfoName(userInfo.getFirstContactName());
-                        mmanUserRelaOne.setInfoValue(userInfo.getFirstContactPhone());
-                        MmanUserRela mmanUserRelaTwo = new MmanUserRela();
+                    pageConfig = mmanUserRelaService.findPage(params);
+                    List<MmanUserRela> mmanUserRelaList = pageConfig.getItems();
+                    MmanUserRela mmanUserRelaOne = new MmanUserRela();
+                    mmanUserRelaOne.setUserId(order.getUserId());
+                    mmanUserRelaOne.setRealName(userInfo.getRealname());
+                    mmanUserRelaOne.setContactsKey(userInfo.getFristContactRelation().toString());
+                    mmanUserRelaOne.setRelaKey(userInfo.getFristContactRelation().toString());
+                    mmanUserRelaOne.setInfoName(userInfo.getFirstContactName());
+                    mmanUserRelaOne.setInfoValue(userInfo.getFirstContactPhone());
+                    MmanUserRela mmanUserRelaTwo = new MmanUserRela();
 
 
-                        mmanUserRelaTwo.setRealName(userInfo.getRealname());
-                        mmanUserRelaTwo.setUserId(order.getUserId());
-                        mmanUserRelaTwo.setContactsKey(userInfo.getSecondContactRelation().toString());
-                        mmanUserRelaTwo.setRelaKey(userInfo.getSecondContactRelation().toString());
-                        mmanUserRelaTwo.setInfoName(userInfo.getSecondContactName());
-                        mmanUserRelaTwo.setInfoValue(userInfo.getSecondContactPhone());
-                        mmanUserRelaList.add(0, mmanUserRelaOne);
-                        mmanUserRelaList.add(1, mmanUserRelaTwo);
+                    mmanUserRelaTwo.setRealName(userInfo.getRealname());
+                    mmanUserRelaTwo.setUserId(order.getUserId());
+                    mmanUserRelaTwo.setContactsKey(userInfo.getSecondContactRelation().toString());
+                    mmanUserRelaTwo.setRelaKey(userInfo.getSecondContactRelation().toString());
+                    mmanUserRelaTwo.setInfoName(userInfo.getSecondContactName());
+                    mmanUserRelaTwo.setInfoValue(userInfo.getSecondContactPhone());
+                    mmanUserRelaList.add(0, mmanUserRelaOne);
+                    mmanUserRelaList.add(1, mmanUserRelaTwo);
 
-                        model.addAttribute("pm", pageConfig);
-                    }
-                } else {
-                    erroMsg = "催收成功订单不允许查看通讯录！";
+                    model.addAttribute("pm", pageConfig);
                 }
-            } else {
-                logger.error("借款人联系人异常，请核实，借款id: " + orderId);
             }
-
-            //备用查看通讯录规则
-//			if(overdueDays <= 1){
-//				erroMsg = "逾期2天方可申请查看通讯录";
-//			}else if(overdueDays >= 2 && overdueDays <= 3){
-//				params.put("num",2);
-//				List<MmanUserRela> list = mmanUserRelaService.getList(params);
-//				model.addAttribute("list", list);
-//			}else{
-//				params.put("num",3);
-//				List<MmanUserRela> list = mmanUserRelaService.getList(params);
-//				model.addAttribute("list", list);
-//			}
-
         } catch (Exception e) {
             logger.error("getMmanUserRelaPage error", e);
         }
-        model.addAttribute("orderId", orderId);
-        model.addAttribute("params", params);// 用于搜索框保留值
-        model.addAttribute(MESSAGE, erroMsg);
-        return pageConfig;
+        return JSON.toJSONString(pageConfig);
     }
 
 

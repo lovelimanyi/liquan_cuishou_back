@@ -326,9 +326,6 @@
             </c:forEach>
             </tbody>
         </table>
-        <c:set var="page" value="${page}"></c:set>
-        <!-- 分页 -->
-        <%@ include file="/WEB-INF/viewback/page.jsp" %>
     </div>
 
     <script type="text/javascript">

@@ -551,6 +551,10 @@ public class MyCollectionOrderController extends BaseController {
                 CreditLoanPay creditLoanPay = creditLoanPayService.get(mmanLoanCollectionOrderOri.getPayId());
                 // 催收记录
                 List<MmanLoanCollectionRecord> list = mmanLoanCollectionRecordService.findListRecord(id);
+                // 联系人信息
+                params.put("userId", userInfo.getId());
+                List<MmanUserRela> mmanUserRelaList = mmanUserRelaService.getList(params);
+                model.addAttribute("mmanUserRelaList", mmanUserRelaList);
                 model.addAttribute("recordList", list);
                 model.addAttribute("collectionOrder", mmanLoanCollectionOrderOri);
                 model.addAttribute("userInfo", userInfo);

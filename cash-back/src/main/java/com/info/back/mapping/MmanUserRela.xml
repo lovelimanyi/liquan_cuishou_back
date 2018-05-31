@@ -118,7 +118,7 @@
 		ui.id =#{userId}
 		</where>
 		GROUP BY ur.info_value
-		ORDER BY  ur.call_cnt desc limit 0,#{num}
+		ORDER BY  ur.call_cnt desc
 		
 	</select>
 	
