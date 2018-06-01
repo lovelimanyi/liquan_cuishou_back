@@ -316,7 +316,7 @@
                     <li class="selected"><a href="#"><span>催收记录</span></a></li>
                     <li><a href="#"><span>通话记录</span></a></li>
                     <li><a href="#"><span>通讯录</span></a></li>
-                    <li><a href="#"><span>聚信立报告</span></a></li>
+                    <li><a href="#" onclick="getJxlContent();"><span>聚信立报告</span></a></li>
                 </ul>
             </div>
         </div>
@@ -441,8 +441,8 @@
                 </fieldset>
 
             </div>
-            <div>
-                催收记录
+            <div id="jxl">
+
             </div>
 
         </div>
@@ -589,7 +589,7 @@
 
 <script type="text/javascript">
 
-//    $(getRecordList());
+    //    $(getRecordList());
 
     // 点击身份证图片放大
     PostbirdImgGlass.init({
@@ -598,17 +598,18 @@
     });
 
 
-    function getRecordList() {
+    function getJxlContent() {
         var orderId = $("#orderId").val();
         $.ajax({
             type: "GET",
-            url: "/back/collectionRecord/getRecordsByOrderId",
+            url: "/back/mmanUserInfo/jxlReport",
             param: {
                 id: orderId
             },
             success: function (data) {
                 if (data.code = 200) {
                     console.log(data)
+                    $("#jxl").innerHTML = data;
                     /*var res = "";
                      $.each(record, function () {
                      res += '<td>' + record.orderId + '</td>';

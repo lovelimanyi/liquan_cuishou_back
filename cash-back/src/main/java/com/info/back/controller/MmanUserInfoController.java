@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,43 +31,45 @@ public class MmanUserInfoController extends BaseController {
     private IMmanUserInfoService mmanUserInfoService;
     @Autowired
     private IMmanLoanCollectionOrderService mmanLoanCollectionOrderService;
+
     /**
      * 聚信立报告
+     *
      * @param request
-     * @param response
      * @param model
      * @return
      */
     @RequestMapping("/jxlReport")
-    public String getPage(HttpServletRequest request, HttpServletResponse response, Model model){
-        String url=null;
+    @ResponseBody
+    public ModelAndView getPage(HttpServletRequest request, Model model) {
+        String url = null;
         try {
             HashMap<String, Object> params = getParametersO(request);
-            MmanLoanCollectionOrder order =  null;
-            if(StringUtils.isNotBlank(params.get("id")+"")){
+            MmanLoanCollectionOrder order = null;
+            if (StringUtils.isNotBlank(params.get("id") + "")) {
                 order = mmanLoanCollectionOrderService.getOrderById(params.get("id").toString());
             }
-            if(order != null){
+            if (order != null) {
                 int overdueDay = order.getOverdueDays();
                 String userId = order.getUserId();
-                BackUser backUser=this.loginAdminUser(request);
-                if(!BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())){
-                    if((BackConstant.COLLECTION_ROLE_ID.toString().equals(backUser.getRoleId()) && "2".equals(order.getJxlStatus()))|| !BackConstant.COLLECTION_ROLE_ID.toString().equals(backUser.getRoleId())){
-                        url = mmanUserInfoService.handleJxl(model,userId);
-                    }else {
-                        if (overdueDay < 0){
+                BackUser backUser = this.loginAdminUser(request);
+                if (!BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())) {
+                    if ((BackConstant.COLLECTION_ROLE_ID.toString().equals(backUser.getRoleId()) && "2".equals(order.getJxlStatus())) || !BackConstant.COLLECTION_ROLE_ID.toString().equals(backUser.getRoleId())) {
+                        url = mmanUserInfoService.handleJxl(model, userId);
+                    } else {
+                        if (overdueDay < 0) {
                             model.addAttribute(MESSAGE, "逾期2天以上订单才能查看聚信里报告！");
-                            url="mycollectionorder/jxlReport";
-                        }else if (overdueDay>0){
-                            url = mmanUserInfoService.handleJxl(model,userId);
-                        }else {
-                            url="mycollectionorder/tapplyJxlRepor";
+                            url = "mycollectionorder/jxlReport";
+                        } else if (overdueDay > 0) {
+                            url = mmanUserInfoService.handleJxl(model, userId);
+                        } else {
+                            url = "mycollectionorder/tapplyJxlRepor";
                         }
                     }
-                }else {
+                } else {
                     model.addAttribute(MESSAGE, "催收成功订单不允许查看聚信里报告！");
                 }
-            }else{
+            } else {
                 logger.error("该订单异常，请核实，订单号：" + params.get("id"));
             }
             model.addAttribute("params", params);
@@ -74,7 +78,7 @@ public class MmanUserInfoController extends BaseController {
             e.printStackTrace();
             model.addAttribute(MESSAGE, "聚信立异常");
         }
-        return url;
+        System.out.println(new ModelAndView(url));
+        return new ModelAndView(url);
     }
-
 }
