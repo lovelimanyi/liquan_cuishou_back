@@ -512,7 +512,7 @@ public class CollectionStatisticsController extends BaseController {
 	 * @param
 	 */
 	@RequestMapping("smallAmountStatistics")
-	public String smallAmountStatistics(@RequestParam(value = "Flag") String Flag,HttpServletRequest request,HttpServletResponse response, Model model){
+	public String smallAmountStatistics(@RequestParam(value = "Flag") String Flag,HttpServletRequest request,Model model){
 		String url = "";
 		try {
 			HashMap<String, Object> params = getParametersO(request);
@@ -521,31 +521,25 @@ public class CollectionStatisticsController extends BaseController {
 				params.put("createDate",DateUtil.getDateFormat(new Date(),"yyyy-MM-dd"));
 			}
 			//设置登录账户可查看的公司权限
-			//handleCompanyPermission(backUser,params,model);  //lastVersion
 			PageConfig<PersonStatistics> pageConfig = new PageConfig<>();
 
 			//如果Flag 为person则查看个人统计，如果为 company则查看公司统计
 			if ("person".equals(Flag)){
 				handleCompanyPermission(backUser,params,model);
 				url = "statistics/personStatistics";
-				if (!model.containsAttribute("company")){
-					return url;
-				}
 				pageConfig = personStatisticsService.findPage(params);
 			}else if("company".equals(Flag)){
 				url = "statistics/companyStatistics";
-//                if (!model.containsAttribute("company")){ //lastVersion
-//                    return url;
-//                }
 				pageConfig = personStatisticsService.findCompanyPage(params);
 				List<String> companyIds = getCompanyIds(backUser);
 				if(pageConfig.getItems() != null && pageConfig.getItems().size() > 0){
-					for (int i = 1; i < pageConfig.getItems().size(); i ++) {
+					for (int i = 0; i < pageConfig.getItems().size(); i ++) {
 						if(!companyIds.contains(pageConfig.getItems().get(i).getCompanyId())){
 							pageConfig.getItems().get(i).setCompanyName("* * * * * * * * ");
 						}
 					}
 				}
+				handleCompanyPermission(backUser,params,model);
 			}
 			model.addAttribute("groupLevelMap", BackConstant.groupNameMap);
 			model.addAttribute("groupLevel", String.valueOf(params.get("groupLevel")));
@@ -566,7 +560,7 @@ public class CollectionStatisticsController extends BaseController {
 	 * @param
 	 */
 	@RequestMapping("bigAmountStatistics")
-	public String bigAmountStatistics(@RequestParam(value = "Flag") String Flag, HttpServletRequest request, HttpServletResponse response, Model model){
+	public String bigAmountStatistics(@RequestParam(value = "Flag") String Flag, HttpServletRequest request,Model model){
 		String url = "";
 		try {
 			HashMap<String, Object> params = getParametersO(request);
@@ -574,34 +568,26 @@ public class CollectionStatisticsController extends BaseController {
 			if(StringUtils.isEmpty(params.get("createDate")) && StringUtils.isEmpty(params.get("createDate"))){
 				params.put("createDate",DateUtil.getDateFormat(new Date(),"yyyy-MM-dd"));
 			}
-			//设置登录账户可查看的公司权限
-//            handleCompanyPermission(backUser,params,model);
-
 			PageConfig<BigAmountStatistics>  pageConfig = new PageConfig<>();
 
 			//如果Flag 为person则查看个人统计，如果为 company则查看公司统计
 			if ("person".equals(Flag)){
 				handleCompanyPermission(backUser,params,model);
 				url = "statistics/bigPersonStatistics";
-				if (!model.containsAttribute("company")){
-					return url;
-				}
 				pageConfig = bigAmountStatisticsService.findPage(params);
 			}else if("company".equals(Flag)){
 				url = "statistics/bigCompanyStatistics";
-//                if (!model.containsAttribute("company")){
-//                    return url;
-//                }
 				pageConfig = bigAmountStatisticsService.findCompanyPage(params);
 
 				List<String> companyIds = getCompanyIds(backUser);
 				if(pageConfig.getItems() != null && pageConfig.getItems().size() > 0){
-					for (int i = 1; i < pageConfig.getItems().size(); i ++) {
+					for (int i = 0; i < pageConfig.getItems().size(); i ++) {
 						if(!companyIds.contains(pageConfig.getItems().get(i).getCompanyId())){
 							pageConfig.getItems().get(i).setCompanyName("* * * * * * * * ");
 						}
 					}
 				}
+				handleCompanyPermission(backUser,params,model);
 			}
 			model.addAttribute("groupLevelMap", BackConstant.groupNameMap);
 			model.addAttribute("groupLevel", String.valueOf(params.get("groupLevel")));
@@ -638,6 +624,8 @@ public class CollectionStatisticsController extends BaseController {
 			params.put("uuid", backUser.getUuid());
 			params.put("roleId", backUser.getRoleId());
 			params.put("backUserName",backUser.getUserName());
+			MmanLoanCollectionCompany company = mmanLoanCollectionCompanyService.getCompanyById(backUser.getCompanyId());
+			model.addAttribute("companyName",company.getTitle());
 		}else {
 			// 所有公司--系统管理员可以查看所有公司
 			List<MmanLoanCollectionCompany> companys =mmanLoanCollectionCompanyService.selectCompanyList();
@@ -649,9 +637,6 @@ public class CollectionStatisticsController extends BaseController {
 					companyIds.add(company.getId());
 				}
 				params.put("companyIds",companyIds);
-				model.addAttribute("groupLevelMap", BackConstant.groupNameMap);
-				model.addAttribute("groupLevel", String.valueOf(params.get("groupLevel")));
-				model.addAttribute("dictMap",BackConstant.groupNameMap);
 				model.addAttribute("company",coms);
 			}
 
