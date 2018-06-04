@@ -46,8 +46,9 @@ public class MmanUserInfoController extends BaseController {
         try {
             HashMap<String, Object> params = getParametersO(request);
             MmanLoanCollectionOrder order = null;
-            if (StringUtils.isNotBlank(params.get("id") + "")) {
-                order = mmanLoanCollectionOrderService.getOrderById(params.get("id").toString());
+            String id = params.get("id") + "";
+            if (StringUtils.isNotBlank(id)) {
+                order = mmanLoanCollectionOrderService.getOrderById(id);
             }
             if (order != null) {
                 int overdueDay = order.getOverdueDays();

@@ -20,6 +20,7 @@
 <div style="height:800px;overflow:auto;">
     <%--<div class="pageContent">--%>
     <input type="hidden" value="${params.id}">
+    <input type="hidden" id="orderId" value="${params.id}">
     <div class="tabs">
         <div class="tabsHeader">
             <div class="tabsHeaderContent">

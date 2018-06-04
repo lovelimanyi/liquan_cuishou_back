@@ -125,7 +125,6 @@ public class MyCollectionOrderController extends BaseController {
         }
 
         checkPermission(params, backUser);
-
         params.put("source", BackConstant.OPERATION_RECORD_SOURCE_MY_ORDER);  // 操作來源 我的催收订单
         // 查询公司列表
         MmanLoanCollectionCompany mmanLoanCollectionCompany = new MmanLoanCollectionCompany();
