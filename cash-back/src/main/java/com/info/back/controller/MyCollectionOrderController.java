@@ -577,7 +577,7 @@ public class MyCollectionOrderController extends BaseController {
      * @throws IOException
      */
     private String getPhones(MmanUserInfo userInfo) {
-        logger.info(">>>调起共债接口,参数： " + JSON.toJSONString(userInfo));
+        logger.info(">>>调起共债接口,参数： " + JSON.toJSONString(userInfo.getIdNumber()));
         Map<String,String> map = new HashMap();
         map.put("id",userInfo.getIdNumber());
         String returnInfo = HttpUtil.getInstance().doPost(PayContents.XJX_GET_PHONES,JSON.toJSONString(map));
