@@ -164,7 +164,7 @@ public class CompanyIpAddressController extends BaseController {
      * @throws Exception
      */
     private void updateCompanyIpInfo() throws Exception {
-        JedisDataClient.del("orayIps");
+        JedisDataClient.del("cuishou:orayIps");
         List<String> ipList = new ArrayList<>();
         List<CompanyIpAddressDto> companyIps = companyIpAddressService.listAll();
         for (CompanyIpAddressDto companyIpAddress : companyIps) {
@@ -174,7 +174,7 @@ public class CompanyIpAddressController extends BaseController {
             }
         }
 
-        JedisDataClient.setList("orayIps", ipList);
+        JedisDataClient.setList("cuishou:orayIps", ipList);
     }
 
 }
