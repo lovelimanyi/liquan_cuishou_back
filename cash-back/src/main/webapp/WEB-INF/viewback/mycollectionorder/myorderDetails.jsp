@@ -4,6 +4,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%
     String path = request.getContextPath();
+    String basePath = path + "/common/back";
 %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
@@ -11,10 +12,10 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=7"/>
     <title>订单详情</title>
-    <link rel="stylesheet" href="/common/back/css/myOrderDetailCss.css">
-    <%--<link rel="stylesheet" href="/common/back/css/imgCss/bootstrap-grid.min.css">--%>
+    <link rel="stylesheet" href="<%=basePath%>/css/myOrderDetailCss.css">
 
-    <script src="/common/back/js/imgjs/postbird-img-glass.min.js"/>
+    <script type="text/javascript" src="<%=basePath%>/js/imgjs/postbird-img-glass.min.js"/>
+    <script type="text/javascript" src="<%=basePath%>/js/orderDetail/myOrderDetailJs.js"/>
 </head>
 <body>
 <div style="height:800px;overflow:auto;">
@@ -26,7 +27,7 @@
             <div class="tabsHeaderContent">
                 <ul>
                     <li class="selected"><a href="#"><span>订单详情</span></a></li>
-                    <li><a href="#"><span>还款信息</span></a></li>
+                    <li><a href="#" onclick="getUserRepayInfo()"><span>还款信息</span></a></li>
                 </ul>
             </div>
         </div>
@@ -52,8 +53,6 @@
                             <td colspan="2">${userInfo.userSex}</td>
                         </tr>
                         <tr>
-                            <%--<td class="tdGround">性别:</td>
-                            <td>${userInfo.userSex}</td>--%>
                             <td class="tdGround">预留手机号:</td>
                             <td>${userCar.mobile}</td>
                             <td class="tdGround">现居时长</td>
@@ -113,12 +112,6 @@
                                     </c:if>
                                 </div>
                             </td>
-                            <%--<td class="tdGround" style="height: 116px;">个人名片:</td>
-                            <td colspan="5">
-                                <c:if test="${userInfo.headPortrait!=null}">
-                                    <img id="imgHead" class="img-container" src="${userInfo.headPortrait}"/>
-                                </c:if>
-                            </td>--%>
                         </tr>
                     </table>
                 </fieldset>
@@ -129,8 +122,8 @@
                 <fieldset>
                     <legend>还款信息</legend>
                     <table class="repayTable">
-                        <tbody>
-                        <tr>
+                        <tbody id="repayInfo">
+                        <%--<tr>
                             <td class="htd">借款编号:</td>
                             <td class="ttd">${collectionOrder.loanId}</td>
                             <c:if test="${userLoan.borrowingType eq '2'}">
@@ -191,9 +184,7 @@
                                 <td class="hhtd">剩余应还:</td>
                                 <td class="tttd"><font color="red">${userLoan.loanMoney+userLoan.loanPenalty+userLoan.serviceCharge+userLoan.accrual-payMonery}</font></td>
                             </c:if>
-
-
-                        </tr>
+                        </tr>--%>
                         </tbody>
                     </table>
                 </fieldset>
@@ -201,16 +192,23 @@
                 <fieldset>
                     <legend>还款详情</legend>
                     <table class="detailB" width="100%">
+                        <thead>
                         <tr>
                             <th align="center">序号</th>
-                            <th align="left">实还本金</th>
+                            <th align="center">实还本金</th>
                             <th align="center">实还罚息</th>
+                            <th align="center">实还利息</th>
                             <th align="center">剩余应还本金</th>
                             <th align="center">剩余应还罚息</th>
+                            <th align="center">剩余应还利息</th>
                             <th align="center">还款方式</th>
                             <th align="center">还款时间</th>
                         </tr>
-                        <c:forEach var="pay" items="${detailList}" varStatus="status">
+                        </thead>
+                        <tbody id="payDetail">
+
+
+                        <%--<c:forEach var="pay" items="${detailList}" varStatus="status">
                             <tr>
                                 <td>
                                         ${status.count}
@@ -239,13 +237,17 @@
                                     <fmt:formatDate value="${pay.updateDate }" pattern="yyyy-MM-dd HH:mm:ss"/>
                                 </td>
                             </tr>
-                        </c:forEach>
+                        </c:forEach>--%>
+                        </tbody>
                     </table>
                 </fieldset>
                 <!-- 代扣信息 -->
                 <fieldset>
                     <legend>代扣记录</legend>
                     <table class="detailB" width="100%">
+                        <thead>
+
+
                         <tr>
                             <th align="center">创建时间</th>
                             <th align="center">借款人姓名</th>
@@ -258,51 +260,9 @@
                             <th align="center">失败原因</th>
                             <th align="center">更新时间</th>
                         </tr>
-                        <c:forEach var="withhold" items="${withholdList}" varStatus="status">
-                            <tr>
-                                <td>
-                                    <fmt:formatDate value="${withhold.createDate }" pattern="yyyy-MM-dd HH:mm:ss"/>
-                                </td>
-                                <td>
-                                        ${withhold.loanUserName }
-                                </td>
-                                <td>
-                                        ${withhold.loanUserPhone }
-                                </td>
-                                <td>
-                                    <c:choose>
-                                        <c:when test="${withhold.orderStatus eq 1 }">催收中</c:when>
-                                        <c:when test="${withhold.orderStatus eq 2}">承诺还款</c:when>
-                                        <c:when test="${withhold.orderStatus eq 3}">待催收（委外）</c:when>
-                                        <c:when test="${withhold.orderStatus eq 4}">催收成功</c:when>
-                                        <c:when test="${withhold.orderStatus eq 5}">续期</c:when>
-                                        <c:otherwise>待催收</c:otherwise>
-                                    </c:choose>
-                                </td>
-                                <td>
-                                        ${withhold.arrearsMoney}
-                                </td>
-                                <td>
-                                        ${withhold.hasalsoMoney }
-                                </td>
-                                <td>
-                                        ${withhold.deductionsMoney }
-                                </td>
-                                <td>
-                                    <c:choose>
-                                        <c:when test="${withhold.status eq 0}">申请中</c:when>
-                                        <c:when test="${withhold.status eq 1}">成功</c:when>
-                                        <c:when test="${withhold.status eq 2}">失败</c:when>
-                                    </c:choose>
-                                </td>
-                                <td>
-                                        ${withhold.remark }
-                                </td>
-                                <td>
-                                    <fmt:formatDate value="${withhold.updateDate }" pattern="yyyy-MM-dd HH:mm:ss"/>
-                                </td>
-                            </tr>
-                        </c:forEach>
+                        </thead>
+                        <tbody id="withholdDetail">
+                        </tbody>
                     </table>
                 </fieldset>
             </div>
@@ -314,14 +274,14 @@
         <div class="tabsHeader">
             <div class="tabsHeaderContent">
                 <ul>
-                    <li class="selected"><a href="#"><span>催收记录</span></a></li>
+                    <li class="selected" onclick='script:$("#collectionRecord").show();'><a href="#"><span>催收记录</span></a></li>
                     <li><a href="#"><span>通话记录</span></a></li>
-                    <li><a href="#"><span>通讯录</span></a></li>
+                    <li><a href="#" onclick="getUserRealContent();"><span>通讯录</span></a></li>
                     <li><a href="#" onclick="getJxlContent();"><span>聚信立报告</span></a></li>
                 </ul>
             </div>
         </div>
-        <div class="tabsContent" style="height:300px;">
+        <div class="tabsContent" id="jxlTabs" style="height:300px;">
             <div>
                 <fieldset>
                     <legend>催收记录</legend>
@@ -329,6 +289,9 @@
                         <table class="table" style="width: 100%;" nowrapTD="false">
                             <thead>
                             <tr>
+                                <th align="center" width="20">
+                                    <input type="checkbox" id="checkAlls"/>
+                                </th>
                                 <th align="center" width="30">序号</th>
                                 <th align="center" width="40">借款编号</th>
                                 <th align="center" width="50">借款人</th>
@@ -348,6 +311,9 @@
 
                             <c:forEach var="record" items="${recordList }" varStatus="status">
                                 <tr target="recordId" rel="${record.id }">
+                                    <td>
+                                        <input type="checkbox" name="checkItem" value="${record.id}"/>
+                                    </td>
                                     <td>${status.count}</td>
                                     <td>${record.orderId}</td>
                                     <td>${record.userId}</td>
@@ -404,8 +370,8 @@
                                 <th align="center" width="20">被叫次数</th>
                             </tr>
                             </thead>
-                            <tbody>
-                            <c:forEach var="userReal" items="${mmanUserRelaList }" varStatus="status">
+                            <tbody id="userRealContent">
+                            <%--<c:forEach var="userReal" items="${mmanUserRelaList }" varStatus="status">
                                 <tr target="userRealId" rel="${userReal.id }">
                                     <td>${status.count}</td>
                                     <td>${userReal.realName}</td>
@@ -435,7 +401,7 @@
                                     <td>${userReal.callOutCnt}</td>
                                     <td>${userReal.callInCnt}</td>
                                 </tr>
-                            </c:forEach>
+                            </c:forEach>--%>
                             </tbody>
                         </table>
                     </div>
@@ -449,7 +415,7 @@
         </div>
     </div>
 
-    <div class="tabs">
+    <div class="tabs" id="collectionRecord">
         <div class="tabsHeader">
             <div class="tabsHeaderContent">
                 <ul>
@@ -586,49 +552,5 @@
     </div>
 </div>
 </body>
+
 </html>
-
-<script type="text/javascript">
-
-    //    $(getRecordList());
-
-    // 点击身份证图片放大
-    PostbirdImgGlass.init({
-        domSelector: ".img-container",
-        animation: true
-    });
-
-
-    function getJxlContent() {
-        var orderId = $("#orderId").val();
-        $.ajax({
-            type: "GET",
-            url: "/back/mmanUserInfo/jxlReport",
-            param: {
-                id: orderId
-            },
-            success: function (data) {
-                if (data.code = 200) {
-                    console.log(data)
-                    $("#jxl").innerHTML = data;
-                    /*var res = "";
-                     $.each(record, function () {
-                     res += '<td>' + record.orderId + '</td>';
-                     res += '<td>' + record.userId + '</td>';
-                     res += '<td>' + record.contactName + '</td>';
-                     res += '<td>' + record.contactPhone + '</td>';
-                     res += '<td>' + record.orderState + '</td>';
-                     res += '<td>' + record.collectionDate + '</td>';
-                     res += '<td>' + record.collectionGroup + '</td>';
-                     res += '<td>' + record.collectionPerson + '</td>';
-                     res += '<td>' + record.collectionAdvice + '</td>';
-                     res += '<td>' + record.fengKongLabel + '</td>';
-                     res += '<td>' + record.content + '</td>';
-                     res += '<td>' + record.collectionAdviceRemark + '</td>';
-                     })
-                     $('#generateContent').append(res);*/
-                }
-            }
-        });
-    }
-</script>

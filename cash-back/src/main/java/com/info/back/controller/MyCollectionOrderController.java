@@ -522,8 +522,7 @@ public class MyCollectionOrderController extends BaseController {
                     userInfo.setIdcardImgZ(frontImageUrl.toString());
                     userInfo.setIdcardImgF(backImageUrl.toString());
                 }
-                List<CreditLoanPayDetail> detailList = creditLoanPayDetailService
-                        .findPayDetail(mmanLoanCollectionOrderOri.getPayId());
+
                 /*
                 BigDecimal payMonery = new BigDecimal(0);
                 if (detailList != null) {
@@ -547,21 +546,14 @@ public class MyCollectionOrderController extends BaseController {
                         withholdingRecord.setLoanUserPhone(MaskCodeUtil.getMaskCode(withholdingRecord.getLoanUserPhone()));
                     }
                 }
-                CreditLoanPay creditLoanPay = creditLoanPayService.get(mmanLoanCollectionOrderOri.getPayId());
                 // 催收记录
                 List<MmanLoanCollectionRecord> list = mmanLoanCollectionRecordService.findListRecord(id);
                 // 联系人信息
-                params.put("userId", userInfo.getId());
-                List<MmanUserRela> mmanUserRelaList = mmanUserRelaService.getList(params);
-                model.addAttribute("mmanUserRelaList", mmanUserRelaList);
                 model.addAttribute("recordList", list);
                 model.addAttribute("collectionOrder", mmanLoanCollectionOrderOri);
                 model.addAttribute("userInfo", userInfo);
                 model.addAttribute("userCar", userCar);// 银行卡
-                model.addAttribute("payMonery", creditLoanPay.getRealMoney());// 已还金额
-                model.addAttribute("detailList", detailList);
-                model.addAttribute("withholdList", withholdList);
-                model.addAttribute("domaiName", PayContents.XJX_DOMAINNAME_URL);
+//                model.addAttribute("domaiName", PayContents.XJX_DOMAINNAME_URL);
                 url = "mycollectionorder/myorderDetails";
 //			}
             }
@@ -572,6 +564,77 @@ public class MyCollectionOrderController extends BaseController {
         model.addAttribute("params", params);
         return url;
     }
+
+
+    /**
+     * 查询借款人借款及还款详情信息
+     *
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/getUserRepayInfo")
+    public String getUserRepayInfo(HttpServletRequest request) {
+        HashMap<String, Object> params = this.getParametersO(request);
+        Map<String, Object> result = new HashMap<>();
+        String id = params.get("id") + "";
+        try {
+            if (StringUtils.isEmpty(id)) {
+                return null;
+            }
+            MmanLoanCollectionOrder order = mmanLoanCollectionOrderService.getOrderById(id);
+            if (order == null) {
+                return null;
+            }
+            // 银行卡信息
+            SysUserBankCard userCar = sysUserBankCardService.findUserId(order.getUserId());
+            // 还款信息
+            CreditLoanPay creditLoanPay = creditLoanPayService.get(order.getPayId());
+            // 代扣记录
+            List<CollectionWithholdingRecord> withholdList = mmanLoanCollectionRecordService.findWithholdRecord(order.getId());
+            // 还款详情
+            List<CreditLoanPayDetail> detailList = creditLoanPayDetailService.findPayDetail(order.getPayId());
+            // 借款信息
+            MmanUserLoan userLoan = mmanUserLoanService.get(order.getLoanId());
+            if (userLoan.getPaidMoney().compareTo(BigDecimal.ZERO) <= 0) {
+                userLoan.setServiceCharge(BigDecimal.ZERO);
+            }
+
+            // 应还总额
+            BigDecimal totalAmount = getTotalAmount(userLoan);
+            // 剩余应还金额
+            BigDecimal paidMoney = creditLoanPay.getRealMoney() == null ? BigDecimal.ZERO : creditLoanPay.getRealMoney();
+            BigDecimal remainAmount = totalAmount.subtract(paidMoney);
+
+            result.put("collectionOrder", order);
+            result.put("totalAmount", totalAmount);
+            result.put("remainAmount", remainAmount);
+            result.put("userLoan", userLoan);
+            result.put("bankCard", userCar);
+            result.put("pay", creditLoanPay);
+            result.put("withholdList", withholdList);
+            result.put("payDetail", detailList);
+            result.put("payMonery", creditLoanPay.getRealMoney());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return JSON.toJSONString(result);
+    }
+
+    /**
+     * 计算订单应还总金额
+     *
+     * @param userLoan
+     * @return
+     */
+    private BigDecimal getTotalAmount(MmanUserLoan userLoan) {
+        BigDecimal loanMoney = userLoan.getLoanMoney() == null ? BigDecimal.ZERO : userLoan.getLoanMoney();
+        BigDecimal loanPenalty = userLoan.getLoanPenalty() == null ? BigDecimal.ZERO : userLoan.getLoanPenalty();
+        BigDecimal serviceCharge = userLoan.getServiceCharge() == null ? BigDecimal.ZERO : userLoan.getServiceCharge();
+        BigDecimal accrual = userLoan.getAccrual() == null ? BigDecimal.ZERO : userLoan.getAccrual();
+        return loanMoney.add(loanPenalty).add(serviceCharge).add(accrual);
+    }
+
 
     /**
      * 催收记录表

@@ -39,7 +39,7 @@ public class MmanUserRelaController extends BaseController {
     public String getMmanUserRelaPage(HttpServletRequest request, Model model) {
         HashMap<String, Object> params = this.getParametersO(request);
         String orderId = params.get("id").toString();
-        PageConfig<MmanUserRela> pageConfig = null;
+        List<MmanUserRela> list = null;
         try {
             MmanLoanCollectionOrder order = mmanLoanCollectionOrderService.getOrderById(orderId);
             if (order != null) {
@@ -51,8 +51,8 @@ public class MmanUserRelaController extends BaseController {
                     MmanUserInfo userInfo = mmanUserInfoService.getUserInfoById(order.getUserId());
 
 
-                    pageConfig = mmanUserRelaService.findPage(params);
-                    List<MmanUserRela> mmanUserRelaList = pageConfig.getItems();
+                    list = mmanUserRelaService.getList(params);
+                    List<MmanUserRela> mmanUserRelaList = list;
                     MmanUserRela mmanUserRelaOne = new MmanUserRela();
                     mmanUserRelaOne.setUserId(order.getUserId());
                     mmanUserRelaOne.setRealName(userInfo.getRealname());
@@ -72,13 +72,13 @@ public class MmanUserRelaController extends BaseController {
                     mmanUserRelaList.add(0, mmanUserRelaOne);
                     mmanUserRelaList.add(1, mmanUserRelaTwo);
 
-                    model.addAttribute("pm", pageConfig);
+                    model.addAttribute("pm", list);
                 }
             }
         } catch (Exception e) {
             logger.error("getMmanUserRelaPage error", e);
         }
-        return JSON.toJSONString(pageConfig);
+        return JSON.toJSONString(list);
     }
 
 
