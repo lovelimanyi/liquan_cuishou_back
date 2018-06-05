@@ -137,10 +137,10 @@
                             <tr>
                                 <td class="tdGround">性别:</td>
                                 <td>${userInfo.userSex}</td>
-                                <td class="tdGround">预留手机号码:</td>
-                                <td>${userCar.mobile}</td>
+                                <%--<td class="tdGround">预留手机号码:</td>--%>
+                                <%--<td>${userCar.mobile}</td>--%>
                                 <td class="tdGround">现居时长</td>
-                                <td>
+                                <td colspan="3">
                                     <c:choose>
                                         <c:when test="${userInfo.presentPeriod eq 1}">1~6个月</c:when>
                                         <c:when test="${userInfo.presentPeriod eq 2}">6~12个月</c:when>
