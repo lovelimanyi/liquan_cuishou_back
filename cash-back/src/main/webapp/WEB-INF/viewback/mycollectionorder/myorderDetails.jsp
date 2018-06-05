@@ -126,10 +126,13 @@
                             <tr>
                                 <td class="tdGround" style="width:80px;">借款人姓名:</td>
                                 <td>${userInfo.realname}</td>
-                                <td class="tdGround">借款人手机号码:</td>
-                                <td>${userInfo.userPhone}</td>
+                                <%--<td class="tdGround">借款人手机号码:</td>--%>
+                                <%--<td>${userInfo.userPhone}</td>--%>
                                 <td class="tdGround">身份证号码:</td>
-                                <td>${userInfo.idNumber}</td>
+                                <td colspan="3">${userInfo.idNumber}</td>
+                            </tr>
+                            <tr>
+                                <td class="tdGround">借款人手机号:</td><td colspan="5" >${userInfo.userPhones}</td>
                             </tr>
                             <tr>
                                 <td class="tdGround">性别:</td>

@@ -46,8 +46,7 @@ public class HttpUtil {
         return httpUtil;
     }
 
-    public String doPost(String url, String params)
-            throws ClientProtocolException, IOException {
+    public String doPost(String url, String params) {
         logger.info("请求参数:" + params.toString());
         String result = "";
         HttpPost httpPost = new HttpPost(url);
@@ -56,8 +55,8 @@ public class HttpUtil {
 
         httpPost.setEntity(stringEntity);
         HttpClient httpClient = new DefaultHttpClient();
-        HttpResponse httpResponse = httpClient.execute(httpPost);
         try {
+            HttpResponse httpResponse = httpClient.execute(httpPost);
             BufferedReader reader = new BufferedReader(new InputStreamReader(
                     httpResponse.getEntity().getContent()));
             String resultStr = reader.readLine();
@@ -66,7 +65,10 @@ public class HttpUtil {
                 result = resultStr;
                 resultStr = reader.readLine();
             }
-        } finally {
+        } catch (Exception e){
+            logger.error("调用异常：{}",e);
+        }
+        finally {
             httpClient.getConnectionManager().shutdown();
         }
         return result;

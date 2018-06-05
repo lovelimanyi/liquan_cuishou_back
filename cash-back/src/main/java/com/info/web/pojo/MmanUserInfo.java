@@ -31,6 +31,8 @@ public class MmanUserInfo {
 	private String qq;
 	// 手机号码
 	private String userPhone;
+	// 共债手机号
+	private String userPhones;
 	// 淘宝账号
 	private String taobaoAccount;
 	// 邮箱
@@ -828,4 +830,11 @@ public class MmanUserInfo {
 		return this.userFrom;
 	}
 
+	public String getUserPhones() {
+		return userPhones;
+	}
+
+	public void setUserPhones(String userPhones) {
+		this.userPhones = userPhones;
+	}
 }
