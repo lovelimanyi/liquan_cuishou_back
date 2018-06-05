@@ -36,6 +36,9 @@ public class BigAmountStatisticsService implements IBigAmountStatisticsService {
         PageConfig<BigAmountStatistics> pageConfig ;
         pageConfig = paginationDao.findPage("findAll", "findAllCount", params, null);
         params.put("numPerPage", pageConfig.getTotalResultSize());
+        if (pageConfig.getTotalResultSize() <= 0){
+            return pageConfig;
+        }
         PageConfig<BigAmountStatistics> pageAllConfig = paginationDao.findPage("findAll", "findAllCount", params, null);
         BigAmountStatistics bas = this.handleData(pageAllConfig.getItems());
         if (bas != null) {
@@ -50,6 +53,9 @@ public class BigAmountStatisticsService implements IBigAmountStatisticsService {
         PageConfig<BigAmountStatistics> pageConfig ;
         pageConfig = paginationDao.findPage("findCompanyAll", "findCompanyAllCount", params, null);
         params.put("numPerPage", pageConfig.getTotalResultSize());
+        if (pageConfig.getTotalResultSize() <= 0){
+            return pageConfig;
+        }
         PageConfig<BigAmountStatistics> pageAllConfig = paginationDao.findPage("findCompanyAll", "findCompanyAllCount", params, null);
         BigAmountStatistics bas = this.handleData(pageAllConfig.getItems());
         if (bas != null) {

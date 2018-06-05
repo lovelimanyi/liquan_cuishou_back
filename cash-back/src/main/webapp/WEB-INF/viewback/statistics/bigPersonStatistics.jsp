@@ -148,10 +148,15 @@
                     <fmt:formatDate value="${list.createDate}" pattern="yyyy-MM-dd"/>
                 </td>
                 <td>
-                    <c:forEach items="${company}" var="company">
-                        <c:if test="${list.companyId == company.id}">${company.title}
-                        </c:if>
-                    </c:forEach>
+                    <c:if test="${companyName == null}">
+                        <c:forEach items="${company}" var="company">
+                            <c:if test="${list.companyId == company.id}">${company.title}
+                            </c:if>
+                        </c:forEach>
+                    </c:if>
+                    <c:if test="${companyName != null}">
+                        ${companyName}
+                    </c:if>
                 </td>
                 <td>
                         ${dictMap[list.groupLevel] }
