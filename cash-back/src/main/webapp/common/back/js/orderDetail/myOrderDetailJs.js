@@ -79,21 +79,13 @@ function getUserRepayInfo() {
             payResult += '<tr><td class="htd">借款时间:</td><td class="ttd">' + getFormatDate(data.userLoan.loanStartTime) + '</td>';
             payResult += '<td class="htd">到期本金:</td> <td class="ttd">' + data.userLoan.loanMoney + '</td>';
             payResult += getOrderInfoColumnResult(data);
-
-
             payResult += '<td class="htd">滞&nbsp&nbsp纳&nbsp&nbsp金:</td> <td class="ttd">' + data.userLoan.loanPenalty + '</td>';
-
             payResult += '<td class="htd">逾期天数:</td> <td class="ttd">' + data.collectionOrder.overdueDays + '</td></tr>';
-
             payResult += '<td class="htd">应还时间:</td> <td class="ttd">' + getFormatDate(data.userLoan.loanEndTime) + '</td>';
-
             payResult += '<td class="htd">应还总额:</td><td class="ttd" colspan="7">' + data.totalAmount + '</td></tr>';
-
             payResult += '<tr> <td class="hhtd">扣款银行:</td><td class="tttd">' + data.bankCard.depositBank + '</td><td class="hhtd">银行卡号:</td> <td class="tttd">' + data.bankCard.bankCard + '</td>';
             payResult += getPayInfoColumnResult(data);
             payResult += '</tr>';
-
-
             $("#repayInfo").append(payResult);
 
             // 还款详情列表

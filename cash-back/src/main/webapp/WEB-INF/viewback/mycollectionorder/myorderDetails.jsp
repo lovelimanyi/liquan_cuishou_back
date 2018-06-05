@@ -246,8 +246,6 @@
                     <legend>代扣记录</legend>
                     <table class="detailB" width="100%">
                         <thead>
-
-
                         <tr>
                             <th align="center">创建时间</th>
                             <th align="center">借款人姓名</th>
@@ -409,7 +407,6 @@
 
             </div>
             <div id="jxl">
-
             </div>
 
         </div>
@@ -458,13 +455,13 @@
                                     </label>
                                 </dt>
                                 <dd style="column-span: 1;">
-                                    <label><input type="radio" name="promiseRepay" value="1"/>是</label>
-
+                                    <span><input type="radio" name="promiseRepay" value="1"/>是</span>
+                                    <span><input type="radio" name="promiseRepay" checked="checked" value="0"/>否</span>
                                 </dd>
-                                <dd style="column-span: 1;">
+                                <%-- <dd style="column-span: 1;">
 
-                                    <label><input type="radio" name="promiseRepay" checked="checked" value="0"/>否</label>
-                                </dd>
+
+                                 </dd>--%>
 
                             </dl>
                             <dl>
@@ -477,23 +474,18 @@
                                     <input type="text" id="repaymentTime" name="repaymentTime" value="" class="date textInput readonly" datefmt="yyyy-MM-dd" readonly="readonly"/>
                                 </dd>
                             </dl>
+                            <div class="divider"></div>
                             <dl>
                                 <dt style="width: 80px;">
                                     <label>
                                         是否接通:
                                     </label>
                                 </dt>
-                                <dd style="column-span: 1;">
-                                    <label><input type="radio" name="isConnected" value="1"/>接通</label>
-                                </dd>
-                                <dd style="column-span: 1;">
-                                    <label><input type="radio" name="isConnected" value="2"/>无人接听</label>
-                                </dd>
-                                <dd style="column-span: 1;">
-                                    <label><input type="radio" name="isConnected" value="3"/>空号/停机/关机</label>
-                                </dd>
-                                <dd style="column-span: 1;">
-                                    <label><input type="radio" name="isConnected" value="4"/>拒接/挂断/拉黑</label>
+                                <dd>
+                                    <span><input type="radio" name="isConnected" value="1"/>接通</span>
+                                    <span><input type="radio" name="isConnected" value="2"/>无人接听</span>
+                                    <span><input type="radio" name="isConnected" value="3"/>空号/停机/关机</span>
+                                    <span><input type="radio" name="isConnected" value="4"/>拒接/挂断/拉黑</span>
                                 </dd>
                             </dl>
                         </fieldset>
