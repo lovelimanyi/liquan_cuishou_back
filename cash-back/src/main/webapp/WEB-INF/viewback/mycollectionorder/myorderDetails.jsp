@@ -329,13 +329,10 @@
         </div>
         <div class="tabsContent" style="height:300px;">
             <div class="pageContent" style="width: 80%;">
-
                 <form id="frm" method="post" enctype="multipart/form-data" action="collectionOrder/addRecordAndAdvice" onsubmit="return validateCallback(this, dialogAjaxDone);"
                       class="pageForm required-validate">
                     <input type="hidden" name="parentId" value="${params.parentId}"/>
                     <input type="hidden" name="id" id="id" value="${params.id }">
-                    <%--<input type="hidden" name="fengkongIds" id="fengkongIds"/>
-                    <input type="hidden" name="fkLabels" id="fkLabels"/>--%>
                     <input type="hidden" name="type" id="type" value="${params.type }"/>
                     <div class="pageFormContent" style="overflow: auto;">
                         <fieldset>
@@ -362,7 +359,7 @@
                                 </dt>
                                 <dd style="column-span: 1;">
                                     <span><input type="radio" name="promiseRepay" value="1"/>是</span>
-                                    <span><input type="radio" name="promiseRepay" checked="checked" value="0"/>否</span>
+                                    <span style="margin-left: 50px;"><input type="radio" name="promiseRepay" checked="checked" value="0"/>否</span>
                                 </dd>
 
                             </dl>
@@ -382,74 +379,86 @@
                                 </dl>
                             </fieldset>
                         </div>
-                        <fieldset>
-                            <dl>
-                                <dt style="width: 80px;">
-                                    <label>
-                                        是否接通:
-                                    </label>
-                                </dt>
-                                <dd>
-                                    <span><input type="radio" name="isConnected" value="1"/>接通</span>
-                                    <span><input type="radio" name="isConnected" value="2"/>无人接听</span>
-                                    <span><input type="radio" name="isConnected" value="3"/>空号/停机/关机</span>
-                                    <span><input type="radio" name="isConnected" value="4"/>拒接/挂断/拉黑</span>
-                                </dd>
-                            </dl>
-                        </fieldset>
-                        <div id="communicate">
+                        <div id="collectionWithPhone">
                             <fieldset>
                                 <dl>
                                     <dt style="width: 80px;">
                                         <label>
-                                            沟通情况:
+                                            是否接通:
+                                        </label>
+                                    </dt>
+                                    <dd style="width: 500px">
+                                        <span><input type="radio" name="isConnected" value="1"/>接通</span>
+                                        <span style="margin-left: 30px;"><input type="radio" name="isConnected" value="2"/>无人接听</span>
+                                        <span style="margin-left: 30px;"><input type="radio" name="isConnected" value="3"/>空号/停机/关机</span>
+                                        <span style="margin-left: 30px;"><input type="radio" name="isConnected" value="4"/>拒接/挂断/拉黑</span>
+                                    </dd>
+                                </dl>
+                            </fieldset>
+                            <div id="communicate">
+                                <fieldset>
+                                    <dl>
+                                        <dt style="width: 80px;">
+                                            <label>
+                                                沟通情况:
+                                            </label>
+                                        </dt>
+                                        <dd style="width: 500px">
+                                            <span><input type="radio" name="communication" value="1"/>无偿还意愿</span>
+                                            <span style="margin-left: 40px;"><input type="radio" name="communication" value="2"/>无偿还能力</span>
+                                            <span style="margin-left: 40px;"><input type="radio" name="communication" value="3"/>虚假通讯录</span>
+                                        </dd>
+                                        <dd style="width: 500px">
+                                            <span style="margin-left: 90px;"><input type="radio" name="communication" value="4"/>虚假个人信息</span>
+                                            <span style="margin-left: 28px;"><input type="radio" name="communication" value="5"/>有偿还意愿</span>
+                                            <span style="margin-left: 40px;"><input type="radio" name="communication" value="6"/>亲友答应转告</span>
+                                        </dd>
+                                        <dd style="width: 500px">
+                                            <span style="margin-left: 90px;"><input type="radio" name="communication" value="7"/>亲友拒绝沟通</span>
+                                            <span style="margin-left: 28px;"><input type="radio" name="communication" value="8"/>无</span>
+                                        </dd>
+                                    </dl>
+                                </fieldset>
+                            </div>
+                            <fieldset>
+                                <div class="divider"></div>
+                                <dl>
+                                    <dt style="width: 80px;">
+                                        <label>
+                                            催收内容:
                                         </label>
                                     </dt>
                                     <dd>
-                                        <span><input type="radio" name="communication" value="1"/>无偿还意愿</span>
-                                        <span><input type="radio" name="communication" value="2"/>无偿还能力</span>
-                                        <span><input type="radio" name="communication" value="3"/>虚假通讯录</span>
-                                    </dd>
-                                    <br>
-                                    <dd>
-                                        <span><input type="radio" name="communication" value="4"/>虚假个人信息</span>
-                                        <span><input type="radio" name="communication" value="5"/>有偿还意愿</span>
-                                        <span><input type="radio" name="communication" value="6"/>亲友答应转告</span>
-                                    </dd>
-                                    <br>
-                                    <dd>
-                                        <span><input type="radio" name="communication" value="7"/>亲友拒绝沟通</span>
-                                        <span><input type="radio" name="communication" value="8"/>无</span>
+                                        <textarea name="content" rows="5" cols="80" maxlength="100"></textarea>
                                     </dd>
                                 </dl>
                             </fieldset>
                         </div>
-                        <fieldset>
-                            <div class="divider"></div>
-                            <dl>
-                                <dt style="width: 80px;">
-                                    <label>
-                                        催收内容:
-                                    </label>
-                                </dt>
-                                <dd>
-                                    <textarea name="content" rows="5" cols="80" maxlength="100"></textarea>
-                                </dd>
-                            </dl>
-                        </fieldset>
-                        <%--<fieldset>
-                            <dl>
-                                <dt style="width: 80px;">
-                                    <label>
-                                        备注:
-                                    </label>
-                                </dt>
-                                <dd>
-                                    <textarea onblur="checkLength();" name="collectionRemark" rows="5" cols="80" maxlength="500" id="collectionAdviceRemark"></textarea>
-                                </dd>
-                            </dl>
-
-                        </fieldset>--%>
+                        <div id="collectionWithMsg">
+                            <div class="pageFormContent">
+                                <dl>
+                                    <dt style="width: 80px;">
+                                        <label>
+                                            短信模板:
+                                        </label>
+                                    </dt>
+                                    <dd>
+                                        <select name="msgTemplate" id="msgTemplate">
+                                            <option value="">请选择模板</option>
+                                            <c:forEach var="msg" items="${msgs}" varStatus="status">
+                                                <option value="${msg.id}">${msg.name}</option>
+                                            </c:forEach>
+                                        </select>
+                                    </dd>
+                                    <dd>
+                                        <textarea id="msgContent" name="msgContent" readonly="readonly">${msgContent}</textArea>
+                                    </dd>
+                                </dl>
+                                <div id="msgNotice">
+                                    <span>每日可发送次数：${msgCountLimit} 次,今日剩余次数：<span style="color: #cd0a0a;">${remainMsgCount}</span> 次</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="formBar">
                         <ul>

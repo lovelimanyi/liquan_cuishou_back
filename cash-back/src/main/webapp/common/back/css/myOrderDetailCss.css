@@ -101,3 +101,16 @@
 .myStyle {
     width: 50px;
 }
+
+#msgContent {
+    width: 400px;
+    height: 100px;
+    position: absolute;
+    left:180px;
+    top:40px;
+}
+
+#msgNotice {
+    margin-left: 180px;
+    margin-top: 165px;
+}

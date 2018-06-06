@@ -1,6 +1,7 @@
 $(function () {
     $("#promiseRepayTime").hide();
     $("#communicate").hide();
+    $("#collectionWithMsg").hide();
 })
 
 $(PostbirdImgGlass.init({
@@ -254,6 +255,54 @@ $("input[name='isConnected']").change(function () {
     }
 })
 
+function doCheck() {
+    var msgTemplate = $("#msgTemplate").val();
+    if (msgTemplate == "") {
+        alertMsg.warn("请先选择短信模板");
+        return;
+    }
+    alertMsg.confirm("您确认要发送短信吗?", {
+        okCall: function () {
+            $("#frm").submit();
+        }
+    });
+}
+
+$("#msgTemplate").change(function () {
+    var msgTemplate = $("#msgTemplate").val();
+    if (msgTemplate == "") {
+        $("#msgContent").val("请选择短信模板！");
+        return;
+    }
+    $.ajax({
+        url: "collectionOrder/refreshMsg",
+        type: "GET",
+        data: {
+            "id": $("#id").val(),
+            "msgId": msgTemplate
+        },
+        dataType: "json",
+        contentType: "application/x-www-form-urlencoded; charset=utf-8",
+        success: function (data) {
+            console.log(data);
+            $("#msgContent").val(data.msgContent);
+            $("#msgId").val(data.msgId);
+        },
+        error: function () {
+            $("#msgContent").val("系统错误！");
+        }
+    })
+})
 
 
+$("select[name='collectionType']").change(function () {
+   var val = $("select[name='collectionType'] option:selected").val();
+   if(val == '1'){
+       $("#collectionWithPhone").show();
+       $("#collectionWithMsg").hide();
+   }else {
+       $("#collectionWithPhone").hide();
+       $("#collectionWithMsg").show();
+   }
+})
 

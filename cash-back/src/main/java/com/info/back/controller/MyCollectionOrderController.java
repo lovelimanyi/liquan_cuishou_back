@@ -452,7 +452,6 @@ public class MyCollectionOrderController extends BaseController {
         try {
             String id = params.get("id") + "";
             if (StringUtils.isNotBlank(id)) {
-                BackUser backUser = this.loginAdminUser(request);
                 //该条订单是否已审//			int count = auditCenterService.findAuditStatus(params);
 //			if(count != 0 || !BackConstant.COLLECTION_ROLE_ID.toString().equals(backUser.getRoleId())){
                 MmanLoanCollectionOrder mmanLoanCollectionOrderOri = mmanLoanCollectionOrderService.getOrderById(id);
@@ -549,11 +548,26 @@ public class MyCollectionOrderController extends BaseController {
                 // 催收记录
                 List<MmanLoanCollectionRecord> list = mmanLoanCollectionRecordService.findListRecord(id);
                 // 联系人信息
+
+
+                List<TemplateSms> msgs = getAllMsg();
+                int count = smsUserService.getSendMsgCount(mmanLoanCollectionOrderOri.getLoanId());
+                String msgLimitCountKey = "cuishou:" + SHORT_MESSAGE_LIMIT_COUNT_REDIS_KEY;
+                int msgCountLimit = JedisDataClient.get(msgLimitCountKey) == null ? 0 : Integer.valueOf(JedisDataClient.get(msgLimitCountKey));
+                if (msgCountLimit == 0) {
+                    // 默认短信发送上限为2条
+                    msgCountLimit = 2;
+                }
+                int remainCount = msgCountLimit - count > 0 ? msgCountLimit - count : 0;
+                model.addAttribute("remainMsgCount", remainCount);
+                model.addAttribute("msgCountLimit", msgCountLimit);
+                model.addAttribute("msgs", msgs);
+                model.addAttribute("orderId", id);
+                model.addAttribute("phoneNumber", mmanLoanCollectionOrderOri.getLoanUserPhone());
                 model.addAttribute("recordList", list);
                 model.addAttribute("collectionOrder", mmanLoanCollectionOrderOri);
                 model.addAttribute("userInfo", userInfo);
                 model.addAttribute("userCar", userCar);// 银行卡
-//                model.addAttribute("domaiName", PayContents.XJX_DOMAINNAME_URL);
                 url = "mycollectionorder/myorderDetails";
 //			}
             }
@@ -1010,7 +1024,7 @@ public class MyCollectionOrderController extends BaseController {
         List<TemplateSms> msgs = JedisDataClient.getList("cuishou:", SHORT_MESSAGE_LIST_REDIS_KEY);
         if (CollectionUtils.isEmpty(msgs)) {
             msgs = templateSmsDao.getMsgs();
-            JedisDataClient.setList("cuishou:", SHORT_MESSAGE_LIST_REDIS_KEY, msgs, 5 * 60);
+            JedisDataClient.setList("cuishou:", SHORT_MESSAGE_LIST_REDIS_KEY, msgs, 60 * 60);
         }
         return msgs;
     }

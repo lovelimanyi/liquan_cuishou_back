@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 
 /**
@@ -79,7 +78,6 @@ public class MmanUserInfoController extends BaseController {
             e.printStackTrace();
             model.addAttribute(MESSAGE, "聚信立异常");
         }
-        System.out.println(new ModelAndView(url));
         return new ModelAndView(url);
     }
 }
