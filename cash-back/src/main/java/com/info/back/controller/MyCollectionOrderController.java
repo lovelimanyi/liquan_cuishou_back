@@ -2,7 +2,9 @@ package com.info.back.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.info.back.dao.*;
+import com.info.back.dao.IMerchantInfoDao;
+import com.info.back.dao.IMmanUserLoanDao;
+import com.info.back.dao.ITemplateSmsDao;
 import com.info.back.result.JsonResult;
 import com.info.back.service.*;
 import com.info.back.utils.*;
@@ -27,7 +29,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.net.URL;
