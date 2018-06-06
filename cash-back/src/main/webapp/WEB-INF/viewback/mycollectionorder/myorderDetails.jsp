@@ -132,7 +132,7 @@
                                 <td colspan="3">${userInfo.idNumber}</td>
                             </tr>
                             <tr>
-                                <td class="tdGround">借款人手机号:</td><td colspan="5" >${userInfo.userPhones}</td>
+                                <td class="tdGround">借款人手机:</td><td colspan="5" >${userInfo.userPhones}</td>
                             </tr>
                             <tr>
                                 <td class="tdGround">性别:</td>

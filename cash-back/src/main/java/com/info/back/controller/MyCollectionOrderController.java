@@ -481,7 +481,6 @@ public class MyCollectionOrderController extends BaseController {
                         }
                     }
 
-
                     if (userLoan.getPaidMoney().compareTo(BigDecimal.ZERO) <= 0) {
                         userLoan.setServiceCharge(BigDecimal.ZERO);
                     }
@@ -489,11 +488,18 @@ public class MyCollectionOrderController extends BaseController {
                 } else {
                     logger.error("mmanLoanCollectionOrderOri 为null 借款id:" + params.get("id").toString());
                 }
+
                 MmanUserInfo userInfo = mmanUserInfoService.getUserInfoById(mmanLoanCollectionOrderOri.getUserId());
                 if (userInfo != null) {
+                    // 调用接口获取用户共债手机号
                     String phones = getPhones(userInfo);
-                    userInfo.setUserPhones(phones);
+                    // 判断数据库数据和数据库存储数据是否一致，不一致则更新数据库数据
+                    if (!phones.equals(userInfo.getUserPhones())) {
+                        // 更新userInfo中数据
+                        updateUserInfo(userInfo, phones);
+                    }
                 }
+
                 // add by yyf 根据身份证前6位 映射用户地址
                 if (userInfo != null) {
                     if (StringUtils.isBlank(userInfo.getIdcardImgZ()) || StringUtils.isBlank(userInfo.getIdcardImgF())) {
@@ -502,30 +508,10 @@ public class MyCollectionOrderController extends BaseController {
                         userInfo.setPresentAddress(presentAddress);
                     }
                 }
-                // 从oss获取图片地址
-                OSSUpload ossUpload = new OSSUpload();
-                if (userInfo != null) {
-                    String userHeadUrl = userInfo.getHeadPortrait();
-                    String userFrontImgUrl = userInfo.getIdcardImgZ();
-                    String userBackImgUrl = userInfo.getIdcardImgF();
 
-                    // 针对老用户特殊处理
-                    if (userHeadUrl != null && userHeadUrl.startsWith("/")) {
-                        userHeadUrl = userHeadUrl.substring(1);
-                    }
-                    if (userFrontImgUrl != null && userFrontImgUrl.startsWith("/")) {
-                        userFrontImgUrl = userFrontImgUrl.substring(1);
-                    }
-                    if (userBackImgUrl != null && userBackImgUrl.startsWith("/")) {
-                        userBackImgUrl = userBackImgUrl.substring(1);
-                    }
-                    URL headImageUrl = ossUpload.sampleGetFileUrl("xjx-files", userHeadUrl, 1000l * 3600l);
-                    URL frontImageUrl = ossUpload.sampleGetFileUrl("xjx-files", userFrontImgUrl, 1000l * 3600l);
-                    URL backImageUrl = ossUpload.sampleGetFileUrl("xjx-files", userBackImgUrl, 1000l * 3600l);
-                    userInfo.setHeadPortrait(headImageUrl.toString());
-                    userInfo.setIdcardImgZ(frontImageUrl.toString());
-                    userInfo.setIdcardImgF(backImageUrl.toString());
-                }
+                // 从oss获取图片地址
+                getUserImageUrl(userInfo);
+
                 List<CreditLoanPayDetail> detailList = creditLoanPayDetailService
                         .findPayDetail(mmanLoanCollectionOrderOri.getPayId());
                 /*
@@ -543,14 +529,9 @@ public class MyCollectionOrderController extends BaseController {
                 // 代扣记录
                 List<CollectionWithholdingRecord> withholdList = mmanLoanCollectionRecordService.findWithholdRecord(mmanLoanCollectionOrderOri.getId());
 
-                if (BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(mmanLoanCollectionOrderOri.getStatus())) {
-                    userInfo.setIdNumber(MaskCodeUtil.getMaskCode(userInfo.getIdNumber()));
-                    userInfo.setUserPhone(MaskCodeUtil.getMaskCode(userInfo.getUserPhone()));
-                    userCar.setBankCard(MaskCodeUtil.getMaskCode(userCar.getBankCard()));
-                    for (CollectionWithholdingRecord withholdingRecord : withholdList) {
-                        withholdingRecord.setLoanUserPhone(MaskCodeUtil.getMaskCode(withholdingRecord.getLoanUserPhone()));
-                    }
-                }
+                // 还款完成用户信息掩码处理
+                dealwithUserInfo(mmanLoanCollectionOrderOri, userInfo, userCar, withholdList);
+
                 CreditLoanPay creditLoanPay = creditLoanPayService.get(mmanLoanCollectionOrderOri.getPayId());
 
                 model.addAttribute("collectionOrder", mmanLoanCollectionOrderOri);
@@ -572,29 +553,97 @@ public class MyCollectionOrderController extends BaseController {
     }
 
     /**
+     * 对于还款完成用户手机号，身份证号等信息掩码处理
+     *
+     * @param mmanLoanCollectionOrderOri
+     * @param userInfo
+     * @param userCar
+     * @param withholdList
+     */
+    private void dealwithUserInfo(MmanLoanCollectionOrder mmanLoanCollectionOrderOri, MmanUserInfo userInfo, SysUserBankCard userCar, List<CollectionWithholdingRecord> withholdList) {
+        if (BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(mmanLoanCollectionOrderOri.getStatus())) {
+            userInfo.setIdNumber(MaskCodeUtil.getMaskCode(userInfo.getIdNumber()));
+            userInfo.setUserPhone(MaskCodeUtil.getMaskCode(userInfo.getUserPhone()));
+            userCar.setBankCard(MaskCodeUtil.getMaskCode(userCar.getBankCard()));
+            for (CollectionWithholdingRecord withholdingRecord : withholdList) {
+                withholdingRecord.setLoanUserPhone(MaskCodeUtil.getMaskCode(withholdingRecord.getLoanUserPhone()));
+            }
+        }
+    }
+
+    /**
+     * 获取用户头像地址
+     *
+     * @param userInfo
+     */
+    private void getUserImageUrl(MmanUserInfo userInfo) {
+        OSSUpload ossUpload = new OSSUpload();
+        if (userInfo != null) {
+            String userHeadUrl = userInfo.getHeadPortrait();
+            String userFrontImgUrl = userInfo.getIdcardImgZ();
+            String userBackImgUrl = userInfo.getIdcardImgF();
+
+            // 针对老用户特殊处理
+            if (userHeadUrl != null && userHeadUrl.startsWith("/")) {
+                userHeadUrl = userHeadUrl.substring(1);
+            }
+            if (userFrontImgUrl != null && userFrontImgUrl.startsWith("/")) {
+                userFrontImgUrl = userFrontImgUrl.substring(1);
+            }
+            if (userBackImgUrl != null && userBackImgUrl.startsWith("/")) {
+                userBackImgUrl = userBackImgUrl.substring(1);
+            }
+            URL headImageUrl = ossUpload.sampleGetFileUrl("xjx-files", userHeadUrl, 1000l * 3600l);
+            URL frontImageUrl = ossUpload.sampleGetFileUrl("xjx-files", userFrontImgUrl, 1000l * 3600l);
+            URL backImageUrl = ossUpload.sampleGetFileUrl("xjx-files", userBackImgUrl, 1000l * 3600l);
+            userInfo.setHeadPortrait(headImageUrl.toString());
+            userInfo.setIdcardImgZ(frontImageUrl.toString());
+            userInfo.setIdcardImgF(backImageUrl.toString());
+        }
+    }
+
+    /**
+     * 更新用户共债手机号信息
+     *
+     * @param userInfo
+     * @param phones
+     */
+    private void updateUserInfo(MmanUserInfo userInfo, String phones) {
+        MmanUserInfo info = new MmanUserInfo();
+        info.setUserPhones(phones);
+        info.setId(userInfo.getId());
+        mmanUserInfoService.updateUserPhonesByUserId(info);
+    }
+
+    /**
      * 获取共债手机号
+     *
      * @param userInfo
      * @throws IOException
      */
     private String getPhones(MmanUserInfo userInfo) {
-        logger.info(">>>调起共债接口,参数： " + JSON.toJSONString(userInfo.getIdNumber()));
-        Map<String,String> map = new HashMap();
-        map.put("id",userInfo.getIdNumber());
-        String returnInfo = HttpUtil.getInstance().doPost(PayContents.XJX_GET_PHONES,JSON.toJSONString(map));
-        logger.info(">>>调用共债接口返回： " + returnInfo);
+        logger.info(">>>调起共债接口,参数： " + userInfo.getIdNumber());
         Set<String> set = new HashSet<>();
-        // 自己平台的手机号
-        set.add(userInfo.getUserPhone());
-        Map<String,Object> o = (Map<String,Object>)JSONObject.parse(returnInfo);
+        try {
+            Map<String, String> map = new HashMap();
+            map.put("id", userInfo.getIdNumber());
+            String returnInfo = HttpUtil.getInstance().doPost(PayContents.XJX_GET_PHONES, JSON.toJSONString(map));
+            // 自己平台的手机号
+            set.add(userInfo.getUserPhone());
+            Map<String, Object> o = (Map<String, Object>) JSONObject.parse(returnInfo);
 
-        if(o != null && "0".equals(String.valueOf(o.get("code")))){
-            List<Map<String,String>> data = (List<Map<String, String>>) o.get("data");
-            for(Map<String,String> mArray : data){
-                set.add(mArray.get("reg_mobile"));
-                set.add(mArray.get("bc_mobile"));
+            if (o != null && "0".equals(String.valueOf(o.get("code")))) {
+                List<Map<String, String>> data = (List<Map<String, String>>) o.get("data");
+                for (Map<String, String> mArray : data) {
+                    set.add(mArray.get("reg_mobile"));
+                    set.add(mArray.get("bc_mobile"));
+                }
             }
+        } catch (Exception e) {
+            logger.error("调用共债接口获取手机号出错：" + e);
+            e.printStackTrace();
         }
-        return StringUtils.join(set.toArray(), " ， ");
+        return StringUtils.join(set.toArray(), " , ");
     }
 
     /**
@@ -607,7 +656,7 @@ public class MyCollectionOrderController extends BaseController {
      */
     @RequestMapping("collectionRecordList")
     public String getloanCollectionRecordList(HttpServletRequest request, Model model) {
-        List<MmanLoanCollectionRecord> list = null;
+        List<MmanLoanCollectionRecord> list;
         Map<String, String> params = this.getParameters(request);
         try {
             list = mmanLoanCollectionRecordService.findListRecord(params

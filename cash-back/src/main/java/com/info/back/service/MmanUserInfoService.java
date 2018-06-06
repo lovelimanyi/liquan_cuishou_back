@@ -141,6 +141,12 @@ public class MmanUserInfoService implements IMmanUserInfoService {
         model.addAttribute("age",userInfo.getUserAge());
         return returnUrl;
     }
+
+    @Override
+    public void updateUserPhonesByUserId(MmanUserInfo info) {
+        mmanUserInfoDao.updateUserPhonesByUserId(info);
+    }
+
     /**
      * 本地数据库聚信立解析
      */

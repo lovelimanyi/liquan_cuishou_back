@@ -65,7 +65,7 @@ public class HttpUtils {
             response = httpClient.execute(get);
             String tuid = response.getFirstHeader("X-TUID")==null?null:response.getFirstHeader("X-TUID").getValue();
             String subtype = response.getFirstHeader("X-SUBTYPE")==null?null:response.getFirstHeader("X-SUBTYPE").getValue();
-            logger.info(phone+"phone-jxlGetJsonData-tuid=" + tuid + ",subtype=" + subtype);
+            logger.info(phone+" phone-jxlGetJsonData-tuid= " + tuid + ",subtype=" + subtype);
             HttpEntity entity = response.getEntity();
 //            logger.info(phone+"phone-JxlData="+EntityUtils.toString(entity));
 //            String type= response.getFirstHeader("X-SUBTYPE").getValue();
