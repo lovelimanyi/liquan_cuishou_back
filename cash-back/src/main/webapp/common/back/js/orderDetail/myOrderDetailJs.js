@@ -162,13 +162,13 @@ function getValues(data) {
 function getCollectionStatus(status) {
     if (status == '1') {
         return "催收中";
-    } else if (status == '1') {
+    } else if (status == '2') {
         return "承诺还款";
-    } else if (status == '1') {
+    } else if (status == '3') {
         return "待催收（委外）";
-    } else if (status == '1') {
+    } else if (status == '4') {
         return "催收成功";
-    } else if (status == '1') {
+    } else if (status == '5') {
         return "续期";
     } else {
         return "待催收";
@@ -268,6 +268,7 @@ function doCheck() {
     });
 }
 
+// 获取短信内容
 $("#msgTemplate").change(function () {
     var msgTemplate = $("#msgTemplate").val();
     if (msgTemplate == "") {

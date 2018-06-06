@@ -472,6 +472,41 @@
 	t.idcard_img_f ,
 	t.jxl_detail
 	 FROM mman_user_info t WHERE id = #{id,jdbcType=VARCHAR}</select>
+
+	<select id="getUserInfoById" resultMap="queryResultMap" parameterType="com.info.web.pojo.MmanUserInfo">
+		SELECT
+		t.id ,
+		t.user_name ,
+		t.realname ,
+		t.id_number ,
+		t.user_sex ,
+		t.user_age ,
+		t.education ,
+		t.marital_status ,
+		t.present_address ,
+		t.present_address_distinct ,
+		t.present_latitude ,
+		t.present_longitude ,
+		t.present_period ,
+		t.company_name ,
+		t.company_address ,
+		t.company_address_distinct ,
+		t.company_longitude ,
+		t.company_latitude ,
+		t.company_phone ,
+		t.company_period ,
+		t.first_contact_name ,
+		t.first_contact_phone ,
+		t.frist_contact_relation ,
+		t.second_contact_name ,
+		t.second_contact_phone ,
+		t.second_contact_relation ,
+		t.update_time ,
+		t.head_portrait ,
+		t.idcard_img_z ,
+		t.idcard_img_f
+		FROM mman_user_info t WHERE id = #{id,jdbcType=VARCHAR}</select>
+
 	<!-- 根据主键删除记录 -->
 	<delete id="del" parameterType="com.info.web.pojo.MmanUserInfo">DELETE FROM mman_user_info WHERE id = #{id,jdbcType=VARCHAR}</delete>
 	<select id="findJxlDetail" parameterType="HashMap" resultMap="queryResultMap">

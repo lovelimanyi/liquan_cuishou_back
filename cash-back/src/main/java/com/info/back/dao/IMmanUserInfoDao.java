@@ -11,18 +11,20 @@ import com.info.web.pojo.MmanUserInfo;
 @Repository
 public interface IMmanUserInfoDao {
 
-    public MmanUserInfo get(String id);
+    MmanUserInfo get(String id);
+
+    MmanUserInfo getUserInfoById(String id);
 
 
-    public MmanUserInfo getxjxuser(Long id);
+    MmanUserInfo getxjxuser(Long id);
 
 
-    public int saveNotNull(MmanUserInfo mmanUserInfo);
+    int saveNotNull(MmanUserInfo mmanUserInfo);
 
-    public MmanUserInfo findJxlDetail(Map<String, Object> map);
+    MmanUserInfo findJxlDetail(Map<String, Object> map);
 
 
-    public List<ContactInfo> getContactInfo(String phoneNum);
+    List<ContactInfo> getContactInfo(String phoneNum);
 
     String getAddressByIDNumber(String idNumber);
 }

@@ -454,14 +454,14 @@ public class MyCollectionOrderController extends BaseController {
             if (StringUtils.isNotBlank(id)) {
                 //该条订单是否已审//			int count = auditCenterService.findAuditStatus(params);
 //			if(count != 0 || !BackConstant.COLLECTION_ROLE_ID.toString().equals(backUser.getRoleId())){
-                MmanLoanCollectionOrder mmanLoanCollectionOrderOri = mmanLoanCollectionOrderService.getOrderById(id);
+                MmanLoanCollectionOrder order = mmanLoanCollectionOrderService.getOrderById(id);
 
-                if (mmanLoanCollectionOrderOri != null) {
-                    MmanUserLoan userLoan = mmanUserLoanService.get(mmanLoanCollectionOrderOri.getLoanId());
+                if (order != null) {
+                    MmanUserLoan userLoan = mmanUserLoanService.get(order.getLoanId());
                     //如果是分期商城的订单则判断是否获取商品名称
                     if (Constant.ORDER_TYPE_FEN.equals(userLoan.getBorrowingType())) {
-                        if (StringUtils.isBlank(mmanLoanCollectionOrderOri.getProductName())) {
-                            String LoanId = StringUtils.substringBefore(mmanLoanCollectionOrderOri.getLoanId(), Constant.SEPARATOR_FOR_ORDER_SOURCE);
+                        if (StringUtils.isBlank(order.getProductName())) {
+                            String LoanId = StringUtils.substringBefore(order.getLoanId(), Constant.SEPARATOR_FOR_ORDER_SOURCE);
                             Map<String, String> paramMap = new HashedMap();
                             paramMap.put("id", LoanId);
                             //TODO 分期商城上线后更改地址
@@ -473,8 +473,8 @@ public class MyCollectionOrderController extends BaseController {
                                 JSONObject jsonResult = JSONObject.parseObject(result);
                                 if ("00".equals(jsonResult.get("code"))) {
                                     String productName = jsonResult.get("productName").toString();
-                                    mmanLoanCollectionOrderOri.setProductName(productName);
-                                    mmanLoanCollectionOrderService.updateProductName(mmanLoanCollectionOrderOri);
+                                    order.setProductName(productName);
+                                    mmanLoanCollectionOrderService.updateProductName(order);
                                 }
                             }
                         }
@@ -488,7 +488,7 @@ public class MyCollectionOrderController extends BaseController {
                 } else {
                     logger.error("mmanLoanCollectionOrderOri 为null 借款id:" + params.get("id").toString());
                 }
-                MmanUserInfo userInfo = mmanUserInfoService.getUserInfoById(mmanLoanCollectionOrderOri.getUserId());
+                MmanUserInfo userInfo = mmanUserInfoService.getUserInfoAccordId(order.getUserId());
                 // add by yyf 根据身份证前6位 映射用户地址
                 if (userInfo != null) {
                     if (StringUtils.isBlank(userInfo.getIdcardImgZ()) || StringUtils.isBlank(userInfo.getIdcardImgF())) {
@@ -533,11 +533,11 @@ public class MyCollectionOrderController extends BaseController {
                 */
 
                 // 银行卡
-                SysUserBankCard userCar = sysUserBankCardService.findUserId(mmanLoanCollectionOrderOri.getUserId());
+                SysUserBankCard userCar = sysUserBankCardService.findUserId(order.getUserId());
                 // 代扣记录
-                List<CollectionWithholdingRecord> withholdList = mmanLoanCollectionRecordService.findWithholdRecord(mmanLoanCollectionOrderOri.getId());
+                List<CollectionWithholdingRecord> withholdList = mmanLoanCollectionRecordService.findWithholdRecord(order.getId());
 
-                if (BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(mmanLoanCollectionOrderOri.getStatus())) {
+                if (BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())) {
                     userInfo.setIdNumber(MaskCodeUtil.getMaskCode(userInfo.getIdNumber()));
                     userInfo.setUserPhone(MaskCodeUtil.getMaskCode(userInfo.getUserPhone()));
                     userCar.setBankCard(MaskCodeUtil.getMaskCode(userCar.getBankCard()));
@@ -551,7 +551,7 @@ public class MyCollectionOrderController extends BaseController {
 
 
                 List<TemplateSms> msgs = getAllMsg();
-                int count = smsUserService.getSendMsgCount(mmanLoanCollectionOrderOri.getLoanId());
+                int count = smsUserService.getSendMsgCount(order.getLoanId());
                 String msgLimitCountKey = "cuishou:" + SHORT_MESSAGE_LIMIT_COUNT_REDIS_KEY;
                 int msgCountLimit = JedisDataClient.get(msgLimitCountKey) == null ? 0 : Integer.valueOf(JedisDataClient.get(msgLimitCountKey));
                 if (msgCountLimit == 0) {
@@ -563,9 +563,9 @@ public class MyCollectionOrderController extends BaseController {
                 model.addAttribute("msgCountLimit", msgCountLimit);
                 model.addAttribute("msgs", msgs);
                 model.addAttribute("orderId", id);
-                model.addAttribute("phoneNumber", mmanLoanCollectionOrderOri.getLoanUserPhone());
+                model.addAttribute("phoneNumber", order.getLoanUserPhone());
                 model.addAttribute("recordList", list);
-                model.addAttribute("collectionOrder", mmanLoanCollectionOrderOri);
+                model.addAttribute("collectionOrder", order);
                 model.addAttribute("userInfo", userInfo);
                 model.addAttribute("userCar", userCar);// 银行卡
                 url = "mycollectionorder/myorderDetails";

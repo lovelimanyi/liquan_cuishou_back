@@ -13,13 +13,13 @@ public interface IMmanUserInfoService {
 	 * @param
 	 * @return
 	 */
-	public MmanUserInfo getUserInfoById(String id);
+	MmanUserInfo getUserInfoById(String id);
 	
 	
-	public MmanUserInfo  getxjxuser(Long id);
+	MmanUserInfo  getxjxuser(Long id);
 	
 	
-	public int saveNotNull(MmanUserInfo mmanUserInfo);
+	int saveNotNull(MmanUserInfo mmanUserInfo);
 	
 
 	/**
@@ -27,7 +27,7 @@ public interface IMmanUserInfoService {
 	 * @param phoneNum
 	 * @return
 	 */
-	public List<ContactInfo> getContactInfo(String phoneNum);
+	List<ContactInfo> getContactInfo(String phoneNum);
 
 	/**
 	 * 根据身份证号码前6位获取地址
@@ -37,5 +37,7 @@ public interface IMmanUserInfoService {
     String getAddressByIDNumber(String idNumber);
 
     String handleJxl(Model model, String userId);
+
+	MmanUserInfo getUserInfoAccordId(String id);
 }
 
