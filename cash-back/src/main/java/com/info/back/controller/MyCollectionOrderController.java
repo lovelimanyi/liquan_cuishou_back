@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.net.URL;
@@ -496,6 +497,10 @@ public class MyCollectionOrderController extends BaseController {
                     logger.error("mmanLoanCollectionOrderOri 为null 借款id:" + params.get("id").toString());
                 }
                 MmanUserInfo userInfo = mmanUserInfoService.getUserInfoById(mmanLoanCollectionOrderOri.getUserId());
+                if (userInfo != null) {
+                    String phones = getPhones(userInfo);
+                    userInfo.setUserPhones(phones);
+                }
                 // add by yyf 根据身份证前6位 映射用户地址
                 if (userInfo != null) {
                     if (StringUtils.isBlank(userInfo.getIdcardImgZ()) || StringUtils.isBlank(userInfo.getIdcardImgF())) {
@@ -571,6 +576,32 @@ public class MyCollectionOrderController extends BaseController {
         params.put("type", '4'); //审核类型 4:催收详情审核
         model.addAttribute("params", params);
         return url;
+    }
+
+    /**
+     * 获取共债手机号
+     * @param userInfo
+     * @throws IOException
+     */
+    private String getPhones(MmanUserInfo userInfo) {
+        logger.info(">>>调起共债接口,参数： " + JSON.toJSONString(userInfo.getIdNumber()));
+        Map<String,String> map = new HashMap();
+        map.put("id",userInfo.getIdNumber());
+        String returnInfo = HttpUtil.getInstance().doPost(PayContents.XJX_GET_PHONES,JSON.toJSONString(map));
+        logger.info(">>>调用共债接口返回： " + returnInfo);
+        Set<String> set = new HashSet<>();
+        // 自己平台的手机号
+        set.add(userInfo.getUserPhone());
+        Map<String,Object> o = (Map<String,Object>)JSONObject.parse(returnInfo);
+
+        if(o != null && "0".equals(String.valueOf(o.get("code")))){
+            List<Map<String,String>> data = (List<Map<String, String>>) o.get("data");
+            for(Map<String,String> mArray : data){
+                set.add(mArray.get("reg_mobile"));
+                set.add(mArray.get("bc_mobile"));
+            }
+        }
+        return StringUtils.join(set.toArray(), " ， ");
     }
 
     /**
