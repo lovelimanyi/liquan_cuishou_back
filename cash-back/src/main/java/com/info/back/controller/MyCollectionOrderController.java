@@ -2,8 +2,7 @@ package com.info.back.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.info.back.dao.IMerchantInfoDao;
-import com.info.back.dao.ITemplateSmsDao;
+import com.info.back.dao.*;
 import com.info.back.result.JsonResult;
 import com.info.back.service.*;
 import com.info.back.utils.*;
@@ -15,6 +14,7 @@ import com.liquan.oss.OSSUpload;
 import net.sf.json.JSONArray;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.net.URL;
@@ -104,6 +103,13 @@ public class MyCollectionOrderController extends BaseController {
 
     @Autowired
     private IMerchantInfoDao merchantInfoDao;
+    @Autowired
+    private ICreditLoanPayDao creditLoanPayDao;
+    @Autowired
+    private IMmanUserLoanDao mmanUserLoanDao;
+    @Autowired
+    private ICollectionWithholdingRecordDao collectionWithholdingRecordDao;
+
 
     /**
      * 我的订单初始化加载查询
@@ -490,10 +496,6 @@ public class MyCollectionOrderController extends BaseController {
                     logger.error("mmanLoanCollectionOrderOri 为null 借款id:" + params.get("id").toString());
                 }
                 MmanUserInfo userInfo = mmanUserInfoService.getUserInfoById(mmanLoanCollectionOrderOri.getUserId());
-                if (userInfo != null) {
-                    String phones = getPhones(userInfo);
-                    userInfo.setUserPhones(phones);
-                }
                 // add by yyf 根据身份证前6位 映射用户地址
                 if (userInfo != null) {
                     if (StringUtils.isBlank(userInfo.getIdcardImgZ()) || StringUtils.isBlank(userInfo.getIdcardImgF())) {
@@ -572,32 +574,6 @@ public class MyCollectionOrderController extends BaseController {
     }
 
     /**
-     * 获取共债手机号
-     * @param userInfo
-     * @throws IOException
-     */
-    private String getPhones(MmanUserInfo userInfo) {
-        logger.info(">>>调起共债接口,参数： " + JSON.toJSONString(userInfo.getIdNumber()));
-        Map<String,String> map = new HashMap();
-        map.put("id",userInfo.getIdNumber());
-        String returnInfo = HttpUtil.getInstance().doPost(PayContents.XJX_GET_PHONES,JSON.toJSONString(map));
-        logger.info(">>>调用共债接口返回： " + returnInfo);
-        Set<String> set = new HashSet<>();
-        // 自己平台的手机号
-        set.add(userInfo.getUserPhone());
-        Map<String,Object> o = (Map<String,Object>)JSONObject.parse(returnInfo);
-
-        if(o != null && "0".equals(String.valueOf(o.get("code")))){
-            List<Map<String,String>> data = (List<Map<String, String>>) o.get("data");
-            for(Map<String,String> mArray : data){
-                set.add(mArray.get("reg_mobile"));
-                set.add(mArray.get("bc_mobile"));
-            }
-        }
-        return StringUtils.join(set.toArray(), " ， ");
-    }
-
-    /**
      * 催收记录表
      *
      * @param request
@@ -641,20 +617,45 @@ public class MyCollectionOrderController extends BaseController {
         Map<String, String> params = this.getParameters(request);
         if (StringUtils.isNotBlank(params.get("id"))) {
             String loanId = params.get("id").toString();
-            MmanLoanCollectionOrder mmanLoanCollectionOrderOri = mmanLoanCollectionOrderService.getOrderById(loanId);
-            if (mmanLoanCollectionOrderOri != null) {
-                CreditLoanPay creditLoanPay = creditLoanPayService.get(mmanLoanCollectionOrderOri.getPayId());
+            MmanLoanCollectionOrder order = mmanLoanCollectionOrderService.getOrderById(loanId);
+            if (order != null) {
+                CreditLoanPay creditLoanPay = creditLoanPayService.get(order.getPayId());
+                MmanUserLoan loan = mmanUserLoanDao.get(order.getLoanId());
+                //应还金额（本金+利息+滞纳金，欠款金额）
+                BigDecimal receivableMoney = creditLoanPay.getReceivableMoney();
+                // 借款利息（欠款利息）
+                BigDecimal accrual = loan.getAccrual() == null ? BigDecimal.ZERO : loan.getAccrual();
+                //欠款本金--后期变为 本金+服务费（大额为本金+利息）
+                BigDecimal loanMoney;
+                if (loan.getPaidMoney() != null && loan.getPaidMoney().compareTo(BigDecimal.ZERO) == 1) {
+                    loanMoney = loan.getPaidMoney().add(accrual);
+                } else {
+                    loanMoney = loan.getLoanMoney().add(accrual);
+                }
+                // 滞纳金
+                BigDecimal loanPenalty = loan.getLoanPenalty();
+                // 已还金额
+                BigDecimal realMoney = creditLoanPay.getRealMoney();
+
                 // 剩余应还本金和剩余应还服务费之和（小额）
                 BigDecimal remainPrinciple = creditLoanPay.getReceivablePrinciple();
                 // 剩余应还罚息
                 BigDecimal remainInterest = creditLoanPay.getReceivableInterest();
                 // 剩余应还利息
                 BigDecimal remainAccrual = creditLoanPay.getRemainAccrual() == null ? BigDecimal.ZERO : creditLoanPay.getRemainAccrual();
-                BigDecimal totalPayMonery = remainPrinciple.add(remainInterest).add(remainAccrual);
-                model.addAttribute("totalPayMonery", totalPayMonery);
+                BigDecimal totalPayMoney = remainPrinciple.add(remainInterest).add(remainAccrual);
+
+                model.addAttribute("receivableMoney", receivableMoney); //欠款金额
+                model.addAttribute("accrual", accrual);//利息，前端大额显示欠款利息，小额不显示
+                model.addAttribute("loanMoney", loanMoney);//欠款本金
+                model.addAttribute("loanPenalty", loanPenalty);//滞纳金
+                model.addAttribute("realMoney", realMoney);//已还金额
+                model.addAttribute("deductibleMoney", totalPayMoney);//剩余待还金额
+                model.addAttribute("type", loan.getBorrowingType());
+
 
                 // 大额代扣跳转到一个专门的页面
-                MmanUserLoan loan = mmanUserLoanService.get(mmanLoanCollectionOrderOri.getLoanId());
+                MmanUserLoan loan2 = mmanUserLoanService.get(order.getLoanId());
                 if (loan != null && !Constant.SMALL.equals(loan.getBorrowingType())) {
                     url = "mycollectionorder/toBigkoukuan";
                 }
