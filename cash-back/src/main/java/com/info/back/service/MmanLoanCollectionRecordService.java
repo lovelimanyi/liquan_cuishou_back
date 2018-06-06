@@ -659,7 +659,7 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
                     BackConstant.SUPER_MANAGE_ROLE_ID.toString().equals(currentUserRoleId)) {
                 count = 0;
             }
-            if (count >= 3) {
+            if (count >= 2) {
                 String msg = list.get(0).getRemark() == null ? "" : list.get(0).getRemark();
                 reslut.setMsg(msg + " 代扣失败，您今日还有1次代扣机会 / 您今日已经无法代扣，请联系委外对接人代扣。");
                 return reslut;

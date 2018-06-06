@@ -99,7 +99,7 @@
 				<div class="pageFormContents" style="height: 220px;">
 					<dl>
 						<dt style="width: 400px;color: red">
-							&nbsp;&nbsp;注意:"已还金额"必须大于等于"欠款本金"才能减免！！！
+							&nbsp;&nbsp;注意：本息还清后，方可减免滞纳金，且只能减免滞纳金
 						</dt>
 					</dl>
 					<div class="divider"></div>
