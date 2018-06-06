@@ -47,7 +47,7 @@ public class HttpUtil {
     }
 
     public String doPost(String url, String params) {
-        logger.info("请求参数:" + params.toString());
+//        logger.info("请求参数:" + params.toString());
         String result = "";
         HttpPost httpPost = new HttpPost(url);
         StringEntity stringEntity = new StringEntity(params.toString(), "utf-8");
@@ -60,15 +60,14 @@ public class HttpUtil {
             BufferedReader reader = new BufferedReader(new InputStreamReader(
                     httpResponse.getEntity().getContent()));
             String resultStr = reader.readLine();
-            logger.info("resultStr=" + resultStr);
+//            logger.info("resultStr=" + resultStr);
             while (null != resultStr) {
                 result = resultStr;
                 resultStr = reader.readLine();
             }
-        } catch (Exception e){
-            logger.error("调用异常：{}",e);
-        }
-        finally {
+        } catch (Exception e) {
+            logger.error("调用异常：{}", e);
+        } finally {
             httpClient.getConnectionManager().shutdown();
         }
         return result;
