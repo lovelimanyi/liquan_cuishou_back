@@ -18,35 +18,115 @@
         <input type="hidden" name="parentId" value="${params.parentId}"/>
         <input type="hidden" name="id" id="id" value="${params.id }">
         <input type="hidden" name="borrowingType" id="borrowingType" value="1">
-        <div class="pageFormContent" layoutH="65" style="overflow: auto;">
-            <dl>
-                <dt style="width: 80px;">
-                    <label>
-                        代扣金额:
-                    </label>
-                </dt>
-                <dd>
-                    <input type="text" name="payMoney" maxlength="16" class="number" value="${totalPayMonery}">
-                </dd>
-            </dl>
+        <div class="pageFormContent" layoutH=50 style="overflow: auto;">
+            <fieldset name="message" style="padding-bottom: 30px;height: 310px">
+                <!-- 借款信息 -->
+                <legend>欠款信息</legend>
+                <table class="userTable">
+                    <tr>
+                        <dt style="width: 80px;">
+                            <label>
+                                欠款金额:
+                            </label>
+                        </dt>
+                        <dd>
+                            <label>
+                                ${receivableMoney}
+                            </label>
+                        </dd>
+                        <dt style="width: 80px;">
+                            <label>
+                                欠款本金:
+                            </label>
+                        </dt>
+                        <dd>
+                            <label>
+                                ${loanMoney}
+                            </label>
+                        </dd>
+                        <dt style="width: 80px;">
+                            <label>
+                                欠款滞纳金:
+                            </label>
+                        </dt>
+                        <dd>
+                            <label>
+                                ${loanPenalty}
+                            </label>
+                        </dd>
+                        <c:if test="${type eq 1}">
+                            <dt style="width: 80px;">
+                                <label>
+                                    欠款利息:
+                                </label>
+                            </dt>
+                            <dd>
+                                <label>
+                                        ${accrual}
+                                </label>
+                            </dd>
+                        </c:if>
+                        <dt style="width: 80px;">
+                            <label>
+                                已还金额:
+                            </label>
+                        </dt>
+                        <dd>
+                            <label>
+                                ${realMoney}
+                            </label>
+                        </dd>
+
+                        <dt style="width: 80px;color: red">
+                            <label>
+                                剩余待还金额:
+                            </label>
+                        </dt>
+                        <dd style="color: red">
+                            <label>
+                                ${deductibleMoney}
+                            </label>
+                        </dd>
+                        </td>
+                    </tr>
+
+                </table>
+                <div class="divider"></div>
+                <div class="pageFormContents" style="height: 220px;">
+                    <dl>
+                        <dt style="width: 400px;color: red">
+                            &nbsp;&nbsp;
+                        </dt>
+                    </dl>
+                    <div class="divider"></div>
+                    <dl>
+                        <dt style="width: 80px;">
+                            <label>
+                                代扣金额:
+                            </label>
+                        </dt>
+                        <dd>
+                            <input type="text" name="payMoney"  maxlength="16" class="number" value="${deductibleMoney}">
+                        </dd>
+                    </dl>
+                    <div class="divider"></div>
+                    <dl>
+                        <dt style="width: 400px;color: red">
+                            &nbsp;&nbsp;注意:
+                            <br/>&nbsp;&nbsp;1.每次代扣金额不得小于50元
+                            <br/>&nbsp;&nbsp;2.当日代扣操作失败次数大于2次后，不可再扣。请于次日重试
+                        </dt>
+                    </dl>
+                </div>
+            </fieldset>
         </div>
-        <%--<div><span style="color: #cd0a0a"><span style="color: #1b8d0f">温馨提示：</span>大额代扣暂时不支持部分扣款，部分扣款功能开发中...</span></div>--%>
         <div class="formBar">
             <ul>
                 <li>
                     <div class="buttonActive">
                         <div class="buttonContent">
                             <button type="submit">
-                                扣款
-                            </button>
-                        </div>
-                    </div>
-                </li>
-                <li>
-                    <div class="button">
-                        <div class="buttonContent">
-                            <button type="button" class="close">
-                                取消
+                                确认代扣
                             </button>
                         </div>
                     </div>
