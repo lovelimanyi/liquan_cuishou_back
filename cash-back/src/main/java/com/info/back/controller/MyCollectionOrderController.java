@@ -106,7 +106,6 @@ public class MyCollectionOrderController extends BaseController {
     private IMmanUserLoanDao mmanUserLoanDao;
 
 
-
     /**
      * 我的订单初始化加载查询
      *
@@ -500,6 +499,7 @@ public class MyCollectionOrderController extends BaseController {
                         // 更新userInfo中数据
                         updateUserInfo(userInfo, phones);
                     }
+                    userInfo.setUserPhones(phones);
                 }
 
                 // add by yyf 根据身份证前6位 映射用户地址
