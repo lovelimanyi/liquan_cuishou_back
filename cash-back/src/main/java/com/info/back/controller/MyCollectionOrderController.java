@@ -14,7 +14,6 @@ import com.liquan.oss.OSSUpload;
 import net.sf.json.JSONArray;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
-import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -105,11 +104,7 @@ public class MyCollectionOrderController extends BaseController {
     @Autowired
     private IMerchantInfoDao merchantInfoDao;
     @Autowired
-    private ICreditLoanPayDao creditLoanPayDao;
-    @Autowired
     private IMmanUserLoanDao mmanUserLoanDao;
-    @Autowired
-    private ICollectionWithholdingRecordDao collectionWithholdingRecordDao;
 
 
     /**
@@ -505,6 +500,7 @@ public class MyCollectionOrderController extends BaseController {
                         // 更新userInfo中数据
                         updateUserInfo(userInfo, phones);
                     }
+                    userInfo.setUserPhones(phones);
                 }
 
                 // add by yyf 根据身份证前6位 映射用户地址
@@ -519,8 +515,8 @@ public class MyCollectionOrderController extends BaseController {
                 // 从oss获取图片地址
                 getUserImageUrl(userInfo);
 
-                List<CreditLoanPayDetail> detailList = creditLoanPayDetailService
-                        .findPayDetail(mmanLoanCollectionOrderOri.getPayId());
+                List<CreditLoanPayDetail> detailList = creditLoanPayDetailService.findPayDetail(mmanLoanCollectionOrderOri.getPayId());
+
                 /*
                 BigDecimal payMonery = new BigDecimal(0);
                 if (detailList != null) {
@@ -626,7 +622,7 @@ public class MyCollectionOrderController extends BaseController {
      * 获取共债手机号
      *
      * @param userInfo
-     * @throws IOException
+     * @throws
      */
     private String getPhones(MmanUserInfo userInfo) {
         logger.info(">>>调起共债接口,参数： " + userInfo.getIdNumber());
@@ -735,7 +731,6 @@ public class MyCollectionOrderController extends BaseController {
 
 
                 // 大额代扣跳转到一个专门的页面
-                MmanUserLoan loan2 = mmanUserLoanService.get(order.getLoanId());
                 if (loan != null && !Constant.SMALL.equals(loan.getBorrowingType())) {
                     url = "mycollectionorder/toBigkoukuan";
                 }
