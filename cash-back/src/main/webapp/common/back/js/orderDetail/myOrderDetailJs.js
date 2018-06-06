@@ -1,3 +1,7 @@
+$(function () {
+    $("#promiseRepayTime").hide();
+    $("#communicate").hide();
+})
 
 $(PostbirdImgGlass.init({
     domSelector: ".img-container",
@@ -196,7 +200,7 @@ function getReturnType(type) {
         return "小额减免";
     } else if (type == '99') {
         return "大额减免";
-    }else {
+    } else {
         return "未知还款方式";
     }
 }
@@ -230,3 +234,26 @@ function getPayInfoColumnResult(data) {
             '<td class="tttd"><font color="red">data.payMonery</font></td> <td class="hhtd">剩余应还:</td><td class="tttd"><font color="red">' + remainAmount + '</font></td>';
     }
 }
+
+
+$("input[name='promiseRepay']").change(function () {
+    var val = $('input:radio[name="promiseRepay"]:checked').val();
+    if (val == '0') {
+        $("#promiseRepayTime").hide();
+    } else {
+        $("#promiseRepayTime").show();
+    }
+})
+
+$("input[name='isConnected']").change(function () {
+    var val = $('input:radio[name="isConnected"]:checked').val();
+    if (val == '1') {
+        $("#communicate").show();
+    } else {
+        $("#communicate").hide();
+    }
+})
+
+
+
+

@@ -123,68 +123,6 @@
                     <legend>还款信息</legend>
                     <table class="repayTable">
                         <tbody id="repayInfo">
-                        <%--<tr>
-                            <td class="htd">借款编号:</td>
-                            <td class="ttd">${collectionOrder.loanId}</td>
-                            <c:if test="${userLoan.borrowingType eq '2'}">
-                                <td class="ttd" colspan="8"></td>
-                            </c:if>
-                            <c:if test="${userLoan.borrowingType eq '1'}">
-                                <td class="htd">分期类型:</td>
-                                <td class="ttd" colspan="7">现金分期</td>
-                            </c:if>
-                            <c:if test="${userLoan.borrowingType eq '3'}">
-                                <td class="htd">分期类型:</td>
-                                <td class="ttd">商品分期</td>
-                                <td class="htd">分期产品:</td>
-                                <td colspan="5" class="ttd">${collectionOrder.productName}</td>
-                            </c:if>
-                        </tr>
-                        <tr>
-                            <td class="htd">借款时间:</td>
-                            <td class="ttd"><fmt:formatDate value="${userLoan.loanStartTime}" pattern="yyyy-MM-dd"/></td>
-                            <td class="htd">到期本金:</td>
-                            <td class="ttd">${userLoan.loanMoney}</td>
-                            <c:if test="${userLoan.borrowingType eq '2'}">
-                                <td class="htd">服&nbsp&nbsp务&nbsp&nbsp费:</td>
-                                <td class="ttd">${userLoan.serviceCharge}</td>
-                            </c:if>
-                            <c:if test="${userLoan.borrowingType ne '2'}">
-                                <td class="htd">到期利息:</td>
-                                <td class="ttd">${userLoan.accrual}</td>
-                            </c:if>
-                            <td class="htd">滞&nbsp&nbsp纳&nbsp&nbsp金:</td>
-                            <td class="ttd">${userLoan.loanPenalty}</td>
-                            <td class="htd">逾期天数:</td>
-                            <td class="ttd">${collectionOrder.overdueDays}</td>
-                        </tr>
-                        <tr>
-                            <td class="htd">应还时间:</td>
-                            <td class="ttd"><fmt:formatDate value="${userLoan.loanEndTime}" pattern="yyyy-MM-dd"/></td>
-                            <td class="htd">应还总额:</td>
-                            <td class="ttd" colspan="7">${userLoan.loanMoney+userLoan.loanPenalty+userLoan.serviceCharge+userLoan.accrual}</td>
-                        </tr>
-                        <tr>
-                            <td class="hhtd">扣款银行:</td>
-                            <td class="tttd">${userCar.depositBank}</td>
-                            <td class="hhtd">银行卡号:</td>
-                            <td class="tttd">${userCar.bankCard}</td>
-                            <c:if test="${userLoan.borrowingType eq '2'}">
-                                <td class="hhtd">已还金额:</td>
-                                <td class="tttd"><font color="red">${payMonery}</font></td>
-                                <td class="hhtd">剩余应还:</td>
-                                <td class="tttd" colspan="3"><font color="red">${userLoan.loanMoney+userLoan.loanPenalty+userLoan.serviceCharge+userLoan.accrual-payMonery}</font>
-                                </td>
-                            </c:if>
-                            <c:if test="${userLoan.borrowingType ne '2'}">
-                                <td class="hhtd">逾期期数:</td>
-                                <td class="tttd"><font color="red">${userLoan.termNumber}</font></td>
-                                <td class="hhtd">已还金额:</td>
-                                <td class="tttd"><font color="red">${payMonery}</font></td>
-                                <td class="hhtd">剩余应还:</td>
-                                <td class="tttd"><font color="red">${userLoan.loanMoney+userLoan.loanPenalty+userLoan.serviceCharge+userLoan.accrual-payMonery}</font></td>
-                            </c:if>
-                        </tr>--%>
                         </tbody>
                     </table>
                 </fieldset>
@@ -206,38 +144,6 @@
                         </tr>
                         </thead>
                         <tbody id="payDetail">
-
-
-                        <%--<c:forEach var="pay" items="${detailList}" varStatus="status">
-                            <tr>
-                                <td>
-                                        ${status.count}
-                                </td>
-                                <td>
-                                        ${pay.realMoney}
-                                </td>
-                                <td>
-                                    <fmt:formatNumber type="number" value="${pay.realPenlty}" pattern="0.00" maxFractionDigits="2"/>
-                                </td>
-                                <td>
-                                    <fmt:formatNumber type="number" value="${pay.realPrinciple}" pattern="0.00" maxFractionDigits="2"/>
-                                </td>
-                                <td>
-                                    <fmt:formatNumber type="number" value="${pay.realInterest}" pattern="0.00" maxFractionDigits="2"/>
-                                </td>
-                                <td>
-                                    <c:if test="${pay.returnType eq '1' }">支付宝</c:if>
-                                    <c:if test="${pay.returnType eq '2' }">银行卡主动还款</c:if>
-                                    <c:if test="${pay.returnType eq '3' }">代扣</c:if>
-                                    <c:if test="${pay.returnType eq '4' }">对公银行卡转账</c:if>
-                                    <c:if test="${pay.returnType eq '5' }">线下还款</c:if>
-                                    <c:if test="${pay.returnType eq '6' }">减免</c:if>
-                                </td>
-                                <td>
-                                    <fmt:formatDate value="${pay.updateDate }" pattern="yyyy-MM-dd HH:mm:ss"/>
-                                </td>
-                            </tr>
-                        </c:forEach>--%>
                         </tbody>
                     </table>
                 </fieldset>
@@ -448,7 +354,7 @@
                             </dl>
                         </fieldset>
                         <fieldset>
-                            <dl>
+                            <dl id="promisePay">
                                 <dt style="width: 80px;">
                                     <label>
                                         承诺还款:
@@ -458,23 +364,25 @@
                                     <span><input type="radio" name="promiseRepay" value="1"/>是</span>
                                     <span><input type="radio" name="promiseRepay" checked="checked" value="0"/>否</span>
                                 </dd>
-                                <%-- <dd style="column-span: 1;">
-
-
-                                 </dd>--%>
 
                             </dl>
-                            <dl>
-                                <dt style="width: 80px;">
-                                    <label>
-                                        承诺还款时间:
-                                    </label>
-                                </dt>
-                                <dd>
-                                    <input type="text" id="repaymentTime" name="repaymentTime" value="" class="date textInput readonly" datefmt="yyyy-MM-dd" readonly="readonly"/>
-                                </dd>
-                            </dl>
-                            <div class="divider"></div>
+                        </fieldset>
+                        <div id="promiseRepayTime">
+                            <fieldset>
+                                <dl>
+                                    <dt style="width: 80px;">
+                                        <label>
+                                            承诺还款时间:
+                                        </label>
+                                    </dt>
+                                    <dd>
+                                        <input type="text" id="repaymentTime" name="repaymentTime" value="" class="date textInput readonly" datefmt="yyyy-MM-dd"
+                                               readonly="readonly"/>
+                                    </dd>
+                                </dl>
+                            </fieldset>
+                        </div>
+                        <fieldset>
                             <dl>
                                 <dt style="width: 80px;">
                                     <label>
@@ -489,6 +397,33 @@
                                 </dd>
                             </dl>
                         </fieldset>
+                        <div id="communicate">
+                            <fieldset>
+                                <dl>
+                                    <dt style="width: 80px;">
+                                        <label>
+                                            沟通情况:
+                                        </label>
+                                    </dt>
+                                    <dd>
+                                        <span><input type="radio" name="communication" value="1"/>无偿还意愿</span>
+                                        <span><input type="radio" name="communication" value="2"/>无偿还能力</span>
+                                        <span><input type="radio" name="communication" value="3"/>虚假通讯录</span>
+                                    </dd>
+                                    <br>
+                                    <dd>
+                                        <span><input type="radio" name="communication" value="4"/>虚假个人信息</span>
+                                        <span><input type="radio" name="communication" value="5"/>有偿还意愿</span>
+                                        <span><input type="radio" name="communication" value="6"/>亲友答应转告</span>
+                                    </dd>
+                                    <br>
+                                    <dd>
+                                        <span><input type="radio" name="communication" value="7"/>亲友拒绝沟通</span>
+                                        <span><input type="radio" name="communication" value="8"/>无</span>
+                                    </dd>
+                                </dl>
+                            </fieldset>
+                        </div>
                         <fieldset>
                             <div class="divider"></div>
                             <dl>
