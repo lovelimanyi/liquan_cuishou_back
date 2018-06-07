@@ -46,6 +46,10 @@
         <result column="title" property="companyTitle" jdbcType="VARCHAR"></result>
         <!--催收建议备注-->
         <result column="collection_advice_remark" property="collectionAdviceRemark" jdbcType="VARCHAR"></result>
+
+        <result column="communication_status" property="communicationStatus" jdbcType="VARCHAR"></result>
+
+        <result column="current_overdue_level" property="currentOverdueLevel" jdbcType="VARCHAR"></result>
     </resultMap>
     <!-- 保存,保存不为NULL的字段 -->
 
@@ -238,7 +242,8 @@
     <delete id="del" parameterType="com.info.web.pojo.MmanLoanCollectionRecord">DELETE FROM mman_loan_collection_record WHERE id = #{id,jdbcType=VARCHAR}</delete>
     <!-- 根据orderid查询历史 -->
     <select id="findListRecord" resultMap="queryResultMap" parameterType="string">
-		SELECT t.id , t.order_id , t.collection_id , mo.`loan_id` as user_id , t.contact_type , t.contact_name , t.relation , t.contact_phone , t.stress_level , t.order_state , t.collection_type , t.collection_date , t.collectionAmount , t.content , t.create_date , t.update_date , t.remark
+		SELECT t.id , t.order_id , t.collection_id , mo.`loan_id` as user_id , t.contact_type , t.contact_name , t.relation , t.contact_phone ,t.order_state ,
+		t.collection_type , t.collection_date , t.collectionAmount , t.content , t.create_date , t.update_date , t.remark,t.communication_status,t.current_overdue_level
 		FROM mman_loan_collection_record t left join mman_loan_collection_order mo on mo.id = t.order_id  WHERE t.order_id = #{orderId,jdbcType=VARCHAR}
 		ORDER BY t.`create_date` DESC
 	</select>

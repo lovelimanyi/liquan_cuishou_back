@@ -1,4 +1,5 @@
 $(function () {
+    getRecordLists();
     $("#promiseRepayTime").hide();
     $("#communicate").hide();
     $("#collectionWithMsg").hide();
@@ -295,8 +296,8 @@ $("#msgTemplate").change(function () {
 });
 
 
-$("select[name='collectionType']").change(function () {
-    var val = $("select[name='collectionType'] option:selected").val();
+$("select[name='collectionMode']").change(function () {
+    var val = $("select[name='collectionMode'] option:selected").val();
     if (val == '1') {
         $("#collectionWithPhone").show();
         $("#collectionWithMsg").hide();
@@ -308,7 +309,7 @@ $("select[name='collectionType']").change(function () {
 
 
 $("#send").click(function () {
-    var val = $("select[name='collectionType'] option:selected").val();
+    var val = $("select[name='collectionMode'] option:selected").val();
     if (val == '1') {
         alertMsg.warn("打电话...电话催收");
         // 保存对应的催收记录
@@ -317,3 +318,21 @@ $("#send").click(function () {
         // 发送短信
     }
 });
+
+
+function getRecordLists() {
+    var orderId = $("#orderId").val();
+    $.ajax({
+        type: "GET",
+        url: "/back/collectionRecord/getRecordListsByOrderId",
+        data: {
+            id: orderId
+        },
+        dataType: "html",
+        success: function (data) {
+            if (data.code = 200) {
+                $("#collectionTable").append(data);
+            }
+        }
+    });
+};

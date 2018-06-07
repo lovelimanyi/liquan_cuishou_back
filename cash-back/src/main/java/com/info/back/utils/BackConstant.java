@@ -122,6 +122,8 @@ public class BackConstant {
 
     public final static String SMS_REGISTER_PREFIX = "newPhoneCode_";// Redis注册key前缀
 
+    public static final String REDIS_KEY_PREFIX = "cuishou:";
+
     static {
         groupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_S1, "S1");
         groupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_S2, "S2");

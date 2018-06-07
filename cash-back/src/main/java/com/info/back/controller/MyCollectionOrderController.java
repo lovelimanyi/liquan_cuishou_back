@@ -553,7 +553,7 @@ public class MyCollectionOrderController extends BaseController {
 
                 List<TemplateSms> msgs = getAllMsg();
                 int count = smsUserService.getSendMsgCount(order.getLoanId());
-                String msgLimitCountKey = "cuishou:" + SHORT_MESSAGE_LIMIT_COUNT_REDIS_KEY;
+                String msgLimitCountKey = BackConstant.REDIS_KEY_PREFIX + SHORT_MESSAGE_LIMIT_COUNT_REDIS_KEY;
                 int msgCountLimit = JedisDataClient.get(msgLimitCountKey) == null ? 0 : Integer.valueOf(JedisDataClient.get(msgLimitCountKey));
                 if (msgCountLimit == 0) {
                     // 默认短信发送上限为2条
@@ -987,7 +987,7 @@ public class MyCollectionOrderController extends BaseController {
 //                TemplateSms msg = msgs.get(code);
 //                String content = MessageFormat.format(msg.getContenttext(), StringUtils.split(getMsgParam(order), ','));
                 // 是否显示更换短信按钮
-//                model.addAttribute("refreshMsg", JedisDataClient.get("cuishou:refreshMsg"));
+//                model.addAttribute("refreshMsg", JedisDataClient.get(BackConstant.REDIS_KEY_PREFIX + "refreshMsg"));
 //                if (BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())) {
 //                    content = "该订单已还款完成，请核实！";
 //                }
@@ -995,7 +995,7 @@ public class MyCollectionOrderController extends BaseController {
 //                model.addAttribute("msgId", msg.getId());
                 // 查询当日该订单已发短信条数
                 int count = smsUserService.getSendMsgCount(order.getLoanId());
-                String msgLimitCountKey = "cuishou:" + SHORT_MESSAGE_LIMIT_COUNT_REDIS_KEY;
+                String msgLimitCountKey = BackConstant.REDIS_KEY_PREFIX + SHORT_MESSAGE_LIMIT_COUNT_REDIS_KEY;
                 int msgCountLimit = JedisDataClient.get(msgLimitCountKey) == null ? 0 : Integer.valueOf(JedisDataClient.get(msgLimitCountKey));
                 if (msgCountLimit == 0) {
                     // 默认短信发送上限为2条
@@ -1021,10 +1021,10 @@ public class MyCollectionOrderController extends BaseController {
      * @return
      */
     private List<TemplateSms> getAllMsg() {
-        List<TemplateSms> msgs = JedisDataClient.getList("cuishou:", SHORT_MESSAGE_LIST_REDIS_KEY);
+        List<TemplateSms> msgs = JedisDataClient.getList(BackConstant.REDIS_KEY_PREFIX, SHORT_MESSAGE_LIST_REDIS_KEY);
         if (CollectionUtils.isEmpty(msgs)) {
             msgs = templateSmsDao.getMsgs();
-            JedisDataClient.setList("cuishou:", SHORT_MESSAGE_LIST_REDIS_KEY, msgs, 60 * 60);
+            JedisDataClient.setList(BackConstant.REDIS_KEY_PREFIX, SHORT_MESSAGE_LIST_REDIS_KEY, msgs, 60 * 60);
         }
         return msgs;
     }
@@ -1069,10 +1069,10 @@ public class MyCollectionOrderController extends BaseController {
         List<MerchantInfo> list = new ArrayList<>(8);
         String merchantNanme = null;
         try {
-            list = JedisDataClient.getList("cuishou:", MERCHANT_INFO_REDIS_KEY);
+            list = JedisDataClient.getList(BackConstant.REDIS_KEY_PREFIX, MERCHANT_INFO_REDIS_KEY);
             if (CollectionUtils.isEmpty(list)) {
                 list = merchantInfoDao.getAll();
-                JedisDataClient.setList("cuishou:", MERCHANT_INFO_REDIS_KEY, list, 10 * 60);
+                JedisDataClient.setList(BackConstant.REDIS_KEY_PREFIX, MERCHANT_INFO_REDIS_KEY, list, 10 * 60);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -1147,7 +1147,7 @@ public class MyCollectionOrderController extends BaseController {
             }
             // 查询出该订单当天已发短信的次数
             int count = smsUserService.getSendMsgCount(order.getLoanId());
-            String msgLimitCountKey = "cuishou:" + SHORT_MESSAGE_LIMIT_COUNT_REDIS_KEY;
+            String msgLimitCountKey = BackConstant.REDIS_KEY_PREFIX + SHORT_MESSAGE_LIMIT_COUNT_REDIS_KEY;
             int msgCountLimit = JedisDataClient.get(msgLimitCountKey) == null ? 0 : Integer.valueOf(JedisDataClient.get(msgLimitCountKey));
             if (msgCountLimit == 0) {
                 // 默认短信发送上限为2条

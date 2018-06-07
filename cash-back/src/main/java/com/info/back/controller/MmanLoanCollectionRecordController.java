@@ -1,21 +1,17 @@
 package com.info.back.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.info.back.service.IBackUserService;
-import com.info.back.service.IFengKongService;
-import com.info.back.service.IMmanLoanCollectionRecordService;
-import com.info.back.service.ISysDictService;
+import com.info.back.service.*;
 import com.info.back.utils.BackConstant;
 import com.info.back.utils.DwzResult;
 import com.info.back.utils.MaskCodeUtil;
 import com.info.back.utils.SpringUtils;
 import com.info.constant.Constant;
-import com.info.web.pojo.BackUser;
-import com.info.web.pojo.BackUserCompanyPermissions;
-import com.info.web.pojo.MmanLoanCollectionRecord;
-import com.info.web.pojo.OrderBaseResult;
+import com.info.web.pojo.*;
 import com.info.web.util.DateUtil;
+import com.info.web.util.JedisDataClient;
 import com.info.web.util.PageConfig;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,13 +19,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * 催收记录控制层
@@ -50,6 +44,10 @@ public class MmanLoanCollectionRecordController extends BaseController {
     private IBackUserService backUserService;
     @Autowired
     private IFengKongService fengKongService;
+    @Autowired
+    private ICommunicationSituationService situationService;
+    @Autowired
+    private ISysDictService dictService;
 
 
     @RequestMapping("/getMmanLoanCollectionRecord")
@@ -186,5 +184,75 @@ public class MmanLoanCollectionRecordController extends BaseController {
             e.printStackTrace();
         }
         return JSON.toJSONString(list);
+    }
+
+
+    @ResponseBody
+    @RequestMapping("/getRecordListsByOrderId")
+    public ModelAndView getRecordListsByOrderId(HttpServletRequest request, Model model) {
+        HashMap<String, Object> params = this.getParametersO(request);
+        String orderId = params.get("id") + "";
+        List<MmanLoanCollectionRecord> list = new ArrayList<>();
+        try {
+            // 沟通情况
+            List<CommunicationSituation> communicationSituations = situationService.getLableList();
+            // 订单状态
+            Map<String, Object> orderStatusMap = getOrderStatusMap();
+            // 沟通情况
+            Map<String, Object> communicationSituationsMap = getCommunicationSituationsMap(communicationSituations);
+            // 逾期等级
+            Map<String, Object> overdueLevelMap = getOverdueLevelMap();
+            if (StringUtils.isNotEmpty(orderId)) {
+                // 催收记录
+                list = mmanLoanCollectionRecordService.findListRecord(orderId);
+            }
+            model.addAttribute("communicationSituationsMap", communicationSituationsMap);
+            model.addAttribute("overdueLevelMap", overdueLevelMap);
+            model.addAttribute("orderStatusMap", orderStatusMap);
+            model.addAttribute("list", list);
+            model.addAttribute("params", params);
+            model.addAttribute("communicationSituations", communicationSituations);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new ModelAndView("mmanLoanCollectionRecord/orderCollectionRecord");
+    }
+
+    private Map<String, Object> getCommunicationSituationsMap(List<CommunicationSituation> communicationSituations) {
+        Map<String, Object> map = new HashMap<>(16);
+        if (CollectionUtils.isNotEmpty(communicationSituations)) {
+            for (CommunicationSituation situation : communicationSituations) {
+                map.put(situation.getId().toString(), situation.getCommunicationLabel());
+            }
+        }
+        return map;
+    }
+
+
+    private Map<String, Object> getOverdueLevelMap() {
+        List<SysDict> overdueLevel = JedisDataClient.getList(BackConstant.REDIS_KEY_PREFIX, "overdueLevel");
+        if (CollectionUtils.isEmpty(overdueLevel)) {
+            overdueLevel = dictService.findDictByType("xjx_overdue_level");
+            JedisDataClient.setList(BackConstant.REDIS_KEY_PREFIX, "overdueLevel", overdueLevel, 60 * 60 * 24);
+        }
+        Map<String, Object> overdueLevelMap = new HashMap<>(16);
+        for (SysDict sysDict : overdueLevel) {
+            overdueLevelMap.put(sysDict.getValue(), sysDict.getLabel());
+        }
+        return overdueLevelMap;
+    }
+
+
+    private Map<String, Object> getOrderStatusMap() {
+        List<SysDict> orderStatus = JedisDataClient.getList(BackConstant.REDIS_KEY_PREFIX, "orderStatus");
+        if (CollectionUtils.isEmpty(orderStatus)) {
+            orderStatus = dictService.findDictByType("xjx_collection_order_state");
+            JedisDataClient.setList(BackConstant.REDIS_KEY_PREFIX, "orderStatus", orderStatus, 60 * 60 * 24);
+        }
+        Map<String, Object> orderStatusMap = new HashMap<>(8);
+        for (SysDict sysDict : orderStatus) {
+            orderStatusMap.put(sysDict.getValue(), sysDict.getLabel());
+        }
+        return orderStatusMap;
     }
 }

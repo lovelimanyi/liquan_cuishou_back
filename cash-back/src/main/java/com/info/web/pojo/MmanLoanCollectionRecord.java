@@ -50,6 +50,8 @@ public class MmanLoanCollectionRecord {
     // 备注（以备催收人员查阅）
     private String remark;
 
+    private String communicationStatus;
+
 
     private String companyTitle; // 公司名称
     private String collectionAdvice; //催收建议
@@ -254,5 +256,13 @@ public class MmanLoanCollectionRecord {
 
     public void setCurrentOverdueLevel(String currentOverdueLevel) {
         this.currentOverdueLevel = currentOverdueLevel;
+    }
+
+    public String getCommunicationStatus() {
+        return communicationStatus;
+    }
+
+    public void setCommunicationStatus(String communicationStatus) {
+        this.communicationStatus = communicationStatus;
     }
 }

@@ -190,68 +190,6 @@
                 <fieldset>
                     <legend>催收记录</legend>
                     <div class="pageContent" id="collectionTable">
-                        <table class="table" style="width: 100%;" nowrapTD="false">
-                            <thead>
-                            <tr>
-                                <th align="center" width="20">
-                                    <input type="radio" id="checkAlls" name="collectionRecord"/>
-                                </th>
-                                <th align="center" width="30">序号</th>
-                                <th align="center" width="40">借款编号</th>
-                                <th align="center" width="50">借款人</th>
-                                <th align="center" width="60">联系人姓名</th>
-                                <th align="center" width="80">联系人电话</th>
-                                <th align="center" width="80">当前催收状态</th>
-                                <th align="center" width="120">催收时间</th>
-                                <th align="center" width="80">催收组</th>
-                                <th align="center" width="80">催收员</th>
-                                <th align="center" width="60">催收建议</th>
-                                <th align="center" width="200">风控标签</th>
-                                <th align="center" width="180">催收内容</th>
-                                <th align="center" width="180">催收建议备注</th>
-                            </tr>
-                            </thead>
-                            <tbody id="generateContent">
-
-                            <c:forEach var="record" items="${recordList }" varStatus="status">
-                                <tr target="recordId" rel="${record.id }">
-                                    <td>
-                                        <input type="radio" name="collectionRecord" value="${record.id}"/>
-                                    </td>
-                                    <td>${status.count}</td>
-                                    <td>${record.orderId}</td>
-                                    <td>${record.userId}</td>
-                                    <td>${record.contactName }</td>
-                                    <td>${record.contactPhone }</td>
-                                    <td>
-                                        <c:if test="${record.orderState == '0'}">待催收</c:if>
-                                        <c:if test="${record.orderState == '1'}">催收中</c:if>
-                                        <c:if test="${record.orderState == '2'}">承诺还款</c:if>
-                                        <c:if test="${record.orderState == '3'}">委外中</c:if>
-                                        <c:if test="${record.orderState == '4'}">催收成功</c:if>
-                                    </td>
-                                    <td><fmt:formatDate value="${record.collectionDate }" pattern="yyyy-MM-dd HH:mm:ss"/></td>
-                                    <td>
-                                        <c:if test="${record.collectionGroup == '1'}">超级管理员</c:if>
-                                        <c:if test="${record.collectionGroup == '3'}">S1组</c:if>
-                                        <c:if test="${record.collectionGroup == '4'}">S2组</c:if>
-                                        <c:if test="${record.collectionGroup == '5'}">M1-M2组</c:if>
-                                        <c:if test="${record.collectionGroup == '6'}">M2-M3组</c:if>
-                                        <c:if test="${record.collectionGroup == '7'}">M3+</c:if>
-                                    </td>
-                                    <td>${record.collectionPerson }</td>
-                                    <td>
-                                        <c:if test="${record.collectionAdvice == '1'}">通过</c:if>
-                                        <c:if test="${record.collectionAdvice == '2'}">拒绝</c:if>
-                                        <c:if test="${record.collectionAdvice == '3'}">无建议</c:if>
-                                    </td>
-                                    <td>${record.fengKongLabel}</td>
-                                    <td>${record.content }</td>
-                                    <td>${record.collectionAdviceRemark }</td>
-                                </tr>
-                            </c:forEach>
-                            </tbody>
-                        </table>
                     </div>
                 </fieldset>
             </div>
@@ -294,7 +232,7 @@
                                     </label>
                                 </dt>
                                 <dd>
-                                    <select class="required" name="collectionType">
+                                    <select class="required" name="collectionMode">
                                         <option value="1">电话催收</option>
                                         <option value="2">短信催收</option>
                                     </select>

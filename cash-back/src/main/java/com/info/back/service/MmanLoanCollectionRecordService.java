@@ -847,7 +847,7 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
     }
 
     private String getWithholdChannel() throws Exception {
-        String realKey = "cuishou:" + WITHHOLD_CHANNEL_KEY;
+        String realKey = BackConstant.REDIS_KEY_PREFIX + WITHHOLD_CHANNEL_KEY;
         String withholdChannel = JedisDataClient.get(realKey);
         if (StringUtils.isBlank(withholdChannel)) {
             withholdChannel = channelSwitchingDao.getChannelValue("cuishou_withhold_channel").getChannelValue();
