@@ -179,7 +179,7 @@
             <div class="tabsHeaderContent">
                 <ul>
                     <li class="selected" onclick='script:$("#collectionRecord").show();'><a href="#"><span>催收记录</span></a></li>
-                    <li><a href="#"><span>通话记录</span></a></li>
+                    <%--<li><a href="#"><span>通话记录</span></a></li>--%>
                     <li><a href="#" onclick="getUserRealContent();"><span>通讯录</span></a></li>
                     <li><a href="#" onclick="getJxlContent();"><span>聚信立报告</span></a></li>
                 </ul>
@@ -189,12 +189,12 @@
             <div>
                 <fieldset>
                     <legend>催收记录</legend>
-                    <div class="pageContent">
+                    <div class="pageContent" id="collectionTable">
                         <table class="table" style="width: 100%;" nowrapTD="false">
                             <thead>
                             <tr>
                                 <th align="center" width="20">
-                                    <input type="checkbox" id="checkAlls"/>
+                                    <input type="radio" id="checkAlls" name="collectionRecord"/>
                                 </th>
                                 <th align="center" width="30">序号</th>
                                 <th align="center" width="40">借款编号</th>
@@ -216,7 +216,7 @@
                             <c:forEach var="record" items="${recordList }" varStatus="status">
                                 <tr target="recordId" rel="${record.id }">
                                     <td>
-                                        <input type="checkbox" name="checkItem" value="${record.id}"/>
+                                        <input type="radio" name="collectionRecord" value="${record.id}"/>
                                     </td>
                                     <td>${status.count}</td>
                                     <td>${record.orderId}</td>
@@ -255,62 +255,13 @@
                     </div>
                 </fieldset>
             </div>
-            <div>通话记录</div>
+            <%--<div>通话记录</div>--%>
             <div>
                 <fieldset>
                     <legend>通讯录</legend>
-                    <div class="pageContent">
-                        <table class="table" style="width: 100%;" nowrapTD="false">
-                            <thead>
-                            <tr>
-                                <th align="center" width="30">序号</th>
-                                <th align="center" width="20">借款用户</th>
-                                <th align="center" width="40">联系人类型</th>
-                                <th align="center" width="25">联系人关系</th>
-                                <th align="center" width="20">联系人姓名</th>
-                                <th align="center" width="30">归属地</th>
-                                <th align="center" width="20">联系次数</th>
-                                <th align="center" width="20">主叫次数</th>
-                                <th align="center" width="20">被叫次数</th>
-                            </tr>
-                            </thead>
-                            <tbody id="userRealContent">
-                            <%--<c:forEach var="userReal" items="${mmanUserRelaList }" varStatus="status">
-                                <tr target="userRealId" rel="${userReal.id }">
-                                    <td>${status.count}</td>
-                                    <td>${userReal.realName}</td>
-                                    <td>
-                                        <c:if test="${MmanUserRela.contactsKey eq '1' }">直系亲属联系人</c:if>
-                                        <c:if test="${MmanUserRela.contactsKey eq '2' }">其他联系人</c:if>
-                                    </td>
-                                    <td>
-                                        <c:if test="${userReal.contactsKey eq '1' }">
-                                            <c:if test="${userReal.relaKey eq '1' }">父亲</c:if>
-                                            <c:if test="${userReal.relaKey eq '2' }">母亲</c:if>
-                                            <c:if test="${userReal.relaKey eq '3' }">儿子</c:if>
-                                            <c:if test="${userReal.relaKey eq '4' }">女儿</c:if>
-                                            <c:if test="${userReal.relaKey eq '5' }">配偶</c:if>
-                                        </c:if>
-                                        <c:if test="${userReal.contactsKey eq '2' }">
-                                            <c:if test="${userReal.relaKey eq '1' }">同学</c:if>
-                                            <c:if test="${userReal.relaKey eq '2' }">亲戚</c:if>
-                                            <c:if test="${userReal.relaKey eq '3' }">同事</c:if>
-                                            <c:if test="${userReal.relaKey eq '4' }">朋友</c:if>
-                                            <c:if test="${userReal.relaKey eq '5' }">其他</c:if>
-                                        </c:if>
-                                    </td>
-                                    <td>${userReal.infoName}</td>
-                                    <td>${userReal.phoneNumLoc}</td>
-                                    <td>${userReal.callCnt}</td>
-                                    <td>${userReal.callOutCnt}</td>
-                                    <td>${userReal.callInCnt}</td>
-                                </tr>
-                            </c:forEach>--%>
-                            </tbody>
-                        </table>
+                    <div class="pageContent" id="userRealContent">
                     </div>
                 </fieldset>
-
             </div>
             <div id="jxl">
             </div>
@@ -482,6 +433,7 @@
                             </li>
                         </ul>
                     </div>
+                    <br>
                 </form>
             </div>
         </div>

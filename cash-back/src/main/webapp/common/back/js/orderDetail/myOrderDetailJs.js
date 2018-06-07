@@ -2,13 +2,15 @@ $(function () {
     $("#promiseRepayTime").hide();
     $("#communicate").hide();
     $("#collectionWithMsg").hide();
-})
+});
 
+// 点击图片放大效果
 $(PostbirdImgGlass.init({
     domSelector: ".img-container",
     animation: true
 }));
 
+// 获取用户聚信立报告信息
 function getJxlContent() {
     var orderId = $("#orderId").val();
     $.ajax({
@@ -31,6 +33,7 @@ function getJxlContent() {
 function getUserRealContent() {
     var orderId = $("#orderId").val();
     $("#collectionRecord").show();
+    $('#userRealContent').empty();
     $.ajax({
         type: "GET",
         url: "/back/mmanUserRela/getMmanUserRelaPage",
@@ -40,20 +43,16 @@ function getUserRealContent() {
         dataType: 'json',
         contentType: "application/x-www-form-urlencoded; charset=UTF-8",
         success: function (data) {
-            var res = "";
-            for (var i = 0; i < data.length; i++) {
-                res += '<tr>';
-                res += '<td>' + (i + 1) + '</td>';
-                res += '<td>' + data[i].realName + '</td>';
-                res += '<td>' + data[i].contactsKey + '</td>';
-                res += '<td>' + data[i].relaKey + '</td>';
-                res += '<td>' + data[i].infoName + '</td>';
-                res += '<td>' + data[i].phoneNumLoc + '</td>';
-                res += '<td>' + data[i].callCnt + '</td>';
-                res += '<td>' + data[i].callOutCnt + '</td>';
-                res += '<td>' + data[i].callInCnt + '</td>';
-                res += '</tr>';
+            var res = '<table class="table" style="width: 100%;"><tr>';
+            var count = data.length;
+            for (var i = 1; i <= count; i++) {
+                res += '<td style="width: 105px;height: 24px;"><input type="radio" name="concatInfo">' + '&nbsp&nbsp' + data[i - 1].infoName
+                    + '</td><td style="width: 120px;height: 24px;">' + data[i - 1].infoValue + '</td>';
+                if (i % 5 == 0) {
+                    res += '</tr>';
+                }
             }
+            res += '</table>';
             $('#userRealContent').append(res);
         }
     });
@@ -82,13 +81,13 @@ function getUserRepayInfo() {
             payResult += '<td class="ttd">' + data.collectionOrder.loanId + '</td>';
             payResult += getProductNameColumnResult(data.userLoan.borrowingType) + '</tr>';
             payResult += '<tr><td class="htd">借款时间:</td><td class="ttd">' + getFormatDate(data.userLoan.loanStartTime) + '</td>';
-            payResult += '<td class="htd">到期本金:</td> <td class="ttd">' + data.userLoan.loanMoney + '</td>';
+            payResult += '<td class="htd">到期本金:</td><td class="ttd">' + data.userLoan.loanMoney + '</td>';
             payResult += getOrderInfoColumnResult(data);
-            payResult += '<td class="htd">滞&nbsp&nbsp纳&nbsp&nbsp金:</td> <td class="ttd">' + data.userLoan.loanPenalty + '</td>';
-            payResult += '<td class="htd">逾期天数:</td> <td class="ttd">' + data.collectionOrder.overdueDays + '</td></tr>';
-            payResult += '<td class="htd">应还时间:</td> <td class="ttd">' + getFormatDate(data.userLoan.loanEndTime) + '</td>';
+            payResult += '<td class="htd">滞&nbsp&nbsp纳&nbsp&nbsp金:</td><td class="ttd">' + data.userLoan.loanPenalty + '</td>';
+            payResult += '<td class="htd">逾期天数:</td><td class="ttd">' + data.collectionOrder.overdueDays + '</td></tr>';
+            payResult += '<td class="htd">应还时间:</td><td class="ttd">' + getFormatDate(data.userLoan.loanEndTime) + '</td>';
             payResult += '<td class="htd">应还总额:</td><td class="ttd" colspan="7">' + data.totalAmount + '</td></tr>';
-            payResult += '<tr> <td class="hhtd">扣款银行:</td><td class="tttd">' + data.bankCard.depositBank + '</td><td class="hhtd">银行卡号:</td> <td class="tttd">' + data.bankCard.bankCard + '</td>';
+            payResult += '<tr> <td class="hhtd">扣款银行:</td><td class="tttd">' + data.bankCard.depositBank + '</td><td class="hhtd">银行卡号:</td><td class="tttd">' + data.bankCard.bankCard + '</td>';
             payResult += getPayInfoColumnResult(data);
             payResult += '</tr>';
             $("#repayInfo").append(payResult);
@@ -129,7 +128,7 @@ function getUserRepayInfo() {
     });
 }
 
-
+// 格式化时间函数
 Date.prototype.Format = function (fmt) {
     var o = {
         "M+": this.getMonth() + 1, //月份
@@ -144,7 +143,7 @@ Date.prototype.Format = function (fmt) {
     for (var k in o)
         if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
     return fmt;
-}
+};
 
 function getFormatDate(now) {
     var d = new Date(now);
@@ -244,7 +243,7 @@ $("input[name='promiseRepay']").change(function () {
     } else {
         $("#promiseRepayTime").show();
     }
-})
+});
 
 $("input[name='isConnected']").change(function () {
     var val = $('input:radio[name="isConnected"]:checked').val();
@@ -253,7 +252,7 @@ $("input[name='isConnected']").change(function () {
     } else {
         $("#communicate").hide();
     }
-})
+});
 
 function doCheck() {
     var msgTemplate = $("#msgTemplate").val();
@@ -293,17 +292,28 @@ $("#msgTemplate").change(function () {
             $("#msgContent").val("系统错误！");
         }
     })
-})
+});
 
 
 $("select[name='collectionType']").change(function () {
-   var val = $("select[name='collectionType'] option:selected").val();
-   if(val == '1'){
-       $("#collectionWithPhone").show();
-       $("#collectionWithMsg").hide();
-   }else {
-       $("#collectionWithPhone").hide();
-       $("#collectionWithMsg").show();
-   }
-})
+    var val = $("select[name='collectionType'] option:selected").val();
+    if (val == '1') {
+        $("#collectionWithPhone").show();
+        $("#collectionWithMsg").hide();
+    } else {
+        $("#collectionWithPhone").hide();
+        $("#collectionWithMsg").show();
+    }
+});
 
+
+$("#send").click(function () {
+    var val = $("select[name='collectionType'] option:selected").val();
+    if (val == '1') {
+        alertMsg.warn("打电话...电话催收");
+        // 保存对应的催收记录
+    } else {
+        alertMsg.info("发送短信...短信催收");
+        // 发送短信
+    }
+});

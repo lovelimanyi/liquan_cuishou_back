@@ -19,6 +19,7 @@ import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -882,7 +883,6 @@ public class MyCollectionOrderController extends BaseController {
     /**
      * 转派-根据公司查询分组or催收员
      *
-     * @param //mmanLoanCollectionOrder
      * @param request
      * @param response
      * @return

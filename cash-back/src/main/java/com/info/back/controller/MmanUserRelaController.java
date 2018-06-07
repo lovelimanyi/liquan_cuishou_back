@@ -1,6 +1,7 @@
 package com.info.back.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.info.back.service.IMmanLoanCollectionOrderService;
 import com.info.back.service.IMmanUserInfoService;
 import com.info.back.service.IMmanUserRelaService;
@@ -9,6 +10,7 @@ import com.info.web.pojo.MmanLoanCollectionOrder;
 import com.info.web.pojo.MmanUserInfo;
 import com.info.web.pojo.MmanUserRela;
 import com.info.web.util.PageConfig;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/mmanUserRela")
@@ -36,7 +39,7 @@ public class MmanUserRelaController extends BaseController {
 
     @RequestMapping("/getMmanUserRelaPage")
     @ResponseBody
-    public String getMmanUserRelaPage(HttpServletRequest request, Model model) {
+    public String getMmanUserRelaPage(HttpServletRequest request) {
         HashMap<String, Object> params = this.getParametersO(request);
         String orderId = params.get("id").toString();
         List<MmanUserRela> list = null;
@@ -44,12 +47,11 @@ public class MmanUserRelaController extends BaseController {
             MmanLoanCollectionOrder order = mmanLoanCollectionOrderService.getOrderById(orderId);
             if (order != null) {
                 params.put("userId", order.getUserId());
-                params.put("userId", order.getUserId());
-                int overdueDays = order.getOverdueDays();//逾期天数
-                params.put("overdueDays", overdueDays);
+//                params.put("userId", order.getUserId());
+//                int overdueDays = order.getOverdueDays();//逾期天数
+//                params.put("overdueDays", overdueDays);
                 if (!BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())) {
                     MmanUserInfo userInfo = mmanUserInfoService.getUserInfoById(order.getUserId());
-
 
                     list = mmanUserRelaService.getList(params);
                     List<MmanUserRela> mmanUserRelaList = list;
@@ -62,7 +64,6 @@ public class MmanUserRelaController extends BaseController {
                     mmanUserRelaOne.setInfoValue(userInfo.getFirstContactPhone());
                     MmanUserRela mmanUserRelaTwo = new MmanUserRela();
 
-
                     mmanUserRelaTwo.setRealName(userInfo.getRealname());
                     mmanUserRelaTwo.setUserId(order.getUserId());
                     mmanUserRelaTwo.setContactsKey(userInfo.getSecondContactRelation().toString());
@@ -71,8 +72,8 @@ public class MmanUserRelaController extends BaseController {
                     mmanUserRelaTwo.setInfoValue(userInfo.getSecondContactPhone());
                     mmanUserRelaList.add(0, mmanUserRelaOne);
                     mmanUserRelaList.add(1, mmanUserRelaTwo);
-
-                    model.addAttribute("pm", list);
+                    // 为了美观 对里面（特殊数据）过长做截取处理（名字留8位字符，电话留25位字符）
+                    getResultStr(list);
                 }
             }
         } catch (Exception e) {
@@ -81,10 +82,27 @@ public class MmanUserRelaController extends BaseController {
         return JSON.toJSONString(list);
     }
 
+    // 对里面（特殊数据）过长做截取处理（名字留8位字符，电话留25位字符）
+    private void getResultStr(List<MmanUserRela> list) {
+        for (MmanUserRela info : list) {
+            String name = info.getInfoName();
+            String phone = info.getInfoValue();
+            if (StringUtils.isNotEmpty(name)) {
+                if (name.length() > 8) {
+                    info.setInfoName(name.substring(0, 7));
+                }
+            }
+            if (StringUtils.isNotEmpty(phone)) {
+                if (phone.length() > 25) {
+                    info.setInfoValue(phone.substring(0, 23));
+                }
+            }
+        }
+    }
+
 
     @RequestMapping("getMmanUserRelaCountPage")
     public String getMmanUserRelaCountPage(HttpServletRequest request, HttpServletResponse response, Model model) {
-        //String erroMsg = null;
         try {
             HashMap<String, Object> params = this.getParametersO(request);
             String orderId = params.get("id").toString();
