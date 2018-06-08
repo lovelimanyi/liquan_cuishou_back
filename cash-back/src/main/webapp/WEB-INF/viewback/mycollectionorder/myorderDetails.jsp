@@ -190,6 +190,63 @@
                 <fieldset>
                     <legend>催收记录</legend>
                     <div class="pageContent" id="collectionTable">
+                        <div class="pageHeader">
+                            <div class="searchBar">
+                                <table class="searchContent">
+                                    <tr>
+                                        <td>
+                                            催收组(逾期等级):
+                                            <select name="overdueLevel">
+                                                <option value="">全部</option>
+                                                <c:forEach var="overdueLevel" items="${overdueLevelMap}">
+                                                    <option value="${overdueLevel.key}">${overdueLevel.value}</option>
+                                                </c:forEach>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            催收状态:
+                                            <select name="collectionStatus">
+                                                <option value="">全部</option>
+                                                <c:forEach var="status" items="${orderStatusMap}">
+                                                    <option value="${status.key}">${status.value}</option>
+                                                </c:forEach>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            催收类型:
+                                            <select name="collectionType">
+                                                <option value="">全部</option>
+                                                <option value="1">电话催收</option>
+                                                <option value="2">短信催收</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            催&nbsp;&nbsp;收&nbsp;&nbsp;员:
+                                            <input type="text" name="collectionName" value="${params.collectionName }" style="width: 60px;"/>
+                                        </td>
+                                        <td>
+                                            沟通情况:
+                                            <select name="communicationSituation">
+                                                <option value="">全部</option>
+                                                <c:forEach var="status" items="${communicationSituationsMap}">
+                                                    <option value="${status.key}">${status.value}</option>
+                                                </c:forEach>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <div class="buttonActive" style="margin-left: 350px;">
+                                                <div class="buttonContent">
+                                                    <button type="button" id="searchOrderCollectionRecord">
+                                                        查询
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <div id="recordListContent"></div>
                     </div>
                 </fieldset>
             </div>

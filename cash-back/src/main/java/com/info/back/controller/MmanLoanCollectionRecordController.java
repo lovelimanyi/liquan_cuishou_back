@@ -173,13 +173,10 @@ public class MmanLoanCollectionRecordController extends BaseController {
     @RequestMapping("/getRecordsByOrderId")
     public String getRecordListByOrderId(HttpServletRequest request) {
         HashMap<String, Object> params = this.getParametersO(request);
-        String id = params.get("id") + "";
         List<MmanLoanCollectionRecord> list = new ArrayList<>();
         try {
-            if (StringUtils.isNotEmpty(id)) {
-                // 催收记录
-                list = mmanLoanCollectionRecordService.findListRecord(id);
-            }
+            // 催收记录
+            list = mmanLoanCollectionRecordService.findListRecord(params);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -202,16 +199,16 @@ public class MmanLoanCollectionRecordController extends BaseController {
             Map<String, Object> communicationSituationsMap = getCommunicationSituationsMap(communicationSituations);
             // 逾期等级
             Map<String, Object> overdueLevelMap = getOverdueLevelMap();
+
             if (StringUtils.isNotEmpty(orderId)) {
                 // 催收记录
-                list = mmanLoanCollectionRecordService.findListRecord(orderId);
+                list = mmanLoanCollectionRecordService.findListRecord(params);
             }
             model.addAttribute("communicationSituationsMap", communicationSituationsMap);
             model.addAttribute("overdueLevelMap", overdueLevelMap);
             model.addAttribute("orderStatusMap", orderStatusMap);
             model.addAttribute("list", list);
             model.addAttribute("params", params);
-            model.addAttribute("communicationSituations", communicationSituations);
         } catch (Exception e) {
             e.printStackTrace();
         }

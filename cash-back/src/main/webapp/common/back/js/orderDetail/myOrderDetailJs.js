@@ -322,6 +322,7 @@ $("#send").click(function () {
 
 function getRecordLists() {
     var orderId = $("#orderId").val();
+    $("#recordListContent").empty();
     $.ajax({
         type: "GET",
         url: "/back/collectionRecord/getRecordListsByOrderId",
@@ -331,8 +332,40 @@ function getRecordLists() {
         dataType: "html",
         success: function (data) {
             if (data.code = 200) {
-                $("#collectionTable").append(data);
+                $("#recordListContent").append(data);
             }
         }
     });
 };
+
+
+$("#searchOrderCollectionRecord").click(function () {
+    var overdueLevel = $("select[name='overdueLevel'] option:checked").val();
+    var collectionStatus = $("select[name='collectionStatus'] option:checked").val();
+    var collectionType = $("select[name='collectionType'] option:checked").val();
+    var communicationSituation = $("select[name='communicationSituation'] option:checked").val();
+    var collectionName = $("input[name='collectionName']").val();
+    var orderId = $("#orderId").val();
+    $("#recordListContent").empty();
+    $.ajax({
+        type: "GET",
+        url: "/back/collectionRecord/getRecordListsByOrderId",
+        data: {
+            id: orderId,
+            overdueLevel: overdueLevel,
+            collectionStatus: collectionStatus,
+            collectionType: collectionType,
+            communicationSituation: communicationSituation,
+            collectionName: collectionName
+        },
+        dataType: "html",
+        success: function (data) {
+            if (data.code = 200) {
+                $("#recordListContent").append(data);
+            }
+        },
+        error:function(){
+            alertMsg.error("系统开小差了,请稍后再试...")
+        }
+    });
+});

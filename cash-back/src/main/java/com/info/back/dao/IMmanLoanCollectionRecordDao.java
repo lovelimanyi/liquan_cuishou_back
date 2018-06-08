@@ -42,5 +42,5 @@ public interface IMmanLoanCollectionRecordDao {
 	 * 根据订单号查询历史
 	 * @return
 	 */
-	List<MmanLoanCollectionRecord> findListRecord(String OrderId);
+	List<MmanLoanCollectionRecord> findListRecord(HashMap<String,Object> map);
 }

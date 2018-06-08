@@ -48,7 +48,7 @@ public interface IMmanLoanCollectionRecordService {
 	 * 
 	 * @return
 	 */
-	 List<MmanLoanCollectionRecord> findListRecord(String OrderId);
+	 List<MmanLoanCollectionRecord> findListRecord(HashMap<String,Object> param);
 
 	 void assignCollectionOrderToRelatedGroup(
 			List<MmanLoanCollectionOrder> mmanLoanCollectionOrderList,

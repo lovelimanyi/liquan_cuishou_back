@@ -348,8 +348,8 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
     }
 
     @Override
-    public List<MmanLoanCollectionRecord> findListRecord(String OrderId) {
-        return mmanLoanCollectionRecordDao.findListRecord(OrderId);
+    public List<MmanLoanCollectionRecord> findListRecord(HashMap<String,Object> map) {
+        return mmanLoanCollectionRecordDao.findListRecord(map);
     }
 
     @Override

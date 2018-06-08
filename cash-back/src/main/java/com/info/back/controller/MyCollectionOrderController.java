@@ -7,7 +7,6 @@ import com.info.back.dao.ITemplateSmsDao;
 import com.info.back.result.JsonResult;
 import com.info.back.service.*;
 import com.info.back.utils.*;
-import com.info.config.PayContents;
 import com.info.constant.Constant;
 import com.info.web.pojo.*;
 import com.info.web.util.*;
@@ -15,11 +14,9 @@ import com.liquan.oss.OSSUpload;
 import net.sf.json.JSONArray;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
-import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -57,54 +54,76 @@ public class MyCollectionOrderController extends BaseController {
 
     private static final String MERCHANT_INFO_REDIS_KEY = "merchants";
 
-    // 公司
+    private static final String DICTIONARY_TYPE_OVERDUE_LEVEL = "xjx_overdue_level";
+
+    private static final String DICTIONARY_TYPE_ORDER_STATE = "xjx_collection_order_state";
+
+
     @Autowired
     private IMmanLoanCollectionCompanyService mmanLoanCollectionCompanyService;
-    // 订单
+
     @Autowired
     private IMmanLoanCollectionOrderService mmanLoanCollectionOrderService;
 
-    // 用户信息
     @Autowired
     private IMmanUserInfoService mmanUserInfoService;
+
     @Autowired
     private IMmanLoanCollectionStatusChangeLogService mmanLoanCollectionStatusChangeLogService;
+
     @Autowired
     private IMmanLoanCollectionRecordService mmanLoanCollectionRecordService;
+
     @Autowired
     private IBackUserService backUserService;
+
     @Autowired
     private ITemplateSmsDao templateSmsDao;
+
     @Autowired
     private ICreditLoanPayDetailService creditLoanPayDetailService;
+
     @Autowired
     private IMmanUserLoanService mmanUserLoanService;
+
     @Autowired
     private IAuditCenterService auditCenterService;
-    @Autowired
-    private ISysDictService sysDictService;
+
     @Autowired
     private ICreditLoanPayService creditLoanPayService;
+
     @Autowired
     private ISysUserBankCardService sysUserBankCardService;
+
     @Autowired
     private ISmsUserService smsUserService;
+
     @Autowired
     private IMmanUserRelaService mmanUserRelaService;
+
     @Autowired
     private IMman_loan_collection_orderdeductionService collection_orderdeductionService;
+
     @Autowired
     private ICountCollectionAssessmentService countCollectionAssessmentService;
 
     @Autowired
     private ICountCollectionManageService countCollectionManageService;
+
     @Autowired
     private IFengKongService fengKongService;
+
     @Autowired
     private ICollectionWithholdingRecordService collectionWithholdingRecordService;
 
     @Autowired
     private IMerchantInfoDao merchantInfoDao;
+
+    @Autowired
+    private ICommunicationSituationService situationService;
+
+    @Autowired
+    private ISysDictService sysDictService;
 
     /**
      * 我的订单初始化加载查询
@@ -139,8 +158,7 @@ public class MyCollectionOrderController extends BaseController {
             params.put("roleUserId", backUser.getUuid());
             page = mmanLoanCollectionOrderService.getCollectionUserPage(params);
         }
-        model.addAttribute("ListMmanLoanCollectionCompany",
-                ListMmanLoanCollectionCompany);
+        model.addAttribute("ListMmanLoanCollectionCompany", ListMmanLoanCollectionCompany);
 
         if (page != null && page.getItems().size() > 0) {
             for (OrderBaseResult order : page.getItems()) {
@@ -547,7 +565,7 @@ public class MyCollectionOrderController extends BaseController {
                     }
                 }
                 // 催收记录
-                List<MmanLoanCollectionRecord> list = mmanLoanCollectionRecordService.findListRecord(id);
+//                List<MmanLoanCollectionRecord> list = mmanLoanCollectionRecordService.findListRecord(id);
                 // 联系人信息
 
 
@@ -559,13 +577,27 @@ public class MyCollectionOrderController extends BaseController {
                     // 默认短信发送上限为2条
                     msgCountLimit = 2;
                 }
+
+                // 沟通情况
+                List<CommunicationSituation> communicationSituations = situationService.getLableList();
+                // 订单状态
+                Map<String, Object> orderStatusMap = getOrderStatusMap();
+                // 沟通情况
+                Map<String, Object> communicationSituationsMap = getCommunicationSituationsMap(communicationSituations);
+                // 逾期等级
+                Map<String, Object> overdueLevelMap = getOverdueLevelMap();
                 int remainCount = msgCountLimit - count > 0 ? msgCountLimit - count : 0;
+
+                model.addAttribute("communicationSituationsMap", communicationSituationsMap);
+                model.addAttribute("overdueLevelMap", overdueLevelMap);
+                model.addAttribute("orderStatusMap", orderStatusMap);
+//                model.addAttribute("list", list);
                 model.addAttribute("remainMsgCount", remainCount);
                 model.addAttribute("msgCountLimit", msgCountLimit);
                 model.addAttribute("msgs", msgs);
                 model.addAttribute("orderId", id);
                 model.addAttribute("phoneNumber", order.getLoanUserPhone());
-                model.addAttribute("recordList", list);
+//                model.addAttribute("recordList", list);
                 model.addAttribute("collectionOrder", order);
                 model.addAttribute("userInfo", userInfo);
                 model.addAttribute("userCar", userCar);// 银行卡
@@ -659,12 +691,12 @@ public class MyCollectionOrderController extends BaseController {
      * @param model
      * @return
      */
-    @RequestMapping("collectionRecordList")
+    /*@RequestMapping("collectionRecordList")
     public String getloanCollectionRecordList(HttpServletRequest request, Model model) {
         List<MmanLoanCollectionRecord> list = null;
         Map<String, String> params = this.getParameters(request);
         try {
-            list = mmanLoanCollectionRecordService.findListRecord(params.get("id"));
+//            list = mmanLoanCollectionRecordService.findListRecord(params.get("id"));
             model.addAttribute("listRecord", list);
             // 跟进等级
             List<SysDict> levellist = sysDictService
@@ -677,7 +709,7 @@ public class MyCollectionOrderController extends BaseController {
         }
         model.addAttribute("params", params);
         return "mycollectionorder/listRecord";
-    }
+    }*/
 
 
     /**
@@ -1567,4 +1599,42 @@ public class MyCollectionOrderController extends BaseController {
         return null;
     }
 
+
+    private Map<String, Object> getCommunicationSituationsMap(List<CommunicationSituation> communicationSituations) {
+        Map<String, Object> map = new HashMap<>(16);
+        if (CollectionUtils.isNotEmpty(communicationSituations)) {
+            for (CommunicationSituation situation : communicationSituations) {
+                map.put(situation.getId().toString(), situation.getCommunicationLabel());
+            }
+        }
+        return map;
+    }
+
+
+    private Map<String, Object> getOverdueLevelMap() {
+        List<SysDict> overdueLevel = JedisDataClient.getList(BackConstant.REDIS_KEY_PREFIX, "overdueLevel");
+        if (CollectionUtils.isEmpty(overdueLevel)) {
+            overdueLevel = sysDictService.findDictByType(DICTIONARY_TYPE_OVERDUE_LEVEL);
+            JedisDataClient.setList(BackConstant.REDIS_KEY_PREFIX, "overdueLevel", overdueLevel, 60 * 60 * 24);
+        }
+        Map<String, Object> overdueLevelMap = new HashMap<>(16);
+        for (SysDict sysDict : overdueLevel) {
+            overdueLevelMap.put(sysDict.getValue(), sysDict.getLabel());
+        }
+        return overdueLevelMap;
+    }
+
+
+    private Map<String, Object> getOrderStatusMap() {
+        List<SysDict> orderStatus = JedisDataClient.getList(BackConstant.REDIS_KEY_PREFIX, "orderStatus");
+        if (CollectionUtils.isEmpty(orderStatus)) {
+            orderStatus = sysDictService.findDictByType(DICTIONARY_TYPE_ORDER_STATE);
+            JedisDataClient.setList(BackConstant.REDIS_KEY_PREFIX, "orderStatus", orderStatus, 60 * 60 * 24);
+        }
+        Map<String, Object> orderStatusMap = new HashMap<>(8);
+        for (SysDict sysDict : orderStatus) {
+            orderStatusMap.put(sysDict.getValue(), sysDict.getLabel());
+        }
+        return orderStatusMap;
+    }
 }
