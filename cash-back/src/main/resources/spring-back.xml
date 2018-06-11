@@ -93,7 +93,7 @@
     </bean>
 
     <task:scheduled-tasks scheduler="myScheduler">
-        <task:scheduled ref="taskJobMiddleService" method="autoDispatch" cron="0 11 1,12,20 * * ?" />每天凌晨3、5、9、20点11分 跑分单，逾期计算
+        <!--<task:scheduled ref="taskJobMiddleService" method="autoDispatch" cron="0 11 1,12,20 * * ?" />&lt;!&ndash;每天凌晨3、5、9、20点11分 跑分单，逾期计算&ndash;&gt;-->
         <task:scheduled ref="taskJobStatistics" method="callProcedure" cron="0 2 0,11,14,17,20,22 * * ?"/>
         <task:scheduled ref="taskJobStatistics" method="callCountCollection" cron="0 1 0 * * ?"/> <!-- 催收记录统计 凌晨01分跑 -->
         <task:scheduled ref="taskJobStatistics" method="personAndCompanyStatistics" cron="0 45 7-23 * * ?"/>  <!-- 个人和公司统计 整点45 -->
