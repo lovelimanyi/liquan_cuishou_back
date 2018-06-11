@@ -1,0 +1,465 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.info.back.dao.IStatisticsDao">
+
+    <select id="doTrackStatistics" resultType="com.info.web.pojo.TrackStatistics">
+        SELECT
+        x.dt AS 'dispatchTime',
+        x.gsmc AS 'companyName',
+        x.companyId AS 'companyId',
+        x.csyxm AS 'backUserName',
+        x.csyid AS 'uuid',
+        x.csyfz AS 'groupLevel',
+        x.lx AS 'borrowingType',
+        x.yqdj,
+        x.type AS'userType',
+
+        sum(x.pdbj) AS'totalPrincipal',
+        sum(x.yhbj) AS'realgetTotalPrincipal',
+        sum(x.sybj) AS'remainPrincipal',
+        round(ifnull(sum(x.yhbj) / sum(x.pdbj), 0) * 100,2) AS'repaymentProbability',
+
+        count(*) AS'totalOrderCount',
+        sum(x.yhds) AS'doneOrderCount',
+        round(sum(x.yhds) / count(*) * 100, 2) AS'orderProbability',
+
+        sum(x.zznj)AS'totalPenalty',
+        sum(x.sqznj) AS'realgetTotalPenalty',
+        sum(x.zznj) - sum(x.znjsq) AS'remainPenalty',
+        round(ifnull(sum(x.hksjznj) / sum(x.hkzznj),0) * 100,2) AS'penaltyProbability',
+
+        sum(x.cll) AS 'handleCount'
+
+        FROM
+        (
+        SELECT
+        date(b.dispatch_time) dt,
+        b.current_collection_user_id csyid,
+        cmp.id AS companyId,
+        usr.user_name csyxm,
+        cmp.title gsmc,
+        usr.group_level csyfz,
+        d.borrowing_type lx,
+        (
+        CASE
+        WHEN b.current_overdue_level = 3 THEN
+        "S1"
+        WHEN b.current_overdue_level = 4 THEN
+        "S2"
+        WHEN b.current_overdue_level = 5 THEN
+        "MI-M2"
+        WHEN b.current_overdue_level = 6 THEN
+        "M2-M3"
+        WHEN b.current_overdue_level = 7 THEN
+        "M3+"
+        WHEN b.current_overdue_level = 8 THEN
+        "M6+"
+        WHEN b.current_overdue_level = 11 THEN
+        "F-M1"
+        WHEN b.current_overdue_level = 12 THEN
+        "F-M2"
+        WHEN b.current_overdue_level = 13 THEN
+        "F-M3"
+        WHEN b.current_overdue_level = 16 THEN
+        "F-M6"
+        ELSE
+        "未知"
+        END
+        ) yqdj,
+        (
+        CASE
+        WHEN bo.user_flag = 3 THEN
+        "18老用户"
+        WHEN d.customer_type = 1 THEN
+        "17老用户"
+        WHEN d.customer_type = 0 THEN
+        "新用户"
+        ELSE
+        "未知"
+        END
+        ) type,
+
+        IF (
+        d.borrowing_type = 2
+        AND d.paid_money > 0,
+        d.paid_money,
+        d.loan_money + ifnull(d.accrual, 0)
+        ) zbj,
+
+        IF (
+        d.borrowing_type = 2
+        AND d.paid_money > 0,
+        d.paid_money,
+        d.loan_money + ifnull(d.accrual, 0)
+        ) - ifnull(hk.zqbj, 0) pdbj,
+
+        IF (
+        d.borrowing_type = 2
+        AND d.paid_money > 0,
+        d.paid_money,
+        d.loan_money + ifnull(d.accrual, 0)
+        ) - ifnull(hk.zqbj, 0) - ifnull(hk.yhbj, 0) sybj,
+        ifnull(hk.yhbj, 0) yhbj,
+
+        IF (b.`status` = 4, 1, 0) yhds,
+
+        IF (b.`status` = 4, hk.sjhkznj, 0) sqznj,
+
+        IF (b.`status` = 4, hk.znjsq, 0) znjsq,
+        ifnull(d.loan_penalty, 0) zznj,
+
+        IF (
+        b.`status` = 4,
+        hk.sjhkznj + ifnull(jmznj.bjrkhznj, 0),
+        0
+        ) hksjznj,
+
+        IF (
+        b.`status` = 4,
+        d.loan_penalty,
+        0
+        ) hkzznj,
+
+        IF (
+        csjl.dt >= b.dispatch_time,
+        1,
+        0
+        ) cll
+        FROM
+        mman_loan_collection_order b
+        LEFT JOIN back_user usr ON usr.uuid = b.current_collection_user_id
+        LEFT JOIN mman_loan_collection_company cmp ON usr.company_id = cmp.id
+        LEFT JOIN mman_user_loan d ON d.id = b.loan_id
+        LEFT JOIN bi_order bo ON d.user_id = bo.user_id
+        LEFT JOIN credit_loan_pay clp ON clp.loan_id = b.loan_id
+        LEFT JOIN (
+        SELECT
+        a.pay_id id,
+        sum(
+
+        IF (
+        <![CDATA[ a.update_Date < (b.dispatch_time), ]]>
+        a.real_money + ifnull(a.realget_accrual, 0),
+        0
+        )
+        ) zqbj,
+        sum(
+
+        IF (
+        a.update_Date >= (b.dispatch_time),
+        a.real_money + ifnull(a.realget_accrual, 0),
+        0
+        )
+        ) yhbj,
+        sum(a.real_penlty) - ifnull(clp.reduction_money, 0) sjhkznj,
+        sum(a.real_penlty) znjsq
+        FROM
+        credit_loan_pay_detail a
+        LEFT JOIN mman_loan_collection_order b ON a.pay_id = b.pay_id
+        LEFT JOIN mman_user_loan d ON d.id = b.loan_id
+        LEFT JOIN credit_loan_pay clp ON clp.loan_id = b.loan_id
+        GROUP BY
+        a.pay_id
+        ) hk ON hk.id = b.pay_id
+        LEFT JOIN (
+        SELECT
+        loan_id id,
+        max(create_date) dt
+        FROM
+        mman_loan_collection_record
+        GROUP BY
+        loan_id
+        ) csjl ON b.loan_id = csjl.id
+        LEFT JOIN (
+        SELECT
+        pay_id id,
+        sum(reduction_money) bjrkhznj
+        FROM
+        audit_center
+        WHERE
+        type = 3
+        AND `status` IN (5)
+        GROUP BY
+        pay_id
+        ) jmznj ON jmznj.id = b.pay_id
+        WHERE
+        usr.`status` = 1
+        ) x
+        GROUP BY
+        x.gsmc,
+        x.csyid,
+        x.yqdj,
+        x.csyfz,
+        x.type,
+        x.lx,
+        x.dt
+        ORDER BY
+        x.dt,
+        x.gsmc,
+        x.yqdj,
+        x.csyid,
+        x.csyfz,
+        x.type,
+        x.lx
+    </select>
+
+    <insert id="insertTrackStatistics" parameterType="List">
+        INSERT INTO track_statistics
+        (dispatchTime, companyName, companyId,backUserName,uuid,groupLevel,borrowingType,userType,totalPrincipal,realgetTotalPrincipal,remainPrincipal,repaymentProbability,totalPenalty,realgetTotalPenalty,remainPenalty,
+        penaltyProbability, totalOrderCount,doneOrderCount ,orderProbability,handleCount,createDate)
+        VALUES
+        <foreach collection ="list" item="track" separator =",">
+            (#{track.dispatchTime}, #{track.companyName}, #{track.companyId},#{track.backUserName},#{track.uuid},#{track.groupLevel},#{track.borrowingType},#{track.userType},#{track.totalPrincipal},#{track.realgetTotalPrincipal},#{track.remainPrincipal},#{track.repaymentProbability},#{track.totalPenalty},#{track.realgetTotalPenalty},#{track.remainPenalty},#{track.penaltyProbability},#{track.totalOrderCount},#{track.doneOrderCount},#{track.orderProbability},#{track.handleCount}, now())
+        </foreach >
+    </insert>
+
+    <sql id="wherePersonColumn">
+        <where>
+            <if test="dispatchTime != null and dispatchTime != ''">
+                AND <![CDATA[ s.dispatchTime >= #{dispatchTime} ]]>
+            </if>
+            <if test="dispatchEndTime != null and dispatchEndTime != ''">
+                AND <![CDATA[ s.dispatchTime <= #{dispatchEndTime} ]]>
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND <![CDATA[ s.dispatchTime <= #{endTime} ]]>
+            </if>
+            <if test="backUserName != null and backUserName != ''">
+                AND s.backUserName = #{backUserName}
+            </if>
+            <if test="uuid != null and uuid != ''">
+                AND s.uuid = #{uuid}
+            </if>
+            <if test="borrowingType != null and borrowingType != ''">
+                AND s.borrowingType = #{borrowingType}
+            </if>
+            <if test="userType != null and userType != ''">
+                AND s.userType = #{userType}
+            </if>
+            <if test="companyId != null and companyId != ''">
+                AND s.companyId = #{companyId}
+            </if>
+            <if test="groupLevel != null and groupLevel != ''">
+                AND s.groupLevel = #{groupLevel}
+            </if>
+            <if test="companys != null and companyId == null">
+                AND s.companyId IN
+                <foreach collection="companys" open="(" close=")" item="company" separator=",">
+                    #{company.id}
+                </foreach>
+            </if>
+        </where>
+        GROUP BY
+        s.backUserName,
+        s.companyId,
+        s.uuid,
+        s.groupLevel,
+        s.borrowingType,
+        s.userType
+
+        <if test="orderBy != null and orderBy != ''">
+            ORDER by ${orderBy}
+        </if>
+    </sql>
+    <sql id="whereCompanyColumn">
+        <where>
+            <if test="dispatchTime != null and dispatchTime != ''">
+                AND <![CDATA[ s.dispatchTime >= #{dispatchTime} ]]>
+            </if>
+            <if test="dispatchEndTime != null and dispatchEndTime != ''">
+                AND <![CDATA[ s.dispatchTime <= #{dispatchEndTime} ]]>
+            </if>
+            <if test="endTime != null and endTime != ''">
+                AND <![CDATA[ s.dispatchTime <= #{endTime} ]]>
+            </if>
+            <if test="borrowingType != null and borrowingType != ''">
+                AND s.borrowingType = #{borrowingType}
+            </if>
+            <if test="userType != null and userType != ''">
+                AND s.userType = #{userType}
+            </if>
+            <if test="companyId != null and companyId != ''">
+                AND s.companyId = #{companyId}
+            </if>
+            <if test="groupLevel != null and groupLevel != ''">
+                AND s.groupLevel = #{groupLevel}
+            </if>
+            <if test="companys != null and companyId == null">
+                AND s.companyId IN
+                <foreach collection="companys" open="(" close=")" item="company" separator=",">
+                    #{company.id}
+                </foreach>
+            </if>
+        </where>
+        GROUP BY
+        s.companyId,
+        s.groupLevel,
+        s.borrowingType,
+        s.userType
+
+        <if test="orderBy != null and orderBy != ''">
+            ORDER by ${orderBy}
+        </if>
+    </sql>
+    <select id="findAll" resultType="com.info.web.pojo.TrackStatistics" parameterType="HashMap">
+        SELECT
+			 s.dispatchTime AS 'dispatchTime',
+       s.companyName AS 'companyName',
+       s.companyId AS 'companyId',
+       s.backUserName AS 'backUserName',
+       s.uuid AS 'uuid',
+       s.groupLevel AS 'groupLevel',
+       s.borrowingType AS 'borrowingType',
+       s.userType AS 'userType',
+
+       sum(s.totalPrincipal) AS 'totalPrincipal',
+       sum(s.realgetTotalPrincipal) AS'realgetTotalPrincipal',
+       sum(s.remainPrincipal) AS'remainPrincipal',
+round(ifnull( sum(s.realgetTotalPrincipal)/ sum(s.totalPrincipal), 0) * 100,2) AS'repaymentProbability',
+
+
+       sum(s.totalPenalty)AS'totalPenalty',
+       sum(s.realgetTotalPenalty)AS'realgetTotalPenalty',
+       sum(s.remainPenalty)AS'remainPenalty',
+round(sum(s.realgetTotalPenalty) / sum(s.totalPenalty), 2) AS'penaltyProbability',
+
+
+       sum(s.totalOrderCount) AS 'totalOrderCount',
+       sum(s.doneOrderCount) AS 'doneOrderCount',
+       round(sum(s.doneOrderCount) / sum(s.totalOrderCount) * 100, 2) AS'orderProbability',
+       sum(s.handleCount) AS 'handleCount'
+        FROM track_statistics s
+        <include refid="wherePersonColumn"/>
+
+    </select>
+    <select id="findAllCount" resultType="Integer" parameterType="HashMap">
+        SELECT COUNT(1)
+        FROM ( SELECT
+        s.dispatchTime AS 'dispatchTime',
+        s.companyName AS 'companyName',
+        s.companyId AS 'companyId',
+        s.backUserName AS 'backUserName',
+        s.uuid AS 'uuid',
+        s.groupLevel AS 'groupLevel',
+        s.borrowingType AS 'borrowingType',
+        s.userType AS 'userType',
+
+        sum(s.totalPrincipal) AS 'totalPrincipal',
+        sum(s.realgetTotalPrincipal) AS'realgetTotalPrincipal',
+        sum(s.remainPrincipal) AS'remainPrincipal',
+        round(ifnull( sum(s.realgetTotalPrincipal)/ sum(s.totalPrincipal), 0) * 100,2) AS'repaymentProbability',
+
+
+        sum(s.totalPenalty)AS'totalPenalty',
+        sum(s.realgetTotalPenalty)AS'realgetTotalPenalty',
+        sum(s.remainPenalty)AS'remainPenalty',
+        round(sum(s.realgetTotalPenalty) / sum(s.totalPenalty), 2) AS'penaltyProbability',
+
+
+        sum(s.totalOrderCount) AS 'totalOrderCount',
+        sum(s.doneOrderCount) AS 'doneOrderCount',
+        round(sum(s.doneOrderCount) / sum(s.totalOrderCount) * 100, 2) AS'orderProbability',
+        sum(s.handleCount) AS 'handleCount'
+        FROM track_statistics s
+        <include refid="wherePersonColumn"/>) a
+    </select>
+    <select id="findAllCompany" resultType="com.info.web.pojo.TrackStatistics" parameterType="HashMap">
+        SELECT
+			 s.dispatchTime AS 'dispatchTime',
+       s.companyName AS 'companyName',
+       s.companyId AS 'companyId',
+       s.groupLevel AS 'groupLevel',
+       s.borrowingType AS 'borrowingType',
+       s.userType AS 'userType',
+
+       sum(s.totalPrincipal) AS 'totalPrincipal',
+       sum(s.realgetTotalPrincipal) AS'realgetTotalPrincipal',
+       sum(s.remainPrincipal) AS'remainPrincipal',
+round(ifnull( sum(s.realgetTotalPrincipal)/ sum(s.totalPrincipal), 0) * 100,2) AS'repaymentProbability',
+
+
+       sum(s.totalPenalty)AS'totalPenalty',
+       sum(s.realgetTotalPenalty)AS'realgetTotalPenalty',
+       sum(s.remainPenalty)AS'remainPenalty',
+round(sum(s.realgetTotalPenalty) / sum(s.totalPenalty), 2) AS'penaltyProbability',
+
+
+       sum(s.totalOrderCount) AS 'totalOrderCount',
+       sum(s.doneOrderCount) AS 'doneOrderCount',
+       round(sum(s.doneOrderCount) / sum(s.totalOrderCount) * 100, 2) AS'orderProbability',
+       sum(s.handleCount) AS 'handleCount'
+        FROM track_statistics s
+        <include refid="whereCompanyColumn"/>
+    </select>
+    <select id="findAllCompanyCount" resultType="Integer" parameterType="HashMap">
+        SELECT COUNT(1)
+        FROM ( SELECT
+        s.dispatchTime AS 'dispatchTime',
+        s.companyName AS 'companyName',
+        s.companyId AS 'companyId',
+        s.groupLevel AS 'groupLevel',
+        s.borrowingType AS 'borrowingType',
+        s.userType AS 'userType',
+
+        sum(s.totalPrincipal) AS 'totalPrincipal',
+        sum(s.realgetTotalPrincipal) AS'realgetTotalPrincipal',
+        sum(s.remainPrincipal) AS'remainPrincipal',
+        round(ifnull( sum(s.realgetTotalPrincipal)/ sum(s.totalPrincipal), 0) * 100,2) AS'repaymentProbability',
+
+
+        sum(s.totalPenalty)AS'totalPenalty',
+        sum(s.realgetTotalPenalty)AS'realgetTotalPenalty',
+        sum(s.remainPenalty)AS'remainPenalty',
+        round(sum(s.realgetTotalPenalty) / sum(s.totalPenalty), 2) AS'penaltyProbability',
+
+
+        sum(s.totalOrderCount) AS 'totalOrderCount',
+        sum(s.doneOrderCount) AS 'doneOrderCount',
+        round(sum(s.doneOrderCount) / sum(s.totalOrderCount) * 100, 2) AS'orderProbability',
+        sum(s.handleCount) AS 'handleCount'
+        FROM track_statistics s
+        <include refid="whereCompanyColumn"/>) a
+    </select>
+
+    <delete id="delTrackStatistics" parameterType="HashMap">
+        DELETE s FROM track_statistics s
+        WHERE <![CDATA[ s.createDate >= #{beginTime} ]]>
+              <![CDATA[ AND s.createDate <= #{endTime}  ]]>
+    </delete>
+
+
+
+
+
+
+
+
+    <!--<select id="findAll" resultType="com.info.web.pojo.TrackStatistics" parameterType="HashMap">-->
+       <!--SELECT-->
+       <!--dispatchTime,-->
+       <!--companyName,-->
+       <!--companyId,-->
+       <!--backUserName,-->
+       <!--uuid,-->
+       <!--groupLevel,-->
+       <!--borrowingType,-->
+       <!--userType,-->
+       <!--totalPrincipal,-->
+       <!--realgetTotalPrincipal,-->
+       <!--remainPrincipal,-->
+       <!--repaymentProbability,-->
+       <!--totalPenalty,-->
+       <!--realgetTotalPenalty,-->
+       <!--remainPenalty,-->
+       <!--penaltyProbability,-->
+       <!--totalOrderCount,-->
+       <!--doneOrderCount,-->
+       <!--orderProbability,-->
+       <!--handleCount,-->
+       <!--createDate-->
+       <!--FROM track_statistics-->
+        <!--<include refid="wherePersonColumn"/>-->
+    <!--</select>-->
+
+
+</mapper>

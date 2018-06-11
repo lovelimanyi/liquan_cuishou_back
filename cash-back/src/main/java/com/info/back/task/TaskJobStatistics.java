@@ -6,13 +6,10 @@ import java.util.Date;
 import java.util.HashMap;
 
 import com.info.back.dao.IPersonStatisticsDao;
-import com.info.back.service.IBigAmountStatisticsService;
-import com.info.back.service.IPersonStatisticsService;
+import com.info.back.service.*;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.info.back.service.ICountCollectionAssessmentService;
-import com.info.back.service.ICountCollectionManageService;
 import com.info.web.util.DateUtil;
 import org.springframework.stereotype.Component;
 
@@ -36,6 +33,9 @@ public class TaskJobStatistics {
 
     @Autowired
     private IBigAmountStatisticsService bigAmountStatisticsService;
+
+    @Autowired
+    IStatisticsService statisticsService;
 
     public void callProcedure() {
         try {
@@ -96,6 +96,13 @@ public class TaskJobStatistics {
         logger.info("大额统计开始.....");
         bigAmountStatisticsService.doStatistics(beginTime,endTime);
         logger.info("大额统计执行完成,完成时间 :" + DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
+    }
+
+    //时间段累计统计
+    public void trackStatistics(){
+        logger.info("时间段累计统计开始.....");
+        statisticsService.doTrackStatistics();
+        logger.info("时间段累计统计完成,完成时间 :" + DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
     }
 
 

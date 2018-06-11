@@ -20,6 +20,10 @@ public class BackConstant {
     public static final Map<String, String> groupNameTypeMap = new LinkedHashMap<String, String>();
     public static final Map<String, String> MTypeMap = new LinkedHashMap<String, String>();
 
+    public static final Map<String, String> borrowingTypeMap = new HashMap<String, String>();//借款类型
+
+    public static final Map<String, String> userTypeMap = new HashMap<String, String>();//借款人类型
+
     public static final Map<String, String> groupStatusMap = new HashMap<String, String>();//催收员状态
 
     public static final Map<String, String> typeMap = new LinkedHashMap<String, String>(); // 分期类型
@@ -157,6 +161,16 @@ public class BackConstant {
         typeNameMap.put("2", "二期");
         typeNameMap.put("3", "三期");
         typeNameMap.put("4", "四期");
+
+        borrowingTypeMap.put("1","大额");
+        borrowingTypeMap.put("2","小额");
+        borrowingTypeMap.put("3","分期商城");
+
+        userTypeMap.put("新用户","新用户");
+        userTypeMap.put("17老用户","17老用户");
+        userTypeMap.put("18老用户","18老用户");
+        userTypeMap.put("未知","未知");
+
     }
 
     public final static String XJX_COLLECTION_ORDER_USED = "1";// 派单状态-有效

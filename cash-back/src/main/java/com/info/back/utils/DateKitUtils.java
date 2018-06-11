@@ -3,6 +3,7 @@ package com.info.back.utils;
 import com.info.web.util.DateUtil;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -26,6 +27,7 @@ public class DateKitUtils {
         }
         return params;
     }
+
 
 
 
@@ -58,5 +60,47 @@ public class DateKitUtils {
         String nowTime = DateUtil.getDateFormat(new Date(),"yyyy-MM-dd HH:45:00");
         params.put("endTime",nowTime);
         return params;
+    }
+
+
+    public static HashMap<String,Object> delTrackDate() {
+        HashMap<String, Object> params = new HashMap<>();
+        String firstDate =  DateUtil.getDateFormat(DateUtil.getDayFirst(),"yyyy-MM-dd");
+        params.put("beginTime",firstDate);
+        String lastDate = DateUtil.getDateFormat(DateUtil.getDayLast(),"yyyy-MM-dd");
+        params.put("endTime",lastDate);
+        return params;
+    }
+
+    public static void handleSelectDate(HashMap<String, Object> params) {
+        if (null != params.get("dispatchTime")){
+            String dispatchTime = (String) params.get("dispatchTime");//起始派单日期
+            String dispatchEndTime ="";
+            Calendar cal1 = Calendar.getInstance();
+            cal1.setTime(DateUtil.getDateTimeFormat(dispatchTime,"yyyy-MM-dd"));
+            int month = cal1.get(Calendar.MONTH)+1;
+
+            if ( null == params.get("dispatchEndTime")){ //如果最后派单日期为空，则默认为起始派单日当月的最后一天
+                dispatchEndTime = DateUtil.getLastDayOfMonth(cal1.get(Calendar.YEAR),month);
+            }else { //如果最后派单日期不为空，则为选择日期
+                dispatchEndTime = (String) params.get("dispatchEndTime");
+                Calendar cal2 = Calendar.getInstance();
+                cal2.setTime(DateUtil.getDateTimeFormat(dispatchEndTime,"yyyy-MM-dd"));
+                int month2 = cal2.get(Calendar.MONTH)+1; //获取所选日期的月份
+                if (month != month2){ //如果起始日期和最后日期不在一个月，则最后日期为起始日期当月的最后一天
+                    dispatchEndTime = DateUtil.getLastDayOfMonth(cal1.get(Calendar.YEAR),month);
+                }
+            }
+
+            params.put("dispatchTime",dispatchTime);
+            params.put("dispatchEndTime",dispatchEndTime);
+            params.put("endTime",DateUtil.getLastDayOfMonth(cal1.get(Calendar.YEAR),month)); //统计截止日
+
+        }else{ //如果未选择任何值，则设置默认值
+            params.put("dispatchTime",DateUtil.getDateFormat(DateUtil.getDayFirst(),"yyyy-MM-dd"));
+            params.put("dispatchEndTime",DateUtil.getDateFormat(new Date(),"yyyy-MM-dd"));
+            params.put("endTime",DateUtil.getDateFormat(DateUtil.getDayLast(),"yyyy-MM-dd"));//统计截止日
+            System.out.println("ss");
+        }
     }
 }

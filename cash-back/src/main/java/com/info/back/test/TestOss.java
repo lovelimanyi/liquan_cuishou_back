@@ -1,6 +1,7 @@
 package com.info.back.test;
 
 import com.alibaba.fastjson.JSONObject;
+import com.info.back.utils.CompanyUtils;
 import com.info.back.utils.HttpUtils;
 import com.info.back.utils.MQResponse;
 import com.info.back.vo.JxlResponse;
@@ -11,6 +12,8 @@ import com.info.back.vo.jxl_dk360.Dk360Report;
 import com.info.back.vo.jxl_jdq.JdqReport;
 import com.info.back.vo.jxl_jlm.JlmReport;
 import com.info.constant.Constant;
+import com.info.web.pojo.BackUser;
+import com.info.web.pojo.MmanLoanCollectionCompany;
 import com.info.web.util.DateUtil;
 import com.liquan.oss.OSSUpload;
 import org.apache.commons.lang.StringUtils;
@@ -25,6 +28,7 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 /**
  * 类描述：
@@ -37,6 +41,19 @@ public class TestOss {
 
     @Test
     public void test() {
+
+        String st = DateUtil.getLastDayOfMonth(2018,4);
+        System.out.println(st);
+
+
+        BackUser backUser = new BackUser();
+        backUser.setRoleId("10022");
+        backUser.setId(13757);
+        List<MmanLoanCollectionCompany> companyList = CompanyUtils.getUserCompanyRelation(backUser);
+        System.out.println(companyList);
+
+
+
         String firstDate =  DateUtil.getDateFormat(DateUtil.getDayFirst(),"yyyy-MM-dd 00:00:00");
         System.out.println(firstDate);
         String date1 = DateUtil.getDateFormat(new Date(),"yyyy-MM-dd HH:45:00");
