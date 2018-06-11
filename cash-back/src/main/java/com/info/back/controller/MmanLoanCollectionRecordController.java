@@ -2,10 +2,7 @@ package com.info.back.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.info.back.service.*;
-import com.info.back.utils.BackConstant;
-import com.info.back.utils.DwzResult;
-import com.info.back.utils.MaskCodeUtil;
-import com.info.back.utils.SpringUtils;
+import com.info.back.utils.*;
 import com.info.constant.Constant;
 import com.info.web.pojo.*;
 import com.info.web.util.DateUtil;
@@ -18,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -251,5 +249,20 @@ public class MmanLoanCollectionRecordController extends BaseController {
             orderStatusMap.put(sysDict.getValue(), sysDict.getLabel());
         }
         return orderStatusMap;
+    }
+
+    // 保存催收记录
+    @ResponseBody
+    @RequestMapping(value = "/saveRecord", method = RequestMethod.POST)
+    public String saveCollectionRecord(HttpServletRequest request) {
+        HashMap<String, Object> params = this.getParametersO(request);
+        try {
+            BackUser user = (BackUser) request.getSession().getAttribute(Constant.BACK_USER);
+            mmanLoanCollectionRecordService.saveCollectionRecord(params,user);
+        } catch (Exception e) {
+            logger.error("添加催收记录出错！");
+            e.printStackTrace();
+        }
+        return ServiceResult.SUCCESS;
     }
 }

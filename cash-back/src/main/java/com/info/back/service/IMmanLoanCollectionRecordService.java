@@ -106,4 +106,6 @@ public interface IMmanLoanCollectionRecordService {
 	 * @return
      */
 	 JsonResult fqWithholding(Map<String, String> params);
+
+    void saveCollectionRecord(HashMap<String, Object> params, BackUser user);
 }

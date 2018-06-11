@@ -22,6 +22,13 @@
     <%--<div class="pageContent">--%>
     <input type="hidden" value="${params.id}">
     <input type="hidden" id="orderId" value="${params.id}">
+    <input type="hidden" id="loanId" value="${collectionOrder.loanId}">
+    <input type="hidden" id="orderStatus" value="${collectionOrder.status}">
+    <input type="hidden" id="parentId" value="${params.parentId}">
+    <input type="hidden" id="phoneNumber" value="${collectionOrder.loanUserPhone}">
+    <input type="hidden" id="userId" value="${collectionOrder.userId}">
+    <input type="hidden" id="contactId">
+    <input type="hidden" id="collectionRecordId">
     <div class="tabs">
         <div class="tabsHeader">
             <div class="tabsHeaderContent">
@@ -176,12 +183,12 @@
 
     <div class="tabs">
         <div class="tabsHeader">
-            <div class="tabsHeaderContent">
+            <div class="tabsHeaderContent" id="collectionZone">
                 <ul>
-                    <li class="selected" onclick='script:$("#collectionRecord").show();'><a href="#"><span>催收记录</span></a></li>
+                    <li class="selected" onclick='getCollectionLists();'><a href="#"><span>催收记录</span></a></li>
                     <%--<li><a href="#"><span>通话记录</span></a></li>--%>
-                    <li><a href="#" onclick="getUserRealContent();"><span>通讯录</span></a></li>
-                    <li><a href="#" onclick="getJxlContent();"><span>聚信立报告</span></a></li>
+                    <li id="addressList"><a href="#" onclick="getUserRealContent();"><span>通讯录</span></a></li>
+                    <li id="jxlLable"><a href="#" onclick="getJxlContent();"><span>聚信立报告</span></a></li>
                 </ul>
             </div>
         </div>
@@ -234,7 +241,7 @@
                                             </select>
                                         </td>
                                         <td>
-                                            <div class="buttonActive" style="margin-left: 350px;">
+                                            <div class="buttonActive" style="margin-left: 180px;">
                                                 <div class="buttonContent">
                                                     <button type="button" id="searchOrderCollectionRecord">
                                                         查询
@@ -260,7 +267,6 @@
             </div>
             <div id="jxl">
             </div>
-
         </div>
     </div>
 
@@ -271,165 +277,143 @@
                     <li class="selected"><a href="#"><span>添加催记</span></a></li>
                 </ul>
             </div>
-
         </div>
         <div class="tabsContent" style="height:300px;">
-            <div class="pageContent" style="width: 80%;">
-                <form id="frm" method="post" enctype="multipart/form-data" action="collectionOrder/addRecordAndAdvice" onsubmit="return validateCallback(this, dialogAjaxDone);"
-                      class="pageForm required-validate">
-                    <input type="hidden" name="parentId" value="${params.parentId}"/>
-                    <input type="hidden" name="id" id="id" value="${params.id }">
-                    <input type="hidden" name="type" id="type" value="${params.type }"/>
-                    <div class="pageFormContent" style="overflow: auto;">
+            <div class="pageContent" style="width: 100%;">
+                <div class="pageFormContent" style="overflow: auto;">
+                    <fieldset>
+                        <dl>
+                            <dt style="width: 80px;">
+                                <label>
+                                    催收类型:
+                                </label>
+                            </dt>
+                            <dd>
+                                <select class="required" name="collectionMode">
+                                    <option value="1">电话催收</option>
+                                    <option value="2">短信催收</option>
+                                </select>
+                            </dd>
+                        </dl>
+                    </fieldset>
+                    <fieldset>
+                        <dl id="promisePay">
+                            <dt style="width: 80px;">
+                                <label>
+                                    承诺还款:
+                                </label>
+                            </dt>
+                            <dd style="column-span: 1;">
+                                <span><input type="radio" name="promiseRepay" value="1"/>是</span>
+                                <span style="margin-left: 50px;"><input type="radio" name="promiseRepay" checked="checked" value="0"/>否</span>
+                            </dd>
+
+                        </dl>
+                    </fieldset>
+                    <div id="promiseRepayTime">
                         <fieldset>
                             <dl>
                                 <dt style="width: 80px;">
                                     <label>
-                                        催收类型:
+                                        承诺还款时间:
                                     </label>
                                 </dt>
                                 <dd>
-                                    <select class="required" name="collectionMode">
-                                        <option value="1">电话催收</option>
-                                        <option value="2">短信催收</option>
-                                    </select>
+                                    <input type="text" id="repaymentTime" name="repaymentTime" value="" class="date textInput readonly" datefmt="yyyy-MM-dd"
+                                           readonly="readonly"/>
                                 </dd>
                             </dl>
                         </fieldset>
+                    </div>
+                    <div id="collectionWithPhone">
                         <fieldset>
-                            <dl id="promisePay">
+                            <dl>
                                 <dt style="width: 80px;">
                                     <label>
-                                        承诺还款:
+                                        是否接通:
                                     </label>
                                 </dt>
-                                <dd style="column-span: 1;">
-                                    <span><input type="radio" name="promiseRepay" value="1"/>是</span>
-                                    <span style="margin-left: 50px;"><input type="radio" name="promiseRepay" checked="checked" value="0"/>否</span>
+                                <dd style="width: 500px">
+                                    <span><input type="radio" name="isConnected" value="1"/>接通</span>
+                                    <span style="margin-left: 30px;"><input type="radio" name="isConnected" value="2"/>无人接听</span>
+                                    <span style="margin-left: 30px;"><input type="radio" name="isConnected" value="3"/>空号/停机/关机</span>
+                                    <span style="margin-left: 30px;"><input type="radio" name="isConnected" value="4"/>拒接/挂断/拉黑</span>
                                 </dd>
-
                             </dl>
                         </fieldset>
-                        <div id="promiseRepayTime">
+                        <div id="communicate">
                             <fieldset>
                                 <dl>
                                     <dt style="width: 80px;">
                                         <label>
-                                            承诺还款时间:
-                                        </label>
-                                    </dt>
-                                    <dd>
-                                        <input type="text" id="repaymentTime" name="repaymentTime" value="" class="date textInput readonly" datefmt="yyyy-MM-dd"
-                                               readonly="readonly"/>
-                                    </dd>
-                                </dl>
-                            </fieldset>
-                        </div>
-                        <div id="collectionWithPhone">
-                            <fieldset>
-                                <dl>
-                                    <dt style="width: 80px;">
-                                        <label>
-                                            是否接通:
+                                            沟通情况:
                                         </label>
                                     </dt>
                                     <dd style="width: 500px">
-                                        <span><input type="radio" name="isConnected" value="1"/>接通</span>
-                                        <span style="margin-left: 30px;"><input type="radio" name="isConnected" value="2"/>无人接听</span>
-                                        <span style="margin-left: 30px;"><input type="radio" name="isConnected" value="3"/>空号/停机/关机</span>
-                                        <span style="margin-left: 30px;"><input type="radio" name="isConnected" value="4"/>拒接/挂断/拉黑</span>
+                                        <span><input type="radio" name="communication" value="1"/>无偿还意愿</span>
+                                        <span style="margin-left: 40px;"><input type="radio" name="communication" value="2"/>无偿还能力</span>
+                                        <span style="margin-left: 40px;"><input type="radio" name="communication" value="3"/>虚假通讯录</span>
                                     </dd>
-                                </dl>
-                            </fieldset>
-                            <div id="communicate">
-                                <fieldset>
-                                    <dl>
-                                        <dt style="width: 80px;">
-                                            <label>
-                                                沟通情况:
-                                            </label>
-                                        </dt>
-                                        <dd style="width: 500px">
-                                            <span><input type="radio" name="communication" value="1"/>无偿还意愿</span>
-                                            <span style="margin-left: 40px;"><input type="radio" name="communication" value="2"/>无偿还能力</span>
-                                            <span style="margin-left: 40px;"><input type="radio" name="communication" value="3"/>虚假通讯录</span>
-                                        </dd>
-                                        <dd style="width: 500px">
-                                            <span style="margin-left: 90px;"><input type="radio" name="communication" value="4"/>虚假个人信息</span>
-                                            <span style="margin-left: 28px;"><input type="radio" name="communication" value="5"/>有偿还意愿</span>
-                                            <span style="margin-left: 40px;"><input type="radio" name="communication" value="6"/>亲友答应转告</span>
-                                        </dd>
-                                        <dd style="width: 500px">
-                                            <span style="margin-left: 90px;"><input type="radio" name="communication" value="7"/>亲友拒绝沟通</span>
-                                            <span style="margin-left: 28px;"><input type="radio" name="communication" value="8"/>无</span>
-                                        </dd>
-                                    </dl>
-                                </fieldset>
-                            </div>
-                            <fieldset>
-                                <div class="divider"></div>
-                                <dl>
-                                    <dt style="width: 80px;">
-                                        <label>
-                                            催收内容:
-                                        </label>
-                                    </dt>
-                                    <dd>
-                                        <textarea name="content" rows="5" cols="80" maxlength="100"></textarea>
+                                    <dd style="width: 500px">
+                                        <span style="margin-left: 90px;"><input type="radio" name="communication" value="4"/>虚假个人信息</span>
+                                        <span style="margin-left: 28px;"><input type="radio" name="communication" value="5"/>有偿还意愿</span>
+                                        <span style="margin-left: 40px;"><input type="radio" name="communication" value="6"/>亲友答应转告</span>
+                                    </dd>
+                                    <dd style="width: 500px">
+                                        <span style="margin-left: 90px;"><input type="radio" name="communication" value="7"/>亲友拒绝沟通</span>
+                                        <span style="margin-left: 28px;"><input type="radio" name="communication" value="8"/>无</span>
                                     </dd>
                                 </dl>
                             </fieldset>
                         </div>
-                        <div id="collectionWithMsg">
-                            <div class="pageFormContent">
-                                <dl>
-                                    <dt style="width: 80px;">
-                                        <label>
-                                            短信模板:
-                                        </label>
-                                    </dt>
-                                    <dd>
-                                        <select name="msgTemplate" id="msgTemplate">
-                                            <option value="">请选择模板</option>
-                                            <c:forEach var="msg" items="${msgs}" varStatus="status">
-                                                <option value="${msg.id}">${msg.name}</option>
-                                            </c:forEach>
-                                        </select>
-                                    </dd>
-                                    <dd>
-                                        <textarea id="msgContent" name="msgContent" readonly="readonly">${msgContent}</textArea>
-                                    </dd>
-                                </dl>
-                                <div id="msgNotice">
-                                    <span>每日可发送次数：${msgCountLimit} 次,今日剩余次数：<span style="color: #cd0a0a;">${remainMsgCount}</span> 次</span>
-                                </div>
+                        <fieldset>
+                            <div class="divider"></div>
+                            <dl>
+                                <dt style="width: 80px;">
+                                    <label>
+                                        催收内容:
+                                    </label>
+                                </dt>
+                                <dd>
+                                    <textarea name="content" rows="5" cols="80" maxlength="100" id="collectionContent"></textarea>
+                                </dd>
+                            </dl>
+                        </fieldset>
+                    </div>
+                    <div id="collectionWithMsg">
+                        <div class="pageFormContent">
+                            <dl>
+                                <dt style="width: 80px;">
+                                    <label>
+                                        短信模板:
+                                    </label>
+                                </dt>
+                                <dd>
+                                    <select name="msgTemplate" id="msgTemplate">
+                                        <option value="">请选择模板</option>
+                                        <c:forEach var="msg" items="${msgs}">
+                                            <option value="${msg.id}">${msg.name}</option>
+                                        </c:forEach>
+                                    </select>
+                                </dd>
+                                <dd>
+                                    <textarea id="msgContent" name="msgContent" readonly="readonly">${msgContent}</textArea>
+                                </dd>
+                            </dl>
+                            <div id="msgNotice">
+                                <span>每日可发送次数：${msgCountLimit} 次,今日剩余次数：<span style="color: #cd0a0a;">${remainMsgCount}</span> 次</span>
                             </div>
                         </div>
                     </div>
-                    <div class="formBar">
-                        <ul>
-                            <li>
-                                <div class="buttonActive">
-                                    <div class="buttonContent">
-                                        <button type="button" id="send">
-                                            保存
-                                        </button>
-                                    </div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="button">
-                                    <div class="buttonContent">
-                                        <button type="button" class="close">
-                                            取消
-                                        </button>
-                                    </div>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                    <br>
-                </form>
+                </div>
+                <ul>
+                    <li>
+                        <button style="margin-left: 800px;width: 70px;height: 25px;" type="button" id="addCollectionRecord">
+                            添加催记
+                        </button>
+                    </li>
+                </ul>
+                <div style="height: 50px;"></div>
             </div>
         </div>
     </div>

@@ -26,7 +26,7 @@ public interface IMmanLoanCollectionRecordDao {
 	 * @param id 要查询的记录id
 	 * @return 查询到的记录对象
 	 */
-	MmanLoanCollectionRecord getOneCollectionRecord(Integer id);
+	MmanLoanCollectionRecord getOneCollectionRecordById(String id);
 	
 	/**
 	 * 添加一条催收记录

@@ -16,6 +16,7 @@ import com.xjx.mqclient.service.MqClient;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -69,6 +70,8 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
     private IChannelSwitchingDao channelSwitchingDao;
     @Autowired
     private IFengKongService fengKongService;
+    @Autowired
+    private IMmanUserRelaService userRelaService;
 
     @Qualifier("mqClient")
     @Autowired
@@ -348,7 +351,7 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
     }
 
     @Override
-    public List<MmanLoanCollectionRecord> findListRecord(HashMap<String,Object> map) {
+    public List<MmanLoanCollectionRecord> findListRecord(HashMap<String, Object> map) {
         return mmanLoanCollectionRecordDao.findListRecord(map);
     }
 
@@ -926,5 +929,50 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
             }
         }
         return result;
+    }
+
+    @Override
+    public void saveCollectionRecord(HashMap<String, Object> params, BackUser user) {
+        MmanLoanCollectionRecord record = setRecordParam(params, user);
+        String userRealId = params.get("contactId") == null ? null : params.get("contactId").toString();
+        String collectionRecordId = params.get("collectionRecordId") == null ? null : params.get("collectionRecordId").toString();
+        if (StringUtils.isNotEmpty(userRealId)) {
+            // 查询借款人联系人信息
+            MmanUserRela userRela = userRelaService.getUserRealByUserId(userRealId);
+            record.setRelation(userRela.getRelaKey());
+            record.setContactName(userRela.getInfoName());
+            record.setContactPhone(userRela.getInfoValue());
+        } else if (StringUtils.isNotEmpty(collectionRecordId)) {
+            // 查询催收记录
+            System.out.println("查询催收记录");
+            MmanLoanCollectionRecord loanCollectionRecord = mmanLoanCollectionRecordDao.getOneCollectionRecordById(collectionRecordId);
+            record.setRelation(loanCollectionRecord.getRelation());
+            record.setContactName(loanCollectionRecord.getContactName());
+            record.setContactPhone(loanCollectionRecord.getContactPhone());
+        }
+        mmanLoanCollectionRecordDao.insert(record);
+    }
+
+    // 设置共用参数
+    private MmanLoanCollectionRecord setRecordParam(HashMap<String, Object> params, BackUser user) {
+        MmanLoanCollectionRecord record = new MmanLoanCollectionRecord();
+        // 借款人用户id
+        record.setId(IdGen.uuid());
+        record.setOrderId(params.get("orderId").toString());
+        record.setCollectionDate(new Date());
+        record.setContent(params.get("content") == null ? null : params.get("content").toString());
+        record.setCollectionType(params.get("collectionMode").toString());
+        record.setCommunicationStatus(params.get("communication") == null ? null : params.get("communication").toString());
+        record.setCreateDate(new Date());
+        record.setUpdateDate(new Date());
+        record.setUserId(params.get("userId") == null ? null : params.get("userId").toString());
+        record.setCurrentOverdueLevel(user.getGroupLevel());
+        record.setCollectionGroup(user.getGroupLevel());
+        record.setOrderState(params.get("orderStatus") == null ? null : params.get("orderStatus").toString());
+        record.setCompanyTitle(user.getCompanyTitle());
+        record.setLoanId(params.get("loanId") == null ? null : params.get("loanId").toString());
+        record.setContactType("1");
+        record.setCollectionId(user.getUuid());
+        return record;
     }
 }

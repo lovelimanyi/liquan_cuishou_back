@@ -192,6 +192,7 @@
             <if test="loanId != null">`loan_id`,</if>
             <if test="currentOverdueLevel != null">`current_overdue_level`,</if>
             <if test="remark != null">`remark`,</if>
+            <if test="communicationStatus != null">`communication_status`,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id,jdbcType=VARCHAR},</if>
@@ -213,6 +214,7 @@
             <if test="loanId != null">#{loanId,jdbcType=VARCHAR},</if>
             <if test="currentOverdueLevel != null">#{currentOverdueLevel,jdbcType=VARCHAR},</if>
             <if test="remark != null">#{remark,jdbcType=VARCHAR},</if>
+            <if test="communicationStatus != null">#{communicationStatus,jdbcType=VARCHAR},</if>
         </trim>
     </insert>
     <!-- 更新不为NULL的字段 -->
@@ -245,12 +247,12 @@
     <delete id="del" parameterType="com.info.web.pojo.MmanLoanCollectionRecord">DELETE FROM mman_loan_collection_record WHERE id = #{id,jdbcType=VARCHAR}</delete>
     <!-- 根据orderid查询历史 -->
     <select id="findListRecord" resultMap="queryResultMap" parameterType="hashMap">
-		SELECT t.id , t.order_id , t.collection_id , mo.`loan_id` as user_id , t.contact_type , t.contact_name , t.relation , t.contact_phone ,
+        SELECT t.id , t.order_id , t.collection_id , mo.`loan_id` as user_id , t.contact_type , t.contact_name , t.relation , t.contact_phone ,
         t.order_state ,u.user_name AS collectionPerson,t.collection_type , t.collection_date , t.collectionAmount , t.content , t.create_date ,
         t.update_date ,t.remark,t.communication_status,t.current_overdue_level,t.remark
-		FROM mman_loan_collection_record t left join mman_loan_collection_order mo on mo.id = t.order_id LEFT JOIN back_user u on u.uuid = t.collection_id
+        FROM mman_loan_collection_record t left join mman_loan_collection_order mo on mo.id = t.order_id LEFT JOIN back_user u on u.uuid = t.collection_id
         WHERE t.order_id =#{id,jdbcType=VARCHAR}
-		<if test="overdueLevel != '' and overdueLevel != null">
+        <if test="overdueLevel != '' and overdueLevel != null">
             AND t.current_overdue_level = #{overdueLevel}
         </if>
         <if test="collectionStatus != '' and collectionStatus != null">
@@ -265,6 +267,10 @@
         <if test="collectionName != '' and collectionName != null">
             AND u.user_name = #{collectionName}
         </if>
-		ORDER BY t.`create_date` DESC
-	</select>
+        ORDER BY t.`create_date` DESC
+    </select>
+
+    <select id="getOneCollectionRecordById" parameterType="String" resultMap="queryResultMap">
+        SELECT * FROM mman_loan_collection_record WHERE id = #{recordId}
+    </select>
 </mapper>

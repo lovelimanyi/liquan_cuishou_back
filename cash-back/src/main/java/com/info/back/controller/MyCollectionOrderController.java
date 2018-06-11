@@ -468,6 +468,7 @@ public class MyCollectionOrderController extends BaseController {
     public String toxianqin(HttpServletRequest request, Model model) {
         HashMap<String, Object> params = this.getParametersO(request);
         String url = "mycollectionorder/toApplyCsDetail";
+        BackUser backUser = (BackUser) request.getSession().getAttribute(Constant.BACK_USER);
         try {
             String id = params.get("id") + "";
             if (StringUtils.isNotBlank(id)) {
@@ -601,6 +602,7 @@ public class MyCollectionOrderController extends BaseController {
                 model.addAttribute("collectionOrder", order);
                 model.addAttribute("userInfo", userInfo);
                 model.addAttribute("userCar", userCar);// 银行卡
+                model.addAttribute("backUser", backUser);
                 url = "mycollectionorder/myorderDetails";
 //			}
             }
@@ -1129,53 +1131,40 @@ public class MyCollectionOrderController extends BaseController {
      * @return
      */
     @RequestMapping("/sendMsg")
-    public ServiceResult SendSms(HttpServletRequest request, HttpServletResponse response, Model model) {
+    @ResponseBody
+    public ServiceResult SendSms(HttpServletRequest request) {
         JsonResult result = new JsonResult("-1", "发送短信失败");
         HashMap<String, Object> params = this.getParametersO(request);
         try {
             String orderId = params.get("orderId") + "";
             if (StringUtils.isBlank(orderId)) {
-                result.setCode("-1");
-                result.setMsg("订单异常！");
-                return getServiceResult(response, model, result, params);
+                return new ServiceResult("-1", "订单异常！");
             }
             MmanLoanCollectionOrder order = mmanLoanCollectionOrderService.getOrderById(orderId);
             if (order == null) {
-                result.setCode("-2");
-                result.setMsg("订单异常！");
                 logger.error("订单为null,loanId : " + orderId);
-                return getServiceResult(response, model, result, params);
+                return new ServiceResult("-2", "订单异常！");
             }
 
             if (BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())) {
-                result.setCode("-3");
-                result.setMsg("催收成功订单不能发送催收短信！");
                 logger.error("催收成功订单不能发送催收短信！" + orderId);
-                return getServiceResult(response, model, result, params);
+                return new ServiceResult("-3", "催收成功订单不能发送催收短信！");
             }
             String mobile = request.getParameter("phoneNumber") == null ? "" : request.getParameter("phoneNumber").trim();
             if (StringUtils.isEmpty(mobile)) {
-                result.setCode("-4");
-                result.setMsg("手机号不能为空！");
-                return getServiceResult(response, model, result, params);
+                return new ServiceResult("-4", "手机号不能为空！");
             }
             Matcher matcher = MOBILE_PATTERN.matcher(mobile);
             if (!matcher.matches()) {
-                result.setCode("-5");
-                result.setMsg("手机号异常！");
-                return getServiceResult(response, model, result, params);
+                return new ServiceResult("-5", "手机号异常！");
             }
             String msgCode = params.get("msgId") + "";
-            if (StringUtils.isEmpty(msgCode)) {
-                result.setCode("-7");
-                result.setMsg("请选择正确的短信模板！");
-                return getServiceResult(response, model, result, params);
+            if (StringUtils.isEmpty(msgCode) || "0".equals(msgCode)) {
+                return new ServiceResult("-6", "请选择正确的短信模板！");
             }
             String msgParam = getMsgParam(order);
             if (msgParam == null) {
-                result.setCode("-8");
-                result.setMsg("短信参数异常！");
-                return getServiceResult(response, model, result, params);
+                return new ServiceResult("-7", "短信参数异常！");
             }
             // 查询出该订单当天已发短信的次数
             int count = smsUserService.getSendMsgCount(order.getLoanId());
@@ -1186,25 +1175,21 @@ public class MyCollectionOrderController extends BaseController {
                 msgCountLimit = 2;
             }
             if (msgCountLimit <= count) {
-                result.setCode("-6");
-                result.setMsg("今日该订单发送短信已达上限" + (msgCountLimit) + "条！");
-                return getServiceResult(response, model, result, params);
+                return new ServiceResult("-8", "今日该订单发送短信已达上限" + (msgCountLimit) + "条！");
             }
             boolean smsResult = SmsSendUtil.sendSmsNew(mobile, msgParam, msgCode);
             if (smsResult) {
-                result.setCode("0");
-                result.setMsg("发送成功！");
                 // 插入短信记录
                 insertMsg(mobile, order, mobile, msgCode, request);
+                return new ServiceResult("200", "发送短信成功！");
             } else {
-                result.setCode("-8");
-                result.setMsg("发送失败！");
+                return new ServiceResult("-9", "发送失败！");
             }
         } catch (Exception e) {
             logger.error("发送短信失败，订单id：" + params.get("id"));
             e.printStackTrace();
         }
-        return getServiceResult(response, model, result, params);
+        return null;
     }
 
     /**

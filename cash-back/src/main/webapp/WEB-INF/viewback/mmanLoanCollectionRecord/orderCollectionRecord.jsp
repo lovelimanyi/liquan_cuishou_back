@@ -52,7 +52,7 @@
         <c:forEach var="record" items="${list }">
             <tr target="recordId" rel="${record.id }" style="height: 24px;">
                 <td align="center">
-                    <input type="radio" name="collectionRecord">
+                    <input type="radio" name="collectionRecord" id="${record.id }" onchange="getChooseVal(this);">
                 </td>
                 <td align="center">
                         ${record.contactName }

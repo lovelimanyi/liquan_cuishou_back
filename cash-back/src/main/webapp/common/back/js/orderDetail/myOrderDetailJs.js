@@ -32,6 +32,7 @@ function getJxlContent() {
 
 // 获取借款人联系人信息
 function getUserRealContent() {
+    $("#collectionRecordId").val("");
     var orderId = $("#orderId").val();
     $("#collectionRecord").show();
     $('#userRealContent').empty();
@@ -47,8 +48,8 @@ function getUserRealContent() {
             var res = '<table class="table" style="width: 100%;"><tr>';
             var count = data.length;
             for (var i = 1; i <= count; i++) {
-                res += '<td style="width: 105px;height: 24px;"><input type="radio" name="concatInfo">' + '&nbsp&nbsp' + data[i - 1].infoName
-                    + '</td><td style="width: 120px;height: 24px;">' + data[i - 1].infoValue + '</td>';
+                res += '<td style="width: 105px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedVal(this);" value="' + data[i - 1].id + '" ' +
+                    'userPhone="' + data[i - 1].infoValue + '"/>' + '&nbsp&nbsp' + data[i - 1].infoName + '</td><td style="width: 120px;height: 24px;">' + data[i - 1].infoValue + '</td>';
                 if (i % 5 == 0) {
                     res += '</tr>';
                 }
@@ -120,7 +121,7 @@ function getUserRepayInfo() {
                 withholdDetailResult += '<td>' + getValues(withhold.hasalsoMoney) + '</td>';
                 withholdDetailResult += '<td>' + getValues(withhold.deductionsMoney) + '</td>';
                 withholdDetailResult += '<td>' + getWithholdStatus(withhold.status) + '</td>';
-                withholdDetailResult += '<td>' + withhold.remark + '</td>';
+                withholdDetailResult += '<td>' + getReason(withhold.remark) + '</td>';
                 withholdDetailResult += '<td>' + getFormatDate(withhold.updateDate) + '</td>';
                 withholdDetailResult += '</tr>';
             });
@@ -154,6 +155,14 @@ function getFormatDate(now) {
 function getValues(data) {
     if (data == null) {
         return 0.00;
+    } else {
+        return data;
+    }
+}
+
+function getReason(data) {
+    if (data == null) {
+        return "";
     } else {
         return data;
     }
@@ -308,18 +317,21 @@ $("select[name='collectionMode']").change(function () {
 });
 
 
-$("#send").click(function () {
+$("#addCollectionRecord").click(function () {
     var val = $("select[name='collectionMode'] option:selected").val();
     if (val == '1') {
-        alertMsg.warn("打电话...电话催收");
+        // alertMsg.warn("打电话...电话催收");
         // 保存对应的催收记录
+        saveCollectionRecord();
     } else {
-        alertMsg.info("发送短信...短信催收");
+        // alertMsg.info("发送短信...短信催收");
         // 发送短信
+        sendMsg();
+        saveCollectionRecord();
     }
 });
 
-
+// 获取订单的所有催收记录
 function getRecordLists() {
     var orderId = $("#orderId").val();
     $("#recordListContent").empty();
@@ -338,7 +350,7 @@ function getRecordLists() {
     });
 };
 
-
+// 依据条件动态查询订单对应催收记录
 $("#searchOrderCollectionRecord").click(function () {
     var overdueLevel = $("select[name='overdueLevel'] option:checked").val();
     var collectionStatus = $("select[name='collectionStatus'] option:checked").val();
@@ -364,8 +376,114 @@ $("#searchOrderCollectionRecord").click(function () {
                 $("#recordListContent").append(data);
             }
         },
-        error:function(){
+        error: function () {
             alertMsg.error("系统开小差了,请稍后再试...")
         }
     });
 });
+
+// 添加催收记录
+function saveCollectionRecord() {
+    var collectionMode = $("select[name='collectionMode'] option:checked").val();
+    var repaymentTime = $("#repaymentTime").val();
+    var communication = $("input[name='communication']:checked").val();
+    var collectionContent = $("#collectionContent").val();
+    var orderId = $("#orderId").val();
+    // 借款人用户id
+    var userId = $("#userId").val();
+    var loanId = $("#loanId").val();
+    var orderStatus = $("#orderStatus").val();
+    var contactId = $("#contactId").val();
+    var collectionRecordId = $("#collectionRecordId").val();
+    $.ajax({
+        type: "POST",
+        url: "/back/collectionRecord/saveRecord",
+        data: {
+            collectionMode: collectionMode,
+            repaymentTime: repaymentTime,
+            communication: communication,
+            collectionContent: collectionContent,
+            orderId: orderId,
+            contactId: contactId,
+            userId: userId,
+            loanId: loanId,
+            orderStatus: orderStatus,
+            collectionRecordId: collectionRecordId
+        },
+        success: function () {
+            alertMsg.correct("添加催收详情成功！");
+            // 刷新催收记录
+            getRecordLists();
+            // 清空之前的选择记录
+            clearRecord();
+        },
+        error: function () {
+            alertMsg.error("系统错误，请稍后再试！")
+        }
+    })
+}
+
+// 发送短信
+function sendMsg() {
+    var orderId = $("#orderId").val();
+    var parentId = $("#parentId").val();
+    var phoneNumber = $("#phoneNumber").val();
+    var msgId = getMsgId();
+    $.ajax({
+        type: "GET",
+        url: "/back/collectionOrder/sendMsg",
+        data: {
+            orderId: orderId,
+            msgId: msgId,
+            parentId: parentId,
+            phoneNumber: phoneNumber
+        },
+        dataType: "json",
+        success: function (data) {
+            if (data.success) {
+                alertMsg.correct(data.msg);
+            } else {
+                alertMsg.warn(data.msg);
+            }
+        }
+    });
+}
+
+// 获取短信id
+function getMsgId() {
+    var msgId = $("select[name='msgTemplate'] option:checked").val();
+    if (msgId == null || msgId == "") {
+        return 0;
+    }
+    return msgId;
+}
+
+// 设置选中联系人的id值
+function getSelectedVal(i) {
+    $("#contactId").val($(i).val());
+    var userPhone = $(i).attr("userPhone");
+    console.log("userPhone = " + userPhone);
+    $("#phoneNumber").val(userPhone);
+}
+
+// 清空之前添加催收记录所填写的数据
+function clearRecord() {
+    $("textarea[name='content']").val("");
+    $("input[name='communication']").removeAttr("checked");
+    $("input[name='promiseRepay']").removeAttr("checked");
+    $("input[name='isConnected']").removeAttr("checked");
+    $("#repaymentTime").val("");
+}
+
+
+// 获取催收记录
+function getCollectionLists() {
+    $("#contactId").val("");
+    $("#collectionRecord").show();
+    getRecordLists();
+}
+
+// 设置选中催收记录的id,传递到后台便于查询数据
+function getChooseVal(data) {
+    $("#collectionRecordId").val(data.id);
+}
