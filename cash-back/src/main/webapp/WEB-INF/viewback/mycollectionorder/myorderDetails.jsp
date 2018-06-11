@@ -22,13 +22,15 @@
     <%--<div class="pageContent">--%>
     <input type="hidden" value="${params.id}">
     <input type="hidden" id="orderId" value="${params.id}">
-    <input type="hidden" id="loanId" value="${collectionOrder.loanId}">
+    <input type="hidden" id="orderLoanId" value="${collectionOrder.loanId}">
     <input type="hidden" id="orderStatus" value="${collectionOrder.status}">
     <input type="hidden" id="parentId" value="${params.parentId}">
     <input type="hidden" id="phoneNumber" value="${collectionOrder.loanUserPhone}">
     <input type="hidden" id="userId" value="${collectionOrder.userId}">
     <input type="hidden" id="contactId">
     <input type="hidden" id="collectionRecordId">
+    <%-- 标记用户选择的是否是紧急联系人 --%>
+    <input type="hidden" id="isCloseRelation">
     <div class="tabs">
         <div class="tabsHeader">
             <div class="tabsHeaderContent">
@@ -107,7 +109,7 @@
                         <tr>
                             <td class="tdGround" style="height: 116px;border-bottom: 0px;">身份证图片:</td>
                             <td colspan="7" style="border-bottom: 0px;">
-                                <div style="margin: 2px 200px 2px;">
+                                <div style="margin: 2px 200px 2px;" id="userPhoto">
                                     <c:if test="${userInfo.idcardImgZ!=null}">
                                         <img id="imgZ" class="img-container" src="${userInfo.idcardImgZ}"/>
                                     </c:if>
@@ -376,6 +378,9 @@
                                 </dt>
                                 <dd>
                                     <textarea name="content" rows="5" cols="80" maxlength="100" id="collectionContent"></textarea>
+                                    <div style="width: 500px;height: 20px;margin-top: 100px;">
+                                        <font style="color: #1b8d0f">温馨提示：</font><font style="color: #cd0a0a">如果不点选催收记录或通讯录中联系人则默认催收本人。</font>
+                                    </div>
                                 </dd>
                             </dl>
                         </fieldset>
@@ -408,7 +413,7 @@
                 </div>
                 <ul>
                     <li>
-                        <button style="margin-left: 800px;width: 70px;height: 25px;" type="button" id="addCollectionRecord">
+                        <button style="margin-left: 110px;width: 70px;height: 25px;" type="button" id="addCollectionRecord">
                             添加催记
                         </button>
                     </li>

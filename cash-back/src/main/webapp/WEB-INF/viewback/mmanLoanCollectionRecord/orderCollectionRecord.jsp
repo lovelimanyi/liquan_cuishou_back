@@ -83,7 +83,7 @@
                         ${record.collectionPerson }
                 </td>
                 <td align="center">
-                        ${record.remark }
+                        ${record.content }
                 </td>
                 <td align="center">
                     <fmt:formatDate value="${record.collectionDate }" pattern="yyyy-MM-dd HH:mm:ss"/>

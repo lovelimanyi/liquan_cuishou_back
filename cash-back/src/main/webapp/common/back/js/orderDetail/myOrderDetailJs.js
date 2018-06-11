@@ -27,7 +27,7 @@ function getJxlContent() {
         }
     });
     $("#collectionRecord").hide();
-
+    // $("#userPhoto").parent("td").addClass("photoDivStyle");
 }
 
 // 获取借款人联系人信息
@@ -48,10 +48,18 @@ function getUserRealContent() {
             var res = '<table class="table" style="width: 100%;"><tr>';
             var count = data.length;
             for (var i = 1; i <= count; i++) {
-                res += '<td style="width: 105px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedVal(this);" value="' + data[i - 1].id + '" ' +
-                    'userPhone="' + data[i - 1].infoValue + '"/>' + '&nbsp&nbsp' + data[i - 1].infoName + '</td><td style="width: 120px;height: 24px;">' + data[i - 1].infoValue + '</td>';
-                if (i % 5 == 0) {
-                    res += '</tr>';
+                if (i < 3) {
+                    res += '<td style="width: 105px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedVal(this);" value="' + data[i - 1].id + '" isCloseRelation="' + i + '"' +
+                        'userPhone="' + data[i - 1].infoValue + '"/>' + '&nbsp&nbsp' + data[i - 1].infoName + '</td><td style="width: 120px;height: 24px;">' + data[i - 1].infoValue + '</td>';
+                    if (i == 2) {
+                        res += '</tr>';
+                    }
+                } else {
+                    res += '<td style="width: 105px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedVal(this);" value="' + data[i - 1].id + '" ' +
+                        'userPhone="' + data[i - 1].infoValue + '"/>' + '&nbsp&nbsp' + data[i - 1].infoName + '</td><td style="width: 120px;height: 24px;">' + data[i - 1].infoValue + '</td>';
+                    if ((i - 2) % 5 == 0) {
+                        res += '</tr>';
+                    }
                 }
             }
             res += '</table>';
@@ -391,13 +399,36 @@ function saveCollectionRecord() {
     var orderId = $("#orderId").val();
     // 借款人用户id
     var userId = $("#userId").val();
-    var loanId = $("#loanId").val();
+    var loanId = $("#orderLoanId").val();
     var orderStatus = $("#orderStatus").val();
     var contactId = $("#contactId").val();
     var collectionRecordId = $("#collectionRecordId").val();
+    var collectionContent = $("textarea[name='content']").val();
+    var promiseRepay = $("input[name='promiseRepay']:checked").val();
+    var isConnected = $("input[name='isConnected']:checked").val();
+    // 是否是紧急联系人
+    var isCloseRelation = $("#isCloseRelation").val();
+    console.log("isCloseRelation = " + isCloseRelation);
+    if (promiseRepay == 1) {
+        if (repaymentTime == null || repaymentTime == '') {
+            $("#repaymentTime").addClass("required");
+            alertMsg.warn("用户承诺还款，则承诺还款时间必填。");
+            return;
+        }
+    }
+    if (isConnected == 1) {
+        console.log("communication = " + communication);
+        if (communication == null) {
+            $("input[name='communication']").addClass("required");
+            alertMsg.warn("电话接通，则沟通情况必选。");
+            return;
+        }
+    }
+
     $.ajax({
         type: "POST",
         url: "/back/collectionRecord/saveRecord",
+        contentType: "application/x-www-form-urlencoded; charset=utf-8",
         data: {
             collectionMode: collectionMode,
             repaymentTime: repaymentTime,
@@ -408,7 +439,8 @@ function saveCollectionRecord() {
             userId: userId,
             loanId: loanId,
             orderStatus: orderStatus,
-            collectionRecordId: collectionRecordId
+            collectionRecordId: collectionRecordId,
+            isCloseRelation: isCloseRelation
         },
         success: function () {
             alertMsg.correct("添加催收详情成功！");
@@ -460,9 +492,11 @@ function getMsgId() {
 
 // 设置选中联系人的id值
 function getSelectedVal(i) {
+    if ($(i).index() < 3) {
+        $("#isCloseRelation").val($(i).attr("isCloseRelation"));
+    }
     $("#contactId").val($(i).val());
     var userPhone = $(i).attr("userPhone");
-    console.log("userPhone = " + userPhone);
     $("#phoneNumber").val(userPhone);
 }
 
