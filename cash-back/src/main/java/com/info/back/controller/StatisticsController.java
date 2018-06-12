@@ -7,6 +7,7 @@ import com.info.back.utils.DateKitUtils;
 import com.info.constant.Constant;
 import com.info.web.pojo.BackUser;
 import com.info.web.pojo.MmanLoanCollectionCompany;
+import com.info.web.pojo.RecoveryRate;
 import com.info.web.pojo.TrackStatistics;
 import com.info.web.util.PageConfig;
 import org.slf4j.Logger;
@@ -22,7 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * 类描述：新增的统计，包含：派单跟踪统计-机构，派单统计-个人
+ * 类描述：新增的统计，包含：派单跟踪统计-机构，派单统计-个人 ,催回率统计
  * 创建人：yyf
  * 创建时间：2018/6/6 0006下午 03:42
  */
@@ -76,10 +77,40 @@ public class StatisticsController extends BaseController {
         model.addAttribute("params", params);// 用于搜索框保留值
         return pageUrl;
     }
-
+    /**
+     * 时间段累计统计--执行统计
+     */
     @RequestMapping("/doTrackStatistics")
     public void doTrackStatistics(){
         statisticsService.doTrackStatistics();
+    }
+
+    /**
+     * 催回率统计（页面）
+     */
+    @RequestMapping("/recoveryRateStatistics")
+    public String recoveryStatistics(HttpServletRequest request, Model model){
+        String pageUrl = "statisticsNew/recoveryRateStatistics";
+        HashMap<String, Object> params = getParametersO(request);
+        //如果借款类型为空，则默认为 小额的
+        if (params.get("borrowingType") == null){
+            params.put("borrowingType","2");
+        }
+        PageConfig<RecoveryRate> pageConfig = statisticsService.findRecoveryPage(params);
+        model.addAttribute("borrowingTypeMap", BackConstant.borrowingTypeMap);
+        model.addAttribute("list",pageConfig.getItems());
+        model.addAttribute("pm", pageConfig);
+        model.addAttribute("params", params);// 用于搜索框保留值
+        return pageUrl;
+    }
+
+
+    /**
+     * 催回率统计--执行统计
+     */
+    @RequestMapping("/doRecoveryStatistics")
+    public void doRecoveryStatistics(){
+        statisticsService.doRecoveryStatistics();
     }
 
 }

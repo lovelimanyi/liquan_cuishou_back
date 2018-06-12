@@ -1,5 +1,6 @@
 package com.info.back.service;
 
+import com.info.web.pojo.RecoveryRate;
 import com.info.web.pojo.TrackStatistics;
 import com.info.web.util.PageConfig;
 
@@ -16,4 +17,8 @@ public interface IStatisticsService {
     PageConfig<TrackStatistics> findPage(HashMap<String, Object> params);
 
     PageConfig<TrackStatistics> findCompanyPage(HashMap<String, Object> params);
+
+    void doRecoveryStatistics();
+
+    PageConfig<RecoveryRate> findRecoveryPage(HashMap<String, Object> params);
 }

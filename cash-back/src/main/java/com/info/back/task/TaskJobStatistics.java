@@ -103,6 +103,9 @@ public class TaskJobStatistics {
         logger.info("时间段累计统计开始.....");
         statisticsService.doTrackStatistics();
         logger.info("时间段累计统计完成,完成时间 :" + DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
+        logger.info("催回率计统计开始.....");
+        statisticsService.doRecoveryStatistics();
+        logger.info("催回率统计完成,完成时间 :" + DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
     }
 
 
