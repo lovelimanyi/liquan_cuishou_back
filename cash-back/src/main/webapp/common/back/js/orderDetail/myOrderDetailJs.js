@@ -45,6 +45,10 @@ function getUserRealContent() {
         dataType: 'json',
         contentType: "application/x-www-form-urlencoded; charset=UTF-8",
         success: function (data) {
+            if (data == null) {
+                alertMsg.warn("催收成功订单不允许查看通讯录！")
+                return;
+            }
             var res = '<table class="table" style="width: 100%;"><tr>';
             var count = data.length;
             for (var i = 1; i <= count; i++) {
@@ -413,7 +417,7 @@ function saveCollectionRecord() {
     var loanId = $("#orderLoanId").val();
     var orderStatus = $("#orderStatus").val();
     if (orderStatus == 4) {
-        alertMsg.warn("催收完成订单不允许添加催收记录！")
+        alertMsg.warn("催收完成订单不允许添加催收记录！");
         return;
     }
     var contactId = $("#contactId").val();
@@ -482,6 +486,12 @@ function sendMsg() {
             alertMsg.warn("用户承诺还款，则承诺还款时间必填。");
             return;
         }
+    }
+
+    var orderStatus = $("#orderStatus").val();
+    if (orderStatus == 4) {
+        alertMsg.warn("催收完成订单不允许发送短信！");
+        return;
     }
     var msgId = getMsgId();
     $.ajax({
