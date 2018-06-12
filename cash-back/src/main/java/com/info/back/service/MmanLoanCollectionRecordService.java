@@ -973,6 +973,10 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
                     record.setContactName(userInfo.getSecondContactName());
                     record.setContactPhone(userInfo.getSecondContactPhone());
                 }
+            } else {
+                record.setRelation("本人");
+                record.setContactName(userInfo.getRealname());
+                record.setContactPhone(userInfo.getUserName());
             }
 
         }

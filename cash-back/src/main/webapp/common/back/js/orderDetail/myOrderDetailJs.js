@@ -335,7 +335,6 @@ $("#addCollectionRecord").click(function () {
         // alertMsg.info("发送短信...短信催收");
         // 发送短信
         sendMsg();
-        saveCollectionRecord();
     }
 });
 
@@ -408,7 +407,6 @@ function saveCollectionRecord() {
     var isConnected = $("input[name='isConnected']:checked").val();
     // 是否是紧急联系人
     var isCloseRelation = $("#isCloseRelation").val();
-    console.log("isCloseRelation = " + isCloseRelation);
     if (promiseRepay == 1) {
         if (repaymentTime == null || repaymentTime == '') {
             $("#repaymentTime").addClass("required");
@@ -417,7 +415,6 @@ function saveCollectionRecord() {
         }
     }
     if (isConnected == 1) {
-        console.log("communication = " + communication);
         if (communication == null) {
             $("input[name='communication']").addClass("required");
             alertMsg.warn("电话接通，则沟通情况必选。");
@@ -443,7 +440,7 @@ function saveCollectionRecord() {
             isCloseRelation: isCloseRelation
         },
         success: function () {
-            alertMsg.correct("添加催收详情成功！");
+            alertMsg.correct("添加催收记录成功！");
             // 刷新催收记录
             getRecordLists();
             // 清空之前的选择记录
@@ -460,6 +457,15 @@ function sendMsg() {
     var orderId = $("#orderId").val();
     var parentId = $("#parentId").val();
     var phoneNumber = $("#phoneNumber").val();
+    var promiseRepay = $("input[name='promiseRepay']:checked").val();
+    var repaymentTime = $("#repaymentTime").val();
+    if (promiseRepay == 1) {
+        if (repaymentTime == null || repaymentTime == '') {
+            $("#repaymentTime").addClass("required");
+            alertMsg.warn("用户承诺还款，则承诺还款时间必填。");
+            return;
+        }
+    }
     var msgId = getMsgId();
     $.ajax({
         type: "GET",
@@ -472,8 +478,10 @@ function sendMsg() {
         },
         dataType: "json",
         success: function (data) {
-            if (data.success) {
+            if (data.code == 200) {
                 alertMsg.correct(data.msg);
+                // 保存催收记录
+                saveCollectionRecord();
             } else {
                 alertMsg.warn(data.msg);
             }
