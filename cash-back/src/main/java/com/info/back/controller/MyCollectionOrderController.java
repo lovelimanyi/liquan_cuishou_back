@@ -722,7 +722,7 @@ public class MyCollectionOrderController extends BaseController {
 
             result.put("collectionOrder", order);
             result.put("totalAmount", totalAmount);
-            result.put("remainMoney", remainAmount);
+            result.put("remainAmount", remainAmount);
             result.put("userLoan", userLoan);
             result.put("bankCard", userCar);
             result.put("pay", creditLoanPay);
