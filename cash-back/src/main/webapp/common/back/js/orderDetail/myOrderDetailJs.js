@@ -251,13 +251,14 @@ function getOrderInfoColumnResult(data) {
 
 
 function getPayInfoColumnResult(data) {
+    console.log(data);
     var loan = data.userLoan;
     if (loan.borrowingType == '2') {
         return '<td class="hhtd">已还金额:</td><td class="tttd"><font color="red">' + data.payMonery + '</font></td><td class="hhtd">剩余应还:</td>' +
-            '<td class="tttd" colspan="3"><font color="red">' + data.remainAmount + '</font></td>';
+            '<td class="tttd" colspan="3"><font color="red">' + data.remainMoney + '</font></td>';
     } else {
         return '<td class="hhtd">逾期期数:</td><td class="tttd"><font color="red">' + loan.termNumber + '</font></td> <td class="hhtd">已还金额:</td>' +
-            '<td class="tttd"><font color="red">data.payMonery</font></td> <td class="hhtd">剩余应还:</td><td class="tttd"><font color="red">' + remainAmount + '</font></td>';
+            '<td class="tttd"><font color="red">' + data.payMonery + '</font></td> <td class="hhtd">剩余应还:</td><td class="tttd"><font color="red">' + data.remainMoney + '</font></td>';
     }
 }
 
