@@ -156,6 +156,9 @@ Date.prototype.Format = function (fmt) {
 };
 
 function getFormatDate(now) {
+    if (now == null) {
+        return "";
+    }
     var d = new Date(now);
     return d.Format("yyyy-MM-dd hh:mm:ss");
 }
@@ -409,6 +412,10 @@ function saveCollectionRecord() {
     var userId = $("#userId").val();
     var loanId = $("#orderLoanId").val();
     var orderStatus = $("#orderStatus").val();
+    if (orderStatus == 4) {
+        alertMsg.warn("催收完成订单不允许添加催收记录！")
+        return;
+    }
     var contactId = $("#contactId").val();
     var collectionRecordId = $("#collectionRecordId").val();
     var collectionContent = $("textarea[name='content']").val();

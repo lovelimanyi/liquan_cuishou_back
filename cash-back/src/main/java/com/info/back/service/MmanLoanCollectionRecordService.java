@@ -943,7 +943,13 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
 
     @Override
     public void saveCollectionRecord(HashMap<String, Object> params, BackUser user) {
-        MmanLoanCollectionRecord record = setRecordParam(params, user);
+        String loanId = params.get("loanId") == null ? null : params.get("loanId").toString();
+        MmanLoanCollectionOrder collectionOrder = mmanLoanCollectionOrderDao.getOrderByLoanId(loanId);
+        if (BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(collectionOrder.getStatus())) {
+            logger.info("催收完成订单不允许添加催收记录！订单id: " + collectionOrder.getLoanId());
+            return;
+        }
+        MmanLoanCollectionRecord record = setRecordParam(params, user, collectionOrder);
         String userRealId = (params.get("contactId") == null || "undefined".equals(params.get("contactId").toString())) ? null : params.get("contactId").toString();
         String collectionRecordId = params.get("collectionRecordId") == null ? null : params.get("collectionRecordId").toString();
         if (StringUtils.isNotEmpty(userRealId)) {
@@ -1035,11 +1041,8 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
     }
 
     // 设置共用参数
-    private MmanLoanCollectionRecord setRecordParam(HashMap<String, Object> params, BackUser user) {
+    private MmanLoanCollectionRecord setRecordParam(HashMap<String, Object> params, BackUser user, MmanLoanCollectionOrder order) {
         MmanLoanCollectionRecord record = new MmanLoanCollectionRecord();
-        // 借款人用户id
-        String loanId = params.get("loanId") == null ? null : params.get("loanId").toString();
-        MmanLoanCollectionOrder order = mmanLoanCollectionOrderDao.getOrderByLoanId(loanId);
         record.setId(IdGen.uuid());
         record.setOrderId(params.get("orderId") == null ? null : params.get("orderId").toString());
         record.setCollectionDate(new Date());
