@@ -71,7 +71,7 @@
                         ${overdueLevelMap[record.currentOverdueLevel]}
                 </td>
                 <td align="center">
-                    <fmt:formatDate value="${record.collectionDate }" pattern="yyyy-MM-dd HH:mm:ss"/>
+                    <fmt:formatDate value="${record.promiseRepaymentTime }" pattern="yyyy-MM-dd"/>
                 </td>
                 <td align="center">
                         ${communicationSituationsMap[record.communicationStatus]}

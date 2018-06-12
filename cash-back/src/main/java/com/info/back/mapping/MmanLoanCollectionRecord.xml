@@ -52,6 +52,8 @@
         <result column="current_overdue_level" property="currentOverdueLevel" jdbcType="VARCHAR"/>
 
         <result column="user_name" property="collectionPerson" jdbcType="VARCHAR"/>
+
+        <result column="promise_repayment_time" property="promiseRepaymentTime" jdbcType="TIMESTAMP"/>
     </resultMap>
     <!-- 保存,保存不为NULL的字段 -->
 
@@ -193,6 +195,7 @@
             <if test="currentOverdueLevel != null">`current_overdue_level`,</if>
             <if test="remark != null">`remark`,</if>
             <if test="communicationStatus != null">`communication_status`,</if>
+            <if test="promiseRepaymentTime != null">`promise_repayment_time`,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id,jdbcType=VARCHAR},</if>
@@ -215,6 +218,7 @@
             <if test="currentOverdueLevel != null">#{currentOverdueLevel,jdbcType=VARCHAR},</if>
             <if test="remark != null">#{remark,jdbcType=VARCHAR},</if>
             <if test="communicationStatus != null">#{communicationStatus,jdbcType=VARCHAR},</if>
+            <if test="promiseRepaymentTime != null">#{promiseRepaymentTime,jdbcType=VARCHAR},</if>
         </trim>
     </insert>
     <!-- 更新不为NULL的字段 -->
@@ -249,7 +253,7 @@
     <select id="findListRecord" resultMap="queryResultMap" parameterType="hashMap">
         SELECT t.id , t.order_id , t.collection_id , mo.`loan_id` as user_id , t.contact_type , t.contact_name , t.relation , t.contact_phone ,
         t.order_state ,u.user_name AS collectionPerson,t.collection_type , t.collection_date , t.collectionAmount , t.content , t.create_date ,
-        t.update_date ,t.remark,t.communication_status,t.current_overdue_level,t.remark
+        t.update_date ,t.remark,t.communication_status,t.current_overdue_level,t.remark,t.promise_repayment_time
         FROM mman_loan_collection_record t left join mman_loan_collection_order mo on mo.id = t.order_id LEFT JOIN back_user u on u.uuid = t.collection_id
         WHERE t.order_id =#{id,jdbcType=VARCHAR}
         <if test="overdueLevel != '' and overdueLevel != null">

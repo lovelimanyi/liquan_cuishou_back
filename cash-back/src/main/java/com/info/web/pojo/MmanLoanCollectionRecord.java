@@ -52,6 +52,9 @@ public class MmanLoanCollectionRecord {
 
     private String communicationStatus;
 
+    // 承诺还款时间
+    private Date promiseRepaymentTime;
+
 
     private String companyTitle; // 公司名称
     private String collectionAdvice; //催收建议
@@ -264,5 +267,13 @@ public class MmanLoanCollectionRecord {
 
     public void setCommunicationStatus(String communicationStatus) {
         this.communicationStatus = communicationStatus;
+    }
+
+    public Date getPromiseRepaymentTime() {
+        return promiseRepaymentTime;
+    }
+
+    public void setPromiseRepaymentTime(Date promiseRepaymentTime) {
+        this.promiseRepaymentTime = promiseRepaymentTime;
     }
 }

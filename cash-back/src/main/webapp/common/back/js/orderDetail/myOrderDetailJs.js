@@ -310,7 +310,6 @@ $("#msgTemplate").change(function () {
         dataType: "json",
         contentType: "application/x-www-form-urlencoded; charset=utf-8",
         success: function (data) {
-            console.log(data);
             $("#msgContent").val(data.msgContent);
             $("#msgId").val(data.msgId);
         },

@@ -1038,6 +1038,8 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
     private MmanLoanCollectionRecord setRecordParam(HashMap<String, Object> params, BackUser user) {
         MmanLoanCollectionRecord record = new MmanLoanCollectionRecord();
         // 借款人用户id
+        String loanId = params.get("loanId") == null ? null : params.get("loanId").toString();
+        MmanLoanCollectionOrder order = mmanLoanCollectionOrderDao.getOrderByLoanId(loanId);
         record.setId(IdGen.uuid());
         record.setOrderId(params.get("orderId") == null ? null : params.get("orderId").toString());
         record.setCollectionDate(new Date());
@@ -1047,14 +1049,15 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
         record.setCreateDate(new Date());
         record.setUpdateDate(new Date());
         record.setUserId(params.get("userId") == null ? null : params.get("userId").toString());
-        record.setCurrentOverdueLevel(user.getGroupLevel());
-        record.setCollectionGroup(user.getGroupLevel());
+        record.setCurrentOverdueLevel(order.getCurrentOverdueLevel());
+        record.setCollectionGroup(order.getCurrentOverdueLevel());
         record.setOrderState(params.get("orderStatus") == null ? null : params.get("orderStatus").toString());
         record.setCompanyTitle(user.getCompanyTitle());
         record.setLoanId(params.get("loanId") == null ? null : params.get("loanId").toString());
         record.setContactType("1");
         record.setCollectionId(user.getUuid());
         record.setContent(params.get("collectionContent") == null ? null : params.get("collectionContent").toString());
+        record.setPromiseRepaymentTime(params.get("repaymentTime") == null ? null : DateUtil.formatDate(params.get("repaymentTime").toString(), "yyyy-MM-dd"));
         return record;
     }
 }
