@@ -560,19 +560,16 @@ public class MyCollectionOrderController extends BaseController {
                 // 沟通情况
                 Map<String, Object> communicationSituationsMap = getCommunicationSituationsMap(communicationSituations);
                 // 逾期等级
-                Map<String, Object> overdueLevelMap = getOverdueLevelMap();
+                Map<String, Object> overdueLevelMap = getOverdueLevelMap(getAllOverdueLevel());
                 int remainCount = msgCountLimit - count > 0 ? msgCountLimit - count : 0;
-
                 model.addAttribute("communicationSituationsMap", communicationSituationsMap);
                 model.addAttribute("overdueLevelMap", overdueLevelMap);
                 model.addAttribute("orderStatusMap", orderStatusMap);
-//                model.addAttribute("list", list);
                 model.addAttribute("remainMsgCount", remainCount);
                 model.addAttribute("msgCountLimit", msgCountLimit);
                 model.addAttribute("msgs", msgs);
                 model.addAttribute("orderId", id);
                 model.addAttribute("phoneNumber", order.getLoanUserPhone());
-//                model.addAttribute("recordList", list);
                 model.addAttribute("collectionOrder", order);
                 model.addAttribute("userInfo", userInfo);
                 model.addAttribute("userCar", userCar);// 银行卡
@@ -1225,7 +1222,6 @@ public class MyCollectionOrderController extends BaseController {
     @RequestMapping("/sendMsg")
     @ResponseBody
     public ServiceResult SendSms(HttpServletRequest request) {
-        JsonResult result = new JsonResult("-1", "发送短信失败");
         HashMap<String, Object> params = this.getParametersO(request);
         try {
             String orderId = params.get("orderId") + "";
@@ -1629,7 +1625,7 @@ public class MyCollectionOrderController extends BaseController {
     public String testKh(HttpServletRequest request) {
         try {
             Date date = new Date();
-            HashMap<String, Object> params = new HashMap<String, Object>();
+            HashMap<String, Object> params = new HashMap<>();
 //			params.put("currDate", DateUtil.getBeforeOrAfter(date,-1));
             params.put("currDate", request.getParameter("currDate"));
             params.put("begDate", request.getParameter("begDate"));
@@ -1688,17 +1684,21 @@ public class MyCollectionOrderController extends BaseController {
     }
 
 
-    private Map<String, Object> getOverdueLevelMap() {
+    private Map<String, Object> getOverdueLevelMap(List<SysDict> overdueLevel) {
+        Map<String, Object> overdueLevelMap = new LinkedHashMap<>(16);
+        for (SysDict sysDict : overdueLevel) {
+            overdueLevelMap.put(sysDict.getValue(), sysDict.getLabel());
+        }
+        return overdueLevelMap;
+    }
+
+    private List<SysDict> getAllOverdueLevel() {
         List<SysDict> overdueLevel = JedisDataClient.getList(BackConstant.REDIS_KEY_PREFIX, "overdueLevel");
         if (CollectionUtils.isEmpty(overdueLevel)) {
             overdueLevel = sysDictService.findDictByType(DICTIONARY_TYPE_OVERDUE_LEVEL);
             JedisDataClient.setList(BackConstant.REDIS_KEY_PREFIX, "overdueLevel", overdueLevel, 60 * 60 * 24);
         }
-        Map<String, Object> overdueLevelMap = new HashMap<>(16);
-        for (SysDict sysDict : overdueLevel) {
-            overdueLevelMap.put(sysDict.getValue(), sysDict.getLabel());
-        }
-        return overdueLevelMap;
+        return overdueLevel;
     }
 
 

@@ -1,6 +1,5 @@
 package com.info.back.controller;
 
-import com.info.back.dao.IFengKongDao;
 import com.info.back.result.JsonResult;
 import com.info.back.service.*;
 import com.info.back.utils.*;
@@ -69,8 +68,8 @@ public class MmanLoanCollectionOrderController extends BaseController {
             BackUser backUser = (BackUser) request.getSession().getAttribute(Constant.BACK_USER);
             if (backUser != null) {
 //				logger.info("backUser is not null");
-                params.put("source",BackConstant.OPERATION_RECORD_SOURCE_TOTAL_ORDER);  // 操作來源 催收总订单
-                params.put("currentUserAccount",backUser.getUserAccount());
+                params.put("source", BackConstant.OPERATION_RECORD_SOURCE_TOTAL_ORDER);  // 操作來源 催收总订单
+                params.put("currentUserAccount", backUser.getUserAccount());
                 List<BackUserCompanyPermissions> CompanyPermissionsList = backUserService.findCompanyPermissions(backUser.getId());
                 if (CompanyPermissionsList != null && CompanyPermissionsList.size() > 0) {//指定公司的订单
                     params.put("CompanyPermissionsList", CompanyPermissionsList);
@@ -143,7 +142,7 @@ public class MmanLoanCollectionOrderController extends BaseController {
             response.setContentType("application/msexcel");// 定义输出类型
             SXSSFWorkbook workbook = new SXSSFWorkbook(10000);
             String[] titles = {"借款编号", "催收公司", "催收组", "借款人姓名", "借款人身份证", "借款手机号", "借款金额", "逾期天数",
-                    "滞纳金", "催收状态", "应还时间", "已还金额", "最新还款时间", "最后催收时间", "承诺还款时间", "派单时间", "当前催收员", "上一催收员", "减免滞纳金","派单人","用户类型（0 新用户   1 老用户）"};
+                    "滞纳金", "催收状态", "应还时间", "已还金额", "最新还款时间", "最后催收时间", "承诺还款时间", "派单时间", "当前催收员", "上一催收员", "减免滞纳金", "派单人", "用户类型（0 新用户   1 老用户）"};
             List<SysDict> dictlist = sysDictService.getStatus("collection_group");
             HashMap<String, String> dictMap = BackConstant.orderState(dictlist);
             List<SysDict> statulist = sysDictService.getStatus("xjx_collection_order_state");
@@ -197,6 +196,7 @@ public class MmanLoanCollectionOrderController extends BaseController {
 
     /**
      * 跳转到停催页面
+     *
      * @param request
      * @param model
      * @return
@@ -215,21 +215,22 @@ public class MmanLoanCollectionOrderController extends BaseController {
 
     /**
      * 停催操作
+     *
      * @param request
      * @param response
      * @param model
      * @return
      */
     @RequestMapping("stop-collection")
-    public JsonResult stopCollection(HttpServletRequest request,HttpServletResponse response,Model model) {
+    public JsonResult stopCollection(HttpServletRequest request, HttpServletResponse response, Model model) {
         JsonResult result = new JsonResult("-1", "停催失败！");
         HashMap<String, Object> params = getParametersO(request);
-        String loanId = (String)params.get("loanId");
-        String userId = (String)params.get("userId");
-        String orderId = (String)params.get("orderId");
-        try{
+        String loanId = (String) params.get("loanId");
+        String userId = (String) params.get("userId");
+        String orderId = (String) params.get("orderId");
+        try {
             MmanLoanCollectionOrder order = mmanLoanCollectionOrderService.getOrderloanId(loanId);
-            if(!BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())){
+            if (!BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())) {
                 BackUser backUser = (BackUser) request.getSession().getAttribute(Constant.BACK_USER);
                 if (BackConstant.SURPER_MANAGER_ROLE_ID.toString().equals(backUser.getRoleId()) || BackConstant.MANAGER_ROLE_ID.toString().equals(backUser.getRoleId())) {
                     StopCollectionOrderInfo orderInfo = new StopCollectionOrderInfo();
@@ -239,7 +240,7 @@ public class MmanLoanCollectionOrderController extends BaseController {
                     orderInfo.setOperatorId(backUser.getUuid());
                     orderInfo.setCreateTime(new Date());
                     int res = stopCollectionOrderInfoService.save(orderInfo);
-                    if(res > 0){
+                    if (res > 0) {
                         // 删除订单表/借款表相关数据(标记删除)
                         int count = mmanLoanCollectionOrderService.deleteOrderInfoAndLoanInfoByloanId(loanId);
                         // 删除流转日志表记录
@@ -247,7 +248,7 @@ public class MmanLoanCollectionOrderController extends BaseController {
                         // 催收建议表添加一条催收拒绝催收建议
                         CollectionAdvice advice = new CollectionAdvice();
                         advice.setCollectionAdviceRemark("停催添加催收建议");
-                        if(StringUtils.isNotEmpty(userId)){
+                        if (StringUtils.isNotEmpty(userId)) {
                             advice.setBackUserId(Integer.valueOf(userId));
                         }
                         advice.setCreateDate(new Date());
@@ -258,7 +259,7 @@ public class MmanLoanCollectionOrderController extends BaseController {
                         fengKongService.saveAdvice(advice);
                         result.setCode("0");
                         result.setMsg("停催成功！");
-                    }else {
+                    } else {
                         result.setCode("-1");
                         result.setMsg("停催失败！");
                     }
@@ -266,10 +267,10 @@ public class MmanLoanCollectionOrderController extends BaseController {
                     result.setCode("-1");
                     result.setMsg("您无权进行该操作！！");
                 }
-            }else {
+            } else {
                 result = new JsonResult("-1", "催收完成订单不允许停催！");
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         SpringUtils.renderDwzResult(response, "0".equals(result.getCode()),

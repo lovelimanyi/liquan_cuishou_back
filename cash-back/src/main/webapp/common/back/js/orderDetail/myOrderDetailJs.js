@@ -205,17 +205,25 @@ function getWithholdStatus(status) {
 
 function getReturnType(type) {
     if (type == '1') {
-        return "支付宝";
+        return "支付宝还款";
     } else if (type == '2') {
         return "银行卡主动还款";
     } else if (type == '3') {
-        return "代扣";
+        return "催收代扣";
     } else if (type == '4') {
         return "对公银行卡转账";
     } else if (type == '5') {
         return "线下还款";
     } else if (type == '6') {
         return "小额减免";
+    } else if (type == '8') {
+        return "扫码还款自动推送";
+    } else if (type == '10') {
+        return "优惠券还款抵用";
+    } else if (type == '12') {
+        return "催收代扣";
+    } else if (type == '13') {
+        return "用户主动还款";
     } else if (type == '99') {
         return "大额减免";
     } else {
@@ -342,6 +350,8 @@ $("#addCollectionRecord").click(function () {
 function getRecordLists() {
     var orderId = $("#orderId").val();
     $("#recordListContent").empty();
+    $("#contactId").val("");
+    $("#collectionRecordId").val("");
     $.ajax({
         type: "GET",
         url: "/back/collectionRecord/getRecordListsByOrderId",
@@ -405,6 +415,7 @@ function saveCollectionRecord() {
     var collectionContent = $("textarea[name='content']").val();
     var promiseRepay = $("input[name='promiseRepay']:checked").val();
     var isConnected = $("input[name='isConnected']:checked").val();
+
     // 是否是紧急联系人
     var isCloseRelation = $("#isCloseRelation").val();
     if (promiseRepay == 1) {
@@ -515,6 +526,8 @@ function clearRecord() {
     $("input[name='promiseRepay']").removeAttr("checked");
     $("input[name='isConnected']").removeAttr("checked");
     $("#repaymentTime").val("");
+    $("#contactId").val("");
+    $("#collectionRecordId").val("");
 }
 
 
