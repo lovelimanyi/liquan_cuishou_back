@@ -38,6 +38,8 @@ public interface IMmanUserInfoService {
 
     String handleJxl(Model model, String userId);
 
+	MmanUserInfo getUserInfoAccordId(String id);
+
 	void updateUserPhonesByUserId(MmanUserInfo info);
 }
 

@@ -494,6 +494,58 @@
             resultMap="queryResultMap">SELECT t.id , t.user_name , t.password , t.pay_password , t.realname , t.realname_status , t.realname_time , t.id_number , t.user_sex , t.user_age , t.qq , t.user_phone , t.taobao_account , t.email , t.wechat_account , t.education , t.marital_status , t.present_address , t.present_address_distinct , t.present_latitude , t.present_longitude , t.present_period , t.company_name , t.company_address , t.company_address_distinct , t.company_longitude , t.company_latitude , t.company_phone , t.company_period , t.first_contact_name , t.first_contact_phone , t.frist_contact_relation , t.second_contact_name , t.second_contact_phone , t.second_contact_relation , t.create_time , t.create_ip , t.update_time , t.status , t.invite_userid , t.is_save , t.head_portrait , t.idcard_img_z , t.idcard_img_f , t.customer_type , t.amount_min , t.amount_max , t.amount_available , t.equipment_number , t.zm_score , t.zm_score_time , t.zm_industy_black , t.zm_over , t.zm_no_pay_over , t.zm_industy_time , t.zm_status , t.my_hb , t.my_hb_time , t.jxl_token , t.jxl_token_time , t.jxl_status , t.jxl_detail , t.jxl_detail_time , t.jxl_zj_dk_num , t.jxl_bj_dk_num , t.jxl_yj_hf , t.jxl_link2_days , t.jxl_link1_days , t.jxl_link2_num , t.jxl_link1_num , t.jxl_link2_order , t.jxl_link1_order , t.jxl_gj_ts , t.jxl_ht_phone_num , t.jxl_amth_num , t.jxl_phone_reg_days , t.jxl_time , t.user_contact_size , t.history_over_num , t.last_over_days , t.csjy , t.user_from FROM user_info t WHERE id = #{id}</select>
 
     <select id="getContactInfo" resultType="com.info.web.pojo.ContactInfo" parameterType="String">
+
+	<select id="getUserInfoById" resultMap="queryResultMap" parameterType="com.info.web.pojo.MmanUserInfo">
+		SELECT
+		t.id ,
+		t.user_name ,
+		t.realname ,
+		t.id_number ,
+		t.user_sex ,
+		t.user_age ,
+		t.education ,
+		t.marital_status ,
+		t.present_address ,
+		t.present_address_distinct ,
+		t.present_latitude ,
+		t.present_longitude ,
+		t.present_period ,
+		t.company_name ,
+		t.company_address ,
+		t.company_address_distinct ,
+		t.company_longitude ,
+		t.company_latitude ,
+		t.company_phone ,
+		t.company_period ,
+		t.first_contact_name ,
+		t.first_contact_phone ,
+		t.frist_contact_relation ,
+		t.second_contact_name ,
+		t.second_contact_phone ,
+		t.second_contact_relation ,
+		t.update_time ,
+		t.head_portrait ,
+		t.idcard_img_z ,
+		t.idcard_img_f
+		FROM mman_user_info t WHERE id = #{id,jdbcType=VARCHAR}</select>
+
+	<!-- 根据主键删除记录 -->
+	<delete id="del" parameterType="com.info.web.pojo.MmanUserInfo">DELETE FROM mman_user_info WHERE id = #{id,jdbcType=VARCHAR}</delete>
+	<select id="findJxlDetail" parameterType="HashMap" resultMap="queryResultMap">
+	   select 	realname,
+				user_sex,
+				id_number,
+				user_age,
+				jxl_detail from mman_user_info
+	   where 1=1
+	   <if test="loanUserId != null and loanUserId != ''">
+	       and id=#{loanUserId}
+	   </if>
+	</select>
+	<!-- 获取现金侠用户信息 -->
+	<select id="getxjxuser" resultMap="queryResultMap" >SELECT t.id , t.user_name , t.password , t.pay_password , t.realname , t.realname_status , t.realname_time , t.id_number , t.user_sex , t.user_age , t.qq , t.user_phone , t.taobao_account , t.email , t.wechat_account , t.education , t.marital_status , t.present_address , t.present_address_distinct , t.present_latitude , t.present_longitude , t.present_period , t.company_name , t.company_address , t.company_address_distinct , t.company_longitude , t.company_latitude , t.company_phone , t.company_period , t.first_contact_name , t.first_contact_phone , t.frist_contact_relation , t.second_contact_name , t.second_contact_phone , t.second_contact_relation , t.create_time , t.create_ip , t.update_time , t.status , t.invite_userid , t.is_save , t.head_portrait , t.idcard_img_z , t.idcard_img_f , t.customer_type , t.amount_min , t.amount_max , t.amount_available , t.equipment_number , t.zm_score , t.zm_score_time , t.zm_industy_black , t.zm_over , t.zm_no_pay_over , t.zm_industy_time , t.zm_status , t.my_hb , t.my_hb_time , t.jxl_token , t.jxl_token_time , t.jxl_status , t.jxl_detail , t.jxl_detail_time , t.jxl_zj_dk_num , t.jxl_bj_dk_num , t.jxl_yj_hf , t.jxl_link2_days , t.jxl_link1_days , t.jxl_link2_num , t.jxl_link1_num , t.jxl_link2_order , t.jxl_link1_order , t.jxl_gj_ts , t.jxl_ht_phone_num , t.jxl_amth_num , t.jxl_phone_reg_days , t.jxl_time , t.user_contact_size , t.history_over_num , t.last_over_days , t.csjy , t.user_from FROM user_info t WHERE id = #{id}</select>
+
+	<select id="getContactInfo" resultType="com.info.web.pojo.ContactInfo" parameterType="String">
 		select rl.info_name as contactUserName,rl.info_value as contactUserPhone,rl.contacts_key as contactUserType,fo.realname as loanUserName,fo.user_phone as loanUserPhone from mman_user_rela rl left join mman_user_info fo on fo.id = rl.user_id where rl.info_value = #{contactUserPhone}
 	</select>
 

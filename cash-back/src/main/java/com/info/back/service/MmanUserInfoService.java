@@ -147,6 +147,12 @@ public class MmanUserInfoService implements IMmanUserInfoService {
         mmanUserInfoDao.updateUserPhonesByUserId(info);
     }
 
+
+    @Override
+    public MmanUserInfo getUserInfoAccordId(String id) {
+        return mmanUserInfoDao.getUserInfoById(id);
+    }
+
     /**
      * 本地数据库聚信立解析
      */

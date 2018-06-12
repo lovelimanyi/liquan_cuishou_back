@@ -1,6 +1,7 @@
 package com.info.back.dao;
 
 import com.github.miemiedev.mybatis.paginator.domain.PageBounds;
+import com.info.back.utils.BackConstant;
 import com.info.constant.Constant;
 import com.info.web.util.JedisDataClient;
 import com.info.web.util.PageConfig;
@@ -56,11 +57,11 @@ public class OrderPaginationDao<T> extends BaseDao implements IOrderPaginationDa
 //				nameSpace + countSql, map);
         Integer totalRecord = null;
         try {
-            if (org.apache.commons.lang.StringUtils.isNotBlank(JedisDataClient.get("cuishou:" + ORDER_COUNT_REDIS_KEY))) {
-                totalRecord = Integer.parseInt(JedisDataClient.get("cuishou:" + ORDER_COUNT_REDIS_KEY));
+            if (org.apache.commons.lang.StringUtils.isNotBlank(JedisDataClient.get(BackConstant.REDIS_KEY_PREFIX + ORDER_COUNT_REDIS_KEY))) {
+                totalRecord = Integer.parseInt(JedisDataClient.get(BackConstant.REDIS_KEY_PREFIX + ORDER_COUNT_REDIS_KEY));
             } else {
                 totalRecord = (Integer) getSqlSessionTemplate().selectOne(nameSpace + countSql, map);
-                JedisDataClient.set("cuishou:" + ORDER_COUNT_REDIS_KEY, totalRecord.toString(), 60 * 60);
+                JedisDataClient.set(BackConstant.REDIS_KEY_PREFIX + ORDER_COUNT_REDIS_KEY, totalRecord.toString(), 60 * 60);
             }
 
         } catch (Exception e) {
@@ -116,11 +117,11 @@ public class OrderPaginationDao<T> extends BaseDao implements IOrderPaginationDa
 //				nameSpace + countId, map);
         Integer totalRecord = null;
         try {
-            if (StringUtils.isNotBlank(JedisDataClient.get("cuishou:" + ORDER_COUNT_REDIS_KEY))) {
-                totalRecord = Integer.parseInt(JedisDataClient.get("cuishou:" + ORDER_COUNT_REDIS_KEY));
+            if (StringUtils.isNotBlank(JedisDataClient.get(BackConstant.REDIS_KEY_PREFIX + ORDER_COUNT_REDIS_KEY))) {
+                totalRecord = Integer.parseInt(JedisDataClient.get(BackConstant.REDIS_KEY_PREFIX + ORDER_COUNT_REDIS_KEY));
             } else {
                 totalRecord = (Integer) getSqlSessionTemplate().selectOne(nameSpace + countId, map);
-                JedisDataClient.set("cuishou:" + ORDER_COUNT_REDIS_KEY, totalRecord.toString(), 60 * 60);
+                JedisDataClient.set(BackConstant.REDIS_KEY_PREFIX + ORDER_COUNT_REDIS_KEY, totalRecord.toString(), 60 * 60);
             }
 
         } catch (Exception e) {

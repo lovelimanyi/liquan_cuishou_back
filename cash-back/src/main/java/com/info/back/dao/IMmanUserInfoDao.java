@@ -13,6 +13,8 @@ public interface IMmanUserInfoDao {
 
     MmanUserInfo get(String id);
 
+    MmanUserInfo getUserInfoById(String id);
+
 
     MmanUserInfo getxjxuser(Long id);
 

@@ -7,6 +7,7 @@ import com.info.back.dao.IBackUserDao;
 import com.info.back.dao.IEstimateOrderDao;
 import com.info.back.dao.IMmanLoanCollectionOrderDao;
 import com.info.back.dao.IMmanUserLoanDao;
+import com.info.back.utils.BackConstant;
 import com.info.web.pojo.EstimateOrder;
 import com.info.web.synchronization.dao.IDataDao;
 import com.info.web.util.HttpUtil;
@@ -40,7 +41,7 @@ public class EstimateOrderService implements IEstimateOrderService {
     private static final BigDecimal AVG_DAYS = new BigDecimal(7);
     private static final String BIG_SUCCESS_CODE = "00";
 
-//    private static final String BIG_PATH = "http://118.31.47.225:8082/be/getRepaymentOrderForCollection";//预生产
+    //    private static final String BIG_PATH = "http://118.31.47.225:8082/be/getRepaymentOrderForCollection";//预生产
     private static final String BIG_PATH = "http://10.81.168.96:8083/be/getRepaymentOrderForCollection";//线上
     //    private static final String BIG_PATH = "http://192.168.5.46:8082/be/getRepaymentOrderForCollection";
     private static final Integer TIME_DAY = 60 * 60 * 24;
@@ -56,7 +57,7 @@ public class EstimateOrderService implements IEstimateOrderService {
             } else {
                 now = yyyyMMddSdf.parse(testDate);
             }
-            String redisKey = "cuishou:estimate:" + yyyyMMddSdf.format(now);
+            String redisKey = BackConstant.REDIS_KEY_PREFIX + "estimate:" + yyyyMMddSdf.format(now);
             String estimateInfoStr = null;
             JSONObject estimateInfoJSON = null;
             if (StringUtils.isNotBlank(estimateInfoStr)) {
@@ -72,31 +73,31 @@ public class EstimateOrderService implements IEstimateOrderService {
                 List<EstimateOrder> estimateOrderList = new ArrayList<>();
                 Calendar overDateCalendar = Calendar.getInstance();
                 overDateCalendar.setTime(now);
-                for(int i=1;i<8;i++){
+                for (int i = 1; i < 8; i++) {
                     Date curDate = overDateCalendar.getTime();
                     params.put("overDate", curDate);
                     List<EstimateOrder> tempList = estimateOrderDao.findAll(params);
-                    if(tempList!=null && tempList.size()>0){
+                    if (tempList != null && tempList.size() > 0) {
                         estimateOrderList.add(tempList.get(0));
-                    }else{
+                    } else {
                         EstimateOrder estimateOrder = new EstimateOrder();
                         estimateOrder.setOverDate(curDate);
                         estimateOrder.setOrderCount(0);
                         estimateOrder.setAmountTotal(0L);
                         Calendar tmp = Calendar.getInstance();
                         tmp.setTime(curDate);
-                        tmp.add(Calendar.DAY_OF_MONTH,1);
+                        tmp.add(Calendar.DAY_OF_MONTH, 1);
                         estimateOrder.setCollectionDate(tmp.getTime());
-                        if(ORDER_TYPE_SMALL.equals(orderType)){
+                        if (ORDER_TYPE_SMALL.equals(orderType)) {
                             estimateOrder.setOrderAge(3);
-                        }else{
+                        } else {
                             estimateOrder.setOrderAge(11);
                         }
                         estimateOrder.setEstimateAmountCount(0L);
                         estimateOrder.setEstimateOrderCount(0);
                         estimateOrderList.add(estimateOrder);
                     }
-                    overDateCalendar.add(Calendar.DAY_OF_MONTH,1);
+                    overDateCalendar.add(Calendar.DAY_OF_MONTH, 1);
                 }
 
                 resultMap.put("estimateList", estimateOrderList);
@@ -279,7 +280,7 @@ public class EstimateOrderService implements IEstimateOrderService {
             //大额催收预估
             System.out.println("开始预估大额");
             List<HashMap<String, Object>> bigOrderList = getBigOrderInfoList(now, endCalendar.getTime());
-            System.out.println("大额到期催数据："+ JSONObject.toJSONString(bigOrderList));
+            System.out.println("大额到期催数据：" + JSONObject.toJSONString(bigOrderList));
             if (bigOrderList != null && bigOrderList.size() > 0) {
                 HashMap<String, BigDecimal> bigOldRateMap = getBigOldCollectionRate(now);
                 doRecord(ORDER_TYPE_BIG, bigOrderList, bigOldRateMap);
@@ -360,7 +361,7 @@ public class EstimateOrderService implements IEstimateOrderService {
         BigDecimal moneyRate = new BigDecimal(0);
         try {
             HashMap<String, HashMap<String, BigDecimal>> collectionCountMap = getCollectionInfo(ORDER_TYPE_SMALL);
-            System.out.println("小额入催数据："+ JSONObject.toJSONString(collectionCountMap));
+            System.out.println("小额入催数据：" + JSONObject.toJSONString(collectionCountMap));
             if (!(collectionCountMap == null || collectionCountMap.isEmpty())) {
                 HashMap<String, Object> param = new HashMap<>();
                 param.put("endTime", now);
@@ -369,7 +370,7 @@ public class EstimateOrderService implements IEstimateOrderService {
                 endCalendar.add(Calendar.DAY_OF_MONTH, -7);
                 param.put("startTime", endCalendar.getTime());
                 List<HashMap<String, Object>> orderList = dataDao.getEstimateOrder(param);
-                System.out.println("小额到期数据："+ JSONObject.toJSONString(orderList));
+                System.out.println("小额到期数据：" + JSONObject.toJSONString(orderList));
                 rateMap = getRateMap(orderList, collectionCountMap);
             }
         } catch (Exception e) {
@@ -443,13 +444,13 @@ public class EstimateOrderService implements IEstimateOrderService {
         HashMap<String, BigDecimal> rateMap = new HashMap<>();
         try {
             HashMap<String, HashMap<String, BigDecimal>> collectionCountMap = getCollectionInfo(ORDER_TYPE_BIG);
-            System.out.println("大额历史入催数据："+ JSONObject.toJSONString(collectionCountMap));
+            System.out.println("大额历史入催数据：" + JSONObject.toJSONString(collectionCountMap));
             if (!(collectionCountMap == null || collectionCountMap.isEmpty())) {
                 Calendar startCalendar = Calendar.getInstance();
                 startCalendar.setTime(now);
                 startCalendar.add(Calendar.DAY_OF_MONTH, -7);
                 List<HashMap<String, Object>> bigOrderList = getBigOrderInfoList(startCalendar.getTime(), now);
-                System.out.println("大额历史到期催数据："+ JSONObject.toJSONString(bigOrderList));
+                System.out.println("大额历史到期催数据：" + JSONObject.toJSONString(bigOrderList));
                 rateMap = getRateMap(bigOrderList, collectionCountMap);
             }
         } catch (Exception e) {

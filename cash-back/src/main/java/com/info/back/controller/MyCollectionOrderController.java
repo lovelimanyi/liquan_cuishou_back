@@ -8,7 +8,6 @@ import com.info.back.dao.ITemplateSmsDao;
 import com.info.back.result.JsonResult;
 import com.info.back.service.*;
 import com.info.back.utils.*;
-import com.info.config.PayContents;
 import com.info.constant.Constant;
 import com.info.web.pojo.*;
 import com.info.web.util.*;
@@ -56,49 +55,65 @@ public class MyCollectionOrderController extends BaseController {
 
     private static final String MERCHANT_INFO_REDIS_KEY = "merchants";
 
-    // 公司
+    private static final String DICTIONARY_TYPE_OVERDUE_LEVEL = "xjx_overdue_level";
+
+    private static final String DICTIONARY_TYPE_ORDER_STATE = "xjx_collection_order_state";
+
+
     @Autowired
     private IMmanLoanCollectionCompanyService mmanLoanCollectionCompanyService;
-    // 订单
+
     @Autowired
     private IMmanLoanCollectionOrderService mmanLoanCollectionOrderService;
 
-    // 用户信息
     @Autowired
     private IMmanUserInfoService mmanUserInfoService;
+
     @Autowired
     private IMmanLoanCollectionStatusChangeLogService mmanLoanCollectionStatusChangeLogService;
+
     @Autowired
     private IMmanLoanCollectionRecordService mmanLoanCollectionRecordService;
+
     @Autowired
     private IBackUserService backUserService;
+
     @Autowired
     private ITemplateSmsDao templateSmsDao;
+
     @Autowired
     private ICreditLoanPayDetailService creditLoanPayDetailService;
+
     @Autowired
     private IMmanUserLoanService mmanUserLoanService;
+
     @Autowired
     private IAuditCenterService auditCenterService;
-    @Autowired
-    private ISysDictService sysDictService;
+
     @Autowired
     private ICreditLoanPayService creditLoanPayService;
+
     @Autowired
     private ISysUserBankCardService sysUserBankCardService;
+
     @Autowired
     private ISmsUserService smsUserService;
+
     @Autowired
     private IMmanUserRelaService mmanUserRelaService;
+
     @Autowired
     private IMman_loan_collection_orderdeductionService collection_orderdeductionService;
+
     @Autowired
     private ICountCollectionAssessmentService countCollectionAssessmentService;
 
     @Autowired
     private ICountCollectionManageService countCollectionManageService;
+
     @Autowired
     private IFengKongService fengKongService;
+
     @Autowired
     private ICollectionWithholdingRecordService collectionWithholdingRecordService;
 
@@ -107,6 +122,12 @@ public class MyCollectionOrderController extends BaseController {
     @Autowired
     private IMmanUserLoanDao mmanUserLoanDao;
 
+
+    @Autowired
+    private ICommunicationSituationService situationService;
+
+    @Autowired
+    private ISysDictService sysDictService;
 
     /**
      * 我的订单初始化加载查询
@@ -128,7 +149,6 @@ public class MyCollectionOrderController extends BaseController {
         }
 
         checkPermission(params, backUser);
-
         params.put("source", BackConstant.OPERATION_RECORD_SOURCE_MY_ORDER);  // 操作來源 我的催收订单
         // 查询公司列表
         MmanLoanCollectionCompany mmanLoanCollectionCompany = new MmanLoanCollectionCompany();
@@ -142,8 +162,7 @@ public class MyCollectionOrderController extends BaseController {
             params.put("roleUserId", backUser.getUuid());
             page = mmanLoanCollectionOrderService.getCollectionUserPage(params);
         }
-        model.addAttribute("ListMmanLoanCollectionCompany",
-                ListMmanLoanCollectionCompany);
+        model.addAttribute("ListMmanLoanCollectionCompany", ListMmanLoanCollectionCompany);
 
         if (page != null && page.getItems().size() > 0) {
             for (OrderBaseResult order : page.getItems()) {
@@ -453,19 +472,20 @@ public class MyCollectionOrderController extends BaseController {
     public String toxianqin(HttpServletRequest request, Model model) {
         HashMap<String, Object> params = this.getParametersO(request);
         String url = "mycollectionorder/toApplyCsDetail";
+        BackUser backUser = (BackUser) request.getSession().getAttribute(Constant.BACK_USER);
         try {
-            if (StringUtils.isNotBlank(params.get("id") + "")) {
-                BackUser backUser = this.loginAdminUser(request);
+            String id = params.get("id") + "";
+            if (StringUtils.isNotBlank(id)) {
                 //该条订单是否已审//			int count = auditCenterService.findAuditStatus(params);
 //			if(count != 0 || !BackConstant.COLLECTION_ROLE_ID.toString().equals(backUser.getRoleId())){
-                MmanLoanCollectionOrder mmanLoanCollectionOrderOri = mmanLoanCollectionOrderService.getOrderById(params.get("id").toString());
+                MmanLoanCollectionOrder order = mmanLoanCollectionOrderService.getOrderById(id);
 
-                if (mmanLoanCollectionOrderOri != null) {
-                    MmanUserLoan userLoan = mmanUserLoanService.get(mmanLoanCollectionOrderOri.getLoanId());
+                if (order != null) {
+                    MmanUserLoan userLoan = mmanUserLoanService.get(order.getLoanId());
                     //如果是分期商城的订单则判断是否获取商品名称
                     if (Constant.ORDER_TYPE_FEN.equals(userLoan.getBorrowingType())) {
-                        if (StringUtils.isBlank(mmanLoanCollectionOrderOri.getProductName())) {
-                            String LoanId = StringUtils.substringBefore(mmanLoanCollectionOrderOri.getLoanId(), Constant.SEPARATOR_FOR_ORDER_SOURCE);
+                        if (StringUtils.isBlank(order.getProductName())) {
+                            String LoanId = StringUtils.substringBefore(order.getLoanId(), Constant.SEPARATOR_FOR_ORDER_SOURCE);
                             Map<String, String> paramMap = new HashedMap();
                             paramMap.put("id", LoanId);
                             //TODO 分期商城上线后更改地址
@@ -477,8 +497,8 @@ public class MyCollectionOrderController extends BaseController {
                                 JSONObject jsonResult = JSONObject.parseObject(result);
                                 if ("00".equals(jsonResult.get("code"))) {
                                     String productName = jsonResult.get("productName").toString();
-                                    mmanLoanCollectionOrderOri.setProductName(productName);
-                                    mmanLoanCollectionOrderService.updateProductName(mmanLoanCollectionOrderOri);
+                                    order.setProductName(productName);
+                                    mmanLoanCollectionOrderService.updateProductName(order);
                                 }
                             }
                         }
@@ -491,19 +511,7 @@ public class MyCollectionOrderController extends BaseController {
                 } else {
                     logger.error("mmanLoanCollectionOrderOri 为null 借款id:" + params.get("id").toString());
                 }
-
-                MmanUserInfo userInfo = mmanUserInfoService.getUserInfoById(mmanLoanCollectionOrderOri.getUserId());
-                if (userInfo != null) {
-                    // 调用接口获取用户共债手机号
-                    String phones = getPhones(userInfo);
-                    // 判断数据库数据和数据库存储数据是否一致，不一致则更新数据库数据
-                    if (!phones.equals(userInfo.getUserPhones())) {
-                        // 更新userInfo中数据
-                        updateUserInfo(userInfo, phones);
-                    }
-                    userInfo.setUserPhones(phones);
-                }
-
+                MmanUserInfo userInfo = mmanUserInfoService.getUserInfoAccordId(order.getUserId());
                 // add by yyf 根据身份证前6位 映射用户地址
                 if (userInfo != null) {
                     if (StringUtils.isBlank(userInfo.getIdcardImgZ()) || StringUtils.isBlank(userInfo.getIdcardImgF())) {
@@ -529,22 +537,60 @@ public class MyCollectionOrderController extends BaseController {
                 */
 
                 // 银行卡
-                SysUserBankCard userCar = sysUserBankCardService.findUserId(mmanLoanCollectionOrderOri.getUserId());
+                SysUserBankCard userCar = sysUserBankCardService.findUserId(order.getUserId());
                 // 代扣记录
-                List<CollectionWithholdingRecord> withholdList = mmanLoanCollectionRecordService.findWithholdRecord(mmanLoanCollectionOrderOri.getId());
+                List<CollectionWithholdingRecord> withholdList = mmanLoanCollectionRecordService.findWithholdRecord(order.getId());
 
+                if (BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())) {
+                    userInfo.setIdNumber(MaskCodeUtil.getMaskCode(userInfo.getIdNumber()));
+                    userInfo.setUserPhone(MaskCodeUtil.getMaskCode(userInfo.getUserPhone()));
+                    userCar.setBankCard(MaskCodeUtil.getMaskCode(userCar.getBankCard()));
+                    for (CollectionWithholdingRecord withholdingRecord : withholdList) {
+                        withholdingRecord.setLoanUserPhone(MaskCodeUtil.getMaskCode(withholdingRecord.getLoanUserPhone()));
+                    }
+                }
+                // 催收记录
+//                List<MmanLoanCollectionRecord> list = mmanLoanCollectionRecordService.findListRecord(id);
+                // 联系人信息
                 // 还款完成用户信息掩码处理
                 dealwithUserInfo(mmanLoanCollectionOrderOri, userInfo, userCar, withholdList);
 
                 CreditLoanPay creditLoanPay = creditLoanPayService.get(mmanLoanCollectionOrderOri.getPayId());
 
-                model.addAttribute("collectionOrder", mmanLoanCollectionOrderOri);
+
+                List<TemplateSms> msgs = getAllMsg();
+                int count = smsUserService.getSendMsgCount(order.getLoanId());
+                String msgLimitCountKey = BackConstant.REDIS_KEY_PREFIX + SHORT_MESSAGE_LIMIT_COUNT_REDIS_KEY;
+                int msgCountLimit = JedisDataClient.get(msgLimitCountKey) == null ? 0 : Integer.valueOf(JedisDataClient.get(msgLimitCountKey));
+                if (msgCountLimit == 0) {
+                    // 默认短信发送上限为2条
+                    msgCountLimit = 2;
+                }
+
+                // 沟通情况
+                List<CommunicationSituation> communicationSituations = situationService.getLableList();
+                // 订单状态
+                Map<String, Object> orderStatusMap = getOrderStatusMap();
+                // 沟通情况
+                Map<String, Object> communicationSituationsMap = getCommunicationSituationsMap(communicationSituations);
+                // 逾期等级
+                Map<String, Object> overdueLevelMap = getOverdueLevelMap();
+                int remainCount = msgCountLimit - count > 0 ? msgCountLimit - count : 0;
+
+                model.addAttribute("communicationSituationsMap", communicationSituationsMap);
+                model.addAttribute("overdueLevelMap", overdueLevelMap);
+                model.addAttribute("orderStatusMap", orderStatusMap);
+//                model.addAttribute("list", list);
+                model.addAttribute("remainMsgCount", remainCount);
+                model.addAttribute("msgCountLimit", msgCountLimit);
+                model.addAttribute("msgs", msgs);
+                model.addAttribute("orderId", id);
+                model.addAttribute("phoneNumber", order.getLoanUserPhone());
+//                model.addAttribute("recordList", list);
+                model.addAttribute("collectionOrder", order);
                 model.addAttribute("userInfo", userInfo);
                 model.addAttribute("userCar", userCar);// 银行卡
-                model.addAttribute("payMonery", creditLoanPay.getRealMoney());// 已还金额
-                model.addAttribute("detailList", detailList);
-                model.addAttribute("withholdList", withholdList);
-                model.addAttribute("domaiName", PayContents.XJX_DOMAINNAME_URL);
+                model.addAttribute("backUser", backUser);
                 url = "mycollectionorder/myorderDetails";
 //			}
             }
@@ -650,6 +696,77 @@ public class MyCollectionOrderController extends BaseController {
         return StringUtils.join(set.toArray(), " , ");
     }
 
+
+    /**
+     * 查询借款人借款及还款详情信息
+     *
+     * @param request
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/getUserRepayInfo")
+    public String getUserRepayInfo(HttpServletRequest request) {
+        HashMap<String, Object> params = this.getParametersO(request);
+        Map<String, Object> result = new HashMap<>();
+        String id = params.get("id") + "";
+        try {
+            if (StringUtils.isEmpty(id)) {
+                return null;
+            }
+            MmanLoanCollectionOrder order = mmanLoanCollectionOrderService.getOrderById(id);
+            if (order == null) {
+                return null;
+            }
+            // 银行卡信息
+            SysUserBankCard userCar = sysUserBankCardService.findUserId(order.getUserId());
+            // 还款信息
+            CreditLoanPay creditLoanPay = creditLoanPayService.get(order.getPayId());
+            // 代扣记录
+            List<CollectionWithholdingRecord> withholdList = mmanLoanCollectionRecordService.findWithholdRecord(order.getId());
+            // 还款详情
+            List<CreditLoanPayDetail> detailList = creditLoanPayDetailService.findPayDetail(order.getPayId());
+            // 借款信息
+            MmanUserLoan userLoan = mmanUserLoanService.get(order.getLoanId());
+            if (userLoan.getPaidMoney().compareTo(BigDecimal.ZERO) <= 0) {
+                userLoan.setServiceCharge(BigDecimal.ZERO);
+            }
+
+            // 应还总额
+            BigDecimal totalAmount = getTotalAmount(userLoan);
+            // 剩余应还金额
+            BigDecimal paidMoney = creditLoanPay.getRealMoney() == null ? BigDecimal.ZERO : creditLoanPay.getRealMoney();
+            BigDecimal remainAmount = totalAmount.subtract(paidMoney);
+
+            result.put("collectionOrder", order);
+            result.put("totalAmount", totalAmount);
+            result.put("remainAmount", remainAmount);
+            result.put("userLoan", userLoan);
+            result.put("bankCard", userCar);
+            result.put("pay", creditLoanPay);
+            result.put("withholdList", withholdList);
+            result.put("payDetail", detailList);
+            result.put("payMonery", creditLoanPay.getRealMoney());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return JSON.toJSONString(result);
+    }
+
+    /**
+     * 计算订单应还总金额
+     *
+     * @param userLoan
+     * @return
+     */
+    private BigDecimal getTotalAmount(MmanUserLoan userLoan) {
+        BigDecimal loanMoney = userLoan.getLoanMoney() == null ? BigDecimal.ZERO : userLoan.getLoanMoney();
+        BigDecimal loanPenalty = userLoan.getLoanPenalty() == null ? BigDecimal.ZERO : userLoan.getLoanPenalty();
+        BigDecimal serviceCharge = userLoan.getServiceCharge() == null ? BigDecimal.ZERO : userLoan.getServiceCharge();
+        BigDecimal accrual = userLoan.getAccrual() == null ? BigDecimal.ZERO : userLoan.getAccrual();
+        return loanMoney.add(loanPenalty).add(serviceCharge).add(accrual);
+    }
+
+
     /**
      * 催收记录表
      *
@@ -658,13 +775,12 @@ public class MyCollectionOrderController extends BaseController {
      * @param model
      * @return
      */
-    @RequestMapping("collectionRecordList")
+    /*@RequestMapping("collectionRecordList")
     public String getloanCollectionRecordList(HttpServletRequest request, Model model) {
         List<MmanLoanCollectionRecord> list;
         Map<String, String> params = this.getParameters(request);
         try {
-            list = mmanLoanCollectionRecordService.findListRecord(params
-                    .get("id"));
+//            list = mmanLoanCollectionRecordService.findListRecord(params.get("id"));
             model.addAttribute("listRecord", list);
             // 跟进等级
             List<SysDict> levellist = sysDictService
@@ -677,7 +793,7 @@ public class MyCollectionOrderController extends BaseController {
         }
         model.addAttribute("params", params);
         return "mycollectionorder/listRecord";
-    }
+    }*/
 
 
     /**
@@ -907,7 +1023,6 @@ public class MyCollectionOrderController extends BaseController {
     /**
      * 转派-根据公司查询分组or催收员
      *
-     * @param //mmanLoanCollectionOrder
      * @param request
      * @param response
      * @return
@@ -1012,7 +1127,7 @@ public class MyCollectionOrderController extends BaseController {
 //                TemplateSms msg = msgs.get(code);
 //                String content = MessageFormat.format(msg.getContenttext(), StringUtils.split(getMsgParam(order), ','));
                 // 是否显示更换短信按钮
-//                model.addAttribute("refreshMsg", JedisDataClient.get("cuishou:refreshMsg"));
+//                model.addAttribute("refreshMsg", JedisDataClient.get(BackConstant.REDIS_KEY_PREFIX + "refreshMsg"));
 //                if (BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())) {
 //                    content = "该订单已还款完成，请核实！";
 //                }
@@ -1020,7 +1135,7 @@ public class MyCollectionOrderController extends BaseController {
 //                model.addAttribute("msgId", msg.getId());
                 // 查询当日该订单已发短信条数
                 int count = smsUserService.getSendMsgCount(order.getLoanId());
-                String msgLimitCountKey = "cuishou:" + SHORT_MESSAGE_LIMIT_COUNT_REDIS_KEY;
+                String msgLimitCountKey = BackConstant.REDIS_KEY_PREFIX + SHORT_MESSAGE_LIMIT_COUNT_REDIS_KEY;
                 int msgCountLimit = JedisDataClient.get(msgLimitCountKey) == null ? 0 : Integer.valueOf(JedisDataClient.get(msgLimitCountKey));
                 if (msgCountLimit == 0) {
                     // 默认短信发送上限为2条
@@ -1046,10 +1161,10 @@ public class MyCollectionOrderController extends BaseController {
      * @return
      */
     private List<TemplateSms> getAllMsg() {
-        List<TemplateSms> msgs = JedisDataClient.getList("cuishou:", SHORT_MESSAGE_LIST_REDIS_KEY);
+        List<TemplateSms> msgs = JedisDataClient.getList(BackConstant.REDIS_KEY_PREFIX, SHORT_MESSAGE_LIST_REDIS_KEY);
         if (CollectionUtils.isEmpty(msgs)) {
             msgs = templateSmsDao.getMsgs();
-            JedisDataClient.setList("cuishou:", SHORT_MESSAGE_LIST_REDIS_KEY, msgs, 5 * 60);
+            JedisDataClient.setList(BackConstant.REDIS_KEY_PREFIX, SHORT_MESSAGE_LIST_REDIS_KEY, msgs, 60 * 60);
         }
         return msgs;
     }
@@ -1094,10 +1209,10 @@ public class MyCollectionOrderController extends BaseController {
         List<MerchantInfo> list = new ArrayList<>(8);
         String merchantNanme = null;
         try {
-            list = JedisDataClient.getList("cuishou:", MERCHANT_INFO_REDIS_KEY);
+            list = JedisDataClient.getList(BackConstant.REDIS_KEY_PREFIX, MERCHANT_INFO_REDIS_KEY);
             if (CollectionUtils.isEmpty(list)) {
                 list = merchantInfoDao.getAll();
-                JedisDataClient.setList("cuishou:", MERCHANT_INFO_REDIS_KEY, list, 10 * 60);
+                JedisDataClient.setList(BackConstant.REDIS_KEY_PREFIX, MERCHANT_INFO_REDIS_KEY, list, 10 * 60);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -1122,82 +1237,65 @@ public class MyCollectionOrderController extends BaseController {
      * @return
      */
     @RequestMapping("/sendMsg")
-    public ServiceResult SendSms(HttpServletRequest request, HttpServletResponse response, Model model) {
+    @ResponseBody
+    public ServiceResult SendSms(HttpServletRequest request) {
         JsonResult result = new JsonResult("-1", "发送短信失败");
         HashMap<String, Object> params = this.getParametersO(request);
         try {
             String orderId = params.get("orderId") + "";
             if (StringUtils.isBlank(orderId)) {
-                result.setCode("-1");
-                result.setMsg("订单异常！");
-                return getServiceResult(response, model, result, params);
+                return new ServiceResult("-1", "订单异常！");
             }
             MmanLoanCollectionOrder order = mmanLoanCollectionOrderService.getOrderById(orderId);
             if (order == null) {
-                result.setCode("-2");
-                result.setMsg("订单异常！");
                 logger.error("订单为null,loanId : " + orderId);
-                return getServiceResult(response, model, result, params);
+                return new ServiceResult("-2", "订单异常！");
             }
 
             if (BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())) {
-                result.setCode("-3");
-                result.setMsg("催收成功订单不能发送催收短信！");
                 logger.error("催收成功订单不能发送催收短信！" + orderId);
-                return getServiceResult(response, model, result, params);
+                return new ServiceResult("-3", "催收成功订单不能发送催收短信！");
             }
             String mobile = request.getParameter("phoneNumber") == null ? "" : request.getParameter("phoneNumber").trim();
             if (StringUtils.isEmpty(mobile)) {
-                result.setCode("-4");
-                result.setMsg("手机号不能为空！");
-                return getServiceResult(response, model, result, params);
+                return new ServiceResult("-4", "手机号不能为空！");
             }
             Matcher matcher = MOBILE_PATTERN.matcher(mobile);
             if (!matcher.matches()) {
-                result.setCode("-5");
-                result.setMsg("手机号异常！");
-                return getServiceResult(response, model, result, params);
+                return new ServiceResult("-5", "手机号异常！");
             }
             String msgCode = params.get("msgId") + "";
-            if (StringUtils.isEmpty(msgCode)) {
-                result.setCode("-7");
-                result.setMsg("请选择正确的短信模板！");
-                return getServiceResult(response, model, result, params);
+            if (StringUtils.isEmpty(msgCode) || "0".equals(msgCode)) {
+                return new ServiceResult("-6", "请选择正确的短信模板！");
             }
             String msgParam = getMsgParam(order);
             if (msgParam == null) {
-                result.setCode("-8");
-                result.setMsg("短信参数异常！");
-                return getServiceResult(response, model, result, params);
+                return new ServiceResult("-7", "短信参数异常！");
             }
             // 查询出该订单当天已发短信的次数
             int count = smsUserService.getSendMsgCount(order.getLoanId());
-            String msgLimitCountKey = "cuishou:" + SHORT_MESSAGE_LIMIT_COUNT_REDIS_KEY;
+            String msgLimitCountKey = BackConstant.REDIS_KEY_PREFIX + SHORT_MESSAGE_LIMIT_COUNT_REDIS_KEY;
             int msgCountLimit = JedisDataClient.get(msgLimitCountKey) == null ? 0 : Integer.valueOf(JedisDataClient.get(msgLimitCountKey));
             if (msgCountLimit == 0) {
                 // 默认短信发送上限为2条
                 msgCountLimit = 2;
             }
             if (msgCountLimit <= count) {
-                result.setCode("-6");
-                result.setMsg("今日该订单发送短信已达上限" + (msgCountLimit) + "条！");
-                return getServiceResult(response, model, result, params);
+                return new ServiceResult("-8", "今日该订单发送短信已达上限" + (msgCountLimit) + "条！");
             }
             boolean smsResult = SmsSendUtil.sendSmsNew(mobile, msgParam, msgCode);
             if (smsResult) {
-                result.setCode("0");
-                result.setMsg("发送成功！");
                 // 插入短信记录
                 insertMsg(mobile, order, mobile, msgCode, request);
+                return new ServiceResult("200", "发送短信成功！");
             } else {
-                result.setCode("-8");
-                result.setMsg("发送失败！");
+                return new ServiceResult("-9", "发送失败！");
             }
         } catch (Exception e) {
             logger.error("发送短信失败，订单id：" + params.get("id"));
             e.printStackTrace();
         }
-        return getServiceResult(response, model, result, params);
+        return null;
     }
 
     /**
@@ -1592,4 +1690,42 @@ public class MyCollectionOrderController extends BaseController {
         return null;
     }
 
+
+    private Map<String, Object> getCommunicationSituationsMap(List<CommunicationSituation> communicationSituations) {
+        Map<String, Object> map = new HashMap<>(16);
+        if (CollectionUtils.isNotEmpty(communicationSituations)) {
+            for (CommunicationSituation situation : communicationSituations) {
+                map.put(situation.getId().toString(), situation.getCommunicationLabel());
+            }
+        }
+        return map;
+    }
+
+
+    private Map<String, Object> getOverdueLevelMap() {
+        List<SysDict> overdueLevel = JedisDataClient.getList(BackConstant.REDIS_KEY_PREFIX, "overdueLevel");
+        if (CollectionUtils.isEmpty(overdueLevel)) {
+            overdueLevel = sysDictService.findDictByType(DICTIONARY_TYPE_OVERDUE_LEVEL);
+            JedisDataClient.setList(BackConstant.REDIS_KEY_PREFIX, "overdueLevel", overdueLevel, 60 * 60 * 24);
+        }
+        Map<String, Object> overdueLevelMap = new HashMap<>(16);
+        for (SysDict sysDict : overdueLevel) {
+            overdueLevelMap.put(sysDict.getValue(), sysDict.getLabel());
+        }
+        return overdueLevelMap;
+    }
+
+
+    private Map<String, Object> getOrderStatusMap() {
+        List<SysDict> orderStatus = JedisDataClient.getList(BackConstant.REDIS_KEY_PREFIX, "orderStatus");
+        if (CollectionUtils.isEmpty(orderStatus)) {
+            orderStatus = sysDictService.findDictByType(DICTIONARY_TYPE_ORDER_STATE);
+            JedisDataClient.setList(BackConstant.REDIS_KEY_PREFIX, "orderStatus", orderStatus, 60 * 60 * 24);
+        }
+        Map<String, Object> orderStatusMap = new HashMap<>(8);
+        for (SysDict sysDict : orderStatus) {
+            orderStatusMap.put(sysDict.getValue(), sysDict.getLabel());
+        }
+        return orderStatusMap;
+    }
 }

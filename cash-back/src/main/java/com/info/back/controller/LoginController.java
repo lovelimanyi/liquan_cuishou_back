@@ -235,7 +235,7 @@ public class LoginController extends BaseController {
         if (BackConstant.userAccountWhiteListList.contains(userAccount)) {
             return true;
         }
-        String redisKey = "cuishou:" + WHITE_LIST_REDIS_KEY;
+        String redisKey = BackConstant.REDIS_KEY_PREFIX + WHITE_LIST_REDIS_KEY;
         List<String> orayIps = JedisDataClient.getList(redisKey, 0, -1);
         if (CollectionUtils.isEmpty(orayIps)) {
             List<CompanyIpAddressDto> companyIps = companyIpAddressService.getAllIps();

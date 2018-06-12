@@ -48,7 +48,7 @@ public interface IMmanLoanCollectionRecordService {
 	 * 
 	 * @return
 	 */
-	 List<MmanLoanCollectionRecord> findListRecord(String OrderId);
+	 List<MmanLoanCollectionRecord> findListRecord(HashMap<String,Object> param);
 
 	 void assignCollectionOrderToRelatedGroup(
 			List<MmanLoanCollectionOrder> mmanLoanCollectionOrderList,
@@ -106,4 +106,6 @@ public interface IMmanLoanCollectionRecordService {
 	 * @return
      */
 	 JsonResult fqWithholding(Map<String, String> params);
+
+    void saveCollectionRecord(HashMap<String, Object> params, BackUser user);
 }
