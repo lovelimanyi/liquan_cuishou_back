@@ -8,6 +8,7 @@ import com.info.back.dao.ITemplateSmsDao;
 import com.info.back.result.JsonResult;
 import com.info.back.service.*;
 import com.info.back.utils.*;
+import com.info.config.PayContents;
 import com.info.constant.Constant;
 import com.info.web.pojo.*;
 import com.info.web.util.*;
@@ -512,6 +513,17 @@ public class MyCollectionOrderController extends BaseController {
                     logger.error("mmanLoanCollectionOrderOri 为null 借款id:" + params.get("id").toString());
                 }
                 MmanUserInfo userInfo = mmanUserInfoService.getUserInfoAccordId(order.getUserId());
+                if (userInfo != null) {
+                    // 调用接口获取用户共债手机号
+                    String phones = getPhones(userInfo);
+                    // 判断数据库数据和数据库存储数据是否一致，不一致则更新数据库数据
+                    if (!phones.equals(userInfo.getUserPhones())) {
+                        // 更新userInfo中数据
+                        updateUserInfo(userInfo, phones);
+                    }
+                    userInfo.setUserPhones(phones);
+                }
+
                 // add by yyf 根据身份证前6位 映射用户地址
                 if (userInfo != null) {
                     if (StringUtils.isBlank(userInfo.getIdcardImgZ()) || StringUtils.isBlank(userInfo.getIdcardImgF())) {
@@ -524,39 +536,13 @@ public class MyCollectionOrderController extends BaseController {
                 // 从oss获取图片地址
                 getUserImageUrl(userInfo);
 
-                List<CreditLoanPayDetail> detailList = creditLoanPayDetailService.findPayDetail(mmanLoanCollectionOrderOri.getPayId());
-
-                /*
-                BigDecimal payMonery = new BigDecimal(0);
-                if (detailList != null) {
-                    for (CreditLoanPayDetail pay : detailList) {
-                        payMonery = payMonery.add(pay.getRealMoney()).add(
-                                pay.getRealPenlty().add(pay.getRealgetAccrual()));
-                    }
-                }
-                */
-
                 // 银行卡
                 SysUserBankCard userCar = sysUserBankCardService.findUserId(order.getUserId());
                 // 代扣记录
                 List<CollectionWithholdingRecord> withholdList = mmanLoanCollectionRecordService.findWithholdRecord(order.getId());
 
-                if (BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())) {
-                    userInfo.setIdNumber(MaskCodeUtil.getMaskCode(userInfo.getIdNumber()));
-                    userInfo.setUserPhone(MaskCodeUtil.getMaskCode(userInfo.getUserPhone()));
-                    userCar.setBankCard(MaskCodeUtil.getMaskCode(userCar.getBankCard()));
-                    for (CollectionWithholdingRecord withholdingRecord : withholdList) {
-                        withholdingRecord.setLoanUserPhone(MaskCodeUtil.getMaskCode(withholdingRecord.getLoanUserPhone()));
-                    }
-                }
-                // 催收记录
-//                List<MmanLoanCollectionRecord> list = mmanLoanCollectionRecordService.findListRecord(id);
-                // 联系人信息
                 // 还款完成用户信息掩码处理
-                dealwithUserInfo(mmanLoanCollectionOrderOri, userInfo, userCar, withholdList);
-
-                CreditLoanPay creditLoanPay = creditLoanPayService.get(mmanLoanCollectionOrderOri.getPayId());
-
+                dealwithUserInfo(order, userInfo, userCar, withholdList);
 
                 List<TemplateSms> msgs = getAllMsg();
                 int count = smsUserService.getSendMsgCount(order.getLoanId());
