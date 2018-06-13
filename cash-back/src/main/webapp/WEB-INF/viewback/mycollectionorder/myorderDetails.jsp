@@ -63,7 +63,7 @@
                         </tr>
                         <tr>
                             <td class="tdGround">预留手机号:</td>
-                            <td>${userCar.mobile}</td>
+                            <td>${userInfo.userPhones}</td>
                             <td class="tdGround">现居时长</td>
                             <td>
                                 <c:choose>

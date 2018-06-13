@@ -658,7 +658,7 @@ public class MyCollectionOrderController extends BaseController {
             map.put("id", userInfo.getIdNumber());
             String returnInfo = HttpUtil.getInstance().doPost(PayContents.XJX_GET_PHONES, JSON.toJSONString(map));
             // 自己平台的手机号
-            set.add(userInfo.getUserPhone());
+            set.add(userInfo.getUserName());
             Map<String, Object> o = (Map<String, Object>) JSONObject.parse(returnInfo);
 
             if (o != null && "0".equals(String.valueOf(o.get("code")))) {
