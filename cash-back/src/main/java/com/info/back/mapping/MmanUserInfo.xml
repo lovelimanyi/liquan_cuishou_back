@@ -497,6 +497,10 @@
         select rl.info_name as contactUserName,rl.info_value as contactUserPhone,rl.contacts_key as contactUserType,fo.realname as loanUserName,fo.user_phone as loanUserPhone from mman_user_rela rl left join mman_user_info fo on fo.id = rl.user_id where rl.info_value = #{contactUserPhone}
     </select>
 
+    <select id="getAddressByIDNumber" resultType="String" parameterType="String">
+        select address FROM id_card_address WHERE  id_card_number=#{idNumber}
+    </select>
+
     <select id="getUserInfoById" resultMap="queryResultMap" parameterType="com.info.web.pojo.MmanUserInfo">
 		SELECT
 		t.id ,
