@@ -40,15 +40,7 @@ public class AuditCenterService implements IAuditCenterService {
     //订单
     @Autowired
     private IMmanLoanCollectionOrderDao manLoanCollectionOrderDao;
-    @Autowired
-    private IMman_loan_collection_orderdeductionService collection_orderdeductionService;
-    @Autowired
-    private IMmanUserLoanService iMmanUserLoanService;
-    @Autowired
-    private IMmanUserLoanDao iMmanUserLoanDao;
-    @Autowired
-    private ICreditLoanPayDao iCreditLoanPayDao;
-    private MmanLoanCollectionOrder order;
+
     @Autowired
     private MqClient mqClient;
 
@@ -66,7 +58,7 @@ public class AuditCenterService implements IAuditCenterService {
             auditCenter.setLoanUserId(mmanLoanCollectionOrderOri.getUserId());
 
         }
-        Map<String, Object> param = new HashMap<String, Object>();
+        Map<String, Object> param = new HashMap<>();
         param.put("id",params.get("id"));
         param.put("type",params.get("type"));
         int count = auditCenterDao.findAuditStatusByOrderId(param);
@@ -96,7 +88,7 @@ public class AuditCenterService implements IAuditCenterService {
     @Override
     public PageConfig<AuditCenter> findPage(HashMap<String, Object> params) {
         params.put(Constant.NAME_SPACE, "AuditCenter");
-        PageConfig<AuditCenter> pageConfig = new PageConfig<AuditCenter>();
+        PageConfig<AuditCenter> pageConfig;
         pageConfig = paginationDao.findPage("findAll", "findAllCount", params, null);
         return pageConfig;
     }
@@ -216,13 +208,12 @@ public class AuditCenterService implements IAuditCenterService {
                         }else{ //审核状态--同意
                             params.put("id", auditCenter.getId());
                             auditCenterDao.updateStatus(params);
-                            HashMap<String, String> auditMap = new HashMap<String, String>();
+                            HashMap<String, String> auditMap = new HashMap<>();
                             auditMap.put("id", auditCenter.getOrderid());
                             if ("2".equals(auditCenter.getType())) {
                                 auditMap.put("csstatus", params.get("status"));
                                 manLoanCollectionOrderDao.updateAuditStatus(auditMap);
                                 if ("2".equals(auditCenter.getStatus())) {
-                                    HashMap<String, Object> xjxparams = new HashMap<String, Object>();
                                     params.put("id", auditCenter.getLoanUserId());
                                     params.put("collection_advise", auditCenter.getNote());
                                     String resultT = HttpUtil.dopostMap(PayContents.COLLECTION_ADVISE_UPDATE_URL, params);
@@ -250,7 +241,7 @@ public class AuditCenterService implements IAuditCenterService {
     @Override
     public PageConfig<AuditCenter> findAllPage(HashMap<String, Object> params) {
         params.put(Constant.NAME_SPACE, "AuditCenter");
-        PageConfig<AuditCenter> pageConfig = new PageConfig<AuditCenter>();
+        PageConfig<AuditCenter> pageConfig;
         pageConfig = paginationDao.findPage("find", "findCount", params, null);
         return pageConfig;
     }
