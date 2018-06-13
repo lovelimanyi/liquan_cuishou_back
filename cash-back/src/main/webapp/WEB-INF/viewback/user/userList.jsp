@@ -83,9 +83,11 @@
                 <th align="center" width="120">
                     备注
                 </th>
+                <%--
                 <th align="center" width="80">
                     操作
                 </th>
+                --%>
             </tr>
             </thead>
             <tbody>
@@ -136,19 +138,21 @@
                     <td>
                             ${user.remark }
                     </td>
-                    <c:choose>
-                        <c:when test="${verifyCodePermission eq 1}">
-                            <td>
-                                <a href="collection/getVerifyCode?phone=${user.userMobile}" class="add" target="dialog" width="820" height="420" mask="true"
-                                   style="color: #1b8d0f">查询验证码</a>
-                            </td>
-                        </c:when>
-                        <c:otherwise>
-                            <td>
-                                暂无操作权限
-                            </td>
-                        </c:otherwise>
-                    </c:choose>
+                    <%--
+                        <c:choose>
+                            <c:when test="${verifyCodePermission eq 1}">
+                                <td>
+                                    <a href="collection/getVerifyCode?phone=${user.userMobile}" class="add" target="dialog" width="820" height="420" mask="true"
+                                       style="color: #1b8d0f">查询验证码</a>
+                                </td>
+                            </c:when>
+                            <c:otherwise>
+                                <td>
+                                    暂无操作权限
+                                </td>
+                            </c:otherwise>
+                        </c:choose>
+                    --%>
                 </tr>
             </c:forEach>
             </tbody>

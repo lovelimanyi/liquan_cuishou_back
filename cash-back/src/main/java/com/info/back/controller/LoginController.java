@@ -108,7 +108,7 @@ public class LoginController extends BaseController {
     }
 
 
-    @RequestMapping(value = "/sendSmsBack", method = RequestMethod.POST)
+    /*@RequestMapping(value = "/sendSmsBack", method = RequestMethod.POST)
     public void sendSmsBack(HttpServletRequest request, HttpServletResponse response, Model model) {
         HashMap<String, Object> params = this.getParametersO(request);
         ServiceResult serviceResult = new ServiceResult("500", "未知异常");
@@ -157,7 +157,7 @@ public class LoginController extends BaseController {
         }
 
         SpringUtils.renderJson(response, serviceResult);
-    }
+    }*/
 
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
@@ -177,11 +177,11 @@ public class LoginController extends BaseController {
             }
 
 
-//            if (!validateSubmit(request, response)) {
-//                errMsg = "验证码错误";
-//                model.addAttribute(MESSAGE, errMsg);
-//                return "login";
-//            }
+            if (!validateSubmit(request, response)) {
+                errMsg = "验证码错误";
+                model.addAttribute(MESSAGE, errMsg);
+                return "login";
+            }
             params.put("status", BackUser.STATUS_USE);
             BackUser backUser = backUserService.findOneUser(params);
             if (backUser == null || BackConstant.BACK_USER_STATUS.equals(backUser.getUserStatus().toString())) {
@@ -195,7 +195,7 @@ public class LoginController extends BaseController {
                 model.addAttribute(MESSAGE, errMsg);
                 return "login";
             }
-
+            /*
             String key = SMS_REGISTER_PREFIX + backUser.getUserMobile();
             String smsCode = params.get("smsCode") + "";
             //String code = "0000";
@@ -213,7 +213,7 @@ public class LoginController extends BaseController {
                 model.addAttribute(MESSAGE, errMsg);
                 return "login";
             }
-
+            */
             request.getSession(true).setAttribute(Constant.BACK_USER, backUser);
             request.getSession(true).setMaxInactiveInterval(3600);
         } catch (Exception e) {

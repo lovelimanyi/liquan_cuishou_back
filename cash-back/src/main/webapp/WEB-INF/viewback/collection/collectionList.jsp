@@ -96,9 +96,11 @@
                 <th align="center" width="30">
                     添加时间
                 </th>
+                <%--
                 <th align="center" width="30">
                     操作
                 </th>
+                --%>
             </tr>
             </thead>
             <tbody>
@@ -142,19 +144,21 @@
                     <td>
                         <fmt:formatDate value="${collection.createDate }" pattern="yyyy-MM-dd HH:mm:ss"/>
                     </td>
-                    <c:choose>
-                        <c:when test="${verifyCodePermission eq 1}">
-                            <td>
-                                <a href="collection/getVerifyCode?phone=${collection.userMobile}" class="add" target="dialog" width="820" height="420" mask="true"
-                                   style="color: #1b8d0f">查询验证码</a>
-                            </td>
-                        </c:when>
-                        <c:otherwise>
-                            <td>
-                                暂无操作权限
-                            </td>
-                        </c:otherwise>
-                    </c:choose>
+                    <%--
+                        <c:choose>
+                            <c:when test="${verifyCodePermission eq 1}">
+                                <td>
+                                    <a href="collection/getVerifyCode?phone=${collection.userMobile}" class="add" target="dialog" width="820" height="420" mask="true"
+                                       style="color: #1b8d0f">查询验证码</a>
+                                </td>
+                            </c:when>
+                            <c:otherwise>
+                                <td>
+                                    暂无操作权限
+                                </td>
+                            </c:otherwise>
+                        </c:choose>
+                    --%>
                 </tr>
             </c:forEach>
             </tbody>
