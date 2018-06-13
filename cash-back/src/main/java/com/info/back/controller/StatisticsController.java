@@ -58,12 +58,12 @@ public class StatisticsController extends BaseController {
                 params.put("uuid", backUser.getUuid());
             }
             pageConfig = statisticsService.findPage(params);
-            System.out.println(pageConfig);
+//            System.out.println(pageConfig);
         }else if ("company".equals(Flag)){
             pageUrl = "statisticsNew/trackTotalCompanyStatistics";
             params.put("companys",companyList);
             pageConfig = statisticsService.findCompanyPage(params);
-            System.out.println(pageConfig);
+//            System.out.println(pageConfig);
         }
         params.put("roleId",backUser.getRoleId());
         model.addAttribute("companys",companyList);

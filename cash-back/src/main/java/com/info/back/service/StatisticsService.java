@@ -36,8 +36,8 @@ public class StatisticsService implements IStatisticsService {
         HashMap<String, Object> delParam = DateKitUtils.delTrackDate();
         statisticsDao.delTrackStatistics(delParam);
         //2.进行统计
-        List<TrackStatistics>  trackPersonList = statisticsDao.doTrackStatistics();
-        System.out.println(trackPersonList);
+        List<TrackStatistics> trackPersonList = statisticsDao.doTrackStatistics();
+//        System.out.println(trackPersonList);
         //3.将统计数据保存至数据库
         statisticsDao.insertTrackStatistics(trackPersonList);
     }
@@ -46,7 +46,7 @@ public class StatisticsService implements IStatisticsService {
     public PageConfig<TrackStatistics> findPage(HashMap<String, Object> params) {
         params.put(Constant.NAME_SPACE, "Statistics");
         return paginationDao.findPage("findAll", "findAllCount", params, null);
-}
+    }
 
     @Override
     public PageConfig<TrackStatistics> findCompanyPage(HashMap<String, Object> params) {
