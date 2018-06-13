@@ -26,7 +26,7 @@
                     <td>借 款 编 号: <input type="text" id="loanId" name="loanId" value="${params.loanId}"/></td>
                     <td>借款人姓名: <input type="text" id="loanRealName" name="loanRealName" value="${params.loanRealName}"/></td>
                     <td>借款人手机: <input type="text" id="loanUserPhone" name="loanUserPhone" value="${params.loanUserPhone}"/></td>
-                    <td>跟进等级:
+                    <td>跟 进 等 级:
                         <select name="topImportant" id="topImportant">
                             <option value="">全部</option>
                             <c:forEach var="company" items="${levellist }">
