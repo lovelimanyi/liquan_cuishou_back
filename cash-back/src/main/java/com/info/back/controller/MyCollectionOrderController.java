@@ -651,7 +651,7 @@ public class MyCollectionOrderController extends BaseController {
      * @throws
      */
     private String getPhones(MmanUserInfo userInfo) {
-        logger.info(">>>调起共债接口,参数： " + userInfo.getIdNumber());
+        logger.debug(">>>调起共债接口,参数： " + userInfo.getIdNumber());
         Set<String> set = new HashSet<>();
         try {
             Map<String, String> map = new HashMap();

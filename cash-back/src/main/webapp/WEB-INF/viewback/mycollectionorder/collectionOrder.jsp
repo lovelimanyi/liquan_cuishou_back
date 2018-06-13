@@ -332,14 +332,20 @@
                         <%--<td align="center" width="50">
                                 ${order.dispatchName}
                         </td>--%>
-                    <td align="center" width="50">
+                    <td align="center" width="150">
                         <c:if test="${order.collectionStatus ne '4'}">
-                            <a href="collectionOrder/toxianqin?id=${order.id }" target="navtab" style="color: #cd0a0a;width: 40px;">催收</a>
-                            <a href="collectionOrder/tokokuan?id=${order.id }&myId=${params.myId}" target="dialog" style="color: #1b8d0f;width: 40px;">代扣</a>
-                            <a href="collectionOrder/jianmian?id=${order.id }&myId=${params.myId}" target="dialog" style="color: #0f579f;width: 40px;">减免</a>
+                            <a href="collectionOrder/toxianqin?id=${order.id }" target="navtab"
+                               style="color: #cd0a0a;margin: 8px;font-size: 15px;text-decoration: none;">催收</a>
+                            <a href="collectionOrder/tokokuan?id=${order.id }&myId=${params.myId}" target="dialog"
+                               style="color: #1b8d0f;margin: 8px;font-size: 15px;text-decoration: none;">代扣
+                            </a>
+                            <a href="collectionOrder/jianmian?id=${order.id }&myId=${params.myId}" target="dialog"
+                               style="color: #0f579f;margin: 8px;font-size: 15px;text-decoration: none;">减免
+                            </a>
                         </c:if>
                         <c:if test="${order.collectionStatus eq '4'}">
-                            <a href="collectionOrder/toxianqin?id=${order.id }" target="navtab" style="color: #1b8d0f;width: 40px;">催收记录</a>
+                            <a href="collectionOrder/toxianqin?id=${order.id }" target="navtab"
+                               style="color: #1b8d0f;font-size: 15px;margin-top: 2px;text-decoration: none;">催收记录</a>
                         </c:if>
                     </td>
                 </tr>
