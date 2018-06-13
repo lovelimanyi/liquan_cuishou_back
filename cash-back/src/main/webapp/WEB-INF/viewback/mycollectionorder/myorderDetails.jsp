@@ -54,17 +54,17 @@
                         <tr>
                             <td class="tdGround" style="width:80px;">借款人姓名:</td>
                             <td>${userInfo.realname}</td>
-                            <td class="tdGround">借款人手机号码:</td>
-                            <td>${userInfo.userPhone}</td>
+                            <%--<td class="tdGround">借款人手机号码:</td>
+                            <td>${userInfo.userPhone}</td>--%>
                             <td class="tdGround">身份证号码:</td>
                             <td>${userInfo.idNumber}</td>
                             <td class="tdGround">性别:</td>
                             <td colspan="2">${userInfo.userSex}</td>
                         </tr>
                         <tr>
-                            <td class="tdGround">预留手机号:</td>
+                            <td class="tdGround">借款人手机:</td>
                             <td>${userInfo.userPhones}</td>
-                            <td class="tdGround">现居时长</td>
+                            <%--<td class="tdGround">现居时长</td>
                             <td>
                                 <c:choose>
                                     <c:when test="${userInfo.presentPeriod eq 1}">1~6个月</c:when>
@@ -73,7 +73,7 @@
                                     <c:otherwise>--</c:otherwise>
                                 </c:choose>
 
-                            </td>
+                            </td>--%>
                             <td class="tdGround">婚姻:</td>
                             <td colspan="1">
                                 <c:choose>
