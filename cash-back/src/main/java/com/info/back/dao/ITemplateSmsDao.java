@@ -40,6 +40,6 @@ public interface ITemplateSmsDao {
 	 */
 	List<TemplateSms> getMsgs();
 	
-	public List<TemplateSms> getType(HashMap<String, Object> params);
+	List<TemplateSms> getType(HashMap<String, Object> params);
 
 }

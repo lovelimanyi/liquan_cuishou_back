@@ -10,13 +10,12 @@ import com.info.back.utils.*;
 import com.info.config.PayContents;
 import com.info.constant.Constant;
 import com.info.web.pojo.*;
-import com.info.web.util.CompareUtils;
-import com.info.web.util.DateUtil;
-import com.info.web.util.JSONUtil;
-import com.info.web.util.PageConfig;
+import com.info.web.util.*;
 import com.liquan.oss.OSSUpload;
+import jdk.nashorn.internal.runtime.regexp.joni.Regex;
 import net.sf.json.JSONArray;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -26,6 +25,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import redis.clients.jedis.Jedis;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -33,7 +33,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.text.MessageFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 我的催收订单控制层
@@ -45,6 +48,8 @@ import java.util.*;
 public class MyCollectionOrderController extends BaseController {
 
     private static Logger logger = Logger.getLogger(MyCollectionOrderController.class);
+
+    private static final Pattern MOBILE_PATTERN = Pattern.compile("1\\d{10}");
 
     // 公司
     @Autowired
@@ -868,48 +873,20 @@ public class MyCollectionOrderController extends BaseController {
      * @param model 需要发短信的手机号
      * @return
      */
-    @RequestMapping("gotoSendMsg")
-    public String gotoSendMsg(HttpServletRequest request,
-                              HttpServletResponse response, Model model) {
+    @RequestMapping("/gotoSendMsg")
+    public String gotoSendMsg(HttpServletRequest request, Model model) {
         HashMap<String, Object> params = this.getParametersO(request);
-        HashMap<String, Object> map = new HashMap<String, Object>();
         try {
             if (StringUtils.isNotBlank(params.get("id") + "")) {
-                MmanLoanCollectionOrder mmanLoanCollectionOrderOri = mmanLoanCollectionOrderService
+                MmanLoanCollectionOrder order = mmanLoanCollectionOrderService
                         .getOrderById(params.get("id").toString());
-                MmanUserInfo userInfo = mmanUserInfoService
-                        .getUserInfoById(mmanLoanCollectionOrderOri.getUserId());
-                model.addAttribute("loanOrderId",
-                        mmanLoanCollectionOrderOri.getLoanId());
-                model.addAttribute("userPhone", userInfo.getUserPhone());
-                model.addAttribute("orderId",
-                        mmanLoanCollectionOrderOri.getUserId());
-                model.addAttribute("userId", userInfo.getId());
-                model.addAttribute("originalNum", userInfo.getUserPhone());
-                model.addAttribute("msgCount", iSmsUserDao
-                        .getSendTotalMsgCount(mmanLoanCollectionOrderOri
-                                .getLoanId()));
-                String msgType = mmanLoanCollectionOrderOri.getCurrentOverdueLevel();
-                if ("5".equals(msgType)) {
-                    List<String> list = new ArrayList<String>();
-                    list.add("3");
-                    list.add("4");
-                    list.add("5");
-                    map.put("msgType", list);
-                } else if ("6".equals(msgType) || "7".equals(msgType)) {
-                    List<String> list = new ArrayList<String>();
-                    list.add("5");
-                    map.put("msgType", list);
-                } else if ("3".equals(msgType)) {
-                    List<String> list = new ArrayList<String>();
-                    list.add("3");
-                    map.put("msgType", list);
-                } else {
-                    List<String> list = new ArrayList<String>();
-                    list.add("4");
-                    map.put("msgType", list);
-                }
-                model.addAttribute("msgs", templateSmsDao.getType(map));
+                List<TemplateSms> msgList = templateSmsDao.getMsgs();
+                int code = RandomUtils.nextInt(0, msgList.size());
+                TemplateSms msg = msgList.get(code);
+
+                String content = MessageFormat.format(msg.getContenttext(), StringUtils.split(getMsgParam(order), ','));
+                model.addAttribute("msgContent", content);
+                model.addAttribute("msgId", msg.getId());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -919,6 +896,31 @@ public class MyCollectionOrderController extends BaseController {
     }
 
     /**
+     * 拼接短信模板中需要的参数
+     *
+     * @param order
+     * @return
+     */
+    private String getMsgParam(MmanLoanCollectionOrder order) {
+        MmanUserInfo userInfo = mmanUserInfoService.getUserInfoById(order.getUserId());
+        StringBuilder msgParam = new StringBuilder();
+        if (StringUtils.isNotEmpty(userInfo.getUserSex())) {
+            if ("男".equals(userInfo.getUserSex())) {
+                msgParam.append(order.getLoanUserName() + "先生");
+            } else {
+                msgParam.append(order.getLoanUserName() + "女士");
+            }
+
+        }
+        CreditLoanPay pay = creditLoanPayService.findByLoanId(order.getLoanId());
+        BigDecimal remainMoney = pay.getReceivableMoney().subtract(pay.getRealMoney());
+        msgParam.append(",");
+        msgParam.append(order.getOverdueDays()).append(",").append(remainMoney);
+        return msgParam.toString();
+    }
+
+
+    /**
      * 发送催收短信
      *
      * @param //mobiles        需要发送短信的手机号
@@ -926,16 +928,42 @@ public class MyCollectionOrderController extends BaseController {
      * @param //isSendSmsToAll 是否发送给所有人
      * @return
      */
-    @RequestMapping("sendMsg")
-    public ServiceResult SendSms(HttpServletRequest request,
-                                 HttpServletResponse response, Model model) {
+    @RequestMapping("/sendMsg")
+    public ServiceResult SendSms(HttpServletRequest request, HttpServletResponse response, Model model) {
         JsonResult result = new JsonResult("-1", "发送短信失败");
         HashMap<String, Object> params = this.getParametersO(request);
         try {
-            String mobiles = request.getParameter("phoneNumber");
+            String mobile = request.getParameter("phoneNumber") == null ? "" : request.getParameter("phoneNumber").trim();
+            if (StringUtils.isNotEmpty(mobile)) {
+                Matcher matcher = MOBILE_PATTERN.matcher(mobile);
+                if (matcher.matches()) {
+                    // 查询出该订单当天已发短信的次数
+                    int count = smsUserService.getSendMsgCount("");
+                    int msgCountLimit = JedisDataClient.get("msgCountLimit") == null ? 0 : Integer.valueOf(JedisDataClient.get("msgCountLimit"));
+                    if (msgCountLimit == 0) {
+                        // 默认短信发送上限为2条
+                        msgCountLimit = 3;
+                    }
+                    if (msgCountLimit > count) {
+                        boolean smsResult = SmsSendUtil.sendSmsNew(mobile, "", "");
+                        if (smsResult) {
+                            result.setCode("0");
+                            result.setMsg("发送成功！");
+                        } else {
+                            result.setCode("-3");
+                            result.setMsg("发送失败！");
+                        }
+                    }
+                } else {
+                    result.setCode("-2");
+                    result.setMsg("手机号异常！");
+                }
+            } else {
+                result.setCode("-1");
+                result.setMsg("手机号不能为空！");
+            }
+            /*String mobiles = request.getParameter("phoneNumber");
             String msgId = request.getParameter("msgId");
-            // String smsContent =
-            // templateSmsDao.getTemplateSmsById(msgId).getContenttext();
             String smsContent = null;
             if (msgId == null || msgId == "") {
                 result.setMsg("请选择需要发送的短信内容!");
@@ -962,14 +990,6 @@ public class MyCollectionOrderController extends BaseController {
                     // 查询出该订单当天已发短信的次数
                     int count = smsUserService.getSendMsgCount(orderId);
                     int overdueDays = order.getOverdueDays();
-                    // System.out.println("***********************************");
-                    // System.out.println("手机号:" + mobiles);
-                    // System.out.println("短息内容:" + smsContent);
-                    // System.out.println("借款编号:" + orderId);
-                    // System.out.println("订单逾期天数:" + overdueDays);
-                    // System.out.println("今日已发短信次数:" + count);
-                    // System.out.println("***********************************");
-                    // 逾期10天以内(包括10) 可发短信的数量为每天3条
                     if (overdueDays <= 10) {
                         if (count < 3) {
                             sendMsg(result, mobiles, orderId, userName,
@@ -992,7 +1012,7 @@ public class MyCollectionOrderController extends BaseController {
                     result.setCode("5");
                     result.setMsg("请检查您输入的手机号码!");
                 }
-            }
+            }*/
         } catch (Exception e) {
             e.printStackTrace();
         }
