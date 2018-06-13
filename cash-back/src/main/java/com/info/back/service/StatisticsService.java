@@ -43,7 +43,6 @@ public class StatisticsService implements IStatisticsService {
         statisticsDao.delTrackStatistics(delParam);
         //2.进行统计
         List<TrackStatistics>  trackPersonList = statisticsDao.doTrackStatistics();
-        System.out.println(trackPersonList);
         //3.将统计数据保存至数据库
         statisticsDao.insertTrackStatistics(trackPersonList);
     }
@@ -66,7 +65,6 @@ public class StatisticsService implements IStatisticsService {
         recoveryStatisticsDao.delRecoveryStatistics();
         //2.进行统计
         List<RecoveryRate> recoveryRateList = recoveryStatisticsDao.doRecoveryStatistics();
-        System.out.println(recoveryRateList);
         //3.将统计数据保存至数据库
         recoveryStatisticsDao.insertRecoveryStatistics(recoveryRateList);
 
