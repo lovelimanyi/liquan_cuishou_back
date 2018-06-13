@@ -214,7 +214,7 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
         try {
             if (StringUtils.isNotBlank(params.get("id").toString())) {
                 MmanLoanCollectionOrder order = mmanLoanCollectionOrderDao.getOrderById(params.get("id").toString());
-                logger.info("toReductionPage, id = " + params.get("id").toString() + ", order = " + order);
+                logger.debug("toReductionPage, id = " + params.get("id").toString() + ", order = " + order);
                 if (order != null) {
                     CreditLoanPay pay = creditLoanPayDao.findByLoanId(order.getLoanId());
                     MmanUserLoan loan = mmanUserLoanDao.get(order.getLoanId());
