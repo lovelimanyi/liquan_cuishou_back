@@ -307,7 +307,7 @@
                             </dt>
                             <dd style="column-span: 1;">
                                 <span><input type="radio" name="promiseRepay" value="1"/>是</span>
-                                <span style="margin-left: 50px;"><input type="radio" name="promiseRepay" checked="checked" value="0"/>否</span>
+                                <span style="margin-left: 50px;"><input id="notPromiseRepay" type="radio" name="promiseRepay" checked="checked" value="0"/>否</span>
                             </dd>
 
                         </dl>

@@ -544,6 +544,8 @@ function clearRecord() {
     $("#repaymentTime").val("");
     $("#contactId").val("");
     $("#collectionRecordId").val("");
+    $("#notPromiseRepay").attr("checked", "checked");
+    $("#promiseRepayTime").hide();
 }
 
 

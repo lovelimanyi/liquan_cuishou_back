@@ -539,10 +539,10 @@ public class MyCollectionOrderController extends BaseController {
                 // 银行卡
                 SysUserBankCard userCar = sysUserBankCardService.findUserId(order.getUserId());
                 // 代扣记录
-                List<CollectionWithholdingRecord> withholdList = mmanLoanCollectionRecordService.findWithholdRecord(order.getId());
+//                List<CollectionWithholdingRecord> withholdList = mmanLoanCollectionRecordService.findWithholdRecord(order.getId());
 
                 // 还款完成用户信息掩码处理
-                dealwithUserInfo(order, userInfo, userCar, withholdList);
+                dealwithUserInfo(order, userInfo, userCar);
 
                 List<TemplateSms> msgs = getAllMsg();
                 int count = smsUserService.getSendMsgCount(order.getLoanId());
@@ -591,16 +591,12 @@ public class MyCollectionOrderController extends BaseController {
      * @param mmanLoanCollectionOrderOri
      * @param userInfo
      * @param userCar
-     * @param withholdList
      */
-    private void dealwithUserInfo(MmanLoanCollectionOrder mmanLoanCollectionOrderOri, MmanUserInfo userInfo, SysUserBankCard userCar, List<CollectionWithholdingRecord> withholdList) {
+    private void dealwithUserInfo(MmanLoanCollectionOrder mmanLoanCollectionOrderOri, MmanUserInfo userInfo, SysUserBankCard userCar) {
         if (BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(mmanLoanCollectionOrderOri.getStatus())) {
             userInfo.setIdNumber(MaskCodeUtil.getMaskCode(userInfo.getIdNumber()));
             userInfo.setUserPhone(MaskCodeUtil.getMaskCode(userInfo.getUserPhone()));
             userCar.setBankCard(MaskCodeUtil.getMaskCode(userCar.getBankCard()));
-            for (CollectionWithholdingRecord withholdingRecord : withholdList) {
-                withholdingRecord.setLoanUserPhone(MaskCodeUtil.getMaskCode(withholdingRecord.getLoanUserPhone()));
-            }
         }
     }
 
@@ -701,11 +697,18 @@ public class MyCollectionOrderController extends BaseController {
                 return null;
             }
             // 银行卡信息
-            SysUserBankCard userCar = sysUserBankCardService.findUserId(order.getUserId());
+            SysUserBankCard userCard = sysUserBankCardService.findUserId(order.getUserId());
             // 还款信息
             CreditLoanPay creditLoanPay = creditLoanPayService.get(order.getPayId());
             // 代扣记录
             List<CollectionWithholdingRecord> withholdList = mmanLoanCollectionRecordService.findWithholdRecord(order.getId());
+            if (BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())) {
+                for (CollectionWithholdingRecord withholdingRecord : withholdList) {
+                    withholdingRecord.setLoanUserPhone(MaskCodeUtil.getMaskCode(withholdingRecord.getLoanUserPhone()));
+                }
+                userCard.setBankCard(MaskCodeUtil.getMaskCode(userCard.getBankCard()));
+            }
+
             // 还款详情
             List<CreditLoanPayDetail> detailList = creditLoanPayDetailService.findPayDetail(order.getPayId());
             // 借款信息
@@ -724,7 +727,7 @@ public class MyCollectionOrderController extends BaseController {
             result.put("totalAmount", totalAmount);
             result.put("remainAmount", remainAmount);
             result.put("userLoan", userLoan);
-            result.put("bankCard", userCar);
+            result.put("bankCard", userCard);
             result.put("pay", creditLoanPay);
             result.put("withholdList", withholdList);
             result.put("payDetail", detailList);

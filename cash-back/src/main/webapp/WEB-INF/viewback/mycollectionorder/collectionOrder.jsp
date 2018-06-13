@@ -6,10 +6,20 @@
     String path = request.getContextPath();
     String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + path + "/";
 %>
+<style type="text/css">
+    div .dialogContent .layoutBox .unitBox {
+        width: 1000px;
+        height: 450px;
+    }
+
+    a {
+
+    }
+</style>
 
 <form id="pagerForm" onsubmit="return navTabSearch(this);" action="collectionOrder/getListCollectionOrder?myId=${params.myId}" method="post">
     <div class="pageHeader">
-
+        <input type="hidden" id="parentId" name="parentId" value="${params.myId}">
         <div class="searchBar">
             <table class="searchContent">
                 <tr>
@@ -163,14 +173,14 @@
                     借款编号
                 </th>
                 <th align="center" width="50">
-                    借款人姓名
+                    借款人
                 </th>
                 <th align="center" width="50">
                     借款人手机号
                 </th>
-                <th align="center" width="60">
+                <%--<th align="center" width="60">
                     借款人身份证
-                </th>
+                </th>--%>
                 <th align="center" width="50">
                     催收状态
                 </th>
@@ -199,7 +209,7 @@
                     逾期天数
                 </th>
                 <th align="center" width="50">
-                    催收组
+                    逾期等级
                 </th>
                 <th align="center" width="50">
                     用户类型
@@ -207,20 +217,23 @@
                 <th align="center" width="80">
                     应还时间
                 </th>
-                <th align="center" width="70">
+                <%--<th align="center" width="70">
                     派单时间
-                </th>
+                </th>--%>
                 <th align="center" width="70">
                     最新催收时间
                 </th>
                 <th align="center" width="70">
                     承诺还款时间
                 </th>
-                <th align="center" width="70">
+                <%--<th align="center" width="70">
                     最新还款时间
-                </th>
-                <th align="center" width="50">
+                </th>--%>
+                <%--<th align="center" width="50">
                     派单人
+                </th>--%>
+                <th align="center" width="150">
+                    操作
                 </th>
             </tr>
             </thead>
@@ -241,9 +254,6 @@
                     </td>
                     <td align="center" width="50">
                             ${order.phoneNumber}
-                    </td>
-                    <td align="center" width="50">
-                            ${order.idCard}
                     </td>
                     <td align="center" width="50">
                         <c:choose>
@@ -305,22 +315,32 @@
                     <td align="center" width="50">
                         <fmt:formatDate value="${order.loanEndTime}" pattern="yyyy-MM-dd"/>
                     </td>
-                    <td align="center" width="50">
-                        <fmt:formatDate value="${order.dispatchTime}" pattern="yyyy-MM-dd HH:mm:ss"/>
-                    </td>
+                        <%--<td align="center" width="50">
+                            <fmt:formatDate value="${order.dispatchTime}" pattern="yyyy-MM-dd HH:mm:ss"/>
+                        </td>--%>
                     <td align="center" width="50">
                         <fmt:formatDate value="${order.lastCollectionTime}" pattern="yyyy-MM-dd HH:mm:ss"/>
                     </td>
                     <td align="center" width="50">
-                        <fmt:formatDate value="${order.promiseRepaymentTime}" pattern="yyyy-MM-dd HH:mm:ss"/>
+                        <fmt:formatDate value="${order.promiseRepaymentTime}" pattern="yyyy-MM-dd"/>
                     </td>
+                        <%--<td align="center" width="50">
+                            <c:if test="${order.returnMoney>0.0}">
+                                <fmt:formatDate value="${order.currentReturnDay}" pattern="yyyy-MM-dd HH:mm:ss"/>
+                            </c:if>
+                        </td>--%>
+                        <%--<td align="center" width="50">
+                                ${order.dispatchName}
+                        </td>--%>
                     <td align="center" width="50">
-                        <c:if test="${order.returnMoney>0.0}">
-                            <fmt:formatDate value="${order.currentReturnDay}" pattern="yyyy-MM-dd HH:mm:ss"/>
+                        <c:if test="${order.collectionStatus ne '4'}">
+                            <a href="collectionOrder/toxianqin?id=${order.id }" target="navtab" style="color: #cd0a0a;width: 40px;">催收</a>
+                            <a href="collectionOrder/tokokuan?id=${order.id }&myId=${params.myId}" target="dialog" style="color: #1b8d0f;width: 40px;">代扣</a>
+                            <a href="collectionOrder/jianmian?id=${order.id }&myId=${params.myId}" target="dialog" style="color: #0f579f;width: 40px;">减免</a>
                         </c:if>
-                    </td>
-                    <td align="center" width="50">
-                            ${order.dispatchName}
+                        <c:if test="${order.collectionStatus eq '4'}">
+                            <a href="collectionOrder/toxianqin?id=${order.id }" target="navtab" style="color: #1b8d0f;width: 40px;">催收记录</a>
+                        </c:if>
                     </td>
                 </tr>
             </c:forEach>
