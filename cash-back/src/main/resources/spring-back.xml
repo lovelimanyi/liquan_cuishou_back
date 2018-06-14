@@ -65,6 +65,7 @@
                         <value>/auditCenter/reduction-callback-big</value>
                         <value>/statisticsNew/doTrackStatistics</value>
                         <value>/statisticsNew/trackStatistics</value>
+                        <value>/statisticsNew/doRecoveryStatistics</value>
                     </list>
                 </property>
             </bean>
