@@ -987,14 +987,19 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
 
         }
         mmanLoanCollectionRecordDao.insert(record);
+
         String repaymentTime = params.get("repaymentTime") == null ? null : params.get("repaymentTime").toString();
+        MmanLoanCollectionOrder order = new MmanLoanCollectionOrder();
+        order.setId(params.get("orderId") == null ? null : params.get("orderId").toString());
         if (StringUtils.isNotEmpty(repaymentTime)) {
-            // 更新订单的承诺还款时间
-            MmanLoanCollectionOrder order = new MmanLoanCollectionOrder();
-            order.setId(params.get("orderId") == null ? null : params.get("orderId").toString());
+            // 更新承诺还款时间
             order.setPromiseRepaymentTime(DateUtil.getDateTimeFormat(repaymentTime, "yyyy-MM-dd"));
-            mmanLoanCollectionOrderDao.updateCollectionOrder(order);
+        } else {
+            order.setPromiseRepaymentTime(collectionOrder.getPromiseRepaymentTime());
         }
+        // 更新最新催收时间
+        order.setLastCollectionTime(new Date());
+        mmanLoanCollectionOrderDao.updateCollectionOrder(order);
     }
 
     // 获取当前联系人与借款人的关系

@@ -400,7 +400,7 @@ $("#searchOrderCollectionRecord").click(function () {
             }
         },
         error: function () {
-            alertMsg.error("系统开小差了,请稍后再试...")
+            alertMsg.error("系统开小差了,请稍后再试...");
         }
     });
 });
@@ -559,4 +559,100 @@ function getCollectionLists() {
 // 设置选中催收记录的id,传递到后台便于查询数据
 function getChooseVal(data) {
     $("#collectionRecordId").val(data.id);
+}
+
+//获取订单流转日志
+function getStatusChangeLogContent() {
+    var orderId = $("#orderId").val();
+    $("#statusChangeLog").empty();
+    if (orderId == null || orderId == '') {
+        alertMsg.warn("参数错误，请稍后再试！");
+        return;
+    }
+    $.ajax({
+        type: "GET",
+        url: "/back/collectionRecordStatusChangeLog/getListLog",
+        contentType: "application/x-www-form-urlencoded; charset=utf-8",
+        dataType: "json",
+        data: {
+            id: orderId
+        },
+        success: function (data) {
+            var logResult = '<table class="table" style="width: 100%;text-align: center;">';
+            logResult += '<thead><tr style="height: 24px;"><th align="center" width="40">序号</th>';
+            logResult += '<th align="center" width="50">操作前状态</th><th align="center" width="50">操作后状态 </th>';
+            logResult += '<th align="center" width="50">操作类型</th><th align="center" width="50">当前催收员</th>';
+            logResult += '<th align="center" width="50">催收组 </th><th align="center" width="50">订单组</th>';
+            logResult += '<th align="center" width="100">创建时间</th><th align="center" width="50">操作人</th>';
+            logResult += '<th align="center" width="200">操作备注</th></tr></thead><tbody>';
+            $.each(data.logList, function (index, log) {
+                logResult += generateLog(log, index);
+            });
+            logResult += '</tbody></table>';
+
+            $("#statusChangeLog").append(logResult);
+        },
+        error: function () {
+            alertMsg.error("系统开小差了,请稍后再试...");
+        }
+    })
+}
+
+
+// 生成流转日志
+function generateLog(log, index) {
+    var res = "";
+    res += '<tr style="height: 24px;"><td>' + (index + 1) + '</td><td>' + getCollectionStatus(log.beforeStatus) + '</td>';
+    res += '<td>' + getCollectionStatus(log.afterStatus) + '</td><td>' + getLogType(log.type) + '</td>';
+    res += '<td>' + log.currentCollectionUserId + '</td><td>' + getOrderLevel(log.currentCollectionUserLevel) + '</td>';
+    res += '<td>' + getOrderLevel(log.currentCollectionOrderLevel) + '</td><td>' + getFormatDate(log.createDate) + '</td>';
+    res += '<td>' + log.operatorName + '</td><td>' + log.remark + '</td></tr>';
+    return res;
+}
+
+function getLogType(type) {
+    if (type == null || type == '') {
+        return "";
+    } else if (type == 1) {
+        return "入催";
+    } else if (type == 2) {
+        return "逾期等级转换";
+    } else if (type == 3) {
+        return "转单";
+    } else if (type == 4) {
+        return "委外";
+    } else if (type == 5) {
+        return "催收成功";
+    } else {
+        return "";
+    }
+}
+
+
+function getOrderLevel(level) {
+    if (level == null || level == '') {
+        return "";
+    } else if (level == 3) {
+        return "S1";
+    } else if (level == 4) {
+        return "S2";
+    } else if (level == 5) {
+        return "M1-M2";
+    } else if (level == 6) {
+        return "M2-M3";
+    } else if (level == 7) {
+        return "M3+";
+    } else if (level == 8) {
+        return "M6+";
+    } else if (level == 11) {
+        return "F-M1";
+    } else if (level == 12) {
+        return "F-M2";
+    } else if (level == 13) {
+        return "F-M3";
+    } else if (level == 16) {
+        return "F-M6";
+    } else {
+        return "";
+    }
 }

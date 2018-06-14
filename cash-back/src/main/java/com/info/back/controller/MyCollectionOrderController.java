@@ -538,8 +538,6 @@ public class MyCollectionOrderController extends BaseController {
 
                 // 银行卡
                 SysUserBankCard userCar = sysUserBankCardService.findUserId(order.getUserId());
-                // 代扣记录
-//                List<CollectionWithholdingRecord> withholdList = mmanLoanCollectionRecordService.findWithholdRecord(order.getId());
 
                 // 还款完成用户信息掩码处理
                 dealwithUserInfo(order, userInfo, userCar);

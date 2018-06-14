@@ -190,6 +190,7 @@
                     <li class="selected" onclick='getCollectionLists();'><a href="#"><span>催收记录</span></a></li>
                     <%--<li><a href="#"><span>通话记录</span></a></li>--%>
                     <li id="addressList"><a href="#" onclick="getUserRealContent();"><span>通讯录</span></a></li>
+                    <li id="orderStatusChangeLog"><a href="#" onclick="getStatusChangeLogContent();"><span>订单流转日志</span></a></li>
                     <li id="jxlLable"><a href="#" onclick="getJxlContent();"><span>聚信立报告</span></a></li>
                 </ul>
             </div>
@@ -264,6 +265,13 @@
                 <fieldset>
                     <legend>通讯录</legend>
                     <div class="pageContent" id="userRealContent">
+                    </div>
+                </fieldset>
+            </div>
+            <div>
+                <fieldset>
+                    <legend>流转日志</legend>
+                    <div class="pageContent" id="statusChangeLog">
                     </div>
                 </fieldset>
             </div>
