@@ -103,4 +103,11 @@ public class DateKitUtils {
             System.out.println("ss");
         }
     }
+
+    public static void handleSelectDateToday(HashMap<String, Object> params) {
+        if (null == params.get("createDate")){
+            params.put("createDate",DateUtil.getDateFormat(new Date(),"yyyy-MM-dd"));
+        }
+
+    }
 }

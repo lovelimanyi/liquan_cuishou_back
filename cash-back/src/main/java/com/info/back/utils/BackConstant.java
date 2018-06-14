@@ -16,6 +16,8 @@ public class BackConstant {
     public static final String CREDITLOANAPPLY_OVERDUE = "4";// 逾期
 
     public static final Map<String, String> groupNameMap = new LinkedHashMap<>();
+    public static final Map<String, String> smallGroupNameMap = new LinkedHashMap<>();
+    public static final Map<String, String> bigGroupNameMap = new LinkedHashMap<>();
 
     public static final Map<String, String> groupNameTypeMap = new LinkedHashMap<String, String>();
     public static final Map<String, String> MTypeMap = new LinkedHashMap<String, String>();
@@ -137,6 +139,20 @@ public class BackConstant {
         groupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_F_M2, "F-M2");
         groupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_F_M3, "F-M3");
         groupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_F_M6, "F-M6");
+
+
+        smallGroupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_S1, "S1");
+        smallGroupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_S2, "S2");
+        smallGroupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_M1_M2, "M1-M2");
+        smallGroupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_M2_M3, "M2-M3");
+        smallGroupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_M3P, "M3+");
+        smallGroupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_M6P, "M6+");
+
+        bigGroupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_F_M1, "F-M1");
+        bigGroupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_F_M2, "F-M2");
+        bigGroupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_F_M3, "F-M3");
+        bigGroupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_F_M6, "F-M6");
+
 
         MTypeMap.put(BackConstant.XJX_OVERDUE_LEVEL_M3P, "M3+");
         MTypeMap.put(BackConstant.XJX_OVERDUE_LEVEL_M6P, "M6+");

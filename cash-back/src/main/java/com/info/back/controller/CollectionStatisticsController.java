@@ -541,7 +541,7 @@ public class CollectionStatisticsController extends BaseController {
 				}
 				handleCompanyPermission(backUser,params,model);
 			}
-			model.addAttribute("groupLevelMap", BackConstant.groupNameMap);
+			model.addAttribute("groupLevelMap", BackConstant.smallGroupNameMap);
 			model.addAttribute("groupLevel", String.valueOf(params.get("groupLevel")));
 			model.addAttribute("dictMap",BackConstant.groupNameMap);
 			model.addAttribute("list",pageConfig.getItems());
@@ -589,7 +589,7 @@ public class CollectionStatisticsController extends BaseController {
 				}
 				handleCompanyPermission(backUser,params,model);
 			}
-			model.addAttribute("groupLevelMap", BackConstant.groupNameMap);
+			model.addAttribute("groupLevelMap", BackConstant.bigGroupNameMap);
 			model.addAttribute("groupLevel", String.valueOf(params.get("groupLevel")));
 			model.addAttribute("dictMap",BackConstant.groupNameMap);
 			model.addAttribute("list",pageConfig.getItems());

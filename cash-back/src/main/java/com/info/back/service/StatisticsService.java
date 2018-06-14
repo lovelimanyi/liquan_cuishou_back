@@ -6,6 +6,7 @@ import com.info.back.dao.IStatisticsDao;
 import com.info.back.utils.DateKitUtils;
 import com.info.constant.Constant;
 import com.info.web.pojo.RecoveryRate;
+import com.info.web.pojo.TodayRecovery;
 import com.info.web.pojo.TrackStatistics;
 import com.info.web.util.DateUtil;
 import com.info.web.util.PageConfig;
@@ -178,5 +179,15 @@ public class StatisticsService implements IStatisticsService {
 
 
         return pageConfig;
+    }
+
+    @Override
+    public PageConfig<TodayRecovery> findTodayPersonPage(HashMap<String, Object> params) {
+        return null;
+    }
+
+    @Override
+    public PageConfig<TodayRecovery> findTodayCompanyPage(HashMap<String, Object> params) {
+        return null;
     }
 }
