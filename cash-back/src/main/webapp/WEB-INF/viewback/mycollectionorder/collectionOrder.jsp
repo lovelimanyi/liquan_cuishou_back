@@ -156,9 +156,9 @@
         <c:set var="page" value="${page}"></c:set>
         <!-- 分页 -->
         <%@ include file="/WEB-INF/viewback/page.jsp" %>
-        <jsp:include page="${BACK_URL}/rightSubList">
+       <%-- <jsp:include page="${BACK_URL}/rightSubList">
             <jsp:param value="${params.myId}" name="parentId"/>
-        </jsp:include>
+        </jsp:include>--%>
         <table class="table" style="width: 100%;" layoutH="160"
                nowrapTD="false">
             <thead>
