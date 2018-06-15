@@ -66,6 +66,7 @@
                         <value>/statisticsNew/doTrackStatistics</value>
                         <value>/statisticsNew/trackStatistics</value>
                         <value>/statisticsNew/doRecoveryStatistics</value>
+                        <value>/statisticsNew/doTodayStatistics</value>
                     </list>
                 </property>
             </bean>
