@@ -12,25 +12,26 @@ import java.util.Date;
 public class TodayRecovery {
 
     private Long id;
-    private int backUserId;//催收员id
-    private String roleId;//角色id
-    private String companyId;//公司id
+    private Date createDate;
+    private String companyName;
+    private String companyId;
+    private String backUserName;
+    private String uuid;
     private String groupLevel; //催收组
-    private String backUserName;//催收员姓名
+    private String borrowingType;//借款类型
+
     private BigDecimal totalPrincipal;//总本金
     private BigDecimal realgetTotalPrincipal;//已还本金
     private BigDecimal remainPrincipal; //剩余本金
     private BigDecimal repaymentProbability;//本金还款率
+
     private BigDecimal totalPenalty;//总滞纳金
     private BigDecimal realgetTotalPenalty;//已还滞纳金
-    private BigDecimal remainPenalty;//剩余滞纳金
     private BigDecimal penaltyProbability;//滞纳金还款率
+
     private int totalOrderCount;//总订单数
-    private int undoneOrderCount;//未还订单数
     private int doneOrderCount;//完成订单数
     private BigDecimal orderProbability;//订单完成率
-    private Date createDate;
-    private String companyName;
 
     public Long getId() {
         return id;
@@ -40,20 +41,20 @@ public class TodayRecovery {
         this.id = id;
     }
 
-    public int getBackUserId() {
-        return backUserId;
+    public Date getCreateDate() {
+        return createDate;
     }
 
-    public void setBackUserId(int backUserId) {
-        this.backUserId = backUserId;
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
     }
 
-    public String getRoleId() {
-        return roleId;
+    public String getCompanyName() {
+        return companyName;
     }
 
-    public void setRoleId(String roleId) {
-        this.roleId = roleId;
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
     }
 
     public String getCompanyId() {
@@ -64,6 +65,22 @@ public class TodayRecovery {
         this.companyId = companyId;
     }
 
+    public String getBackUserName() {
+        return backUserName;
+    }
+
+    public void setBackUserName(String backUserName) {
+        this.backUserName = backUserName;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
     public String getGroupLevel() {
         return groupLevel;
     }
@@ -72,13 +89,14 @@ public class TodayRecovery {
         this.groupLevel = groupLevel;
     }
 
-    public String getBackUserName() {
-        return backUserName;
+    public String getBorrowingType() {
+        return borrowingType;
     }
 
-    public void setBackUserName(String backUserName) {
-        this.backUserName = backUserName;
+    public void setBorrowingType(String borrowingType) {
+        this.borrowingType = borrowingType;
     }
+
 
     public BigDecimal getTotalPrincipal() {
         return totalPrincipal;
@@ -128,13 +146,6 @@ public class TodayRecovery {
         this.realgetTotalPenalty = realgetTotalPenalty;
     }
 
-    public BigDecimal getRemainPenalty() {
-        return remainPenalty;
-    }
-
-    public void setRemainPenalty(BigDecimal remainPenalty) {
-        this.remainPenalty = remainPenalty;
-    }
 
     public BigDecimal getPenaltyProbability() {
         return penaltyProbability;
@@ -152,14 +163,6 @@ public class TodayRecovery {
         this.totalOrderCount = totalOrderCount;
     }
 
-    public int getUndoneOrderCount() {
-        return undoneOrderCount;
-    }
-
-    public void setUndoneOrderCount(int undoneOrderCount) {
-        this.undoneOrderCount = undoneOrderCount;
-    }
-
     public int getDoneOrderCount() {
         return doneOrderCount;
     }
@@ -174,21 +177,5 @@ public class TodayRecovery {
 
     public void setOrderProbability(BigDecimal orderProbability) {
         this.orderProbability = orderProbability;
-    }
-
-    public Date getCreateDate() {
-        return createDate;
-    }
-
-    public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
-    }
-
-    public String getCompanyName() {
-        return companyName;
-    }
-
-    public void setCompanyName(String companyName) {
-        this.companyName = companyName;
     }
 }

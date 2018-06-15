@@ -26,4 +26,6 @@ public interface IStatisticsService {
     PageConfig<TodayRecovery> findTodayPersonPage(HashMap<String, Object> params);
 
     PageConfig<TodayRecovery> findTodayCompanyPage(HashMap<String, Object> params);
+
+    void doTodayStatistics();
 }

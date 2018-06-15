@@ -6,26 +6,64 @@
     String path = request.getContextPath();
 %>
 
-<form id="pagerForm" onsubmit="return navTabSearch(this);" action="statisticsNew/recoveryRateStatistics?Flag=person&myId=${params.myId}">
+<form id="pagerForm" onsubmit="return navTabSearch(this);" action="statisticsNew/todayStatistics?Flag=person&myId=${params.myId}">
 
     <div class="pageHeader">
         <div class="searchBar">
             <table class="searchContent">
                 <tr>
                     <td>
-                        派单时间:
-                        <input type="text" name="dispatchTime" id="dispatchTime" value="${params.dispatchTime}" class="date textInput readonly" datefmt="yyyy-MM-dd" readonly="readonly" />至
-                        <input type="text" name="dispatchEndTime" id="dispatchEndTime" value="${params.dispatchEndTime}" class="date textInput readonly" datefmt="yyyy-MM-dd" readonly="readonly" />
+                        统计时间:
+                        <input type="text" name="createDate" id="createDate" value="${params.createDate}" class="date textInput readonly" datefmt="yyyy-MM-dd" readonly="readonly" />
                     </td>
-                    <td>
-                        借款类型:
-                        <select name="borrowingType" id="borrowingType">
-                            <c:forEach items="${borrowingTypeMap}" var="map">
-                                <option value="${map.key}" <c:if test="${params.borrowingType eq map.key}">selected="selected"</c:if> >${map.value}</option>
-                            </c:forEach>
-                        </select>
-                    </td>
+                    <c:if test="${roleId  != '10021' }">
+                        <td>
+                            催收组:
+                            <select name="groupLevel" id="groupLevel">
+                                <option value="">全部</option>
+                                <c:forEach items="${groupLevelMap}" var="map">
+                                    <option value="${map.key}" <c:if test="${params.groupLevel eq map.key}">selected="selected"</c:if> >${map.value}</option>
+                                </c:forEach>
+                            </select>
+                        </td>
+                        <td>
+                            催收公司:
+                            <select name="companyId" id="companyId">
+                                <option value="">全部</option>
+                                <c:forEach items="${companys}" var="company">
+                                    <option value="${company.id}" <c:if test="${params.companyId eq company.id}">selected="selected"</c:if> >${company.title}</option>
+                                </c:forEach>
+                            </select>
+                        </td>
 
+                        <td>
+                            借款类型:
+                            <select name="borrowingType" id="borrowingType">
+                                <option value="">全部</option>
+                                <c:forEach items="${borrowingTypeMap}" var="map">
+                                    <option value="${map.key}"
+                                            <c:if test="${params.borrowingType eq map.key}">selected="selected"</c:if> >${map.value}</option>
+                                </c:forEach>
+                            </select>
+                        </td>
+                        <td>
+                            催收员姓名:
+                            <input type="text" name="backUserName" id="backUserName"
+                                   value="${params.backUserName }" />
+                        </td>
+                        <td>
+                            排序:
+                            <select name="orderBy">
+                                <option value="" <c:if test="${params.orderBy eq ''}">selected="selected"</c:if>>默认排序</option>
+                                <option value="repaymentProbability ASC" <c:if test="${params.orderBy eq 'repaymentProbability ASC'}">selected="selected"</c:if>>按本金催回率升序</option>
+                                <option value="repaymentProbability DESC" <c:if test="${params.orderBy eq 'repaymentProbability DESC'}">selected="selected"</c:if>>按本金催回率降序</option>
+                                <option value="penaltyProbability ASC" <c:if test="${params.orderBy eq 'penaltyProbability ASC'}">selected="selected"</c:if>>按滞纳金催回率升序</option>
+                                <option value="penaltyProbability DESC" <c:if test="${params.orderBy eq 'penaltyProbability DESC'}">selected="selected"</c:if>>按滞纳金催回率降序</option>
+                                <option value="orderProbability ASC" <c:if test="${params.orderBy eq 'orderProbability ASC'}">selected="selected"</c:if>>按订单催回率升序</option>
+                                <option value="orderProbability DESC" <c:if test="${params.orderBy eq 'orderProbability DESC'}">selected="selected"</c:if>>按订单催回率降序</option>
+                            </select>
+                        </td>
+                    </c:if>
                     <td>
                         <div class="buttonActive">
                             <div class="buttonContent">
@@ -65,40 +103,37 @@
                     催收员姓名
                 </th>
                 <th align="center" width="100">
+                    借款类型
+                </th>
+                <th align="center" width="100">
                     本金金额
                 </th>
                 <th align="center" width="100">
-                    已还本金
+                    当日催回本金
                 </th>
                 <th align="center" width="100">
-                    未还本金
+                    剩余未还本金
                 </th>
                 <th align="center" width="100">
-                    本金催回率
+                    当日本金催回率
                 </th>
                 <th align="center" width="100">
-                    完成订单总滞纳金
+                    滞纳金总额
                 </th>
                 <th align="center" width="120">
-                    完成订单实收滞纳金
+                    当日滞纳金
                 </th>
                 <th align="center" width="100">
-                    总订单未还滞纳金
-                </th>
-                <th align="center" width="100">
-                    滞纳金催回率
+                    当日滞纳金催回率
                 </th>
                 <th align="center" width="70">
-                    订单量
+                    订单总数
                 </th>
                 <th align="center" width="90">
-                    已还订单量
-                </th>
-                <th align="center" width="90">
-                    未还订单量
+                    当日催回订单数
                 </th>
                 <th align="center" width="100">
-                    订单还款率
+                    当日订单催回率
                 </th>
             </tr>
             </thead>
@@ -112,21 +147,16 @@
                         <fmt:formatDate value="${list.createDate}" pattern="yyyy-MM-dd"/>
                     </td>
                     <td>
-                        <c:if test="${companyName == null}">
-                            <c:forEach items="${company}" var="company">
-                                <c:if test="${list.companyId == company.id}">${company.title}
-                                </c:if>
-                            </c:forEach>
-                        </c:if>
-                        <c:if test="${companyName != null}">
-                            ${companyName}
-                        </c:if>
+                            ${list.companyName}
                     </td>
                     <td>
                             ${dictMap[list.groupLevel] }
                     </td>
                     <td>
                             ${list.backUserName}
+                    </td>
+                    <td>
+                            ${borrowingTypeMap[list.borrowingType]}
                     </td>
                     <td>
                             ${list.totalPrincipal}
@@ -148,9 +178,6 @@
                             ${list.realgetTotalPenalty}
                     </td>
                     <td>
-                            ${list.remainPenalty}
-                    </td>
-                    <td>
                             ${list.penaltyProbability}%
                     </td>
                     <td>
@@ -158,9 +185,6 @@
                     </td>
                     <td>
                             ${list.doneOrderCount}
-                    </td>
-                    <td>
-                            ${list.undoneOrderCount}
                     </td>
                     <td>
                             ${list.orderProbability}%

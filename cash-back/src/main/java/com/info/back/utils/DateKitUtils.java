@@ -110,4 +110,10 @@ public class DateKitUtils {
         }
 
     }
+
+    public static HashMap<String,Object> delTodayStatisticsDate() {
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("delTime",DateUtil.getDateFormat(new Date(),"yyyy-MM-dd"));
+        return params;
+    }
 }
