@@ -461,6 +461,48 @@ public class MyCollectionOrderController extends BaseController {
     }
 
     /**
+     * 调第三方风控，获取通话记录
+     * lmy
+     * List<Map<String,Object>>
+     */
+    @RequestMapping("getContactRecords")
+    @ResponseBody
+    private String getContactRecords(HttpServletRequest request, Model model) {
+        Map<String,Object> callLogs=new HashedMap();
+        Map<String,Object> resultMap = new HashedMap(8);
+        String returnInfo = null;
+        try{
+            HashMap<String, Object> params = getParametersO(request);
+            String idNumber=params.get("idNumber")+"";
+            if (idNumber != null&& idNumber!="") {
+                Map<String, String> map = new HashMap();
+                map.put("id", idNumber);
+                //调用第三方风控
+                returnInfo = HttpUtil.getInstance().doPost(PayContents.XJX_GET_PHONES, JSON.toJSONString(map));
+//                o = (Map<String, Object>) JSONObject.parse(returnInfo);
+                /*if (o != null && "0".equals(String.valueOf(o.get("code")))) {
+                    Map<String, Object> data = (Map<String, Object>) o.get("data");
+                    callLogs.putAll((Map<String, Object>)data.get("call_logs"));
+//                    for (Map<String, String> mArray : call_logs) {
+//                        set.add(mArray.get("reg_mobile"));
+//                        set.add(mArray.get("bc_mobile"));
+//                    }
+                }*/
+                resultMap.put("returnInfo",returnInfo);
+
+
+            }
+
+        }catch (Exception e){
+            logger.error("获取通话记录出错:" + e);
+            e.printStackTrace();
+        }
+        String str=callLogs.toString();
+        logger.info(callLogs.toString());
+        return JSON.toJSONString(resultMap);
+    }
+
+    /**
      * 跳转到订单详情页
      *
      * @param request
@@ -524,6 +566,9 @@ public class MyCollectionOrderController extends BaseController {
                     userInfo.setUserPhones(phones);
                 }
 
+                //获取补充手机号
+                String additionalPhones=getAdditionalPhones(userInfo.getUserName(),userInfo.getUserPhones());
+
                 // add by yyf 根据身份证前6位 映射用户地址
                 if (userInfo != null) {
                     if (StringUtils.isBlank(userInfo.getIdcardImgZ()) || StringUtils.isBlank(userInfo.getIdcardImgF())) {
@@ -574,6 +619,7 @@ public class MyCollectionOrderController extends BaseController {
                 model.addAttribute("userInfo", userInfo);
                 model.addAttribute("userCar", userCar);// 银行卡
                 model.addAttribute("backUser", backUser);
+                model.addAttribute("additionalPhones",additionalPhones);
                 url = "mycollectionorder/myorderDetails";
 //			}
             }
@@ -660,10 +706,10 @@ public class MyCollectionOrderController extends BaseController {
             // 自己平台的手机号
             set.add(userInfo.getUserName());
             Map<String, Object> o = (Map<String, Object>) JSONObject.parse(returnInfo);
-
             if (o != null && "0".equals(String.valueOf(o.get("code")))) {
-                List<Map<String, String>> data = (List<Map<String, String>>) o.get("data");
-                for (Map<String, String> mArray : data) {
+                Map<String, Object> data = (Map<String, Object>) o.get("data");
+                List<Map<String,String>> platformList=(List<Map<String,String>>)data.get("platform_list");
+                for (Map<String, String> mArray : platformList) {
                     set.add(mArray.get("reg_mobile"));
                     set.add(mArray.get("bc_mobile"));
                 }
@@ -672,7 +718,23 @@ public class MyCollectionOrderController extends BaseController {
             logger.error("调用共债接口获取手机号出错：" + e);
             e.printStackTrace();
         }
-        return StringUtils.join(set.toArray(), " , ");
+        return StringUtils.join(set.toArray(), ",");
+    }
+
+    /**
+     * 获取补充手机号
+     */
+    private  String getAdditionalPhones(String phone,String phones){
+        Set<String> pSet=new HashSet<>();
+        try{
+            String [] pArrays=phones.split(",");
+            pSet.addAll(Arrays.asList(pArrays));
+            pSet.remove(phone);
+        }catch(Exception e){
+            logger.error("获取补充手机号出错：" + e);
+            e.printStackTrace();
+        }
+        return StringUtils.join(pSet.toArray(), " , ");
     }
 
 

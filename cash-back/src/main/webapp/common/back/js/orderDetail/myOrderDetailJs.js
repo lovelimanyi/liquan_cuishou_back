@@ -29,6 +29,40 @@ function getJxlContent() {
     $("#collectionRecord").hide();
     // $("#userPhoto").parent("td").addClass("photoDivStyle");
 }
+// 获取用户通话记录信息（所有共债手机通话记录信息）
+function getContactRecords() {
+    var idNumber = $("#idNumber").val();
+    // var userName = $("#idNumber").val();
+    $.ajax({
+        type: "GET",
+        url: "/back/collectionOrder/getContactRecords",
+        contentType: "application/json; charset=UTF-8",
+        data: {
+            idNumber: idNumber
+        },
+        dataType: "json",
+        success: function (data) {
+            alertMsg.info("调用成功....");
+            console.log(data.returnInfo);
+            console.log(data.returnInfo);
+            /*if (data.code = 200) {
+                // console.log(data.data.call_logs);
+                // $("#contactRecords").append(data);
+            }*/
+        },error: function () {
+            alertMsg.error("调用出错！");
+        }
+
+
+        // var data=data[0].
+
+
+
+
+    });
+    // $("#collectionRecord").hide();
+    // $("#userPhoto").parent("td").addClass("photoDivStyle");
+}
 
 // 获取借款人联系人信息
 function getUserRealContent() {

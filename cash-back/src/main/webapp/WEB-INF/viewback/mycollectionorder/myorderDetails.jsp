@@ -29,6 +29,8 @@
     <input type="hidden" id="userId" value="${collectionOrder.userId}">
     <input type="hidden" id="contactId">
     <input type="hidden" id="collectionRecordId">
+    <input type="hidden" id="idNumber" value="${userInfo.idNumber}">
+    <input type="hidden" id="userName" value="${userInfo.userName}">
     <%-- 标记用户选择的是否是紧急联系人 --%>
     <input type="hidden" id="isCloseRelation">
     <div class="tabs">
@@ -62,8 +64,8 @@
                             <td colspan="2">${userInfo.userSex}</td>
                         </tr>
                         <tr>
-                            <td class="tdGround">借款人手机:</td>
-                            <td>${userInfo.userPhones}</td>
+                            <td class="tdGround">平台手机号:</td>
+                            <td>${userInfo.userName}</td>
                             <%--<td class="tdGround">现居时长</td>
                             <td>
                                 <c:choose>
@@ -99,6 +101,10 @@
                                     <c:otherwise>--</c:otherwise>
                                 </c:choose>
                             </td>
+                        </tr>
+                        <tr>
+                            <td class="tdGround">补充手机号:</td>
+                            <td colspan="5">${additionalPhones}</td>
                         </tr>
                         <tr>
                             <td class="tdGround">身份证地址:</td>
@@ -188,7 +194,7 @@
             <div class="tabsHeaderContent" id="collectionZone">
                 <ul>
                     <li class="selected" onclick='getCollectionLists();'><a href="#"><span>催收记录</span></a></li>
-                    <%--<li><a href="#"><span>通话记录</span></a></li>--%>
+                    <li id="contactRecord" onclick='getContactRecords();'><a href="#" ><span>通话记录</span></a></li>
                     <li id="addressList"><a href="#" onclick="getUserRealContent();"><span>通讯录</span></a></li>
                     <li id="jxlLable"><a href="#" onclick="getJxlContent();"><span>聚信立报告</span></a></li>
                 </ul>
@@ -259,7 +265,30 @@
                     </div>
                 </fieldset>
             </div>
-            <%--<div>通话记录</div>--%>
+            <div class="pageContent">
+                        <div class="tabs" id="contactRecords">
+                            <div class="tabsHeader">
+                                <div class="tabsHeaderContent">
+                                    <ul>
+                                        <li class="selected" ><a href="#"><span>15026534657</span></a></li>
+                                        <li class="selected" ><a href="#"><span>17621149919</span></a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="tabsContent">
+                                <div class="pageFormContent">
+                                    <table>
+                                        <tr>
+                                            <td><input type="radio" name="callInfo" onchange="getSelectedVal(this)" ></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="pageFormContent">
+                                    <div >17621149919,,,,,,,,,,,,</div>
+                                </div>
+                            </div>
+                        </div>
+            </div>
             <div>
                 <fieldset>
                     <legend>通讯录</legend>
