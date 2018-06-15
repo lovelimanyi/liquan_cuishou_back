@@ -195,7 +195,7 @@
                 </ul>
             </div>
         </div>
-        <div class="tabsContent" id="jxlTabs" style="height:300px;">
+        <div class="tabsContent" id="jxlTabs" style="height:500px;">
             <div>
                 <fieldset>
                     <legend>催收记录</legend>
@@ -288,7 +288,7 @@
                 </ul>
             </div>
         </div>
-        <div class="tabsContent" style="height:300px;">
+        <div class="tabsContent" style="height:600px;">
             <div class="pageContent" style="width: 100%;">
                 <div class="pageFormContent" style="overflow: auto;">
                     <fieldset>
