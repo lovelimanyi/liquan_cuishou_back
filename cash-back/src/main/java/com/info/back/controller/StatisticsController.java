@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -138,6 +139,22 @@ public class StatisticsController extends BaseController {
             pageUrl = "statisticsNew/todayCompanyStatistics";
             params.put("companys",companyList);
             pageConfig = statisticsService.findTodayCompanyPage(params);
+
+            List<String> companyIds = new ArrayList<>();
+            for (MmanLoanCollectionCompany company : companyList){
+                companyIds.add(company.getId());
+            }
+
+            if(pageConfig.getItems() != null && pageConfig.getItems().size() > 0){
+                List<TodayRecovery> list = pageConfig.getItems();
+                for (TodayRecovery todayRecovery : list) {
+                   if(!companyIds.contains(todayRecovery.getCompanyId())){
+                       todayRecovery.setCompanyName("* * * * * * * * ");
+                   }
+                }
+                pageConfig.setItems(list);
+            }
+
         }
         model.addAttribute("roleId",backUser.getRoleId());
         model.addAttribute("companys",companyList);
@@ -150,6 +167,13 @@ public class StatisticsController extends BaseController {
         model.addAttribute("params", params);// 用于搜索框保留值
         return pageUrl;
 
+    }
+    /**
+     * 催回率统计--执行统计
+     */
+    @RequestMapping("/doTodayStatistics")
+    public void doTodayStatistics(){
+        statisticsService.doTodayStatistics();
     }
 
 }

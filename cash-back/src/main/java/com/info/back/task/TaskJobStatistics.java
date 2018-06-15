@@ -106,6 +106,10 @@ public class TaskJobStatistics {
         logger.info("催回率计统计开始.....");
         statisticsService.doRecoveryStatistics();
         logger.info("催回率统计完成,完成时间 :" + DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
+        logger.info("当日催回计统计开始.....");
+        statisticsService.doTodayStatistics();
+        logger.info("当日催回计统计完成,完成时间 :" + DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
+
     }
 
 

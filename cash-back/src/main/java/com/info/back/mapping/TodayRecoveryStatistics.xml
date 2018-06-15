@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.info.back.dao.ITodayRecoveryDao">
+    <select id="doTodayPersonStatistics" resultType="com.info.web.pojo.TodayRecovery">
+        SELECT
+        now() AS 'createDate',
+        x.gsmc AS 'companyName',
+        x.companyId AS'companyId',
+        x.csyxm AS'backUserName',
+        x.csyid AS 'uuid',
+        x.yqdj AS'groupLevel',
+        x.lx AS'borrowingType',
+
+        sum(x.ycbj) AS'totalPrincipal',
+        sum(x.drbj) AS'realgetTotalPrincipal',
+        sum(x.sybj) AS'remainPrincipal',
+        round(ifnull(sum(x.drbj)/sum(x.ycbj),0)*100,2) AS 'repaymentProbability',
+
+        sum(x.ycznj) AS 'totalPenalty',
+        sum(x.drznj) AS 'realgetTotalPenalty',
+        round(ifnull(sum(x.drznj)/sum(x.ycznj),0)*100,2) AS 'penaltyProbability',
+
+        count(*) AS 'totalOrderCount',
+        sum(x.drhks) AS 'doneOrderCount',
+        round(ifnull(sum(x.drhks)/count(*),0)*100,2) AS 'orderProbability'
+        from  (
+        select  b.current_collection_user_id csyid,usr.user_name csyxm,cmp.title gsmc,cmp.id AS companyId,	d.borrowing_type AS lx,usr.group_level AS yqdj,
+        if(d.borrowing_type=2 and  d.paid_money>0,d.paid_money,d.loan_money+ifnull(d.accrual,0))-ifnull(hk.zqbj,0)  ycbj,
+        ifnull(hk.drbj,0)  drbj,
+        if(d.borrowing_type=2 and  d.paid_money>0,d.paid_money,d.loan_money+ifnull(d.accrual,0))-ifnull(hk.zqbj,0)-ifnull(hk.drbj,0)  sybj,
+        d.loan_penalty-ifnull(hk.zqznj,0)  ycznj, ifnull(hk.drznj,0)  drznj,
+        if(b.`status`=4 and date(clp.update_Date)=date(now()),1,0) drhks
+        from    mman_loan_collection_order  b
+        left  join   back_user usr ON  usr.uuid=b.current_collection_user_id
+        left join  mman_loan_collection_company cmp ON usr.company_id = cmp.id
+        left join mman_user_loan d  on  d.id=b.loan_id
+        left  join   bi_order  bo  on  d.user_id=bo.user_id
+        left  join  credit_loan_pay  clp  on  clp.loan_id=b.loan_id
+        left  join  (select  a.pay_id id,
+        sum(if(<![CDATA[ date(a.update_Date)<=DATE_ADD(curdate(),interval -1 day)]]>,a.real_money+ifnull(a.realget_accrual,0),0)) zqbj,
+        sum(if(<![CDATA[ date(a.update_Date)<=DATE_ADD(curdate(),interval -1 day)]]>,a.real_penlty,0)) zqznj,
+        sum(if(date(a.update_Date)=date(NOW()), a.real_money+ifnull(a.realget_accrual,0),0))  drbj,
+        sum(if(date(a.update_Date)=date(NOW()), a.real_penlty,0))  drznj
+        from   credit_loan_pay_detail a
+        group  by  a.pay_id
+        ) hk  on  hk.id=b.pay_id
+        where
+        #(b.dispatch_time>=DATE_ADD(curdate(),interval -day(curdate())+1 day)
+        <![CDATA[ b.`status`<>4 ]]> or date(clp.update_Date)>DATE_ADD(curdate(),interval -1 day)	 and  cmp.title  is  not  null
+        )  x
+        group  by   x.companyId,x.csyid,x.yqdj,x.lx
+        order  by  x.companyId,x.yqdj,x.csyid,x.lx
+
+    </select>
+
+    <select id="doTodayCompanyStatistics" resultType="com.info.web.pojo.TodayRecovery">
+        SELECT
+        now() AS 'createDate',
+        x.gsmc AS 'companyName',
+        x.companyId AS'companyId',
+        x.yqdj AS'groupLevel',
+        x.lx AS'borrowingType',
+
+        sum(x.ycbj) AS'totalPrincipal',
+        sum(x.drbj) AS'realgetTotalPrincipal',
+        sum(x.sybj) AS'remainPrincipal',
+        round(ifnull(sum(x.drbj)/sum(x.ycbj),0)*100,2) AS 'repaymentProbability',
+
+        sum(x.ycznj) AS 'totalPenalty',
+        sum(x.drznj) AS 'realgetTotalPenalty',
+        round(ifnull(sum(x.drznj)/sum(x.ycznj),0)*100,2) AS 'penaltyProbability',
+
+        count(*) AS 'totalOrderCount',
+        sum(x.drhks) AS 'doneOrderCount',
+        round(ifnull(sum(x.drhks)/count(*),0)*100,2) AS 'orderProbability'
+        from  (
+        select  cmp.title gsmc,
+        d.borrowing_type AS lx,
+        cmp.id AS companyId,
+        usr.group_level AS yqdj	,
+        if(d.borrowing_type=2 and  d.paid_money>0,d.paid_money,d.loan_money+ifnull(d.accrual,0))-ifnull(hk.zqbj,0)  ycbj,
+        ifnull(hk.drbj,0)  drbj,
+        if(d.borrowing_type=2 and  d.paid_money>0,d.paid_money,d.loan_money+ifnull(d.accrual,0))-ifnull(hk.zqbj,0)-ifnull(hk.drbj,0)  sybj,
+        d.loan_penalty-ifnull(hk.zqznj,0)  ycznj, ifnull(hk.drznj,0)  drznj,
+        if(b.`status`=4 and date(clp.update_Date)=date(now()),1,0) drhks
+        from    mman_loan_collection_order  b
+        left  join   back_user usr ON  usr.uuid=b.current_collection_user_id
+        left join  mman_loan_collection_company cmp ON usr.company_id = cmp.id
+        left join mman_user_loan d  on  d.id=b.loan_id
+        left  join   bi_order  bo  on  d.user_id=bo.user_id
+        left  join  credit_loan_pay  clp  on  clp.loan_id=b.loan_id
+        left  join  (select  a.pay_id id,
+        sum(if(<![CDATA[ date(a.update_Date)<=DATE_ADD(curdate(),interval -1 day)]]>,a.real_money+ifnull(a.realget_accrual,0),0)) zqbj,
+        sum(if(<![CDATA[ date(a.update_Date)<=DATE_ADD(curdate(),interval -1 day)]]>,a.real_penlty,0)) zqznj,
+        sum(if(date(a.update_Date)=date(NOW()), a.real_money+ifnull(a.realget_accrual,0),0))  drbj,
+        sum(if(date(a.update_Date)=date(NOW()), a.real_penlty,0))  drznj
+        from   credit_loan_pay_detail a
+        group  by  a.pay_id
+        ) hk  on  hk.id=b.pay_id
+        where
+        #(b.dispatch_time>=DATE_ADD(curdate(),interval -day(curdate())+1 day)
+        <![CDATA[ b.`status`<>4 ]]> or date(clp.update_Date)>DATE_ADD(curdate(),interval -1 day)	and  cmp.title  is  not  null
+        )  x
+        group  by   x.companyId,x.yqdj,x.lx
+        order  by  x.companyId,x.yqdj,x.lx
+    </select>
+
+    <insert id="insertTodayPersonStatistics" parameterType="list">
+        INSERT INTO today_person_statistics
+        (companyName,companyId,groupLevel,uuid,backUserName,borrowingType,totalPrincipal,realgetTotalPrincipal,remainPrincipal,repaymentProbability,totalPenalty,realgetTotalPenalty,penaltyProbability,totalOrderCount,doneOrderCount,orderProbability,createDate  )
+        VALUES
+        <foreach collection ="list" item="today" separator =",">
+            (#{today.companyName},#{today.companyId},#{today.groupLevel},#{today.uuid},
+            #{today.backUserName},#{today.borrowingType},#{today.totalPrincipal},#{today.realgetTotalPrincipal},#{today.remainPrincipal},
+            #{today.repaymentProbability},#{today.totalPenalty},#{today.realgetTotalPenalty},#{today.penaltyProbability},#{today.totalOrderCount},#{today.doneOrderCount},#{today.orderProbability},#{today.createDate})
+
+        </foreach>
+    </insert>
+
+    <insert id="insertTodayCompanyStatistics" parameterType="list">
+        INSERT INTO today_company_statistics
+        (companyName,companyId,groupLevel,borrowingType,totalPrincipal,realgetTotalPrincipal,remainPrincipal,repaymentProbability,totalPenalty,realgetTotalPenalty,penaltyProbability,totalOrderCount,doneOrderCount,orderProbability,createDate  )
+        VALUES
+        <foreach collection ="list" item="today" separator =",">
+            (#{today.companyName},#{today.companyId},#{today.groupLevel},
+            #{today.borrowingType},#{today.totalPrincipal},#{today.realgetTotalPrincipal},#{today.remainPrincipal},
+            #{today.repaymentProbability},#{today.totalPenalty},#{today.realgetTotalPenalty},#{today.penaltyProbability},#{today.totalOrderCount},#{today.doneOrderCount},#{today.orderProbability},#{today.createDate})
+
+        </foreach>
+    </insert>
+
+    <sql id="whereTodayPersonColumn">
+        <where>
+            <if test="createDate != null and createDate != ''">
+                AND date(s.createDate) = #{createDate}
+            </if>
+            <if test="borrowingType != null and borrowingType != ''">
+                AND s.borrowingType = #{borrowingType}
+            </if>
+            <if test="uuid != null and uuid != ''">
+                AND s.uuid = #{uuid}
+            </if>
+            <if test="companyId != null and companyId != ''">
+                AND s.companyId = #{companyId}
+            </if>
+            <if test="groupLevel != null and groupLevel != ''">
+                AND s.groupLevel = #{groupLevel}
+            </if>
+            <if test="companys != null and companyId == null">
+                AND s.companyId IN
+                <foreach collection="companys" open="(" close=")" item="company" separator=",">
+                    #{company.id}
+                </foreach>
+            </if>
+        </where>
+    </sql>
+
+    <select id="findAllPerson" resultType="com.info.web.pojo.TodayRecovery" parameterType="hashmap">
+        SELECT
+            s.createDate,
+            s.companyName,
+            s.companyId,
+            s.backUserName,
+            s.uuid,
+            s.groupLevel,
+            s.borrowingType,
+
+            s.totalPrincipal,
+            s.realgetTotalPrincipal,
+            s.remainPrincipal,
+            s.repaymentProbability,
+
+            s.totalPenalty,
+            s.realgetTotalPenalty,
+            s.penaltyProbability,
+
+            s.totalOrderCount,
+            s.doneOrderCount,
+            s.orderProbability
+        FROM today_person_statistics s
+        <include refid="whereTodayPersonColumn"/>
+    </select>
+
+    <select id="findAllCountPerson" resultType="integer" parameterType="hashmap">
+        SELECT count(1)
+        FROM today_person_statistics s
+        <include refid="whereTodayPersonColumn"/>
+    </select>
+
+    <sql id="whereTodayCompanyColumn">
+        <where>
+            <if test="createDate != null and createDate != ''">
+                AND date(s.createDate) = #{createDate}
+            </if>
+            <if test="borrowingType != null and borrowingType != ''">
+                AND s.borrowingType = #{borrowingType}
+            </if>
+            <if test="companyId != null and companyId != ''">
+                AND s.companyId = #{companyId}
+            </if>
+            <if test="groupLevel != null and groupLevel != ''">
+                AND s.groupLevel = #{groupLevel}
+            </if>
+
+        </where>
+    </sql>
+
+    <select id="findAllCompany" resultType="com.info.web.pojo.TodayRecovery" parameterType="hashmap">
+        SELECT
+        s.createDate,
+        s.companyName,
+        s.companyId,
+        s.groupLevel,
+        s.borrowingType,
+
+        s.totalPrincipal,
+        s.realgetTotalPrincipal,
+        s.remainPrincipal,
+        s.repaymentProbability,
+
+        s.totalPenalty,
+        s.realgetTotalPenalty,
+        s.penaltyProbability,
+
+        s.totalOrderCount,
+        s.doneOrderCount,
+        s.orderProbability
+        FROM today_company_statistics s
+        <include refid="whereTodayCompanyColumn"/>
+    </select>
+
+    <select id="findAllCountCompany" resultType="integer" parameterType="hashmap">
+        SELECT count(1)
+        FROM today_company_statistics s
+        <include refid="whereTodayCompanyColumn"/>
+    </select>
+
+
+
+
+
+
+    <delete id="delTodayStatistics" parameterType="hashmap">
+        DELETE s FROM today_person_statistics s
+        WHERE <![CDATA[ s.createDate >= #{delTime} ]]>;
+
+        DELETE cs FROM today_company_statistics cs
+        WHERE <![CDATA[ cs.createDate >= #{delTime} ]]>;
+    </delete>
+
+</mapper>

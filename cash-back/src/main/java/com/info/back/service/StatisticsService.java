@@ -3,6 +3,7 @@ package com.info.back.service;
 import com.info.back.dao.IPaginationDao;
 import com.info.back.dao.IRecoveryStatisticsDao;
 import com.info.back.dao.IStatisticsDao;
+import com.info.back.dao.ITodayRecoveryDao;
 import com.info.back.utils.DateKitUtils;
 import com.info.constant.Constant;
 import com.info.web.pojo.RecoveryRate;
@@ -36,6 +37,8 @@ public class StatisticsService implements IStatisticsService {
     private IPaginationDao paginationDao;
     @Autowired
     IRecoveryStatisticsDao recoveryStatisticsDao;
+    @Autowired
+    ITodayRecoveryDao todayRecoveryDao;
 
     @Override
     public void doTrackStatistics() {
@@ -181,13 +184,33 @@ public class StatisticsService implements IStatisticsService {
         return pageConfig;
     }
 
+
+
+
+
     @Override
     public PageConfig<TodayRecovery> findTodayPersonPage(HashMap<String, Object> params) {
-        return null;
+        params.put(Constant.NAME_SPACE, "TodayRecovery");
+        return paginationDao.findPage("findAllPerson", "findAllCountPerson", params, null);
     }
 
     @Override
     public PageConfig<TodayRecovery> findTodayCompanyPage(HashMap<String, Object> params) {
-        return null;
+        params.put(Constant.NAME_SPACE, "TodayRecovery");
+        return paginationDao.findPage("findAllCompany", "findAllCountCompany", params, null);
+    }
+
+    @Override
+    public void doTodayStatistics() {
+        //1.先删除之前统计
+        HashMap<String, Object> delParam = DateKitUtils.delTodayStatisticsDate();
+        todayRecoveryDao.delTodayStatistics(delParam);
+        //2.进行统计
+        List<TodayRecovery> recoveryRateList =  todayRecoveryDao.doTodayPersonStatistics(); //个人
+        List<TodayRecovery> recoveryRateList2 =  todayRecoveryDao.doTodayCompanyStatistics();//公司
+        //3.将统计数据保存至数据库
+        todayRecoveryDao.insertTodayPersonStatistics(recoveryRateList);
+        todayRecoveryDao.insertTodayCompanyStatistics(recoveryRateList2);
+
     }
 }
