@@ -153,6 +153,9 @@
                 </foreach>
             </if>
         </where>
+        <if test="orderBy != null and orderBy != ''">
+            ORDER by ${orderBy}
+        </if>
     </sql>
 
     <select id="findAllPerson" resultType="com.info.web.pojo.TodayRecovery" parameterType="hashmap">
@@ -203,6 +206,9 @@
             </if>
 
         </where>
+        <if test="orderBy != null and orderBy != ''">
+            ORDER by ${orderBy}
+        </if>
     </sql>
 
     <select id="findAllCompany" resultType="com.info.web.pojo.TodayRecovery" parameterType="hashmap">
