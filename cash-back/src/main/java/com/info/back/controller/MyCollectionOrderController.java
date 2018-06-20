@@ -557,6 +557,8 @@ public class MyCollectionOrderController extends BaseController {
                 Map<String, Object> orderStatusMap = getOrderStatusMap();
                 // 沟通情况
                 Map<String, Object> communicationSituationsMap = getCommunicationSituationsMap(communicationSituations);
+                // 风控标签
+                Map<String, Object> fengKongLableMap = getFengKongLableMap();
                 // 逾期等级
                 Map<String, Object> overdueLevelMap = getOverdueLevelMap(getAllOverdueLevel());
                 int remainCount = msgCountLimit - count > 0 ? msgCountLimit - count : 0;
