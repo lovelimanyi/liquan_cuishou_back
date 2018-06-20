@@ -567,6 +567,7 @@ public class MyCollectionOrderController extends BaseController {
                 model.addAttribute("orderStatusMap", orderStatusMap);
                 model.addAttribute("remainMsgCount", remainCount);
                 model.addAttribute("msgCountLimit", msgCountLimit);
+                model.addAttribute("fengKongLableMap",fengKongLableMap);
                 model.addAttribute("msgs", msgs);
                 model.addAttribute("orderId", id);
                 model.addAttribute("phoneNumber", order.getLoanUserPhone());
@@ -1716,5 +1717,18 @@ public class MyCollectionOrderController extends BaseController {
             orderStatusMap.put(sysDict.getValue(), sysDict.getLabel());
         }
         return orderStatusMap;
+    }
+
+    private Map<String, Object> getFengKongLableMap() {
+        List<FengKong> fengKongList = JedisDataClient.getList(BackConstant.REDIS_KEY_PREFIX, "fengKongLables");
+        if (CollectionUtils.isEmpty(fengKongList)) {
+            fengKongList = fengKongService.getFengKongList();
+            JedisDataClient.setList(BackConstant.REDIS_KEY_PREFIX, "fengKongLables", fengKongList, 60 * 60 * 24);
+        }
+        Map<String, Object> fengKongLableMap = new HashMap<>(16);
+        for (FengKong lable : fengKongList) {
+            fengKongLableMap.put(lable.getId().toString(), lable.getFkLabel());
+        }
+        return fengKongLableMap;
     }
 }

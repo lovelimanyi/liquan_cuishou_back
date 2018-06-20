@@ -405,7 +405,7 @@
                                             <c:if test="${index.count eq 1 || (index.count) % 4 eq 1}">
                                                 <c:out value="<tr>" escapeXml="false"></c:out>
                                             </c:if>
-                                            <td><label><input type="checkbox" id="checkItem" name="fengkongLable" value="${lable.key}"/>${lable.value}</label>
+                                            <td><label><input type="checkbox" name="fengkongLable" value="${lable.key}"/>${lable.value}</label>
                                             </td>
                                             <c:if test="${(index.count) % 4 eq 0}">
                                                 <c:out value="</tr>" escapeXml="false"></c:out>

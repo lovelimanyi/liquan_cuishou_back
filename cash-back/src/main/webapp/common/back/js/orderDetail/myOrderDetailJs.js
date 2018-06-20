@@ -443,6 +443,8 @@ function saveCollectionRecord() {
         }
     }
 
+    var fengKongIds = getFengKongIds();
+    var advice = $().val();
     $.ajax({
         type: "POST",
         url: "/back/collectionRecord/saveRecord",
@@ -458,7 +460,8 @@ function saveCollectionRecord() {
             loanId: loanId,
             orderStatus: orderStatus,
             collectionRecordId: collectionRecordId,
-            isCloseRelation: isCloseRelation
+            isCloseRelation: isCloseRelation,
+            fengKongIds: fengKongIds
         },
         success: function () {
             alertMsg.correct("添加催收记录成功！");
@@ -655,4 +658,13 @@ function getOrderLevel(level) {
     } else {
         return "";
     }
+}
+
+function getFengKongIds() {
+    var ids = "";
+    $("input[name='fengkongLable']:checked").each(function () {
+        ids += $(this).val() + ",";
+    });
+    ids = ids.substring(0, ids.length - 1);
+    alertMsg.info(ids);
 }
