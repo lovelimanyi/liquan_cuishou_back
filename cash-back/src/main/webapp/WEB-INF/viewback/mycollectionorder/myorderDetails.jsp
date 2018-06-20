@@ -288,7 +288,7 @@
                 </ul>
             </div>
         </div>
-        <div class="tabsContent" style="height:600px;">
+        <div class="tabsContent" style="height:700px;">
             <div class="pageContent" style="width: 100%;">
                 <div class="pageFormContent" style="overflow: auto;">
                     <fieldset>
