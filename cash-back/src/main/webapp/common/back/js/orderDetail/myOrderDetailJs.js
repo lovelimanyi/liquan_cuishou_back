@@ -444,7 +444,7 @@ function saveCollectionRecord() {
     }
 
     var fengKongIds = getFengKongIds();
-    var advice = $().val();
+    var advice = $("select[name='collectionAdvice'] option:selected").val();
     $.ajax({
         type: "POST",
         url: "/back/collectionRecord/saveRecord",
@@ -461,7 +461,8 @@ function saveCollectionRecord() {
             orderStatus: orderStatus,
             collectionRecordId: collectionRecordId,
             isCloseRelation: isCloseRelation,
-            fengKongIds: fengKongIds
+            fengKongIds: fengKongIds,
+            advice: advice
         },
         success: function () {
             alertMsg.correct("添加催收记录成功！");
@@ -549,6 +550,10 @@ function clearRecord() {
     $("#collectionRecordId").val("");
     $("#notPromiseRepay").attr("checked", "checked");
     $("#promiseRepayTime").hide();
+    // 催收建议相关
+    $("input[name='fengkongLable']:checked").removeAttr("checked");
+    $("select[name='collectionAdvice'] option:selected").removeAttr("selected");
+    $("#defaultSelect").attr("selected", "selected");
 }
 
 
@@ -666,5 +671,5 @@ function getFengKongIds() {
         ids += $(this).val() + ",";
     });
     ids = ids.substring(0, ids.length - 1);
-    alertMsg.info(ids);
+    return ids;
 }

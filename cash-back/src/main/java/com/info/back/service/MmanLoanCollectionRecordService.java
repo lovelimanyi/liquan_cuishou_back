@@ -14,6 +14,7 @@ import com.info.web.util.encrypt.MD5coding;
 import com.xjx.mqclient.pojo.MqMessage;
 import com.xjx.mqclient.service.MqClient;
 import net.sf.json.JSONObject;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -1006,21 +1007,36 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
 
         // 保存催收建议
         CollectionAdvice advice = new CollectionAdvice();
-        advice.setOrderId(loanId);
+        String fengKongIds = params.get("fengKongIds") == null ? null : params.get("fengKongIds").toString();
+        advice.setLoanId(loanId);
         advice.setOrderId(orderId);
         advice.setId(IdGen.uuid());
         advice.setCreateDate(new Date());
         advice.setBackUserId(user.getId());
         advice.setCollectionRecordId(recordId);
-        advice.setFengkongIds(params.get("fengKongIds") == null ? null : params.get("fengKongIds").toString());
+        advice.setFengkongIds(fengKongIds);
         advice.setLoanUserName(collectionOrder.getLoanUserName());
         advice.setStatus(params.get("advice").toString());
         advice.setLoanUserPhone(collectionOrder.getLoanUserPhone());
-        advice.setFkLabels("");
+        String fengKongLables = getLables(fengKongIds);
+        advice.setFkLabels(fengKongLables);
         advice.setPayId(collectionOrder.getPayId());
         advice.setUserId(collectionOrder.getUserId());
         advice.setUserName(user.getUserName());
         fengKongService.saveAdvice(advice);
+    }
+
+    private String getLables(String fengKongIds) {
+        if (StringUtils.isEmpty(fengKongIds)) {
+            return null;
+        }
+        String[] ids = fengKongIds.split(",");
+        StringBuilder sb = new StringBuilder(16);
+        Map<String,Object> fengKongLableMap = fengKongService.getFengKongLableMap();
+        for (String fengKongId : ids) {
+            sb.append(fengKongLableMap.get(fengKongId)).append(",");
+        }
+        return sb.toString().substring(0, sb.length() - 1);
     }
 
     // 获取当前联系人与借款人的关系

@@ -4,13 +4,16 @@ import com.info.back.dao.IFengKongDao;
 import com.info.back.dao.IMmanLoanCollectionOrderDao;
 import com.info.back.dao.IPaginationDao;
 import com.info.back.result.JsonResult;
+import com.info.back.utils.BackConstant;
 import com.info.back.utils.IdGen;
 import com.info.constant.Constant;
 import com.info.web.pojo.CollectionAdvice;
 import com.info.web.pojo.FengKong;
 import com.info.web.pojo.MmanLoanCollectionOrder;
+import com.info.web.util.JedisDataClient;
 import com.info.web.util.PageConfig;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -116,6 +119,20 @@ public class FengKongService implements IFengKongService {
     @Override
     public int saveAdvice(CollectionAdvice advice) {
         return fengKongDao.insertAdvice(advice);
+    }
+
+    @Override
+    public Map<String, Object> getFengKongLableMap() {
+        List<FengKong> fengKongList = JedisDataClient.getList(BackConstant.REDIS_KEY_PREFIX, "fengKongLables");
+        if (CollectionUtils.isEmpty(fengKongList)) {
+            fengKongList = fengKongDao.getFengKongList();
+            JedisDataClient.setList(BackConstant.REDIS_KEY_PREFIX, "fengKongLables", fengKongList, 60 * 60 * 24);
+        }
+        Map<String, Object> fengKongLableMap = new HashMap<>(16);
+        for (FengKong lable : fengKongList) {
+            fengKongLableMap.put(lable.getId().toString(), lable.getFkLabel());
+        }
+        return fengKongLableMap;
     }
 
 }

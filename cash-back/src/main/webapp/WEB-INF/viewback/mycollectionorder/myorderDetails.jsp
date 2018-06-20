@@ -393,6 +393,28 @@
                             </dl>
                         </fieldset>
                         <fieldset>
+                            <div class="divider"></div>
+                            <dl>
+                                <dt style="width: 80px;">
+                                    <label>
+                                        催收建议:
+                                    </label>
+                                </dt>
+                                <dd>
+                                    <select name="collectionAdvice">
+                                        <option value="1">通过</option>
+                                        <option value="2">拒绝</option>
+                                        <option value="3" selected="selected" id="defaultSelect">不建议</option>
+                                    </select>
+                                </dd>
+                                <dd style="width: 800px;float: right;margin-top: 10px;">
+                                    <span>
+                                        <font style="color: #1b8d0f">提示：</font><font style="color: #cd0a0a">所建议内容将直接影响用户未来借款成功与否，请如实、慎重选择！不提交则默认建议风控审核。</font>
+                                    </span>
+                                </dd>
+                            </dl>
+                        </fieldset>
+                        <fieldset>
                             <dl>
                                 <dt style="width: 80px;">
                                     <label>

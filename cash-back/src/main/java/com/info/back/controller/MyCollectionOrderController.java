@@ -558,7 +558,7 @@ public class MyCollectionOrderController extends BaseController {
                 // 沟通情况
                 Map<String, Object> communicationSituationsMap = getCommunicationSituationsMap(communicationSituations);
                 // 风控标签
-                Map<String, Object> fengKongLableMap = getFengKongLableMap();
+                Map<String,Object> fengKongLableMap = fengKongService.getFengKongLableMap();
                 // 逾期等级
                 Map<String, Object> overdueLevelMap = getOverdueLevelMap(getAllOverdueLevel());
                 int remainCount = msgCountLimit - count > 0 ? msgCountLimit - count : 0;
@@ -1647,7 +1647,7 @@ public class MyCollectionOrderController extends BaseController {
     public String testGl(HttpServletRequest request) {
         try {
             Date date = new Date();
-            HashMap<String, Object> params = new HashMap<String, Object>();
+            HashMap<String, Object> params = new HashMap<>();
 //			params.put("currDate", DateUtil.getBeforeOrAfter(date,-1));
             params.put("currDate", request.getParameter("currDate"));
             params.put("begDate", DateUtil.getDayFirst());
@@ -1717,18 +1717,5 @@ public class MyCollectionOrderController extends BaseController {
             orderStatusMap.put(sysDict.getValue(), sysDict.getLabel());
         }
         return orderStatusMap;
-    }
-
-    private Map<String, Object> getFengKongLableMap() {
-        List<FengKong> fengKongList = JedisDataClient.getList(BackConstant.REDIS_KEY_PREFIX, "fengKongLables");
-        if (CollectionUtils.isEmpty(fengKongList)) {
-            fengKongList = fengKongService.getFengKongList();
-            JedisDataClient.setList(BackConstant.REDIS_KEY_PREFIX, "fengKongLables", fengKongList, 60 * 60 * 24);
-        }
-        Map<String, Object> fengKongLableMap = new HashMap<>(16);
-        for (FengKong lable : fengKongList) {
-            fengKongLableMap.put(lable.getId().toString(), lable.getFkLabel());
-        }
-        return fengKongLableMap;
     }
 }
