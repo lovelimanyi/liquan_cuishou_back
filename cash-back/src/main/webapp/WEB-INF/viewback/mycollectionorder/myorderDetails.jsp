@@ -392,6 +392,29 @@
                                 </dd>
                             </dl>
                         </fieldset>
+                        <fieldset>
+                            <dl>
+                                <dt style="width: 80px;">
+                                    <label>
+                                        风控标签:
+                                    </label>
+                                </dt>
+                                <dd>
+                                    <table>
+                                        <c:forEach items="${fengKongLableMap}" var="lable" varStatus="index">
+                                            <c:if test="${index.count eq 1 || (index.count) % 4 eq 1}">
+                                                <c:out value="<tr>" escapeXml="false"></c:out>
+                                            </c:if>
+                                            <td><label><input type="checkbox" id="checkItem" name="fengkongLable" value="${lable.key}"/>${lable.value}</label>
+                                            </td>
+                                            <c:if test="${(index.count) % 4 eq 0}">
+                                                <c:out value="</tr>" escapeXml="false"></c:out>
+                                            </c:if>
+                                        </c:forEach>
+                                    </table>
+                                </dd>
+                            </dl>
+                        </fieldset>
                     </div>
                     <div id="collectionWithMsg">
                         <div class="pageFormContent">
@@ -434,38 +457,3 @@
 </body>
 
 </html>
-
-<script type="text/javascript">
-    /*
-     $(document).ready(function () {
-     $("#img1").imgbox({
-     'speedIn': 0,
-     'speedOut': 0,
-     'alignment': 'top',
-     'overlayShow': true,
-     'allowMultiple': false
-     });
-
-     $("#img2").imgbox({
-     'speedIn': 0,
-     'speedOut': 0,
-     'alignment': 'top',
-     'overlayShow': true,
-     'allowMultiple': false
-     });
-     if (${empty userInfo.idcardImgZ}) {
-     $("#img1").hide();
-     }
-     if (${empty userInfo.idcardImgF}) {
-     $("#img2").hide();
-     }
-     });
-     */
-    //var a = 'asdfsdfsdfsadf';
-    //a=a.split('');  //将a字符串转换成数组
-    //a.splice(1,1,'xxxxx'); //将1这个位置的字符，替换成'xxxxx'. 用的是原生js的splice方法。
-    //console.log(a);   //结果是：
-    //["a", "xxxxx", "d", "f", "s", "d", "f", "s", "d", "f", "s", "a", "d", "f"]
-    //
-    //a.join('');
-</script>
