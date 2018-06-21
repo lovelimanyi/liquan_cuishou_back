@@ -287,19 +287,6 @@ $("input[name='isConnected']").change(function () {
     }
 });
 
-function doCheck() {
-    var msgTemplate = $("#msgTemplate").val();
-    if (msgTemplate == "") {
-        alertMsg.warn("请先选择短信模板");
-        return;
-    }
-    alertMsg.confirm("您确认要发送短信吗?", {
-        okCall: function () {
-            $("#frm").submit();
-        }
-    });
-}
-
 // 获取短信内容
 $("#msgTemplate").change(function () {
     var msgTemplate = $("#msgTemplate").val();
@@ -673,3 +660,7 @@ function getFengKongIds() {
     ids = ids.substring(0, ids.length - 1);
     return ids;
 }
+
+$("input[name='isConnected']").click(function () {
+    $("input[name='communication']").removeAttr("checked");
+});

@@ -385,10 +385,7 @@
                                     </label>
                                 </dt>
                                 <dd>
-                                    <textarea name="content" rows="5" cols="80" maxlength="100" id="collectionContent"></textarea>
-                                    <div style="width: 500px;height: 20px;margin-top: 100px;">
-                                        <font style="color: #1b8d0f">温馨提示：</font><font style="color: #cd0a0a">如果不点选催收记录或通讯录中联系人则默认催收本人。</font>
-                                    </div>
+                                    <textarea placeholder="温馨提示：如果不点选催收记录或通讯录中联系人则默认催收本人。" name="content" rows="5" cols="80" maxlength="100" id="collectionContent"></textarea>
                                 </dd>
                             </dl>
                         </fieldset>
@@ -400,15 +397,13 @@
                                         催收建议:
                                     </label>
                                 </dt>
-                                <dd>
+                                <dd style="width: 700px;">
                                     <select name="collectionAdvice">
                                         <option value="1">通过</option>
                                         <option value="2">拒绝</option>
                                         <option value="3" selected="selected" id="defaultSelect">不建议</option>
                                     </select>
-                                </dd>
-                                <dd style="width: 800px;float: right;margin-top: 10px;">
-                                    <span>
+                                    <span style="margin-left: 10px;">
                                         <font style="color: #1b8d0f">提示：</font><font style="color: #cd0a0a">所建议内容将直接影响用户未来借款成功与否，请如实、慎重选择！不提交则默认建议风控审核。</font>
                                     </span>
                                 </dd>
