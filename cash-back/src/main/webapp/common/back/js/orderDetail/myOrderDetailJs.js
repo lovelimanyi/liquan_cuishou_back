@@ -81,12 +81,29 @@ function getContactRecords() {
         },
         dataType: "json",
         success: function (data) {
-            //测试数据
+            //对应身份证号返回通话记录信息为空时：
             var obj = eval("(" + data + ")");//转换为json对象
-            var call_logs=obj["data"]["call_logs"];//获取通话记录数据call_logs
+            var call_logsCopy=obj["data"]["call_logs"];//获取通话记录数据call_logs
+            if(call_logsCopy.length==0){
+                var res= '<table><tr>';
+                //第一紧急联系人
+                res += '<td style="width: 85px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedCallRecordJinji(this);" '  + '" isCloseRelation="' + "1" + '"' +
+                    'userPhone="' + firstContactPhone + '"/>' + '&nbsp&nbsp' + firstContactName + '</td><td style="width: 90px;height: 24px;">' + firstContactPhone + '</td>' +
+                    '<td style="width: 40px;height: 24px;"></td>';
+                //第二紧急联系人
+                res += '<td style="width: 85px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedCallRecordJinji(this);" '  + '" isCloseRelation="' + "2" + '"' +
+                    'userPhone="' + secondContactPhone + '"/>' + '&nbsp&nbsp' + secondContactName + '</td><td style="width: 90px;height: 24px;">' + secondContactPhone +
+                    '</td><td colspan="4" style="color: red">此行为共债用户紧急联系人</td>';
+                res +='</tr><table>';
+                $('#contactRecordsXJX').append(res);
+                return ;
+            }
+
+            var objCopy = eval("(" + data + ")");//转换为json对象
+            var call_logs=objCopy["data"]["call_logs"];//获取通话记录数据call_logs
             var xjxCallLogs='';
             //平台注册手机号
-            if(getCallLogsPhonesStr(call_logs).indexOf(userName)==-1 || call_logs[userName].length==0) {
+            if(getCallLogsPhonesStr(call_logsCopy).indexOf(userName)==-1 || call_logs[userName].length==0) {
                 xjxCallLogs  += '<table><tr>';
                 //第一紧急联系人
                 xjxCallLogs += '<td style="width: 85px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedCallRecordJinji(this);" '  + '" isCloseRelation="' + "1" + '"' +
@@ -157,7 +174,7 @@ function getContactRecords() {
                     res[i] += '</table>';
                 }
             }
-            $('#contactRecords'+ 'XJX').append(xjxCallLogs);
+            $('#contactRecordsXJX').append(xjxCallLogs);
             for (var i=1;i<=res.length;i++){
                 $("#contactRecordsGZ"+ i).append(res[i-1]);
             }
