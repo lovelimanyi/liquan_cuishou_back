@@ -952,6 +952,7 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
         MmanLoanCollectionRecord record = setRecordParam(params, user, collectionOrder);
         String userRealId = (params.get("contactId") == null || "undefined".equals(params.get("contactId").toString())) ? null : params.get("contactId").toString();
         String collectionRecordId = params.get("collectionRecordId") == null ? null : params.get("collectionRecordId").toString();
+        String selectCallRecordFlag = (params.get("selectCallRecordFlag") == null || "undefined".equals(params.get("selectCallRecordFlag").toString())) ? null : params.get("selectCallRecordFlag").toString();
         if (StringUtils.isNotEmpty(userRealId)) {
             // 查询借款人联系人信息
             MmanUserRela userRela = userRelaService.getUserRealByUserId(userRealId);
@@ -965,6 +966,10 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
             record.setContactName(loanCollectionRecord.getContactName());
             record.setContactPhone(loanCollectionRecord.getContactPhone());
 
+        }else if(selectCallRecordFlag !=null ){
+//            record.setRelation(params.get("callUserName"));
+            record.setContactName((String) params.get("callUserName"));
+            record.setContactPhone((String) params.get("phoneNumber"));
         } else {
             String isCloseRelation = params.get("isCloseRelation") == null ? null : params.get("isCloseRelation").toString();
             MmanUserInfo userInfo = mmanUserInfoDao.getUserInfoById(params.get("userId") == null ? null : params.get("userId").toString());

@@ -460,6 +460,21 @@ public class MyCollectionOrderController extends BaseController {
         return "mycollectionorder/listlog";
     }
 
+    //将补充手机号字符串转化为数组返回
+    public static ArrayList<String> getAdditPhonesList(String str) {
+        ArrayList<String> additPhonesArrary = new ArrayList<String> ();
+        if(str==""){
+            return additPhonesArrary;
+        }else if(str!="" && !str.contains(",") ){
+            additPhonesArrary.add(str);
+            return additPhonesArrary;
+        }else {
+            additPhonesArrary.addAll(Arrays.asList(str.split(",")));
+            return additPhonesArrary;
+        }
+    }
+
+
     /**
      * 调第三方风控，获取通话记录
      * lmy
@@ -479,27 +494,13 @@ public class MyCollectionOrderController extends BaseController {
                 map.put("id", idNumber);
                 //调用第三方风控
                 returnInfo = HttpUtil.getInstance().doPost(PayContents.XJX_GET_PHONES, JSON.toJSONString(map));
-//                o = (Map<String, Object>) JSONObject.parse(returnInfo);
-                /*if (o != null && "0".equals(String.valueOf(o.get("code")))) {
-                    Map<String, Object> data = (Map<String, Object>) o.get("data");
-                    callLogs.putAll((Map<String, Object>)data.get("call_logs"));
-//                    for (Map<String, String> mArray : call_logs) {
-//                        set.add(mArray.get("reg_mobile"));
-//                        set.add(mArray.get("bc_mobile"));
-//                    }
-                }*/
                 resultMap.put("returnInfo",returnInfo);
-
-
             }
-
         }catch (Exception e){
             logger.error("获取通话记录出错:" + e);
             e.printStackTrace();
         }
-        String str=callLogs.toString();
-        logger.info(callLogs.toString());
-        return JSON.toJSONString(resultMap);
+        return JSON.toJSONString(returnInfo);
     }
 
     /**
@@ -568,6 +569,7 @@ public class MyCollectionOrderController extends BaseController {
 
                 //获取补充手机号
                 String additionalPhones=getAdditionalPhones(userInfo.getUserName(),userInfo.getUserPhones());
+                ArrayList<String> AdditPhonesList =getAdditPhonesList(additionalPhones);
 
                 // add by yyf 根据身份证前6位 映射用户地址
                 if (userInfo != null) {
@@ -620,6 +622,7 @@ public class MyCollectionOrderController extends BaseController {
                 model.addAttribute("userCar", userCar);// 银行卡
                 model.addAttribute("backUser", backUser);
                 model.addAttribute("additionalPhones",additionalPhones);
+                model.addAttribute("AdditPhonesList",AdditPhonesList);
                 url = "mycollectionorder/myorderDetails";
 //			}
             }

@@ -31,6 +31,14 @@
     <input type="hidden" id="collectionRecordId">
     <input type="hidden" id="idNumber" value="${userInfo.idNumber}">
     <input type="hidden" id="userName" value="${userInfo.userName}">
+    <input type="hidden" id="firstContactName" value="${userInfo.firstContactName}">
+    <input type="hidden" id="firstContactPhone" value="${userInfo.firstContactPhone}">
+    <input type="hidden" id="secondContactName" value="${userInfo.secondContactName}">
+    <input type="hidden" id="secondContactPhone" value="${userInfo.secondContactPhone}">
+    <input type="hidden" id="additionalPhones" value="${additionalPhones}">
+     <input type="hidden" id="AdditPhonesList" value="${AdditPhonesList}">
+     <input type="hidden" id="callUserName">
+        <input type="hidden" id="selectCallRecordFlag">
     <%-- 标记用户选择的是否是紧急联系人 --%>
     <input type="hidden" id="isCloseRelation">
     <div class="tabs">
@@ -265,27 +273,27 @@
                     </div>
                 </fieldset>
             </div>
+            <%--通话记录--%>
             <div class="pageContent">
-                        <div class="tabs" id="contactRecords">
+                        <div class="tabs">
                             <div class="tabsHeader">
                                 <div class="tabsHeaderContent">
-                                    <ul>
-                                        <li class="selected" ><a href="#"><span>15026534657</span></a></li>
-                                        <li class="selected" ><a href="#"><span>17621149919</span></a></li>
+                                    <ul id="contactRecordsHeader">
+                                        <li id="sss" class="selected"><a href="#"><span>${userInfo.userName}(本人平台注册号)</span></a></li>
+                                        <c:forEach items="${AdditPhonesList}" var="item" varStatus="status">
+                                            <li ><a href="#tab-"><span>${item}(补充手机号)</span></a></li>
+                                        </c:forEach>
                                     </ul>
                                 </div>
                             </div>
                             <div class="tabsContent">
-                                <div class="pageFormContent">
-                                    <table>
-                                        <tr>
-                                            <td><input type="radio" name="callInfo" onchange="getSelectedVal(this)" ></td>
-                                        </tr>
-                                    </table>
+                                <div id="contactRecordsXJX" class="pageFormContent">
+
                                 </div>
-                                <div class="pageFormContent">
-                                    <div >17621149919,,,,,,,,,,,,</div>
-                                </div>
+                                <c:forEach items="${AdditPhonesList}" var="item" varStatus="status">
+                                    <div id="contactRecordsGZ${status.count}" class="pageFormContent">
+                                    </div>
+                                </c:forEach>
                             </div>
                         </div>
             </div>

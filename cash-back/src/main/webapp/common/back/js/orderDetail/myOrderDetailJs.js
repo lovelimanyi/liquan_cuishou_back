@@ -29,10 +29,49 @@ function getJxlContent() {
     $("#collectionRecord").hide();
     // $("#userPhoto").parent("td").addClass("photoDivStyle");
 }
+//获取所有共债手机号的拼接字符串
+function getCallLogsPhonesStr(call_logs){
+    var phonesStr=userName;
+    for(var cl in call_logs){
+        phonesStr += cl;
+    }
+    return phonesStr;
+}
+//将补充手机号字符串转化为数组返回
+function getAdditPhonesArrary(str) {
+    // debugger;
+    var additPhonesArrary = new Array();
+    if(str==""){
+        return additPhonesArrary;
+    }else if(str!="" && str.indexOf(",") < 0){
+        additPhonesArrary[0]=str;
+        return additPhonesArrary;
+    }else {
+        additPhonesArrary=str.split(",");
+        return additPhonesArrary;
+    }
+}
+
+
 // 获取用户通话记录信息（所有共债手机通话记录信息）
 function getContactRecords() {
+    $("#recordListContent").empty();
+    $("#userRealContent").empty();
+    $("#collectionRecordId").val("");
+    $("#contactId").val("");
     var idNumber = $("#idNumber").val();
-    // var userName = $("#idNumber").val();
+    var userName= $("#userName").val();
+    var firstContactName=$("#firstContactName").val();
+    var firstContactPhone=$("#firstContactPhone").val();
+    var secondContactName=$("#secondContactName").val();
+    var secondContactPhone=$("#secondContactPhone").val();
+    var additionalPhones=$("#additionalPhones").val();
+    var additPhonesArrary = getAdditPhonesArrary(additionalPhones);
+    $('#contactRecordsXJX').empty();
+    $('#contactRecordsGZ').empty();
+    for(var i=1;i<=additPhonesArrary.length;i++){
+        $("#contactRecordsGZ" + i).empty();
+    }
     $.ajax({
         type: "GET",
         url: "/back/collectionOrder/getContactRecords",
@@ -42,31 +81,83 @@ function getContactRecords() {
         },
         dataType: "json",
         success: function (data) {
-            alertMsg.info("调用成功....");
-            console.log(data.returnInfo);
-            console.log(data.returnInfo);
-            /*if (data.code = 200) {
-                // console.log(data.data.call_logs);
-                // $("#contactRecords").append(data);
-            }*/
+            //测试数据
+            var obj = eval("(" + data + ")");//转换为json对象
+            var call_logs=obj["data"]["call_logs"];//获取通话记录数据call_logs
+            var xjxCallLogs='';
+            //平台注册手机号
+            if(getCallLogsPhonesStr(call_logs).indexOf(userName)==-1 || call_logs[userName].length==0) {
+                xjxCallLogs  += '<table><tr>';
+                //第一紧急联系人
+                xjxCallLogs += '<td style="width: 105px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedCallRecordJinji(this);" '  + '" isCloseRelation="' + "1" + '"' +
+                    'userPhone="' + firstContactPhone + '"/>' + '&nbsp&nbsp' + firstContactName + '</td><td style="width: 120px;height: 24px;">' + firstContactPhone + '</td>' +
+                    '<td style="width: 40px;height: 24px;"></td>';
+                //第二紧急联系人
+                xjxCallLogs += '<td style="width: 105px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedCallRecordJinji(this);" '  + '" isCloseRelation="' + "2" + '"' +
+                    'userPhone="' + secondContactPhone + '"/>' + '&nbsp&nbsp' + secondContactName + '</td><td style="width: 120px;height: 24px;">' + secondContactPhone + '</td>';
+                xjxCallLogs +='</tr><table>';
+            }else {
+                xjxCallLogs  += '<table><tr>';
+                //第一紧急联系人
+                xjxCallLogs += '<td style="width: 105px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedCallRecordJinji(this);" '  + '" isCloseRelation="' + "1" + '"' +
+                    'userPhone="' + firstContactPhone + '"/>' + '&nbsp&nbsp' + firstContactName + '</td><td style="width: 120px;height: 24px;">' + firstContactPhone + '</td>' +
+                    '<td style="width: 40px;height: 24px;"></td>';
+                //第二紧急联系人
+                xjxCallLogs += '<td style="width: 105px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedCallRecordJinji(this);" '  + '" isCloseRelation="' + "2" + '"' +
+                    'userPhone="' + secondContactPhone + '"/>' + '&nbsp&nbsp' + secondContactName + '</td><td style="width: 120px;height: 24px;">' + secondContactPhone + '</td>';
+                xjxCallLogs +='</tr><tr>';
+                for(var i=1;i<=call_logs[userName].length;i++){
+                    xjxCallLogs += '<td style="width: 105px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedCallLogVal(this);" value="' + call_logs[userName][i - 1]["contact_mobile"] + '" ' +
+                        'userPhone="' + call_logs[userName][i - 1]["contact_mobile"] + '" callUserName="' + call_logs[userName][i - 1]["contact_name"] +'"/>' + '&nbsp&nbsp' + call_logs[userName][i - 1]["contact_name"] + '</td><td style="width: 105px;height: 24px;">' +
+                        call_logs[userName][i - 1]["contact_mobile"] + '</td><td style="width: 50px;height: 24px;">' + call_logs[userName][i - 1]["contact_times"] + '次</td>'+ '&nbsp&nbsp&nbsp' ;
+                    if (i % 5 == 0) {
+                        xjxCallLogs += '</tr>';
+                    }
+                }
+                xjxCallLogs += '</table>';
+            }
+            //补充手机号
+            additPhonesArrary = getAdditPhonesArrary(additionalPhones);
+            //补充手机号
+            var res = new Array();
+            for(var i=0;i<additPhonesArrary.length;i++){
+                // debugger;
+                res[i] ='';
+                if(getCallLogsPhonesStr(call_logs).indexOf(additPhonesArrary[i])==-1 || call_logs[additPhonesArrary[i]].length==0){
+                    res[i]  += '<table><tr><td>';
+                    res[i]  += '<h2>此手机号暂无通话记录！！！</h2>';
+                    res[i]  += '</td></tr></table>';
+                }else {
+                    res[i]  += '<table><tr>';
+                    for(var j=1;j<=call_logs[additPhonesArrary[i]].length;j++){
+                        res[i] += '<td style="width: 105px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedCallLogVal(this);" value="' + call_logs[additPhonesArrary[i]][j - 1]["contact_mobile"] + '" ' +
+                            'userPhone="' + call_logs[additPhonesArrary[i]][j - 1]["contact_mobile"] + ' "callUserName="' + call_logs[additPhonesArrary[i]][j - 1]["contact_name"] +'"/>' + '&nbsp&nbsp' + call_logs[additPhonesArrary[i]][j - 1]["contact_name"] + '</td><td style="width: 120px;height: 24px;">' +
+                            call_logs[additPhonesArrary[i]][j - 1]["contact_mobile"] + '</td><td style="width: 50px;height: 24px;">' + call_logs[additPhonesArrary[i]][j - 1]["contact_times"] + '次</td>';
+                        if (j % 5 == 0) {
+                            res[i] += '</tr>';
+                        }
+                    }
+                    res[i] += '</table>';
+                }
+            }
+            $('#contactRecords'+ 'XJX').append(xjxCallLogs);
+            for (var i=1;i<=res.length;i++){
+                $("#contactRecordsGZ"+ i).append(res[i-1]);
+            }
+
+            $("#sss").click();//点击刷新第一个tab页
+            console.log("*******************");
         },error: function () {
             alertMsg.error("调用出错！");
         }
-
-
-        // var data=data[0].
-
-
-
-
     });
-    // $("#collectionRecord").hide();
-    // $("#userPhoto").parent("td").addClass("photoDivStyle");
 }
 
 // 获取借款人联系人信息
 function getUserRealContent() {
     $("#collectionRecordId").val("");
+    $("#phoneNumber").val("");
+    $("#selectCallRecordFlag").val("");
     var orderId = $("#orderId").val();
     $("#collectionRecord").show();
     $('#userRealContent').empty();
@@ -391,6 +482,8 @@ function getRecordLists() {
     var orderId = $("#orderId").val();
     $("#recordListContent").empty();
     $("#contactId").val("");
+    $("#phoneNumber").val("");
+    $("#selectCallRecordFlag").val("");
     $("#collectionRecordId").val("");
     $.ajax({
         type: "GET",
@@ -441,6 +534,9 @@ $("#searchOrderCollectionRecord").click(function () {
 
 // 添加催收记录
 function saveCollectionRecord() {
+    var phoneNumber=$("#phoneNumber").val();
+    var callUserName=$("#callUserName").val();
+    var selectCallRecordFlag=$("#selectCallRecordFlag").val();
     var collectionMode = $("select[name='collectionMode'] option:checked").val();
     var repaymentTime = $("#repaymentTime").val();
     var communication = $("input[name='communication']:checked").val();
@@ -482,6 +578,9 @@ function saveCollectionRecord() {
         url: "/back/collectionRecord/saveRecord",
         contentType: "application/x-www-form-urlencoded; charset=utf-8",
         data: {
+            selectCallRecordFlag:selectCallRecordFlag,
+            callUserName:callUserName,
+            phoneNumber:phoneNumber,
             collectionMode: collectionMode,
             repaymentTime: repaymentTime,
             communication: communication,
@@ -569,6 +668,27 @@ function getSelectedVal(i) {
     $("#phoneNumber").val(userPhone);
 }
 
+// 通话记录页面紧急联系人选中时，设置isCloseRelation，不设置contactId
+function getSelectedCallRecordJinji(i) {
+    if ($(i).index() < 3) {
+        $("#isCloseRelation").val($(i).attr("isCloseRelation"));
+    }
+    var userPhone = $(i).attr("userPhone");
+    $("#phoneNumber").val(userPhone);
+}
+
+// 设置选中通话记录的id值
+function getSelectedCallLogVal(i) {
+    if ($(i).index() < 3) {
+        $("#isCloseRelation").val($(i).attr("isCloseRelation"));
+    }
+    var userPhone = $(i).attr("userPhone");
+    var callUserName = $(i).attr("callUserName");
+    $("#phoneNumber").val(userPhone);
+    $("#callUserName").val(callUserName);
+    $("#selectCallRecordFlag").val("selected");
+}
+
 // 清空之前添加催收记录所填写的数据
 function clearRecord() {
     $("textarea[name='content']").val("");
@@ -577,9 +697,14 @@ function clearRecord() {
     $("input[name='isConnected']").removeAttr("checked");
     $("#repaymentTime").val("");
     $("#contactId").val("");
+    $("#selectCallRecordFlag").val("");
+    $("#callUserName").val("");
+    $("#phoneNumber").val("");
     $("#collectionRecordId").val("");
+    $("#phoneNumber").val("");
     $("#notPromiseRepay").attr("checked", "checked");
     $("#promiseRepayTime").hide();
+    $("#").hide();
 }
 
 
