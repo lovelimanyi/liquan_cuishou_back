@@ -462,13 +462,13 @@ public class MyCollectionOrderController extends BaseController {
 
     //将补充手机号字符串转化为数组返回
     public static ArrayList<String> getAdditPhonesList(String str) {
-        ArrayList<String> additPhonesArrary = new ArrayList<String> ();
-        if(str==""){
+        ArrayList<String> additPhonesArrary = new ArrayList<String>();
+        if (str == "") {
             return additPhonesArrary;
-        }else if(str!="" && !str.contains(",") ){
+        } else if (str != "" && !str.contains(",")) {
             additPhonesArrary.add(str);
             return additPhonesArrary;
-        }else {
+        } else {
             additPhonesArrary.addAll(Arrays.asList(str.split(",")));
             return additPhonesArrary;
         }
@@ -480,22 +480,22 @@ public class MyCollectionOrderController extends BaseController {
      * lmy
      * List<Map<String,Object>>
      */
-    @RequestMapping("getContactRecords")
+    @RequestMapping("/getContactRecords")
     @ResponseBody
-    private String getContactRecords(HttpServletRequest request) {
-        Map<String,Object> resultMap = new HashedMap(8);
+    public String getContactRecords(HttpServletRequest request) {
+        Map<String, Object> resultMap = new HashedMap(8);
         String returnInfo = null;
-        try{
+        try {
             HashMap<String, Object> params = getParametersO(request);
-            String idNumber=params.get("idNumber")+"";
-            if (idNumber != null&& idNumber!="") {
+            String idNumber = params.get("idNumber") + "";
+            if (idNumber != null && idNumber != "") {
                 Map<String, String> map = new HashMap();
                 map.put("id", idNumber);
                 //调用第三方风控
                 returnInfo = HttpUtil.getInstance().doPost(PayContents.XJX_GET_PHONES, JSON.toJSONString(map));
-                resultMap.put("returnInfo",returnInfo);
+                resultMap.put("returnInfo", returnInfo);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.error("获取通话记录出错:" + e);
             e.printStackTrace();
         }
@@ -567,8 +567,8 @@ public class MyCollectionOrderController extends BaseController {
                 }
 
                 //获取补充手机号
-                String additionalPhones=getAdditionalPhones(userInfo.getUserName(),userInfo.getUserPhones());
-                ArrayList<String> AdditPhonesList =getAdditPhonesList(additionalPhones);
+                String additionalPhones = getAdditionalPhones(userInfo.getUserName(), userInfo.getUserPhones());
+                ArrayList<String> AdditPhonesList = getAdditPhonesList(additionalPhones);
 
                 // add by yyf 根据身份证前6位 映射用户地址
                 if (userInfo != null) {
@@ -618,8 +618,8 @@ public class MyCollectionOrderController extends BaseController {
                 model.addAttribute("userInfo", userInfo);
                 model.addAttribute("userCar", userCar);// 银行卡
                 model.addAttribute("backUser", backUser);
-                model.addAttribute("additionalPhones",additionalPhones);
-                model.addAttribute("AdditPhonesList",AdditPhonesList);
+                model.addAttribute("additionalPhones", additionalPhones);
+                model.addAttribute("AdditPhonesList", AdditPhonesList);
                 url = "mycollectionorder/myorderDetails";
 //			}
             }
@@ -708,7 +708,7 @@ public class MyCollectionOrderController extends BaseController {
             Map<String, Object> o = (Map<String, Object>) JSONObject.parse(returnInfo);
             if (o != null && "0".equals(String.valueOf(o.get("code")))) {
                 Map<String, Object> data = (Map<String, Object>) o.get("data");
-                List<Map<String,String>> platformList=(List<Map<String,String>>)data.get("platform_list");
+                List<Map<String, String>> platformList = (List<Map<String, String>>) data.get("platform_list");
                 for (Map<String, String> mArray : platformList) {
                     set.add(mArray.get("reg_mobile"));
                     set.add(mArray.get("bc_mobile"));
@@ -724,13 +724,13 @@ public class MyCollectionOrderController extends BaseController {
     /**
      * 获取补充手机号
      */
-    private  String getAdditionalPhones(String phone,String phones){
-        Set<String> pSet=new HashSet<>();
-        try{
-            String [] pArrays=phones.split(",");
+    private String getAdditionalPhones(String phone, String phones) {
+        Set<String> pSet = new HashSet<>();
+        try {
+            String[] pArrays = phones.split(",");
             pSet.addAll(Arrays.asList(pArrays));
             pSet.remove(phone);
-        }catch(Exception e){
+        } catch (Exception e) {
             logger.error("获取补充手机号出错：" + e);
             e.printStackTrace();
         }
