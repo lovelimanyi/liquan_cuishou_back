@@ -29,6 +29,16 @@
     <input type="hidden" id="userId" value="${collectionOrder.userId}">
     <input type="hidden" id="contactId">
     <input type="hidden" id="collectionRecordId">
+    <input type="hidden" id="idNumber" value="${userInfo.idNumber}">
+    <input type="hidden" id="userName" value="${userInfo.userName}">
+    <input type="hidden" id="firstContactName" value="${userInfo.firstContactName}">
+    <input type="hidden" id="firstContactPhone" value="${userInfo.firstContactPhone}">
+    <input type="hidden" id="secondContactName" value="${userInfo.secondContactName}">
+    <input type="hidden" id="secondContactPhone" value="${userInfo.secondContactPhone}">
+    <input type="hidden" id="additionalPhones" value="${additionalPhones}">
+     <input type="hidden" id="AdditPhonesList" value="${AdditPhonesList}">
+     <input type="hidden" id="callUserName">
+        <input type="hidden" id="selectCallRecordFlag">
     <%-- 标记用户选择的是否是紧急联系人 --%>
     <input type="hidden" id="isCloseRelation">
     <div class="tabs">
@@ -62,8 +72,8 @@
                             <td colspan="2">${userInfo.userSex}</td>
                         </tr>
                         <tr>
-                            <td class="tdGround">借款人手机:</td>
-                            <td>${userInfo.userPhones}</td>
+                            <td class="tdGround">平台手机号:</td>
+                            <td>${userInfo.userName}</td>
                             <%--<td class="tdGround">现居时长</td>
                             <td>
                                 <c:choose>
@@ -97,6 +107,18 @@
                                     <c:when test="${userInfo.education eq 6}">高中</c:when>
                                     <c:when test="${userInfo.education eq 7}">初中及以下</c:when>
                                     <c:otherwise>--</c:otherwise>
+                                </c:choose>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="tdGround">补充手机号:</td>
+                            <%--<td colspan="5">${additionalPhones}</td>--%>
+                            <td colspan="5">
+                                <c:choose>
+                                    <c:when test="${additionalPhones eq ''}">无</c:when>
+                                    <c:when test="${additionalPhones eq 'undefined'}">无</c:when>
+                                    <c:when test="${additionalPhones eq null}">无</c:when>
+                                    <c:otherwise>${additionalPhones}</c:otherwise>
                                 </c:choose>
                             </td>
                         </tr>
@@ -188,7 +210,7 @@
             <div class="tabsHeaderContent" id="collectionZone">
                 <ul>
                     <li class="selected" onclick='getCollectionLists();'><a href="#"><span>催收记录</span></a></li>
-                    <%--<li><a href="#"><span>通话记录</span></a></li>--%>
+                    <li id="contactRecord" onclick='getContactRecords();'><a href="#" ><span>通话记录</span></a></li>
                     <li id="addressList"><a href="#" onclick="getUserRealContent();"><span>通讯录</span></a></li>
                     <li id="orderStatusChangeLog"><a href="#" onclick="getStatusChangeLogContent();"><span>订单流转日志</span></a></li>
                     <li id="jxlLable"><a href="#" onclick="getJxlContent();"><span>聚信立报告</span></a></li>
@@ -260,7 +282,30 @@
                     </div>
                 </fieldset>
             </div>
-            <%--<div>通话记录</div>--%>
+            <%--通话记录--%>
+            <div class="pageContent">
+                        <div class="tabs">
+                            <div class="tabsHeader">
+                                <div class="tabsHeaderContent">
+                                    <ul id="contactRecordsHeader">
+                                        <li id="sss" class="selected"><a href="#"><span>${userInfo.userName}(本人平台注册号)</span></a></li>
+                                        <c:forEach items="${AdditPhonesList}" var="item" varStatus="status">
+                                            <li ><a href="#tab-"><span>${item}(补充手机号)</span></a></li>
+                                        </c:forEach>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="tabsContent">
+                                <div id="contactRecordsXJX" class="pageFormContent">
+
+                                </div>
+                                <c:forEach items="${AdditPhonesList}" var="item" varStatus="status">
+                                    <div id="contactRecordsGZ${status.count}" class="pageFormContent">
+                                    </div>
+                                </c:forEach>
+                            </div>
+                        </div>
+            </div>
             <div>
                 <fieldset>
                     <legend>通讯录</legend>
