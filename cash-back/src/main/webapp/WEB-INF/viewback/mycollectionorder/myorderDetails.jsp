@@ -377,7 +377,6 @@
                             </fieldset>
                         </div>
                         <fieldset>
-                            <div class="divider"></div>
                             <dl>
                                 <dt style="width: 80px;">
                                     <label>
@@ -385,12 +384,11 @@
                                     </label>
                                 </dt>
                                 <dd>
-                                    <textarea placeholder="温馨提示：如果不点选催收记录或通讯录中联系人则默认催收本人。" name="content" rows="5" cols="80" maxlength="100" id="collectionContent"></textarea>
+                                    <textarea placeholder="温馨提示：如果不点选催收记录或通讯录中联系人则默认催收本人。" name="content" rows="4" cols="80" maxlength="100" id="collectionContent"></textarea>
                                 </dd>
                             </dl>
                         </fieldset>
                         <fieldset>
-                            <div class="divider"></div>
                             <dl>
                                 <dt style="width: 80px;">
                                     <label>
