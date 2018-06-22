@@ -89,27 +89,36 @@ function getContactRecords() {
             if(getCallLogsPhonesStr(call_logs).indexOf(userName)==-1 || call_logs[userName].length==0) {
                 xjxCallLogs  += '<table><tr>';
                 //第一紧急联系人
-                xjxCallLogs += '<td style="width: 105px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedCallRecordJinji(this);" '  + '" isCloseRelation="' + "1" + '"' +
-                    'userPhone="' + firstContactPhone + '"/>' + '&nbsp&nbsp' + firstContactName + '</td><td style="width: 120px;height: 24px;">' + firstContactPhone + '</td>' +
+                xjxCallLogs += '<td style="width: 85px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedCallRecordJinji(this);" '  + '" isCloseRelation="' + "1" + '"' +
+                    'userPhone="' + firstContactPhone + '"/>' + '&nbsp&nbsp' + firstContactName + '</td><td style="width: 90px;height: 24px;">' + firstContactPhone + '</td>' +
                     '<td style="width: 40px;height: 24px;"></td>';
                 //第二紧急联系人
-                xjxCallLogs += '<td style="width: 105px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedCallRecordJinji(this);" '  + '" isCloseRelation="' + "2" + '"' +
-                    'userPhone="' + secondContactPhone + '"/>' + '&nbsp&nbsp' + secondContactName + '</td><td style="width: 120px;height: 24px;">' + secondContactPhone + '</td>';
+                xjxCallLogs += '<td style="width: 85px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedCallRecordJinji(this);" '  + '" isCloseRelation="' + "2" + '"' +
+                    'userPhone="' + secondContactPhone + '"/>' + '&nbsp&nbsp' + secondContactName + '</td><td style="width: 90px;height: 24px;">' + secondContactPhone +
+                    '</td><td colspan="4" style="color: red">此行为共债用户紧急联系人</td>';
                 xjxCallLogs +='</tr><table>';
             }else {
                 xjxCallLogs  += '<table><tr>';
                 //第一紧急联系人
-                xjxCallLogs += '<td style="width: 105px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedCallRecordJinji(this);" '  + '" isCloseRelation="' + "1" + '"' +
-                    'userPhone="' + firstContactPhone + '"/>' + '&nbsp&nbsp' + firstContactName + '</td><td style="width: 120px;height: 24px;">' + firstContactPhone + '</td>' +
+                xjxCallLogs += '<td style="width: 85px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedCallRecordJinji(this);" '  + '" isCloseRelation="' + "1" + '"' +
+                    'userPhone="' + firstContactPhone + '"/>' + '&nbsp&nbsp' + firstContactName + '</td><td style="width: 90px;height: 24px;">' + firstContactPhone + '</td>' +
                     '<td style="width: 40px;height: 24px;"></td>';
                 //第二紧急联系人
-                xjxCallLogs += '<td style="width: 105px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedCallRecordJinji(this);" '  + '" isCloseRelation="' + "2" + '"' +
-                    'userPhone="' + secondContactPhone + '"/>' + '&nbsp&nbsp' + secondContactName + '</td><td style="width: 120px;height: 24px;">' + secondContactPhone + '</td>';
+                xjxCallLogs += '<td style="width: 85px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedCallRecordJinji(this);" '  + '" isCloseRelation="' + "2" + '"' +
+                    'userPhone="' + secondContactPhone + '"/>' + '&nbsp&nbsp' + secondContactName + '</td><td style="width: 90px;height: 24px;">' + secondContactPhone + '</td><td colspan="4" style="color: red">此行为共债用户紧急联系人</td>';
                 xjxCallLogs +='</tr><tr>';
                 for(var i=1;i<=call_logs[userName].length;i++){
-                    xjxCallLogs += '<td style="width: 105px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedCallLogVal(this);" value="' + call_logs[userName][i - 1]["contact_mobile"] + '" ' +
-                        'userPhone="' + call_logs[userName][i - 1]["contact_mobile"] + '" callUserName="' + call_logs[userName][i - 1]["contact_name"] +'"/>' + '&nbsp&nbsp' + call_logs[userName][i - 1]["contact_name"] + '</td><td style="width: 105px;height: 24px;">' +
-                        call_logs[userName][i - 1]["contact_mobile"] + '</td><td style="width: 50px;height: 24px;">' + call_logs[userName][i - 1]["contact_times"] + '次</td>'+ '&nbsp&nbsp&nbsp' ;
+                    //判断用户名是否有值，没有则显示未知
+                    var name=call_logs[userName][i - 1]["contact_name"].toString();
+                    if(name==null || name==""  || name == "undefined"){
+                        name="未知";
+                    }else{
+                        name = call_logs[userName][i - 1]["contact_name"];
+                    }
+
+                    xjxCallLogs += '<td style="width: 85px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedCallLogVal(this);" value="' + call_logs[userName][i - 1]["contact_mobile"] + '" ' +
+                        'userPhone="' + call_logs[userName][i - 1]["contact_mobile"] + '" callUserName="' + name +'"/>' + '&nbsp&nbsp' + name + '</td><td style="width: 9px;height: 24px;">' +
+                        call_logs[userName][i - 1]["contact_mobile"] + '</td><td style="width: 120px;height: 24px;">' + call_logs[userName][i - 1]["contact_times"] + '次</td>'+ '&nbsp&nbsp&nbsp' ;
                     if (i % 5 == 0) {
                         xjxCallLogs += '</tr>';
                     }
@@ -130,9 +139,17 @@ function getContactRecords() {
                 }else {
                     res[i]  += '<table><tr>';
                     for(var j=1;j<=call_logs[additPhonesArrary[i]].length;j++){
-                        res[i] += '<td style="width: 105px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedCallLogVal(this);" value="' + call_logs[additPhonesArrary[i]][j - 1]["contact_mobile"] + '" ' +
-                            'userPhone="' + call_logs[additPhonesArrary[i]][j - 1]["contact_mobile"] + ' "callUserName="' + call_logs[additPhonesArrary[i]][j - 1]["contact_name"] +'"/>' + '&nbsp&nbsp' + call_logs[additPhonesArrary[i]][j - 1]["contact_name"] + '</td><td style="width: 120px;height: 24px;">' +
-                            call_logs[additPhonesArrary[i]][j - 1]["contact_mobile"] + '</td><td style="width: 50px;height: 24px;">' + call_logs[additPhonesArrary[i]][j - 1]["contact_times"] + '次</td>';
+                        //判断用户名是否有值，没有则显示未知
+                        var name=call_logs[additPhonesArrary[i]][j - 1]["contact_name"].toString();
+                        if(name==null || name == ""  || name == "undefined"){
+                            name="未知";
+                        }else{
+                            name = call_logs[userName][i - 1]["contact_name"];
+                        }
+
+                        res[i] += '<td style="width: 85px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedCallLogVal(this);" value="' + call_logs[additPhonesArrary[i]][j - 1]["contact_mobile"] + '" ' +
+                            'userPhone="' + call_logs[additPhonesArrary[i]][j - 1]["contact_mobile"] + ' "callUserName="' + name +'"/>' + '&nbsp&nbsp' + name + '</td><td style="width: 90px;height: 24px;">' +
+                            call_logs[additPhonesArrary[i]][j - 1]["contact_mobile"] + '</td><td style="width: 120px;height: 24px;">' + call_logs[additPhonesArrary[i]][j - 1]["contact_times"] + '次</td>';
                         if (j % 5 == 0) {
                             res[i] += '</tr>';
                         }
@@ -181,7 +198,7 @@ function getUserRealContent() {
                     res += '<td style="width: 105px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedVal(this);" value="' + data[i - 1].id + '" isCloseRelation="' + i + '"' +
                         'userPhone="' + data[i - 1].infoValue + '"/>' + '&nbsp&nbsp' + data[i - 1].infoName + '</td><td style="width: 120px;height: 24px;">' + data[i - 1].infoValue + '</td>';
                     if (i == 2) {
-                        res += '</tr>';
+                        res += '<td colspan="4" style="color: red">此行为共债用户紧急联系人</td></tr>';
                     }
                 } else {
                     res += '<td style="width: 105px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedVal(this);" value="' + data[i - 1].id + '" ' +
