@@ -112,7 +112,15 @@
                         </tr>
                         <tr>
                             <td class="tdGround">补充手机号:</td>
-                            <td colspan="5">${additionalPhones}</td>
+                            <%--<td colspan="5">${additionalPhones}</td>--%>
+                            <td colspan="5">
+                                <c:choose>
+                                    <c:when test="${additionalPhones eq ''}">无</c:when>
+                                    <c:when test="${additionalPhones eq 'undefined'}">无</c:when>
+                                    <c:when test="${additionalPhones eq null}">无</c:when>
+                                    <c:otherwise>${additionalPhones}</c:otherwise>
+                                </c:choose>
+                            </td>
                         </tr>
                         <tr>
                             <td class="tdGround">身份证地址:</td>
