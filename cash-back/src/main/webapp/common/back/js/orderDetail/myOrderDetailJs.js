@@ -516,7 +516,7 @@ function getRecordLists() {
     var orderId = $("#orderId").val();
     $("#recordListContent").empty();
     $("#contactId").val("");
-    $("#phoneNumber").val("");
+    // $("#phoneNumber").val("");
     $("#selectCallRecordFlag").val("");
     $("#collectionRecordId").val("");
     $.ajax({
