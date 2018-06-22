@@ -30,9 +30,9 @@ function getJxlContent() {
     // $("#userPhoto").parent("td").addClass("photoDivStyle");
 }
 //获取所有共债手机号的拼接字符串
-function getCallLogsPhonesStr(call_logs){
-    var phonesStr=userName;
-    for(var cl in call_logs){
+function getCallLogsPhonesStr(call_logs) {
+    var phonesStr = userName;
+    for (var cl in call_logs) {
         phonesStr += cl;
     }
     return phonesStr;
@@ -41,13 +41,13 @@ function getCallLogsPhonesStr(call_logs){
 function getAdditPhonesArrary(str) {
     // debugger;
     var additPhonesArrary = new Array();
-    if(str==""){
+    if (str == "") {
         return additPhonesArrary;
-    }else if(str!="" && str.indexOf(",") < 0){
-        additPhonesArrary[0]=str;
+    } else if (str != "" && str.indexOf(",") < 0) {
+        additPhonesArrary[0] = str;
         return additPhonesArrary;
-    }else {
-        additPhonesArrary=str.split(",");
+    } else {
+        additPhonesArrary = str.split(",");
         return additPhonesArrary;
     }
 }
@@ -60,16 +60,16 @@ function getContactRecords() {
     $("#collectionRecordId").val("");
     $("#contactId").val("");
     var idNumber = $("#idNumber").val();
-    var userName= $("#userName").val();
-    var firstContactName=$("#firstContactName").val();
-    var firstContactPhone=$("#firstContactPhone").val();
-    var secondContactName=$("#secondContactName").val();
-    var secondContactPhone=$("#secondContactPhone").val();
-    var additionalPhones=$("#additionalPhones").val();
+    var userName = $("#userName").val();
+    var firstContactName = $("#firstContactName").val();
+    var firstContactPhone = $("#firstContactPhone").val();
+    var secondContactName = $("#secondContactName").val();
+    var secondContactPhone = $("#secondContactPhone").val();
+    var additionalPhones = $("#additionalPhones").val();
     var additPhonesArrary = getAdditPhonesArrary(additionalPhones);
     $('#contactRecordsXJX').empty();
     $('#contactRecordsGZ').empty();
-    for(var i=1;i<=additPhonesArrary.length;i++){
+    for (var i = 1; i <= additPhonesArrary.length; i++) {
         $("#contactRecordsGZ" + i).empty();
     }
     $.ajax({
@@ -83,59 +83,59 @@ function getContactRecords() {
         success: function (data) {
             //对应身份证号返回通话记录信息为空时：
             var obj = eval("(" + data + ")");//转换为json对象
-            var call_logsCopy=obj["data"]["call_logs"];//获取通话记录数据call_logs
-            if(call_logsCopy.length==0){
-                var res= '<table><tr>';
+            var call_logsCopy = obj["data"]["call_logs"];//获取通话记录数据call_logs
+            if (call_logsCopy.length == 0) {
+                var res = '<table><tr>';
                 //第一紧急联系人
-                res += '<td style="width: 85px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedCallRecordJinji(this);" '  + '" isCloseRelation="' + "1" + '"' +
+                res += '<td style="width: 85px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedCallRecordJinji(this);" ' + '" isCloseRelation="' + "1" + '"' +
                     'userPhone="' + firstContactPhone + '"/>' + '&nbsp&nbsp' + firstContactName + '</td><td style="width: 90px;height: 24px;">' + firstContactPhone + '</td>' +
                     '<td style="width: 40px;height: 24px;"></td>';
                 //第二紧急联系人
-                res += '<td style="width: 85px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedCallRecordJinji(this);" '  + '" isCloseRelation="' + "2" + '"' +
+                res += '<td style="width: 85px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedCallRecordJinji(this);" ' + '" isCloseRelation="' + "2" + '"' +
                     'userPhone="' + secondContactPhone + '"/>' + '&nbsp&nbsp' + secondContactName + '</td><td style="width: 90px;height: 24px;">' + secondContactPhone +
                     '</td><td colspan="4" style="color: red">此行为共债用户紧急联系人</td>';
-                res +='</tr><table>';
+                res += '</tr><table>';
                 $('#contactRecordsXJX').append(res);
-                return ;
+                return;
             }
 
             var objCopy = eval("(" + data + ")");//转换为json对象
-            var call_logs=objCopy["data"]["call_logs"];//获取通话记录数据call_logs
-            var xjxCallLogs='';
+            var call_logs = objCopy["data"]["call_logs"];//获取通话记录数据call_logs
+            var xjxCallLogs = '';
             //平台注册手机号
-            if(getCallLogsPhonesStr(call_logsCopy).indexOf(userName)==-1 || call_logs[userName].length==0) {
-                xjxCallLogs  += '<table><tr>';
+            if (getCallLogsPhonesStr(call_logsCopy).indexOf(userName) == -1 || call_logs[userName].length == 0) {
+                xjxCallLogs += '<table><tr>';
                 //第一紧急联系人
-                xjxCallLogs += '<td style="width: 85px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedCallRecordJinji(this);" '  + '" isCloseRelation="' + "1" + '"' +
+                xjxCallLogs += '<td style="width: 85px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedCallRecordJinji(this);" ' + '" isCloseRelation="' + "1" + '"' +
                     'userPhone="' + firstContactPhone + '"/>' + '&nbsp&nbsp' + firstContactName + '</td><td style="width: 90px;height: 24px;">' + firstContactPhone + '</td>' +
                     '<td style="width: 40px;height: 24px;"></td>';
                 //第二紧急联系人
-                xjxCallLogs += '<td style="width: 85px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedCallRecordJinji(this);" '  + '" isCloseRelation="' + "2" + '"' +
+                xjxCallLogs += '<td style="width: 85px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedCallRecordJinji(this);" ' + '" isCloseRelation="' + "2" + '"' +
                     'userPhone="' + secondContactPhone + '"/>' + '&nbsp&nbsp' + secondContactName + '</td><td style="width: 90px;height: 24px;">' + secondContactPhone +
                     '</td><td colspan="4" style="color: red">此行为共债用户紧急联系人</td>';
-                xjxCallLogs +='</tr><table>';
-            }else {
-                xjxCallLogs  += '<table><tr>';
+                xjxCallLogs += '</tr><table>';
+            } else {
+                xjxCallLogs += '<table><tr>';
                 //第一紧急联系人
-                xjxCallLogs += '<td style="width: 85px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedCallRecordJinji(this);" '  + '" isCloseRelation="' + "1" + '"' +
+                xjxCallLogs += '<td style="width: 85px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedCallRecordJinji(this);" ' + '" isCloseRelation="' + "1" + '"' +
                     'userPhone="' + firstContactPhone + '"/>' + '&nbsp&nbsp' + firstContactName + '</td><td style="width: 90px;height: 24px;">' + firstContactPhone + '</td>' +
                     '<td style="width: 40px;height: 24px;"></td>';
                 //第二紧急联系人
-                xjxCallLogs += '<td style="width: 85px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedCallRecordJinji(this);" '  + '" isCloseRelation="' + "2" + '"' +
+                xjxCallLogs += '<td style="width: 85px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedCallRecordJinji(this);" ' + '" isCloseRelation="' + "2" + '"' +
                     'userPhone="' + secondContactPhone + '"/>' + '&nbsp&nbsp' + secondContactName + '</td><td style="width: 90px;height: 24px;">' + secondContactPhone + '</td><td colspan="4" style="color: red">此行为共债用户紧急联系人</td>';
-                xjxCallLogs +='</tr><tr>';
-                for(var i=1;i<=call_logs[userName].length;i++){
+                xjxCallLogs += '</tr><tr>';
+                for (var i = 1; i <= call_logs[userName].length; i++) {
                     //判断用户名是否有值，没有则显示未知
-                    var name=call_logs[userName][i - 1]["contact_name"].toString();
-                    if(name==null || name==""  || name == "undefined"){
-                        name="未知";
-                    }else{
+                    var name = call_logs[userName][i - 1]["contact_name"].toString();
+                    if (name == null || name == "" || name == "undefined") {
+                        name = "未知";
+                    } else {
                         name = call_logs[userName][i - 1]["contact_name"];
                     }
 
                     xjxCallLogs += '<td style="width: 85px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedCallLogVal(this);" value="' + call_logs[userName][i - 1]["contact_mobile"] + '" ' +
-                        'userPhone="' + call_logs[userName][i - 1]["contact_mobile"] + '" callUserName="' + name +'"/>' + '&nbsp&nbsp' + name + '</td><td style="width: 9px;height: 24px;">' +
-                        call_logs[userName][i - 1]["contact_mobile"] + '</td><td style="width: 120px;height: 24px;">' + call_logs[userName][i - 1]["contact_times"] + '次</td>'+ '&nbsp&nbsp&nbsp' ;
+                        'userPhone="' + call_logs[userName][i - 1]["contact_mobile"] + '" callUserName="' + name + '"/>' + '&nbsp&nbsp' + name + '</td><td style="width: 9px;height: 24px;">' +
+                        call_logs[userName][i - 1]["contact_mobile"] + '</td><td style="width: 120px;height: 24px;">' + call_logs[userName][i - 1]["contact_times"] + '次</td>' + '&nbsp&nbsp&nbsp';
                     if (i % 5 == 0) {
                         xjxCallLogs += '</tr>';
                     }
@@ -146,26 +146,26 @@ function getContactRecords() {
             additPhonesArrary = getAdditPhonesArrary(additionalPhones);
             //补充手机号
             var res = new Array();
-            for(var i=0;i<additPhonesArrary.length;i++){
+            for (var i = 0; i < additPhonesArrary.length; i++) {
                 // debugger;
-                res[i] ='';
-                if(getCallLogsPhonesStr(call_logs).indexOf(additPhonesArrary[i])==-1 || call_logs[additPhonesArrary[i]].length==0){
-                    res[i]  += '<table><tr><td>';
-                    res[i]  += '<h2>此手机号暂无通话记录！！！</h2>';
-                    res[i]  += '</td></tr></table>';
-                }else {
-                    res[i]  += '<table><tr>';
-                    for(var j=1;j<=call_logs[additPhonesArrary[i]].length;j++){
+                res[i] = '';
+                if (getCallLogsPhonesStr(call_logs).indexOf(additPhonesArrary[i]) == -1 || call_logs[additPhonesArrary[i]].length == 0) {
+                    res[i] += '<table><tr><td>';
+                    res[i] += '<h2>此手机号暂无通话记录！！！</h2>';
+                    res[i] += '</td></tr></table>';
+                } else {
+                    res[i] += '<table><tr>';
+                    for (var j = 1; j <= call_logs[additPhonesArrary[i]].length; j++) {
                         //判断用户名是否有值，没有则显示未知
-                        var name=call_logs[additPhonesArrary[i]][j - 1]["contact_name"].toString();
-                        if(name==null || name == ""  || name == "undefined"){
-                            name="未知";
-                        }else{
+                        var name = call_logs[additPhonesArrary[i]][j - 1]["contact_name"].toString();
+                        if (name == null || name == "" || name == "undefined") {
+                            name = "未知";
+                        } else {
                             name = call_logs[userName][i - 1]["contact_name"];
                         }
 
                         res[i] += '<td style="width: 85px;height: 24px;"><input type="radio" name="concatInfo" onchange="getSelectedCallLogVal(this);" value="' + call_logs[additPhonesArrary[i]][j - 1]["contact_mobile"] + '" ' +
-                            'userPhone="' + call_logs[additPhonesArrary[i]][j - 1]["contact_mobile"] + ' "callUserName="' + name +'"/>' + '&nbsp&nbsp' + name + '</td><td style="width: 90px;height: 24px;">' +
+                            'userPhone="' + call_logs[additPhonesArrary[i]][j - 1]["contact_mobile"] + ' "callUserName="' + name + '"/>' + '&nbsp&nbsp' + name + '</td><td style="width: 90px;height: 24px;">' +
                             call_logs[additPhonesArrary[i]][j - 1]["contact_mobile"] + '</td><td style="width: 120px;height: 24px;">' + call_logs[additPhonesArrary[i]][j - 1]["contact_times"] + '次</td>';
                         if (j % 5 == 0) {
                             res[i] += '</tr>';
@@ -175,13 +175,13 @@ function getContactRecords() {
                 }
             }
             $('#contactRecordsXJX').append(xjxCallLogs);
-            for (var i=1;i<=res.length;i++){
-                $("#contactRecordsGZ"+ i).append(res[i-1]);
+            for (var i = 1; i <= res.length; i++) {
+                $("#contactRecordsGZ" + i).append(res[i - 1]);
             }
 
             $("#sss").click();//点击刷新第一个tab页
             console.log("*******************");
-        },error: function () {
+        }, error: function () {
             alertMsg.error("调用出错！");
         }
     });
@@ -568,9 +568,9 @@ $("#searchOrderCollectionRecord").click(function () {
 
 // 添加催收记录
 function saveCollectionRecord() {
-    var phoneNumber=$("#phoneNumber").val();
-    var callUserName=$("#callUserName").val();
-    var selectCallRecordFlag=$("#selectCallRecordFlag").val();
+    var phoneNumber = $("#phoneNumber").val();
+    var callUserName = $("#callUserName").val();
+    var selectCallRecordFlag = $("#selectCallRecordFlag").val();
     var collectionMode = $("select[name='collectionMode'] option:checked").val();
     var repaymentTime = $("#repaymentTime").val();
     var communication = $("input[name='communication']:checked").val();
@@ -612,9 +612,9 @@ function saveCollectionRecord() {
         url: "/back/collectionRecord/saveRecord",
         contentType: "application/x-www-form-urlencoded; charset=utf-8",
         data: {
-            selectCallRecordFlag:selectCallRecordFlag,
-            callUserName:callUserName,
-            phoneNumber:phoneNumber,
+            selectCallRecordFlag: selectCallRecordFlag,
+            callUserName: callUserName,
+            phoneNumber: phoneNumber,
             collectionMode: collectionMode,
             repaymentTime: repaymentTime,
             communication: communication,
@@ -738,7 +738,6 @@ function clearRecord() {
     $("#phoneNumber").val("");
     $("#notPromiseRepay").attr("checked", "checked");
     $("#promiseRepayTime").hide();
-    $("#").hide();
 }
 
 
