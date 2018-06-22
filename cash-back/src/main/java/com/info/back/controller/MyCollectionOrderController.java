@@ -482,8 +482,7 @@ public class MyCollectionOrderController extends BaseController {
      */
     @RequestMapping("getContactRecords")
     @ResponseBody
-    private String getContactRecords(HttpServletRequest request, Model model) {
-        Map<String,Object> callLogs=new HashedMap();
+    private String getContactRecords(HttpServletRequest request) {
         Map<String,Object> resultMap = new HashedMap(8);
         String returnInfo = null;
         try{

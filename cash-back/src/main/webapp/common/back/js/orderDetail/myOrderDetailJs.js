@@ -31,7 +31,7 @@ function getJxlContent() {
 }
 //获取所有共债手机号的拼接字符串
 function getCallLogsPhonesStr(call_logs) {
-    var phonesStr = userName;
+    var phonesStr = "";
     for (var cl in call_logs) {
         phonesStr += cl;
     }
