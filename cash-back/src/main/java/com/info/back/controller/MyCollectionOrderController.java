@@ -491,22 +491,15 @@ public class MyCollectionOrderController extends BaseController {
             MmanLoanCollectionOrder order = mmanLoanCollectionOrderService.getOrderById(orderId);
             if (order != null) {
                 if (!BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())) {
-                    String idNumber=params.get("idNumber")+"";
-                    if (idNumber != null&& idNumber!="") {
+                    String idNumber = params.get("idNumber") + "";
+                    if (idNumber != null && idNumber != "") {
                         Map<String, String> map = new HashMap();
                         map.put("id", idNumber);
                         //调用第三方风控
                         returnInfo = HttpUtil.getInstance().doPost(PayContents.XJX_GET_PHONES, JSON.toJSONString(map));
-                        resultMap.put("returnInfo",returnInfo);
+                        resultMap.put("returnInfo", returnInfo);
                     }
                 }
-            String idNumber = params.get("idNumber") + "";
-            if (idNumber != null && idNumber != "") {
-                Map<String, String> map = new HashMap();
-                map.put("id", idNumber);
-                //调用第三方风控
-                returnInfo = HttpUtil.getInstance().doPost(PayContents.XJX_GET_PHONES, JSON.toJSONString(map));
-                resultMap.put("returnInfo", returnInfo);
             }
         } catch (Exception e) {
             logger.error("获取通话记录出错:" + e);
