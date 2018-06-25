@@ -60,6 +60,7 @@ function getContactRecords() {
     $("#collectionRecordId").val("");
     $("#contactId").val("");
     var idNumber = $("#idNumber").val();
+    var orderId = $("#orderId").val();
     var userName = $("#userName").val();
     var firstContactName = $("#firstContactName").val();
     var firstContactPhone = $("#firstContactPhone").val();
@@ -78,7 +79,7 @@ function getContactRecords() {
         contentType: "application/json; charset=UTF-8",
         data: {
             idNumber: idNumber,
-            orderId:orderId
+            orderId: orderId
         },
         dataType: "json",
         success: function (data) {
@@ -188,7 +189,7 @@ function getContactRecords() {
             $("#sss").click();//点击刷新第一个tab页
             console.log("*******************");
         }, error: function () {
-        },error: function () {
+        }, error: function () {
             alertMsg.error("调用出错！");
         }
     });
