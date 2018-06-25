@@ -741,10 +741,8 @@ function clearRecord() {
     $("#callUserName").val("");
     $("#phoneNumber").val("");
     $("#collectionRecordId").val("");
-    $("#phoneNumber").val("");
     $("#notPromiseRepay").attr("checked", "checked");
     $("#promiseRepayTime").hide();
-    $("#").hide();
 }
 
 
