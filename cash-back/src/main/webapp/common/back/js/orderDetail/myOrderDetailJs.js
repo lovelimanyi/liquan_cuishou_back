@@ -654,6 +654,7 @@ function sendMsg() {
     var phoneNumber = $("#phoneNumber").val();
     var promiseRepay = $("input[name='promiseRepay']:checked").val();
     var repaymentTime = $("#repaymentTime").val();
+    var collectionRecordId = $("#collectionRecordId").val();
     if (promiseRepay == 1) {
         if (repaymentTime == null || repaymentTime == '') {
             $("#repaymentTime").addClass("required");
@@ -675,7 +676,8 @@ function sendMsg() {
             orderId: orderId,
             msgId: msgId,
             parentId: parentId,
-            phoneNumber: phoneNumber
+            phoneNumber: phoneNumber,
+            collectionRecordId: collectionRecordId
         },
         dataType: "json",
         success: function (data) {

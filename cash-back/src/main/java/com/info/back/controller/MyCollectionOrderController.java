@@ -3,6 +3,7 @@ package com.info.back.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.info.back.dao.IMerchantInfoDao;
+import com.info.back.dao.IMmanLoanCollectionRecordDao;
 import com.info.back.dao.IMmanUserLoanDao;
 import com.info.back.dao.ITemplateSmsDao;
 import com.info.back.result.JsonResult;
@@ -13,6 +14,7 @@ import com.info.constant.Constant;
 import com.info.web.pojo.*;
 import com.info.web.util.*;
 import com.liquan.oss.OSSUpload;
+import com.sun.tracing.dtrace.ArgsAttributes;
 import net.sf.json.JSONArray;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.HashedMap;
@@ -129,6 +131,9 @@ public class MyCollectionOrderController extends BaseController {
 
     @Autowired
     private ISysDictService sysDictService;
+
+    @Autowired
+    private IMmanLoanCollectionRecordDao mmanLoanCollectionRecordDao;
 
     /**
      * 我的订单初始化加载查询
@@ -1309,7 +1314,16 @@ public class MyCollectionOrderController extends BaseController {
                 logger.error("催收成功订单不能发送催收短信！" + orderId);
                 return new ServiceResult("-3", "催收成功订单不能发送催收短信！");
             }
-            String mobile = request.getParameter("phoneNumber") == null ? "" : request.getParameter("phoneNumber").trim();
+
+            String mobile;
+            String collectionRecordId = params.get("collectionRecordId") == null ? null : params.get("collectionRecordId").toString();
+            if (StringUtils.isNotEmpty(collectionRecordId)) {
+                // 查询催收记录
+                MmanLoanCollectionRecord loanCollectionRecord = mmanLoanCollectionRecordDao.getOneCollectionRecordById(collectionRecordId);
+                mobile = loanCollectionRecord.getContactPhone();
+            } else {
+                mobile = request.getParameter("phoneNumber") == null ? "" : request.getParameter("phoneNumber").trim();
+            }
             if (StringUtils.isEmpty(mobile)) {
                 return new ServiceResult("-4", "手机号不能为空！");
             }
