@@ -487,6 +487,19 @@ public class MyCollectionOrderController extends BaseController {
         String returnInfo = null;
         try {
             HashMap<String, Object> params = getParametersO(request);
+            String orderId = params.get("orderId").toString();
+            MmanLoanCollectionOrder order = mmanLoanCollectionOrderService.getOrderById(orderId);
+            if (order != null) {
+                if (!BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())) {
+                    String idNumber=params.get("idNumber")+"";
+                    if (idNumber != null&& idNumber!="") {
+                        Map<String, String> map = new HashMap();
+                        map.put("id", idNumber);
+                        //调用第三方风控
+                        returnInfo = HttpUtil.getInstance().doPost(PayContents.XJX_GET_PHONES, JSON.toJSONString(map));
+                        resultMap.put("returnInfo",returnInfo);
+                    }
+                }
             String idNumber = params.get("idNumber") + "";
             if (idNumber != null && idNumber != "") {
                 Map<String, String> map = new HashMap();
