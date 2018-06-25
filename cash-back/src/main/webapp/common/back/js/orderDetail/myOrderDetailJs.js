@@ -29,9 +29,9 @@ function getJxlContent() {
     $("#collectionRecord").hide();
     // $("#userPhoto").parent("td").addClass("photoDivStyle");
 }
-//获取所有共债手机号的拼接字符串
+//获取所有共债手机号的拼接字符串(通话记录call_logs中的手机号)
 function getCallLogsPhonesStr(call_logs){
-    var phonesStr=userName;
+    var phonesStr="";
     for(var cl in call_logs){
         phonesStr += cl;
     }
@@ -60,6 +60,7 @@ function getContactRecords() {
     $("#collectionRecordId").val("");
     $("#contactId").val("");
     var idNumber = $("#idNumber").val();
+    var orderId = $("#orderId").val();
     var userName= $("#userName").val();
     var firstContactName=$("#firstContactName").val();
     var firstContactPhone=$("#firstContactPhone").val();
@@ -77,10 +78,16 @@ function getContactRecords() {
         url: "/back/collectionOrder/getContactRecords",
         contentType: "application/json; charset=UTF-8",
         data: {
-            idNumber: idNumber
+            idNumber: idNumber,
+            orderId:orderId
         },
         dataType: "json",
         success: function (data) {
+            //催收成功，不允许查看通话记录
+            if (data == null) {
+                alertMsg.warn("催收成功订单不允许查看通话记录！")
+                return;
+            }
             //对应身份证号返回通话记录信息为空时：
             var obj = eval("(" + data + ")");//转换为json对象
             var call_logsCopy=obj["data"]["call_logs"];//获取通话记录数据call_logs
@@ -180,7 +187,6 @@ function getContactRecords() {
             }
 
             $("#sss").click();//点击刷新第一个tab页
-            console.log("*******************");
         },error: function () {
             alertMsg.error("调用出错！");
         }
