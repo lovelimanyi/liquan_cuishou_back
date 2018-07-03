@@ -461,6 +461,9 @@
                             <div id="msgNotice">
                                 <span>每日可发送次数：${msgCountLimit} 次,今日剩余次数：<span style="color: #cd0a0a;">${remainMsgCount}</span> 次</span>
                             </div>
+                            <div style="margin-left:180px;margin-top: 10px;">
+                                <font style="color: #1b8d0f">温馨提示：</font><font style="color: #cd0a0a">催收短信只能在8：30-18:00之间发送。</font>
+                            </div>
                         </div>
                     </div>
                 </div>
