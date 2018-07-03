@@ -115,7 +115,8 @@
         <task:scheduled ref="taskDealWithSpecialOrder" method="updateOrderInfo" cron="0 0 7 2 * ?"/>   <!-- 应产品需求，修改每月1号完成订单至指定催收员(每月2号7点执行) -->
         <task:scheduled ref="taskUpdateOrderInfo" method="updateOrderInfo" cron="0 0 3 * * ?"/>
         <task:scheduled ref="taskDealwithOrderUpgrade" method="orderUpgrade" cron="0 5 0 * * ?"/>
-        <task:scheduled ref="taskUpdateTotalOverdueDays" method="updateTotalOverdueDays" cron="0 17 0 * * ?"/><!--更新总逾期天数-->
+       <!-- <task:scheduled ref="taskUpdateTotalOverdueDays" method="updateTotalOverdueDays" cron="0 17 0 * * ?"/>--><!--更新总逾期天数-->
+        <task:scheduled ref="taskUpdateTotalOverdueDays" method="updateTotalOverdueDays" cron="0 0/2 4-23 * * ?"/><!--更新总逾期天数。测试需要，改成每2分钟跑-->
         <task:scheduled ref="taskEstimateOrder" method="pullEstimateOrder" cron="0 30 7 * * ?"/>
         <task:scheduled ref="taskMailCollection" method="mailBeyondWarn" cron="0 0 8 * * ?"/>
         <task:scheduled ref="taskMailCollection" method="mailSendResult" cron="0 30 8 2-31 * ?"/>
