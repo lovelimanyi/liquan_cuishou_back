@@ -1353,7 +1353,7 @@ public class MyCollectionOrderController extends BaseController {
             boolean smsResult = SmsSendUtil.sendSmsNew(mobile, msgParam, msgCode);
             if (smsResult) {
                 // 插入短信记录
-                insertMsg(mobile, order, mobile, msgCode, request);
+                insertMsg(mobile, order,msgCode, request);
                 return new ServiceResult("200", "发送短信成功！");
             } else {
                 return new ServiceResult("-9", "发送失败！");
@@ -1419,13 +1419,15 @@ public class MyCollectionOrderController extends BaseController {
      *
      * @param mobiles
      * @param
-     * @param userName
      * @param
      * @param request
      */
-    private void insertMsg(String mobiles, MmanLoanCollectionOrder order, String userName, String msgCode, HttpServletRequest request) {
+    private void insertMsg(String mobiles, MmanLoanCollectionOrder order,String msgCode, HttpServletRequest request) {
         SmsUser msg = new SmsUser();
         BackUser user = this.loginAdminUser(request);
+        if(user == null){
+            return;
+        }
         msg.setSendUserId(user.getUuid());
         msg.setAddTime(new Date());
         msg.setLoanOrderId(order.getLoanId());
