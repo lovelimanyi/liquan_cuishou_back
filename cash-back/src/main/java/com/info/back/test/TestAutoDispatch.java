@@ -1,9 +1,14 @@
 package com.info.back.test;
 
+import com.info.back.dao.IMmanLoanCollectionOrderDao;
 import com.info.back.dao.ITemplateSmsDao;
 import com.info.back.service.*;
+import com.info.back.task.TaskDealwithOrderUpgrade;
+import com.info.back.task.TaskUpdateOrderInfo;
+import com.info.back.task.TaskUpdateTotalOverdueDays;
 import com.info.constant.Constant;
 import com.info.web.pojo.*;
+import com.info.web.synchronization.service.DataSyncService;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -14,6 +19,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +44,97 @@ public class TestAutoDispatch {
     private IMmanLoanCollectionOrderService mmanLoanCollectionOrderService;
     @Autowired
     private ITemplateSmsDao templateSmsDao;
+    @Autowired
+    private IMmanLoanCollectionOrderDao mmanLoanCollectionOrderDao;
+    @Autowired
+    private MmanLoanCollectionOrderService mmanLoanCollectionOrderService2;
+    @Autowired
+    private TaskUpdateOrderInfo taskUpdateOrderInfo;
+    @Autowired
+    private DataSyncService dataSyncService;
+    @Autowired
+    private TaskUpdateTotalOverdueDays taskUpdateTotalOverdueDays;
+    @Autowired
+    private TaskDealwithOrderUpgrade taskDealwithOrderUpgrade;
+
+    @Test
+    public void test1() {
+        System.out.println(mmanLoanCollectionOrderService2.isBeforePeroidCollectionCompleted("143595515"));
+        System.out.println(mmanLoanCollectionOrderService2.isBeforePeroidCollectionCompleted("143490-1"));
+        System.out.println(mmanLoanCollectionOrderService2.isBeforePeroidCollectionCompleted("143490-2"));
+    }
+
+    @Test
+    public void test2() {
+        MmanUserLoan mmanUserLoan = new MmanUserLoan();
+        MmanUserLoan mmanUserLoan2;
+        mmanUserLoan.setBorrowingType("1");//大额
+        mmanUserLoan.setId("9000000156-8");
+        mmanUserLoan2 = mmanLoanCollectionOrderService2.getFirstMmanUserLoan(mmanUserLoan);
+        System.out.println(mmanUserLoan2);
+    }
+
+    @Test
+    public void test3() {
+        MmanUserLoan mmanUserLoan = new MmanUserLoan();
+        mmanUserLoan.setBorrowingType("1");//大额
+        mmanUserLoan.setId("9000000063-2");
+        try {
+            Date date = new SimpleDateFormat("yyyy-MM-dd").parse("2018-05-21 00:00:00");
+            mmanUserLoan.setLoanEndTime(date);
+        }catch (Exception e){
+            System.out.println("ddddddddd");
+        }
+        int i = mmanLoanCollectionOrderService2.getOverdueDays(mmanUserLoan);
+        System.out.println(i);
+        System.out.println(i);
+    }
+    @Test
+    public void test4() {
+        mmanLoanCollectionOrderService2.dispatchOrderNew("143937-3","412726198911142015","1");
+    }
+
+    @Test
+    public void test6() {
+        mmanLoanCollectionOrderService2.orderUpgrade("143848-1");
+    }
+
+    @Test
+    public void test7() {
+        dataSyncService.syncOverdueDate();
+    }
+
+    @Test
+    public void test8() {
+        taskUpdateTotalOverdueDays.updateTotalOverdueDays();
+    }
+
+    @Test
+    public void test9() {
+        mmanLoanCollectionOrderService2.updateTotalOverdueDays("143936-2");
+    }
+
+    @Test
+    public void test10() {
+        taskDealwithOrderUpgrade.orderUpgrade();
+    }
+    @Test
+    public void test11() {
+        String [] loanIds={"143936-2"};
+        for (int i=0;i<loanIds.length;i++){
+            mmanLoanCollectionOrderService2.dealwithBigOrderUpgrade(loanIds[i]);
+        }
+    }
+
+
+
+
+
+    //只更新小额
+    @Test
+    public void test5() {
+        mmanLoanCollectionOrderService2.updateOrderInfo("143936-2 " );
+    }
 
     //
     @Test

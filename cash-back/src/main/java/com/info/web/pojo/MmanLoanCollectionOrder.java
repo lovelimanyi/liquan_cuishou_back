@@ -30,6 +30,8 @@ public class MmanLoanCollectionOrder {
     private String currentOverdueLevel;
     // 逾期天数
     private Integer overdueDays;
+    // 大订单逾期天数
+    private Integer totalOverdueDays;
     // s1审批人ID
     private String m1ApproveId;
     // s1审批人操作状态（1，已操作过，0或null未操作过）
@@ -90,6 +92,14 @@ public class MmanLoanCollectionOrder {
 
     //分期商城商品名称
     private String productName;
+
+    public Integer getTotalOverdueDays() {
+        return totalOverdueDays;
+    }
+
+    public void setTotalOverdueDays(Integer totalOverdueDays) {
+        this.totalOverdueDays = totalOverdueDays;
+    }
 
     public BigDecimal getReductionMoney() {
         return reductionMoney;

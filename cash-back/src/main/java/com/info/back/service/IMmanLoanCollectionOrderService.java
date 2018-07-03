@@ -11,6 +11,14 @@ import java.util.Map;
 public interface IMmanLoanCollectionOrderService {
 
 	/**
+	 *查询MmanLoanCollectionOrder表所有逾期未催收完成的大额订单；
+	 *
+	 */
+	List<String> getOverdueOrder();
+
+	void updateTotalOverdueDays(String loanId);
+
+	/**
 	 * 根据条件查询符合的订单
 	 * @param mmanLoanCollectionOrder
 	 * @return

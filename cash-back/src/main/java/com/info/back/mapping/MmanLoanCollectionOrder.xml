@@ -27,6 +27,8 @@
         <result column="current_overdue_level" property="currentOverdueLevel" jdbcType="VARCHAR"/>
         <!-- 逾期天数 -->
         <result column="overdueDays" property="overdueDays" jdbcType="INTEGER"/>
+        <!-- 大订单逾期天数 -->
+        <result column="total_overdueDays" property="totalOverdueDays" jdbcType="INTEGER"/>
         <!-- s1审批人ID -->
         <result column="m1_approve_id" property="m1ApproveId" jdbcType="VARCHAR"/>
         <!-- s1审批人操作状态（1，已操作过，0或null未操作过） -->
@@ -182,6 +184,26 @@
                 ORDER BY a.top_important DESC, a.dispatch_time DESC
             </if>
     </sql>-->
+    <update id="upTotalOverdueDays" parameterType="HashMap">
+        UPDATE mman_loan_collection_order
+        <set>
+            <if test="totalOverdueDays != null and totalOverdueDays !=''">
+                total_overdueDays=#{totalOverdueDays},
+            </if>
+        </set>
+        WHERE loan_id = #{loanId,jdbcType=VARCHAR}
+    </update>
+    <select id="getOverdueOrder" resultType="String">
+        SELECT
+            co.loan_id
+        FROM
+            mman_loan_collection_order co
+        LEFT JOIN mman_user_loan ul ON co.loan_id = ul.id
+        WHERE
+            co.`status` != '-1'
+        AND co.`status` != '4'
+        AND ul.borrowing_type = '1'
+    </select>
 
     <select id="getCollectionOrderList" resultType="com.info.web.pojo.OrderBaseResult" parameterType="HashMap">
         SELECT
@@ -630,6 +652,7 @@
             <if test="loanUserPhone!= null and loanUserPhone!=''">loan_user_phone,</if>
             <if test="idNumber!= null and idNumber!=''">id_number,</if>
             <if test="secondDayFlag!= null and secondDayFlag!=''">second_day_flag,</if>
+            <if test="totalOverdueDays!= null and totalOverdueDays!=''">total_overdueDays,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null and id!=''">#{id,jdbcType=VARCHAR},</if>
@@ -674,6 +697,7 @@
             <if test="loanUserPhone!= null and loanUserPhone!=''">#{loanUserPhone},</if>
             <if test="idNumber!= null and idNumber!=''">#{idNumber},</if>
             <if test="secondDayFlag!= null and secondDayFlag!=''">#{secondDayFlag},</if>
+            <if test="totalOverdueDays!= null and totalOverdueDays!=''">#{totalOverdueDays},</if>
         </trim>
     </insert>
 
@@ -868,6 +892,9 @@
     <select id="getOrderByLoanId" parameterType="String" resultMap="queryResultMap">
 		SELECT loan_id,id_number,status,user_id,loan_user_name,overdueDays,current_overdue_level,promise_repayment_time FROM mman_loan_collection_order WHERE loan_id = #{loanId}
 	</select>
+    <select id="getCollectionOrderByLoanId" parameterType="String" resultMap="queryResultMap">
+        SELECT current_collection_user_id FROM mman_loan_collection_order WHERE loan_id = #{loanId}
+    </select>
     <select id="getStopOrderInfoById" parameterType="String" resultType="com.info.web.pojo.OrderInfo">
 		SELECT o.loan_id AS loanId,o.loan_user_name AS loanUserName,l.user_id AS userId,o.order_id AS orderId,o.loan_user_phone AS loanUserPhone,l.loan_money AS
 		loanMoney,l.loan_start_time AS loanStartTime,l.loan_end_time AS loanEndTime,o.overDuedays AS overDuedays,l.loan_penalty AS loanPenalty from mman_loan_collection_order o

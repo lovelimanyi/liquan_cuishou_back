@@ -52,6 +52,26 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
     private IChannelSwitchingDao channelSwitchingDao;
     @Autowired
     private IOrderChangeRecordService orderChangeRecordService;
+    @Autowired
+    private IMmanLoanCollectionCompanyDao mmanLoanCollectionCompanyDao;
+
+    @Override
+    public List<String> getOverdueOrder() {
+        return mmanLoanCollectionOrderDao.getOverdueOrder();
+    }
+
+    /**
+     * @param loanId
+     */
+    @Override
+    public void updateTotalOverdueDays(String loanId) {
+        MmanUserLoan mmanUserLoan = mmanUserLoanDao.get(loanId);
+        int totalOverdueDays = getTotalOverdueDays(mmanUserLoan);
+        Map<String, String> map = new HashMap<>();
+        map.put("loanId", loanId);
+        map.put("totalOverdueDays", String.valueOf(totalOverdueDays));
+        mmanLoanCollectionOrderDao.upTotalOverdueDays(map);
+    }
 
     @Override
     public List<MmanLoanCollectionOrder> getOrderList(MmanLoanCollectionOrder mmanLoanCollectionOrder) {
@@ -317,7 +337,7 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
             }
 
             // 计算订单逾期天数
-            int dayCount = getOverdueDays(loan);
+            int dayCount = getTotalOverdueDays(loan);
 
             if (dayCount >= 31 && dayCount <= 60) {
                 this.dispatchOrderToFM2(order, orderList, personList);
@@ -376,17 +396,21 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
             this.setCommonVariables(order);
             orderList.add(order);
 
-            Map<String, String> personMap = new HashMap<>();
-            personMap.put("beginDispatchTime", DateUtil.getDateFormat("yyyy-MM-dd 00:00:00"));
-            personMap.put("endDispatchTime", DateUtil.getDateFormat((DateUtil.getBeforeOrAfter(new Date(), 1)), "yyyy-MM-dd HH:mm:ss"));
-            personMap.put("groupLevel", BackConstant.XJX_OVERDUE_LEVEL_F_M2);
-            personMap.put("userStatus", BackConstant.ON);
-            List<MmanLoanCollectionPerson> persons = backUserDao.findUnCompleteCollectionOrderByCurrentUnCompleteCountListByMap(personMap);
-            if (CollectionUtils.isEmpty(persons)) {
-                this.inserWarnMsg();
-                return;
+            if (isBeforePeroidCollectionCompleted(order.getLoanId())) {
+                Map<String, String> personMap = new HashMap<>();
+                personMap.put("beginDispatchTime", DateUtil.getDateFormat("yyyy-MM-dd 00:00:00"));
+                personMap.put("endDispatchTime", DateUtil.getDateFormat((DateUtil.getBeforeOrAfter(new Date(), 1)), "yyyy-MM-dd HH:mm:ss"));
+                personMap.put("groupLevel", BackConstant.XJX_OVERDUE_LEVEL_F_M2);
+                personMap.put("userStatus", BackConstant.ON);
+                List<MmanLoanCollectionPerson> persons = backUserDao.findUnCompleteCollectionOrderByCurrentUnCompleteCountListByMap(personMap);
+                if (CollectionUtils.isEmpty(persons)) {
+                    this.inserWarnMsg();
+                    return;
+                }
+                personList.addAll(persons);
+            } else {
+                personList.addAll(setPersonList(order.getLoanId()));
             }
-            personList.addAll(persons);
         }
     }
 
@@ -402,17 +426,21 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
             this.setCommonVariables(order);
             orderList.add(order);
 
-            Map<String, String> personMap = new HashMap<>();
-            personMap.put("beginDispatchTime", DateUtil.getDateFormat("yyyy-MM-dd 00:00:00"));
-            personMap.put("endDispatchTime", DateUtil.getDateFormat((DateUtil.getBeforeOrAfter(new Date(), 1)), "yyyy-MM-dd HH:mm:ss"));
-            personMap.put("groupLevel", BackConstant.XJX_OVERDUE_LEVEL_F_M3);
-            personMap.put("userStatus", BackConstant.ON);
-            List<MmanLoanCollectionPerson> persons = backUserDao.findUnCompleteCollectionOrderByCurrentUnCompleteCountListByMap(personMap);
-            if (CollectionUtils.isEmpty(persons)) {
-                this.inserWarnMsg();
-                return;
+            if (isBeforePeroidCollectionCompleted(order.getLoanId())) {
+                Map<String, String> personMap = new HashMap<>();
+                personMap.put("beginDispatchTime", DateUtil.getDateFormat("yyyy-MM-dd 00:00:00"));
+                personMap.put("endDispatchTime", DateUtil.getDateFormat((DateUtil.getBeforeOrAfter(new Date(), 1)), "yyyy-MM-dd HH:mm:ss"));
+                personMap.put("groupLevel", BackConstant.XJX_OVERDUE_LEVEL_F_M3);
+                personMap.put("userStatus", BackConstant.ON);
+                List<MmanLoanCollectionPerson> persons = backUserDao.findUnCompleteCollectionOrderByCurrentUnCompleteCountListByMap(personMap);
+                if (CollectionUtils.isEmpty(persons)) {
+                    this.inserWarnMsg();
+                    return;
+                }
+                personList.addAll(persons);
+            } else {
+                personList.addAll(setPersonList(order.getLoanId()));
             }
-            personList.addAll(persons);
         }
     }
 
@@ -428,17 +456,21 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
             this.setCommonVariables(order);
             orderList.add(order);
 
-            Map<String, String> personMap = new HashMap<>();
-            personMap.put("beginDispatchTime", DateUtil.getDateFormat("yyyy-MM-dd 00:00:00"));
-            personMap.put("endDispatchTime", DateUtil.getDateFormat((DateUtil.getBeforeOrAfter(new Date(), 1)), "yyyy-MM-dd HH:mm:ss"));
-            personMap.put("groupLevel", BackConstant.XJX_OVERDUE_LEVEL_F_M6);
-            personMap.put("userStatus", BackConstant.ON);
-            List<MmanLoanCollectionPerson> persons = backUserDao.findUnCompleteCollectionOrderByCurrentUnCompleteCountListByMap(personMap);
-            if (CollectionUtils.isEmpty(persons)) {
-                this.inserWarnMsg();
-                return;
+            if (isBeforePeroidCollectionCompleted(order.getLoanId())) {
+                Map<String, String> personMap = new HashMap<>();
+                personMap.put("beginDispatchTime", DateUtil.getDateFormat("yyyy-MM-dd 00:00:00"));
+                personMap.put("endDispatchTime", DateUtil.getDateFormat((DateUtil.getBeforeOrAfter(new Date(), 1)), "yyyy-MM-dd HH:mm:ss"));
+                personMap.put("groupLevel", BackConstant.XJX_OVERDUE_LEVEL_F_M6);
+                personMap.put("userStatus", BackConstant.ON);
+                List<MmanLoanCollectionPerson> persons = backUserDao.findUnCompleteCollectionOrderByCurrentUnCompleteCountListByMap(personMap);
+                if (CollectionUtils.isEmpty(persons)) {
+                    this.inserWarnMsg();
+                    return;
+                }
+                personList.addAll(persons);
+            } else {
+                personList.addAll(setPersonList(order.getLoanId()));
             }
-            personList.addAll(persons);
         }
     }
 
@@ -541,6 +573,148 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
         }
     }
 
+    /**
+     * 根据loanId判断上一期是否催收完成：
+     * 大额第一期，则返回ture；大额非第一期，则判断上期是否进催收、催收完成；小额，则返回true
+     * lmy
+     *
+     * @param loanId
+     * @return
+     */
+    public boolean isBeforePeroidCollectionCompleted(String loanId) {
+        MmanUserLoan mmanUserLoan = mmanUserLoanDao.get(loanId);
+        String type = mmanUserLoan.getBorrowingType();
+        if (Constant.SMALL.equals(type)) {
+            return true;
+        }
+        if (Constant.BIG.equals(type)) {
+            if (loanId.endsWith("-1")) {//大额第1期，返回true
+                return true;
+            } else {//大额不是第1期
+                String beforeStr = StringUtils.substringBefore(loanId, "-");
+                String afterStr = StringUtils.substringAfter(loanId, "-");
+                String beforePeroidStr = (Integer.parseInt(afterStr) - 1) + "";
+                String beforePeroidLoanId = beforeStr + "-" + beforePeroidStr;//上一期订单loanId
+                MmanLoanCollectionOrder beforePeroidCollectionOrder = mmanLoanCollectionOrderDao.getOrderByLoanId(beforePeroidLoanId);
+                if (beforePeroidCollectionOrder != null) {
+                    if ("4".equals(beforePeroidCollectionOrder.getStatus()) || "-1".equals(beforePeroidCollectionOrder.getStatus())) {//上一期催收完成
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } else {//上一期未进催收系统
+                    return true;
+                }
+            }
+        }
+//        if(Constant.FEN.equals(type)){}  分期商城订单，判断上一期是否催收完成
+        return true;
+    }
+
+
+    /**
+     * 查询大额分期订单对应各期借款单，最早进入催收系统的一期(不包括催收完成、停催)
+     *
+     * @return
+     */
+    public MmanUserLoan getFirstMmanUserLoan(MmanUserLoan mmanUserLoanOri) {
+        MmanUserLoan mmanUserLoan;
+        try {
+            if (Constant.BIG.equals(mmanUserLoanOri.getBorrowingType())) {
+                String beforeStr = StringUtils.substringBefore(mmanUserLoanOri.getId(), "-") + "-";
+                String afterStr = StringUtils.substringAfter(mmanUserLoanOri.getId(), "-");
+                int afterInt = Integer.parseInt(afterStr);
+                String loanId;
+                for (int i = 1; i <= afterInt; i++) {
+                    loanId = beforeStr + String.valueOf(i);
+                    mmanUserLoan = mmanUserLoanDao.get(loanId);
+                    if (mmanUserLoan != null && !"5".equals(mmanUserLoan.getLoanStatus()) && !"-1".equals(mmanUserLoan.getLoanStatus())) {//最早进入催收系统的一期(不包括催收完成、停催)
+                        return mmanUserLoan;
+                    }
+                }
+            }
+//            if(Constant.FEN.equals(mmanUserLoanOri.getBorrowingType())){ } 分期商城订单；
+        } catch (Exception e) {
+            logger.error("查询大额分期订单对应各期借款单，最早进入催收系统的一期。出错：", e);
+        }
+        return mmanUserLoanOri;
+    }
+
+    /**
+     * 计算订单当前的逾期天数
+     *
+     * @param mmanUserLoanOri
+     * @return
+     */
+    public int getOverdueDays(MmanUserLoan mmanUserLoanOri) {
+        int pday = 0;
+        try {
+            pday = DateUtil.daysBetween(mmanUserLoanOri.getLoanEndTime(), new Date());
+        } catch (ParseException e) {
+            logger.error("parse failed", e);
+        }
+        return pday;
+    }
+
+    /**
+     * 计算订单当前的逾期天数。大额计算逾期天数，跟之前几期是否催收完成相关
+     * lmy
+     *
+     * @param mmanUserLoanOri
+     * @return
+     */
+    private int getTotalOverdueDays(MmanUserLoan mmanUserLoanOri) {
+        int pday = 0;
+        if (Constant.SMALL.equals(mmanUserLoanOri.getBorrowingType())) {
+            try {
+                pday = DateUtil.daysBetween(mmanUserLoanOri.getLoanEndTime(), new Date());
+            } catch (ParseException e) {
+                logger.error("parse failed", e);
+            }
+        }
+        if (Constant.BIG.equals(mmanUserLoanOri.getBorrowingType())) {
+            try {
+                if (isBeforePeroidCollectionCompleted(mmanUserLoanOri.getId())) {
+                    pday = DateUtil.daysBetween(mmanUserLoanOri.getLoanEndTime(), new Date());
+                } else {
+                    pday = DateUtil.daysBetween(getFirstMmanUserLoan(mmanUserLoanOri).getLoanEndTime(), new Date());
+                }
+            } catch (ParseException e) {
+                logger.error("parse failed", e);
+            }
+        }
+//        if (Constant.FEN.equals(mmanUserLoanOri.getBorrowingType())) { } 分期商城订单
+        return pday;
+    }
+
+    /**
+     * 大额订单，如果上期未催收完成，设置本期催收员列表
+     *
+     * @param loanId
+     * @return
+     */
+    private List<MmanLoanCollectionPerson> setPersonList(String loanId) {
+        List<MmanLoanCollectionPerson> personList = new ArrayList<>();
+        MmanUserLoan mmanUserLoan = mmanUserLoanDao.get(loanId);
+        String firstLoadId = getFirstMmanUserLoan(mmanUserLoan).getId();
+        MmanLoanCollectionOrder mmanLoanCollectionOrder = mmanLoanCollectionOrderDao.getCollectionOrderByLoanId(firstLoadId);
+        String backUserUuid = mmanLoanCollectionOrder.getCurrentCollectionUserId();
+        BackUser backUser = backUserDao.getBackUserByUuid(backUserUuid);
+        MmanLoanCollectionCompany mmanLoanCollectionCompany = mmanLoanCollectionCompanyDao.getCompanyById(backUser.getCompanyId());
+        MmanLoanCollectionPerson mmanLoanCollectionPerson = new MmanLoanCollectionPerson();
+        mmanLoanCollectionPerson.setId(backUser.getId().toString());
+        mmanLoanCollectionPerson.setUserId(backUser.getUuid());
+        mmanLoanCollectionPerson.setLoginName(backUser.getUserAccount());
+        mmanLoanCollectionPerson.setUsername(backUser.getUserName());
+        mmanLoanCollectionPerson.setGroupLevel(backUser.getGroupLevel());
+        mmanLoanCollectionPerson.setCompanyId(backUser.getCompanyId());
+        mmanLoanCollectionPerson.setCompanyName(mmanLoanCollectionCompany.getTitle());
+        mmanLoanCollectionPerson.setUserStatus(backUser.getUserStatus().toString());
+        mmanLoanCollectionPerson.setRealName(backUser.getUserAccount());
+        personList.add(mmanLoanCollectionPerson);
+        return personList;
+    }
+
     @Override
     public void dispatchOrderNew(String loanId, String idNumber, String type) {
         try {
@@ -563,6 +737,7 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
             order.setOrderId(mmanUserLoan.getLoanPyId());
             order.setUserId(mmanUserLoan.getUserId());
             order.setOverdueDays(getOverdueDays(mmanUserLoan));
+            order.setTotalOverdueDays(getTotalOverdueDays(mmanUserLoan));
             order.setPayId(creditLoanPay.getId());
             order.setDispatchName(sysName);
             order.setDispatchTime(now);
@@ -575,11 +750,16 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
             // 区分大小额分别处理
             Map<String, String> personMap = new HashMap<>();
             if (Constant.BIG.equals(type)) {
-                personMap.put("beginDispatchTime", DateUtil.getDateFormat("yyyy-MM-dd 00:00:00"));
-                personMap.put("endDispatchTime", DateUtil.getDateFormat((DateUtil.getBeforeOrAfter(new Date(), 1)), "yyyy-MM-dd HH:mm:ss"));
-                personMap.put("groupLevel", BackConstant.XJX_OVERDUE_LEVEL_F_M1);
-                personMap.put("userStatus", BackConstant.ON);
-                personList = backUserDao.findUnCompleteCollectionOrderByCurrentUnCompleteCountListByMap(personMap);
+                if(isBeforePeroidCollectionCompleted(loanId)){
+                    personMap.put("beginDispatchTime", DateUtil.getDateFormat("yyyy-MM-dd 00:00:00"));
+                    personMap.put("endDispatchTime", DateUtil.getDateFormat((DateUtil.getBeforeOrAfter(new Date(), 1)), "yyyy-MM-dd HH:mm:ss"));
+                    personMap.put("groupLevel", BackConstant.XJX_OVERDUE_LEVEL_F_M1);
+                    personMap.put("userStatus", BackConstant.ON);
+                    personList = backUserDao.findUnCompleteCollectionOrderByCurrentUnCompleteCountListByMap(personMap);
+                }else {
+                    personList = setPersonList(loanId);
+                }
+
                 if (CollectionUtils.isEmpty(personList)) {
                     SysAlertMsg alertMsg = new SysAlertMsg();
                     alertMsg.setId(IdGen.uuid());
@@ -906,22 +1086,6 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
         order.setLastCollectionUserId(order.getCurrentCollectionUserId());//上一催收员
         //更新聚信立报告申请审核状态为初始状态，下一催收员要看需要重新申请
         order.setJxlStatus(BackConstant.XJX_JXL_STATUS_REFUSE);
-    }
-
-    /**
-     * 计算订单当前的逾期天数
-     *
-     * @param mmanUserLoanOri
-     * @return
-     */
-    private int getOverdueDays(MmanUserLoan mmanUserLoanOri) {
-        int pday = 0;
-        try {
-            pday = DateUtil.daysBetween(mmanUserLoanOri.getLoanEndTime(), new Date());
-        } catch (ParseException e) {
-            logger.error("parse failed", e);
-        }
-        return pday;
     }
 
     /**

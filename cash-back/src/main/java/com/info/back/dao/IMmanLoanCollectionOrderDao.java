@@ -13,6 +13,9 @@ import java.util.Map;
 @Repository
 public interface IMmanLoanCollectionOrderDao {
 
+    void upTotalOverdueDays(Map<String, String> map);
+
+    List<String> getOverdueOrder();
 
     List<MmanLoanCollectionOrder> getOrderList(MmanLoanCollectionOrder mmanLoanCollectionOrder);
 
@@ -87,6 +90,8 @@ public interface IMmanLoanCollectionOrderDao {
     String getLatestLoanByUserPhoneAndLoanEndTime(HashMap<String, Object> params);
 
     MmanLoanCollectionOrder getOrderByLoanId(String loanId);
+
+    MmanLoanCollectionOrder getCollectionOrderByLoanId(String loanId);
 
     OrderInfo getStopOrderInfoById(String id);
 

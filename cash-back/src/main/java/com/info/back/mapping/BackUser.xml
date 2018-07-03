@@ -295,7 +295,7 @@
     </select>
 
     <select id="getBackUserByUuid" parameterType="String" resultMap="BaseResultMap">
-	  select u.uuid,u.company_id,u.group_level,u.user_mobile,u.user_name
+	  select u.uuid,u.company_id,u.group_level,u.user_mobile,u.user_name,u.id,u.user_account,u.status
 			from back_user u where u.uuid=#{_parameter}
 	</select>
 

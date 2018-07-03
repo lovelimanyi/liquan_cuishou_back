@@ -243,6 +243,7 @@
                 AND borrowing_type = #{borrowingType}
             </if>
         </where>
+        order by create_time asc
     </select>
 
     <select id="selectCollectionCountByLoanEndTime" parameterType="java.util.Date" resultType="java.lang.Integer">
