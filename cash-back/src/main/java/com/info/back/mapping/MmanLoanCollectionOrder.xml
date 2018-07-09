@@ -203,6 +203,8 @@
             co.`status` != '-1'
         AND co.`status` != '4'
         AND ul.borrowing_type = '1'
+        ORDER BY
+            co.create_date ASC
     </select>
 
     <select id="getCollectionOrderList" resultType="com.info.web.pojo.OrderBaseResult" parameterType="HashMap">

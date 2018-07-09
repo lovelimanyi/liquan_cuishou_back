@@ -60,8 +60,9 @@ public class TaskDealwithOrderUpgrade {
                 if (StringUtils.isEmpty(loanId)) {
                     continue;
                 }
-                DealwithBigOrderUpgradeThread thread = new DealwithBigOrderUpgradeThread(loanId, orderService);
-                pool.execute(thread);
+//                DealwithBigOrderUpgradeThread thread = new DealwithBigOrderUpgradeThread(loanId, orderService);
+//                pool.execute(thread);
+                orderService.dealwithBigOrderUpgrade(loanId);
             } catch (Exception e) {
                 logger.error("处理逾期订单升级出错，借款id: " + loanId);
                 e.printStackTrace();

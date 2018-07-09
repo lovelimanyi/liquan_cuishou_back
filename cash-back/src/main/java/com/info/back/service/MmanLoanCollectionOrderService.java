@@ -628,7 +628,7 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
                 for (int i = 1; i <= afterInt; i++) {
                     loanId = beforeStr + String.valueOf(i);
                     mmanUserLoan = mmanUserLoanDao.get(loanId);
-                    if (mmanUserLoan != null && !"5".equals(mmanUserLoan.getLoanStatus()) && !"-1".equals(mmanUserLoan.getLoanStatus())) {//最早进入催收系统的一期(不包括催收完成、停催)
+                    if (mmanUserLoan != null && !("5".equals(mmanUserLoan.getLoanStatus()) || "-1".equals(mmanUserLoan.getLoanStatus()))) {//最早进入催收系统的一期(不包括催收完成、停催)
                         return mmanUserLoan;
                     }
                 }
