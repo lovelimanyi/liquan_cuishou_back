@@ -949,6 +949,46 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
             logger.info("催收完成订单不允许添加催收记录！订单id: " + collectionOrder.getLoanId());
             return;
         }
+
+        //更新我的催收订单
+        Date now = new Date();
+        MmanLoanCollectionOrder mmanLoanCollectionOrder = new MmanLoanCollectionOrder();
+        if (collectionOrder != null && !BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(collectionOrder.getStatus())) {
+            if (params.get("repaymentTime") == null || params.get("repaymentTime") == "") {//不填承诺还款时间为催收中
+                mmanLoanCollectionOrder.setStatus(BackConstant.XJX_COLLECTION_ORDER_STATE_ING);
+                mmanLoanCollectionOrder.setPromiseRepaymentTime(null);
+            } else {
+                mmanLoanCollectionOrder.setStatus(BackConstant.XJX_COLLECTION_ORDER_STATE_PROMISE);
+                mmanLoanCollectionOrder.setPromiseRepaymentTime(DateUtil.formatDate((String) params.get("repaymentTime"), "yyyy-MM-dd"));
+            }
+        }
+        params.put("currentOverdueLevel", collectionOrder.getCurrentOverdueLevel());
+        params.put("loanId", collectionOrder.getLoanId());
+        mmanLoanCollectionOrder.setLastCollectionTime(now);
+        mmanLoanCollectionOrder.setOperatorName(StringUtils.isNotBlank(user.getUserName()) ? user.getUserName() : "");
+        //根据等级设置当前催收员某等级操作状态，1代表操作过催收单
+        if (BackConstant.XJX_OVERDUE_LEVEL_S1.equals(user.getGroupLevel())) {
+            mmanLoanCollectionOrder.setM1OperateStatus(BackConstant.ON);
+        } else if (BackConstant.XJX_OVERDUE_LEVEL_S2.equals(user.getGroupLevel())) {
+            if ("S1".equals(collectionOrder.getS1Flag()) && collectionOrder.getOverdueDays() <= 10) {
+                mmanLoanCollectionOrder.setM1OperateStatus(BackConstant.ON);
+            } else {
+                mmanLoanCollectionOrder.setM2OperateStatus(BackConstant.ON);
+            }
+        } else if (BackConstant.XJX_OVERDUE_LEVEL_M1_M2
+                .equals(user.getGroupLevel())) {
+            mmanLoanCollectionOrder.setM3OperateStatus(BackConstant.ON);
+        } else if (BackConstant.XJX_OVERDUE_LEVEL_M2_M3
+                .equals(user.getGroupLevel())) {
+            mmanLoanCollectionOrder.setM4OperateStatus(BackConstant.ON);
+        } else {
+            mmanLoanCollectionOrder.setM5OperateStatus(BackConstant.ON);
+        }
+        mmanLoanCollectionOrder.setS1Flag(collectionOrder.getS1Flag());
+        mmanLoanCollectionOrder.setUpdateDate(now);
+        mmanLoanCollectionOrder.setId(collectionOrder.getId());
+        mmanLoanCollectionOrderService.updateRecord(mmanLoanCollectionOrder);
+
         MmanLoanCollectionRecord record = setRecordParam(params, user, collectionOrder);
         String userRealId = (params.get("contactId") == null || "undefined".equals(params.get("contactId").toString())) ? null : params.get("contactId").toString();
         String collectionRecordId = params.get("collectionRecordId") == null ? null : params.get("collectionRecordId").toString();
@@ -993,18 +1033,18 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
         }
         mmanLoanCollectionRecordDao.insert(record);
 
-        String repaymentTime = params.get("repaymentTime") == null ? null : params.get("repaymentTime").toString();
-        MmanLoanCollectionOrder order = new MmanLoanCollectionOrder();
-        order.setId(params.get("orderId") == null ? null : params.get("orderId").toString());
-        if (StringUtils.isNotEmpty(repaymentTime)) {
-            // 更新承诺还款时间
-            order.setPromiseRepaymentTime(DateUtil.getDateTimeFormat(repaymentTime, "yyyy-MM-dd"));
-        } else {
-            order.setPromiseRepaymentTime(collectionOrder.getPromiseRepaymentTime());
-        }
-        // 更新最新催收时间
-        order.setLastCollectionTime(new Date());
-        mmanLoanCollectionOrderDao.updateCollectionOrder(order);
+//        String repaymentTime = params.get("repaymentTime") == null ? null : params.get("repaymentTime").toString();
+//        MmanLoanCollectionOrder order = new MmanLoanCollectionOrder();
+//        order.setId(params.get("orderId") == null ? null : params.get("orderId").toString());
+//        if (StringUtils.isNotEmpty(repaymentTime)) {
+//            // 更新承诺还款时间
+//            order.setPromiseRepaymentTime(DateUtil.getDateTimeFormat(repaymentTime, "yyyy-MM-dd"));
+//        } else {
+//            order.setPromiseRepaymentTime(collectionOrder.getPromiseRepaymentTime());
+//        }
+//        // 更新最新催收时间
+//        order.setLastCollectionTime(new Date());
+//        mmanLoanCollectionOrderDao.updateCollectionOrder(order);
     }
 
     // 获取当前联系人与借款人的关系
