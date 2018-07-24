@@ -329,19 +329,17 @@
     <profiles>
         <profile>
             <!-- 开发环境 -->
-            <id>dev1</id>
+            <id>docker1</id>
             <properties>
-                <environment>dev1</environment><!-- 节点名字environment是自己随意取的 -->
+                <environment>docker1</environment><!-- 节点名字environment是自己随意取的 -->
             </properties>
-            <activation>
-                <activeByDefault>true</activeByDefault><!-- 默认激活该profile节点-->
-            </activation>
+
         </profile>
         <profile>
             <!-- 开发环境 -->
-            <id>dev2</id>
+            <id>docker3</id>
             <properties>
-                <environment>dev2</environment>
+                <environment>docker3</environment>
             </properties>
         </profile>
         <profile>
@@ -352,31 +350,17 @@
             </properties>
         </profile>
         <profile>
-            <!-- uat环境 -->
-            <id>uat</id>
+            <!-- pre环境 -->
+            <id>pre</id>
             <properties>
-                <environment>uat</environment>
+                <environment>pre</environment>
             </properties>
         </profile>
         <profile>
             <!-- hotfixs环境 -->
-            <id>hotfixs</id>
+            <id>docker4</id>
             <properties>
-                <environment>hotfixs</environment>
-            </properties>
-        </profile>
-        <profile>
-            <!-- 测试环境 -->
-            <id>test1</id>
-            <properties>
-                <environment>test1</environment>
-            </properties>
-        </profile>
-        <profile>
-            <!-- 测试环境 -->
-            <id>test2</id>
-            <properties>
-                <environment>test2</environment>
+                <environment>docker4</environment>
             </properties>
         </profile>
         <profile>
@@ -391,6 +375,15 @@
             <properties>
                 <environment>docker2</environment>
             </properties>
+        </profile>
+        <profile>
+            <id>local</id>
+            <properties>
+                <environment>local</environment>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault><!-- 默认激活该profile节点-->
+            </activation>
         </profile>
     </profiles>
 
