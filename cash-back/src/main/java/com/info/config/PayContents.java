@@ -21,4 +21,5 @@ public class PayContents {
     public static final String JXL_OSS_SERVER_URL = propertiesLoader.getProperty("jxl.oss.server.rul");//oss地址
     //获取商品名称
     public static final String PRODUCT_NAME_URL = propertiesLoader.getProperty("productName.rul");//获取商品名地址
+    public static final String XJX_GET_USERINFOS = propertiesLoader.getProperty("XJX.GET.userInfos");//获取cashman库中用户个人用户信息、银行卡、联系人等信息
 }

@@ -447,28 +447,28 @@ public class syncUtils {
 		mmanUserRela.setDelFlag("0");
 		if (flag.equals("firstContact")){//第一联系人
 			mmanUserRela.setId(IdGen.uuid());
-			phoneNmuber = String.valueOf(userInfo.get("first_contact_phone"));
+			phoneNmuber = String.valueOf(userInfo.get("firstContactPhone"));
 			mmanUserRela.setContactsKey("1");
-			mmanUserRela.setInfoName(String.valueOf(userInfo.get("first_contact_name")));
+			mmanUserRela.setInfoName(String.valueOf(userInfo.get("firstContactName")));
 			mmanUserRela.setInfoValue(phoneNmuber);
-			mmanUserRela.setRelaKey(String.valueOf(userInfo.get("frist_contact_relation")));
+			mmanUserRela.setRelaKey(String.valueOf(userInfo.get("fristContactRelation")));
 			//保存第一联系人
 			saveUserRael(localDataDao,contactList,mmanUserRela,phoneNmuber);
 		}else if (flag.equals("secondContact")){//第二联系人
 			mmanUserRela.setId(IdGen.uuid());
-			phoneNmuber = String.valueOf(userInfo.get("second_contact_phone"));
+			phoneNmuber = String.valueOf(userInfo.get("secondContactPhone"));
 			mmanUserRela.setContactsKey("2");
-			mmanUserRela.setInfoName(String.valueOf(userInfo.get("second_contact_name")));
+			mmanUserRela.setInfoName(String.valueOf(userInfo.get("secondContactName")));
 			mmanUserRela.setInfoValue(phoneNmuber);
-			mmanUserRela.setRelaKey(String.valueOf(userInfo.get("second_contact_relation")));
+			mmanUserRela.setRelaKey(String.valueOf(userInfo.get("secondContactRelation")));
 			//保存第二联系人
 			saveUserRael(localDataDao,contactList,mmanUserRela,phoneNmuber);
 		}else {//其他联系人
 			for(int i=0;i<userContactsList.size();i++){
 				mmanUserRela.setId(IdGen.uuid());
 				HashMap<String,Object> userRela = userContactsList.get(i);
-				phoneNmuber = String.valueOf(userRela.get("contact_phone"));
-				mmanUserRela.setInfoName(String.valueOf(userRela.get("contact_name")));
+				phoneNmuber = String.valueOf(userRela.get("contactPhone"));
+				mmanUserRela.setInfoName(String.valueOf(userRela.get("contactName")));
 				mmanUserRela.setInfoValue(phoneNmuber);
 				//保存其他联系人
 				saveUserRael(localDataDao,contactList,mmanUserRela,phoneNmuber);
@@ -524,13 +524,17 @@ public class syncUtils {
 	private static void saveUpdateSysUserBankCard(String userId,ILocalDataDao localDataDao,HashMap<String,Object> cardInfo,String uuid){
 		if (cardInfo != null){
 			SysUserBankCard bankCard = new SysUserBankCard();
-			bankCard.setUserId(String.valueOf(cardInfo.get("user_id")));
+			bankCard.setUserId(String.valueOf(cardInfo.get("userId")));
 			bankCard.setBankCard(String.valueOf(cardInfo.get("card_no")));
-			bankCard.setDepositBank(String.valueOf(cardInfo.get("bank_name")));
+			bankCard.setDepositBank(String.valueOf(cardInfo.get("bankName")));
 			bankCard.setBankInstitutionNo(String.valueOf(cardInfo.get("bank_id")));
-			bankCard.setName(String.valueOf(cardInfo.get("open_name")));
+			bankCard.setName(String.valueOf(cardInfo.get("openName")));
 			bankCard.setMobile(String.valueOf(cardInfo.get("phone")));
-			bankCard.setCityName(String.valueOf(cardInfo.get("bank_address")));
+			if (cardInfo.get("bank_address") != null){
+				bankCard.setCityName(String.valueOf(cardInfo.get("bank_address")));
+			}else {
+				bankCard.setCityName("");
+			}
 			if (uuid != null && !uuid.equals("")){
 				bankCard.setId(IdGen.uuid());
 				localDataDao.saveSysUserBankCard(bankCard);
