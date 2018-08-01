@@ -83,6 +83,7 @@ public class HttpUtil {
 
         httpPost.setEntity(new StringEntity(params.toString(), "utf-8"));
         HttpClient httpClient = new DefaultHttpClient();
+        logger.error(params);
         try {
             HttpResponse httpResponse = httpClient.execute(httpPost);
 //            BufferedReader reader = new BufferedReader(new InputStreamReader(
