@@ -78,17 +78,18 @@ public class HttpUtil {
 //        logger.info("请求参数:" + params.toString());
         String result = "";
         HttpPost httpPost = new HttpPost(url);
-        StringEntity stringEntity = new StringEntity(params.toString(), "utf-8");
-        httpPost.setHeader("Content-Type", "application/json;charset=utf-8");
+        httpPost.addHeader("Content-Type", "application/json;charset=utf-8");
+        httpPost.setHeader("Accept", "application/json;charset=utf-8");
 
-        httpPost.setEntity(stringEntity);
+        httpPost.setEntity(new StringEntity(params.toString(), "utf-8"));
         HttpClient httpClient = new DefaultHttpClient();
         try {
             HttpResponse httpResponse = httpClient.execute(httpPost);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(
-                    httpResponse.getEntity().getContent()));
+//            BufferedReader reader = new BufferedReader(new InputStreamReader(
+//                    httpResponse.getEntity().getContent()));
+            InputStreamReader isr = new InputStreamReader(httpResponse.getEntity().getContent(), "UTF-8");
+            BufferedReader reader = new BufferedReader(isr);
             String resultStr = reader.readLine();
-//            logger.info("resultStr=" + resultStr);
             while (null != resultStr) {
                 result = resultStr;
                 resultStr = reader.readLine();

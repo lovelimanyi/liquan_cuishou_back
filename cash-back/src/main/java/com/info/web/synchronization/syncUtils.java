@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.info.back.utils.BackConstant;
 import com.info.back.utils.IdGen;
@@ -423,8 +424,44 @@ public class syncUtils {
 			saveUpdateSysUserBankCard(userId,localDataDao,cardInfo,null);
 		}
 	}
+
+	public static void saveUserInfo(ILocalDataDao localDataDao, String payId, String userId, Map<String, Object> userInfo, List<Map<String, Object>> userContactsList, Map<String, Object> cardInfo) {
+		if(checkUserInfo(localDataDao,userId)) {//如果借款人信息不存在
+			//保存用户信息
+			userInfo.put("user_from", 0);
+			localDataDao.saveMmanUserInfo(userInfo);
+			//保存用户联系人
+			saveMmanUserRela(payId,userInfo, userContactsList,localDataDao);
+			//保存银行卡
+			saveUpdateSysUserBankCard(userId,localDataDao,cardInfo, IdGen.uuid());
+		}else{//借款人信息存在
+			if(checkUserRela(localDataDao,userId)){//通讯录不存在
+				//保存用户联系人
+				saveMmanUserRela(payId,userInfo, userContactsList,localDataDao);
+			}
+			//更新银行卡
+			saveUpdateSysUserBankCard(userId,localDataDao,cardInfo,null);
+		}
+	}
+
 	//保存用户联系人
 	private static void saveMmanUserRela(String payId,HashMap<String,Object> userInfo,List<HashMap<String,Object>> userContactsList,ILocalDataDao localDataDao){
+		List<ContactList> contactList = null;
+		try{
+			contactList = JxlJsonUtil.operaJxlDetail(String.valueOf(userInfo.get("jxl_detail")));
+		}catch(Exception e){
+			loger.error("解析聚信立异常-payId"+payId);
+		}
+		MmanUserRela mmanUserRela = null;
+		//保存第一联系人
+		saveMmanUserRelas("firstContact",mmanUserRela,userInfo,userContactsList,contactList,localDataDao);
+		//保存第二联系人
+		saveMmanUserRelas("secondContact",mmanUserRela,userInfo,userContactsList,contactList,localDataDao);
+		//保存其他联系人
+		saveMmanUserRelas("otherContact",mmanUserRela,userInfo,userContactsList,contactList,localDataDao);
+	}
+
+	private static void saveMmanUserRela(String payId,Map<String,Object> userInfo,List<Map<String,Object>> userContactsList,ILocalDataDao localDataDao){
 		List<ContactList> contactList = null;
 		try{
 			contactList = JxlJsonUtil.operaJxlDetail(String.valueOf(userInfo.get("jxl_detail")));
@@ -475,6 +512,44 @@ public class syncUtils {
 			}
 		}
 	}
+
+	private static void saveMmanUserRelas(String flag,MmanUserRela mmanUserRela, Map<String, Object> userInfo, List<Map<String, Object>> userContactsList, List<ContactList> contactList,ILocalDataDao localDataDao) {
+		mmanUserRela = new MmanUserRela();
+		String phoneNmuber = null;
+		mmanUserRela.setUserId(String.valueOf(userInfo.get("id")));
+		mmanUserRela.setDelFlag("0");
+		if (flag.equals("firstContact")){//第一联系人
+			mmanUserRela.setId(IdGen.uuid());
+			phoneNmuber = String.valueOf(userInfo.get("firstContactPhone"));
+			mmanUserRela.setContactsKey("1");
+			mmanUserRela.setInfoName(String.valueOf(userInfo.get("firstContactName")));
+			mmanUserRela.setInfoValue(phoneNmuber);
+			mmanUserRela.setRelaKey(String.valueOf(userInfo.get("fristContactRelation")));
+			//保存第一联系人
+			saveUserRael(localDataDao,contactList,mmanUserRela,phoneNmuber);
+		}else if (flag.equals("secondContact")){//第二联系人
+			mmanUserRela.setId(IdGen.uuid());
+			phoneNmuber = String.valueOf(userInfo.get("secondContactPhone"));
+			mmanUserRela.setContactsKey("2");
+			mmanUserRela.setInfoName(String.valueOf(userInfo.get("secondContactName")));
+			mmanUserRela.setInfoValue(phoneNmuber);
+			mmanUserRela.setRelaKey(String.valueOf(userInfo.get("secondContactRelation")));
+			//保存第二联系人
+			saveUserRael(localDataDao,contactList,mmanUserRela,phoneNmuber);
+		}else {//其他联系人
+			if (userContactsList != null ){
+				for(int i=0;i<userContactsList.size();i++){
+					mmanUserRela.setId(IdGen.uuid());
+					Map<String,Object> userRela = userContactsList.get(i);
+					phoneNmuber = String.valueOf(userRela.get("contactPhone"));
+					mmanUserRela.setInfoName(String.valueOf(userRela.get("contactName")));
+					mmanUserRela.setInfoValue(phoneNmuber);
+					//保存其他联系人
+					saveUserRael(localDataDao,contactList,mmanUserRela,phoneNmuber);
+				}
+			}
+		}
+	}
 	/**
 	 * 设置联系人属性 --保存联系人
 	 * @param contactList
@@ -522,6 +597,32 @@ public class syncUtils {
 	}
 	// 保存-更新用户银行卡
 	private static void saveUpdateSysUserBankCard(String userId,ILocalDataDao localDataDao,HashMap<String,Object> cardInfo,String uuid){
+		if (cardInfo != null){
+			SysUserBankCard bankCard = new SysUserBankCard();
+			bankCard.setUserId(String.valueOf(cardInfo.get("userId")));
+			bankCard.setBankCard(String.valueOf(cardInfo.get("card_no")));
+			bankCard.setDepositBank(String.valueOf(cardInfo.get("bankName")));
+			bankCard.setBankInstitutionNo(String.valueOf(cardInfo.get("bank_id")));
+			bankCard.setName(String.valueOf(cardInfo.get("openName")));
+			bankCard.setMobile(String.valueOf(cardInfo.get("phone")));
+			if (cardInfo.get("bank_address") != null){
+				bankCard.setCityName(String.valueOf(cardInfo.get("bank_address")));
+			}else {
+				bankCard.setCityName("");
+			}
+			if (uuid != null && !uuid.equals("")){
+				bankCard.setId(IdGen.uuid());
+				localDataDao.saveSysUserBankCard(bankCard);
+			}else{
+				localDataDao.updateSysUserBankCard(bankCard);
+			}
+		}else {
+			loger.error("银行卡信息为空：userId="+userId);
+		}
+
+	}
+
+	private static void saveUpdateSysUserBankCard(String userId,ILocalDataDao localDataDao,Map<String,Object> cardInfo,String uuid){
 		if (cardInfo != null){
 			SysUserBankCard bankCard = new SysUserBankCard();
 			bankCard.setUserId(String.valueOf(cardInfo.get("userId")));

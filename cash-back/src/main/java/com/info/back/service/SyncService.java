@@ -57,9 +57,10 @@ public class SyncService implements ISyncService {
         CreditLoanPay creditLoanPay1 = creditLoanPayDao.get(payId);
         if (creditLoanPay1 == null){
             logger.info("accept_overdue_order_begin=" + loanId);
-            HashMap<String,Object> userInfo = null;
-            HashMap<String, Object> cardInfo = null;
-            List<HashMap<String, Object>> userContactsList = null;
+            Map<String,Object> userInfo = null;
+            List<Map<String, Object>> cardInfoList = null;
+            Map<String, Object> cardInfo = null;
+            List<Map<String, Object>> userContactsList = null;
             try{
                 Map<String, String> map = new HashMap();
                 map.put("userId", loan.getUserId());
@@ -68,9 +69,10 @@ public class SyncService implements ISyncService {
                 Map<String, Object> o = (Map<String, Object>) JSONObject.parse(returnInfo);
                 if(o != null && "00".equals(String.valueOf(o.get("code")))){
                     Map<String,Object> data = (Map<String, Object>) o.get("data");
-                    userInfo = (HashMap<String, Object>) data.get("user");
-                    cardInfo = (HashMap<String, Object>) data.get("userCardInfoList");
-                    userContactsList = (List<HashMap<String, Object>>) data.get("userContacts");
+                    userInfo = (Map<String, Object>) data.get("user");
+                    cardInfoList = (List<Map<String, Object>>) data.get("userCardInfoList");
+                    cardInfo = cardInfoList.get(0);
+                    userContactsList = (List<Map<String, Object>>) data.get("userContacts");
                 }
             }catch (Exception e){
                 logger.error("调用cashman获取用户信息出错：" + e);
@@ -133,7 +135,7 @@ public class SyncService implements ISyncService {
 
             //派单
 //            taskJobMiddleService.dispatchforLoanId(loanId,userInfo.get("id_number").toString(),Constant.BIG);
-            orderService.dispatchOrderNew(loanId,userInfo.get("id_number").toString(),Constant.BIG);
+            orderService.dispatchOrderNew(loanId,userInfo.get("idNumber").toString(),Constant.BIG);
             //如果还款详情不为空则保存还款详情
             if(null!=repaymentDetails && 0<repaymentDetails.size()){
                 HashMap<String,String> reMap = new HashMap<String,String>();

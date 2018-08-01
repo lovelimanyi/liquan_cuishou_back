@@ -350,9 +350,9 @@
 			<if test="realnameStatus != null" >
 				realname_status,
 			</if>
-			<if test="realnameTime != null" >
-				realname_time,
-			</if>
+			<!--<if test="realnameTime != null" >-->
+				<!--realname_time,-->
+			<!--</if>-->
 			<if test="idNumber != null" >
 				id_number,
 			</if>
@@ -437,15 +437,15 @@
 			<if test="secondContactRelation != null" >
 				second_contact_relation,
 			</if>
-			<if test="createTime != null" >
-				create_time,
-			</if>
+			<!--<if test="createTime != null" >-->
+				<!--create_time,-->
+			<!--</if>-->
 			<if test="createIp != null" >
 				create_ip,
 			</if>
-			<if test="updateTime != null" >
-				update_time,
-			</if>
+			<!--<if test="updateTime != null" >-->
+				<!--update_time,-->
+			<!--</if>-->
 			<if test="status != null" >
 				status,
 			</if>
@@ -601,9 +601,9 @@
 			<if test="realnameStatus != null" >
 				#{realnameStatus,jdbcType=INTEGER},
 			</if>
-			<if test="realnameTime != null" >
-				#{realnameTime,jdbcType=TIMESTAMP},
-			</if>
+			<!--<if test="realnameTime != null" >-->
+				<!--#{realnameTime,jdbcType=TIMESTAMP},-->
+			<!--</if>-->
 			<if test="idNumber != null" >
 				#{idNumber,jdbcType=VARCHAR},
 			</if>
@@ -688,15 +688,15 @@
 			<if test="secondContactRelation != null" >
 				#{secondContactRelation,jdbcType=INTEGER},
 			</if>
-			<if test="createTime != null" >
-				#{createTime,jdbcType=TIMESTAMP},
-			</if>
+			<!--<if test="createTime != null" >-->
+				<!--#{createTime,jdbcType=TIMESTAMP},-->
+			<!--</if>-->
 			<if test="createIp != null" >
 				#{createIp,jdbcType=VARCHAR},
 			</if>
-			<if test="updateTime != null" >
-				#{updateTime,jdbcType=TIMESTAMP},
-			</if>
+			<!--<if test="updateTime != null" >-->
+				<!--#{updateTime,jdbcType=TIMESTAMP},-->
+			<!--</if>-->
 			<if test="status != null" >
 				#{status,jdbcType=INTEGER},
 			</if>
