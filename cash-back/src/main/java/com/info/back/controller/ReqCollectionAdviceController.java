@@ -35,8 +35,11 @@ public class ReqCollectionAdviceController extends BaseController {
         if (req.getOrderType() == 1){ //大额
             loanId = req.getLoanId()+"-"+req.getTermNumber();
             response = reqCollectionAdviceDao.getCollectionAdvice(loanId);
-            response.setTermNumber(req.getTermNumber());
-            response.setLoanId(req.getLoanId());
+            if (null != response){
+                response.setTermNumber(req.getTermNumber());
+                response.setLoanId(req.getLoanId());
+            }
+
         }else {
             response = reqCollectionAdviceDao.getCollectionAdvice(loanId);
         }
