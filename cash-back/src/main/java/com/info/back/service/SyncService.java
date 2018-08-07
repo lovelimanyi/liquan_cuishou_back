@@ -1,7 +1,10 @@
 package com.info.back.service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.info.back.dao.ICreditLoanPayDao;
 import com.info.back.dao.ILocalDataDao;
+import com.info.config.PayContents;
 import com.info.constant.Constant;
 import com.info.vo.bigAmount.Loan;
 import com.info.vo.bigAmount.Repayment;
@@ -13,6 +16,7 @@ import com.info.web.pojo.MmanUserLoan;
 import com.info.web.synchronization.dao.IDataDao;
 import com.info.web.synchronization.syncUtils;
 import com.info.web.util.DateUtil;
+import com.info.web.util.HttpUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.event.EventListenerSupport;
 import org.apache.log4j.Logger;
@@ -23,6 +27,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 类描述：
@@ -52,14 +57,39 @@ public class SyncService implements ISyncService {
         CreditLoanPay creditLoanPay1 = creditLoanPayDao.get(payId);
         if (creditLoanPay1 == null){
             logger.info("accept_overdue_order_begin=" + loanId);
-            HashMap<String,String> map = new HashMap<>();
-            map.put("USER_ID", loan.getUserId());
-            logger.info("get_userInfo=" + userId);
-            HashMap<String, Object> userInfo = dataDao.getUserInfo(map);
-            logger.info("get_userCardInfo=" + userId);
-            HashMap<String, Object> cardInfo = dataDao.getUserCardInfo(map);	//银行卡--app端
-            logger.info("get_userContacts=" + userId);
-            List<HashMap<String, Object>> userContactsList = dataDao.getUserContacts(map);	//用户联系人--app端
+            Map<String,Object> userInfo = null;
+            List<Map<String, Object>> cardInfoList = null;
+            Map<String, Object> cardInfo = null;
+            List<Map<String, Object>> userContactsList = null;
+            try{
+                Map<String, String> map = new HashMap();
+                map.put("userId", loan.getUserId());
+                map.put("merchantNumber",loan.getMerchantNo());
+                String returnInfo = HttpUtil.getInstance().doPost2(PayContents.XJX_GET_USERINFOS,JSON.toJSONString(map));
+                Map<String, Object> o = (Map<String, Object>) JSONObject.parse(returnInfo);
+                if(o != null && "00".equals(String.valueOf(o.get("code")))){
+                    Map<String,Object> data = (Map<String, Object>) o.get("data");
+                    userInfo = (Map<String, Object>) data.get("user");
+                    cardInfoList = (List<Map<String, Object>>) data.get("userCardInfoList");
+                    cardInfo = cardInfoList.get(0);
+                    userContactsList = (List<Map<String, Object>>) data.get("userContacts");
+                }
+            }catch (Exception e){
+                logger.error("调用cashman获取用户信息出错：" + e);
+                e.printStackTrace();
+                return;
+            }
+
+
+
+//            HashMap<String, String> map2 = new HashMap();
+//            map2.put("USER_ID", loan.getUserId());
+//            logger.info("get_userInfo=" + userId);
+//            HashMap<String, Object> userInfo = dataDao.getUserInfo(map2);
+//            logger.info("get_userCardInfo=" + userId);
+//            HashMap<String, Object> cardInfo = dataDao.getUserCardInfo(map2);	//银行卡--app端
+//            logger.info("get_userContacts=" + userId);
+//            List<HashMap<String, Object>> userContactsList = dataDao.getUserContacts(map2);	//用户联系人--app端
 
             //保存借款表-逾期同步
             MmanUserLoan mmanUserLoan = new MmanUserLoan();
@@ -105,7 +135,7 @@ public class SyncService implements ISyncService {
 
             //派单
 //            taskJobMiddleService.dispatchforLoanId(loanId,userInfo.get("id_number").toString(),Constant.BIG);
-            orderService.dispatchOrderNew(loanId,userInfo.get("id_number").toString(),Constant.BIG);
+            orderService.dispatchOrderNew(loanId,userInfo.get("idNumber").toString(),Constant.BIG);
             //如果还款详情不为空则保存还款详情
             if(null!=repaymentDetails && 0<repaymentDetails.size()){
                 HashMap<String,String> reMap = new HashMap<String,String>();

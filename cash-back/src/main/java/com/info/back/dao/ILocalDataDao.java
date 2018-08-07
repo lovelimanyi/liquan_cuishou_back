@@ -148,4 +148,6 @@ public interface ILocalDataDao {
 	public String checkLoanStatus(HashMap<String, String> map);
 
 	void deleteOrderAndOther(String loanId);
+
+    void saveMmanUserInfo(Map<String, Object> userInfo);
 }

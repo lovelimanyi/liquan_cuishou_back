@@ -74,6 +74,36 @@ public class HttpUtil {
     }
 
 
+    public String doPost2(String url, String params) {
+//        logger.info("请求参数:" + params.toString());
+        String result = "";
+        HttpPost httpPost = new HttpPost(url);
+        httpPost.addHeader("Content-Type", "application/json;charset=utf-8");
+        httpPost.setHeader("Accept", "application/json;charset=utf-8");
+
+        httpPost.setEntity(new StringEntity(params.toString(), "utf-8"));
+        HttpClient httpClient = new DefaultHttpClient();
+        logger.error(params);
+        try {
+            HttpResponse httpResponse = httpClient.execute(httpPost);
+//            BufferedReader reader = new BufferedReader(new InputStreamReader(
+//                    httpResponse.getEntity().getContent()));
+            InputStreamReader isr = new InputStreamReader(httpResponse.getEntity().getContent(), "UTF-8");
+            BufferedReader reader = new BufferedReader(isr);
+            String resultStr = reader.readLine();
+            while (null != resultStr) {
+                result = resultStr;
+                resultStr = reader.readLine();
+            }
+        } catch (Exception e) {
+            logger.error("调用异常：{}", e);
+        } finally {
+            httpClient.getConnectionManager().shutdown();
+        }
+        return result;
+    }
+
+
     public static String dopostMap(String url, Map<String, String> params) {
         String result = "";
         // 创建默认的httpClient实例.    

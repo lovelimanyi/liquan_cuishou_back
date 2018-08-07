@@ -330,176 +330,680 @@
 			)
 	</insert>
 	<insert id="saveMmanUserInfo" parameterType="HashMap">
-		<![CDATA[
-			insert into mman_user_info(
+		insert into mman_user_info
+		<trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="id != null" >
 				id,
+			</if>
+			<if test="userName != null" >
 				user_name,
+			</if>
+			<if test="password != null" >
 				password,
+			</if>
+			<if test="payPassword != null" >
 				pay_password,
+			</if>
+			<if test="realname != null" >
 				realname,
+			</if>
+			<if test="realnameStatus != null" >
 				realname_status,
-				realname_time,
+			</if>
+			<!--<if test="realnameTime != null" >-->
+				<!--realname_time,-->
+			<!--</if>-->
+			<if test="idNumber != null" >
 				id_number,
+			</if>
+			<if test="userSex != null" >
 				user_sex,
+			</if>
+			<if test="userAge != null" >
 				user_age,
+			</if>
+			<if test="qq != null" >
 				qq,
+			</if>
+			<if test="userPhone != null" >
 				user_phone,
+			</if>
+			<if test="taobaoAccount != null" >
 				taobao_account,
+			</if>
+			<if test="email != null" >
 				email,
+			</if>
+			<if test="wechatAccount != null" >
 				wechat_account,
+			</if>
+			<if test="education != null" >
 				education,
+			</if>
+			<if test="maritalStatus != null" >
 				marital_status,
+			</if>
+			<if test="presentAddress != null" >
 				present_address,
+			</if>
+			<if test="presentAddressDistinct != null" >
 				present_address_distinct,
+			</if>
+			<if test="presentLatitude != null" >
 				present_latitude,
+			</if>
+			<if test="presentLongitude != null" >
 				present_longitude,
+			</if>
+			<if test="presentPeriod != null" >
 				present_period,
+			</if>
+			<if test="companyName != null" >
 				company_name,
+			</if>
+			<if test="companyAddress != null" >
 				company_address,
+			</if>
+			<if test="companyAddressDistinct != null" >
 				company_address_distinct,
+			</if>
+			<if test="companyLongitude != null" >
 				company_longitude,
+			</if>
+			<if test="companyLatitude != null" >
 				company_latitude,
+			</if>
+			<if test="companyPhone != null" >
 				company_phone,
+			</if>
+			<if test="companyPeriod != null" >
 				company_period,
+			</if>
+			<if test="firstContactName != null" >
 				first_contact_name,
+			</if>
+			<if test="firstContactPhone != null" >
 				first_contact_phone,
+			</if>
+			<if test="fristContactRelation != null" >
 				frist_contact_relation,
+			</if>
+			<if test="secondContactName != null" >
 				second_contact_name,
+			</if>
+			<if test="secondContactPhone != null" >
 				second_contact_phone,
+			</if>
+			<if test="secondContactRelation != null" >
 				second_contact_relation,
-				create_time,
+			</if>
+			<!--<if test="createTime != null" >-->
+				<!--create_time,-->
+			<!--</if>-->
+			<if test="createIp != null" >
 				create_ip,
-				update_time,
+			</if>
+			<!--<if test="updateTime != null" >-->
+				<!--update_time,-->
+			<!--</if>-->
+			<if test="status != null" >
 				status,
+			</if>
+			<if test="inviteUserid != null" >
 				invite_userid,
+			</if>
+			<if test="isSave != null" >
 				is_save,
+			</if>
+			<if test="headPortrait != null" >
 				head_portrait,
+			</if>
+			<if test="idcardImgZ != null" >
 				idcard_img_z,
+			</if>
+			<if test="idcardImgF != null" >
 				idcard_img_f,
+			</if>
+			<if test="customerType != null" >
 				customer_type,
+			</if>
+			<if test="amountMin != null" >
 				amount_min,
+			</if>
+			<if test="amountMax != null" >
 				amount_max,
+			</if>
+			<if test="amountAvailable != null" >
 				amount_available,
+			</if>
+			<if test="equipmentNumber != null" >
 				equipment_number,
+			</if>
+			<if test="zmScore != null" >
 				zm_score,
+			</if>
+			<if test="zmScoreTime != null" >
 				zm_score_time,
+			</if>
+			<if test="zmIndustyBlack != null" >
 				zm_industy_black,
+			</if>
+			<if test="zmOver != null" >
 				zm_over,
+			</if>
+			<if test="zmNoPayOver != null" >
 				zm_no_pay_over,
+			</if>
+			<if test="zmIndustyTime != null" >
 				zm_industy_time,
+			</if>
+			<if test="zmStatus != null" >
 				zm_status,
+			</if>
+			<if test="myHb != null" >
 				my_hb,
+			</if>
+			<if test="myHbTime != null" >
 				my_hb_time,
+			</if>
+			<if test="jxlToken != null" >
 				jxl_token,
+			</if>
+			<if test="jxlTokenTime != null" >
 				jxl_token_time,
+			</if>
+			<if test="jxlStatus != null" >
 				jxl_status,
-				jxl_detail,
+			</if>
+			<if test="jxlDetailTime != null" >
 				jxl_detail_time,
+			</if>
+			<if test="jxlZjDkNum != null" >
 				jxl_zj_dk_num,
+			</if>
+			<if test="jxlBjDkNum != null" >
 				jxl_bj_dk_num,
+			</if>
+			<if test="jxlYjHf != null" >
 				jxl_yj_hf,
+			</if>
+			<if test="jxlLink2Days != null" >
 				jxl_link2_days,
+			</if>
+			<if test="jxlLink1Days != null" >
 				jxl_link1_days,
+			</if>
+			<if test="jxlLink2Num != null" >
 				jxl_link2_num,
+			</if>
+			<if test="jxlLink1Num != null" >
 				jxl_link1_num,
+			</if>
+			<if test="jxlLink2Order != null" >
 				jxl_link2_order,
+			</if>
+			<if test="jxlLink1Order != null" >
 				jxl_link1_order,
+			</if>
+			<if test="jxlGjTs != null" >
 				jxl_gj_ts,
+			</if>
+			<if test="jxlHtPhoneNum != null" >
 				jxl_ht_phone_num,
+			</if>
+			<if test="jxlAmthNum != null" >
 				jxl_amth_num,
+			</if>
+			<if test="jxlPhoneRegDays != null" >
 				jxl_phone_reg_days,
+			</if>
+			<if test="jxlTime != null" >
 				jxl_time,
+			</if>
+			<if test="userContactSize != null" >
 				user_contact_size,
+			</if>
+			<if test="historyOverNum != null" >
 				history_over_num,
+			</if>
+			<if test="lastOverDays != null" >
 				last_over_days,
+			</if>
+			<if test="csjy != null" >
 				csjy,
-				user_from
-			)values(
-				#{id},
-				#{user_name},
-				#{password},
-				#{pay_password},
-				#{realname},
-				#{realname_status},
-				#{realname_time},
-				#{id_number},
-				#{user_sex},
-				#{user_age},
-				#{qq},
-				#{user_phone},
-				#{taobao_account},
-				#{email},
-				#{wechat_account},
-				#{education},
-				#{marital_status},
-				#{present_address},
-				#{present_address_distinct},
-				#{present_latitude},
-				#{present_longitude},
-				#{present_period},
-				#{company_name},
-				#{company_address},
-				#{company_address_distinct},
-				#{company_longitude},
-				#{company_latitude},
-				#{company_phone},
-				#{company_period},
-				#{first_contact_name},
-				#{first_contact_phone},
-				#{frist_contact_relation},
-				#{second_contact_name},
-				#{second_contact_phone},
-				#{second_contact_relation},
-				#{create_time},
-				#{create_ip},
-				#{update_time},
-				#{status},
-				#{invite_userid},
-				#{is_save},
-				#{head_portrait},
-				#{idcard_img_z},
-				#{idcard_img_f},
-				#{customer_type},
-				#{amount_min},
-				#{amount_max},
-				#{amount_available},
-				#{equipment_number},
-				#{zm_score},
-				#{zm_score_time},
-				#{zm_industy_black},
-				#{zm_over},
-				#{zm_no_pay_over},
-				#{zm_industy_time},
-				#{zm_status},
-				#{my_hb},
-				#{my_hb_time},
-				#{jxl_token},
-				#{jxl_token_time},
-				#{jxl_status},
-				#{jxl_detail},
-				#{jxl_detail_time},
-				#{jxl_zj_dk_num},
-				#{jxl_bj_dk_num},
-				#{jxl_yj_hf},
-				#{jxl_link2_days},
-				#{jxl_link1_days},
-				#{jxl_link2_num},
-				#{jxl_link1_num},
-				#{jxl_link2_order},
-				#{jxl_link1_order},
-				#{jxl_gj_ts},
-				#{jxl_ht_phone_num},
-				#{jxl_amth_num},
-				#{jxl_phone_reg_days},
-				#{jxl_time},
-				#{user_contact_size},
-				#{history_over_num},
-				#{last_over_days},
-				#{csjy},
-				#{user_from}
-			)
-		]]>
+			</if>
+			<if test="userFrom != null" >
+				user_from,
+			</if>
+			<if test="userPhones != null" >
+				user_phones,
+			</if>
+			<if test="jxlDetail != null" >
+				jxl_detail,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="id != null" >
+				#{id,jdbcType=VARCHAR},
+			</if>
+			<if test="userName != null" >
+				#{userName,jdbcType=VARCHAR},
+			</if>
+			<if test="password != null" >
+				#{password,jdbcType=VARCHAR},
+			</if>
+			<if test="payPassword != null" >
+				#{payPassword,jdbcType=VARCHAR},
+			</if>
+			<if test="realname != null" >
+				#{realname,jdbcType=VARCHAR},
+			</if>
+			<if test="realnameStatus != null" >
+				#{realnameStatus,jdbcType=INTEGER},
+			</if>
+			<!--<if test="realnameTime != null" >-->
+				<!--#{realnameTime,jdbcType=TIMESTAMP},-->
+			<!--</if>-->
+			<if test="idNumber != null" >
+				#{idNumber,jdbcType=VARCHAR},
+			</if>
+			<if test="userSex != null" >
+				#{userSex,jdbcType=VARCHAR},
+			</if>
+			<if test="userAge != null" >
+				#{userAge,jdbcType=INTEGER},
+			</if>
+			<if test="qq != null" >
+				#{qq,jdbcType=VARCHAR},
+			</if>
+			<if test="userPhone != null" >
+				#{userPhone,jdbcType=VARCHAR},
+			</if>
+			<if test="taobaoAccount != null" >
+				#{taobaoAccount,jdbcType=VARCHAR},
+			</if>
+			<if test="email != null" >
+				#{email,jdbcType=VARCHAR},
+			</if>
+			<if test="wechatAccount != null" >
+				#{wechatAccount,jdbcType=VARCHAR},
+			</if>
+			<if test="education != null" >
+				#{education,jdbcType=INTEGER},
+			</if>
+			<if test="maritalStatus != null" >
+				#{maritalStatus,jdbcType=INTEGER},
+			</if>
+			<if test="presentAddress != null" >
+				#{presentAddress,jdbcType=VARCHAR},
+			</if>
+			<if test="presentAddressDistinct != null" >
+				#{presentAddressDistinct,jdbcType=VARCHAR},
+			</if>
+			<if test="presentLatitude != null" >
+				#{presentLatitude,jdbcType=VARCHAR},
+			</if>
+			<if test="presentLongitude != null" >
+				#{presentLongitude,jdbcType=VARCHAR},
+			</if>
+			<if test="presentPeriod != null" >
+				#{presentPeriod,jdbcType=INTEGER},
+			</if>
+			<if test="companyName != null" >
+				#{companyName,jdbcType=VARCHAR},
+			</if>
+			<if test="companyAddress != null" >
+				#{companyAddress,jdbcType=VARCHAR},
+			</if>
+			<if test="companyAddressDistinct != null" >
+				#{companyAddressDistinct,jdbcType=VARCHAR},
+			</if>
+			<if test="companyLongitude != null" >
+				#{companyLongitude,jdbcType=VARCHAR},
+			</if>
+			<if test="companyLatitude != null" >
+				#{companyLatitude,jdbcType=VARCHAR},
+			</if>
+			<if test="companyPhone != null" >
+				#{companyPhone,jdbcType=VARCHAR},
+			</if>
+			<if test="companyPeriod != null" >
+				#{companyPeriod,jdbcType=INTEGER},
+			</if>
+			<if test="firstContactName != null" >
+				#{firstContactName,jdbcType=VARCHAR},
+			</if>
+			<if test="firstContactPhone != null" >
+				#{firstContactPhone,jdbcType=VARCHAR},
+			</if>
+			<if test="fristContactRelation != null" >
+				#{fristContactRelation,jdbcType=INTEGER},
+			</if>
+			<if test="secondContactName != null" >
+				#{secondContactName,jdbcType=VARCHAR},
+			</if>
+			<if test="secondContactPhone != null" >
+				#{secondContactPhone,jdbcType=VARCHAR},
+			</if>
+			<if test="secondContactRelation != null" >
+				#{secondContactRelation,jdbcType=INTEGER},
+			</if>
+			<!--<if test="createTime != null" >-->
+				<!--#{createTime,jdbcType=TIMESTAMP},-->
+			<!--</if>-->
+			<if test="createIp != null" >
+				#{createIp,jdbcType=VARCHAR},
+			</if>
+			<!--<if test="updateTime != null" >-->
+				<!--#{updateTime,jdbcType=TIMESTAMP},-->
+			<!--</if>-->
+			<if test="status != null" >
+				#{status,jdbcType=INTEGER},
+			</if>
+			<if test="inviteUserid != null" >
+				#{inviteUserid,jdbcType=INTEGER},
+			</if>
+			<if test="isSave != null" >
+				#{isSave,jdbcType=INTEGER},
+			</if>
+			<if test="headPortrait != null" >
+				#{headPortrait,jdbcType=VARCHAR},
+			</if>
+			<if test="idcardImgZ != null" >
+				#{idcardImgZ,jdbcType=VARCHAR},
+			</if>
+			<if test="idcardImgF != null" >
+				#{idcardImgF,jdbcType=VARCHAR},
+			</if>
+			<if test="customerType != null" >
+				#{customerType,jdbcType=INTEGER},
+			</if>
+			<if test="amountMin != null" >
+				#{amountMin,jdbcType=INTEGER},
+			</if>
+			<if test="amountMax != null" >
+				#{amountMax,jdbcType=INTEGER},
+			</if>
+			<if test="amountAvailable != null" >
+				#{amountAvailable,jdbcType=INTEGER},
+			</if>
+			<if test="equipmentNumber != null" >
+				#{equipmentNumber,jdbcType=VARCHAR},
+			</if>
+			<if test="zmScore != null" >
+				#{zmScore,jdbcType=DECIMAL},
+			</if>
+			<if test="zmScoreTime != null" >
+				#{zmScoreTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="zmIndustyBlack != null" >
+				#{zmIndustyBlack,jdbcType=INTEGER},
+			</if>
+			<if test="zmOver != null" >
+				#{zmOver,jdbcType=INTEGER},
+			</if>
+			<if test="zmNoPayOver != null" >
+				#{zmNoPayOver,jdbcType=INTEGER},
+			</if>
+			<if test="zmIndustyTime != null" >
+				#{zmIndustyTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="zmStatus != null" >
+				#{zmStatus,jdbcType=INTEGER},
+			</if>
+			<if test="myHb != null" >
+				#{myHb,jdbcType=DECIMAL},
+			</if>
+			<if test="myHbTime != null" >
+				#{myHbTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="jxlToken != null" >
+				#{jxlToken,jdbcType=VARCHAR},
+			</if>
+			<if test="jxlTokenTime != null" >
+				#{jxlTokenTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="jxlStatus != null" >
+				#{jxlStatus,jdbcType=INTEGER},
+			</if>
+			<if test="jxlDetailTime != null" >
+				#{jxlDetailTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="jxlZjDkNum != null" >
+				#{jxlZjDkNum,jdbcType=INTEGER},
+			</if>
+			<if test="jxlBjDkNum != null" >
+				#{jxlBjDkNum,jdbcType=INTEGER},
+			</if>
+			<if test="jxlYjHf != null" >
+				#{jxlYjHf,jdbcType=DECIMAL},
+			</if>
+			<if test="jxlLink2Days != null" >
+				#{jxlLink2Days,jdbcType=INTEGER},
+			</if>
+			<if test="jxlLink1Days != null" >
+				#{jxlLink1Days,jdbcType=INTEGER},
+			</if>
+			<if test="jxlLink2Num != null" >
+				#{jxlLink2Num,jdbcType=INTEGER},
+			</if>
+			<if test="jxlLink1Num != null" >
+				#{jxlLink1Num,jdbcType=INTEGER},
+			</if>
+			<if test="jxlLink2Order != null" >
+				#{jxlLink2Order,jdbcType=INTEGER},
+			</if>
+			<if test="jxlLink1Order != null" >
+				#{jxlLink1Order,jdbcType=INTEGER},
+			</if>
+			<if test="jxlGjTs != null" >
+				#{jxlGjTs,jdbcType=INTEGER},
+			</if>
+			<if test="jxlHtPhoneNum != null" >
+				#{jxlHtPhoneNum,jdbcType=INTEGER},
+			</if>
+			<if test="jxlAmthNum != null" >
+				#{jxlAmthNum,jdbcType=INTEGER},
+			</if>
+			<if test="jxlPhoneRegDays != null" >
+				#{jxlPhoneRegDays,jdbcType=INTEGER},
+			</if>
+			<if test="jxlTime != null" >
+				#{jxlTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="userContactSize != null" >
+				#{userContactSize,jdbcType=INTEGER},
+			</if>
+			<if test="historyOverNum != null" >
+				#{historyOverNum,jdbcType=INTEGER},
+			</if>
+			<if test="lastOverDays != null" >
+				#{lastOverDays,jdbcType=INTEGER},
+			</if>
+			<if test="csjy != null" >
+				#{csjy,jdbcType=INTEGER},
+			</if>
+			<if test="userFrom != null" >
+				#{userFrom,jdbcType=INTEGER},
+			</if>
+			<if test="userPhones != null" >
+				#{userPhones,jdbcType=VARCHAR},
+			</if>
+			<if test="jxlDetail != null" >
+				#{jxlDetail,jdbcType=LONGVARCHAR},
+			</if>
+		</trim>
 	</insert>
+		<!--<![CDATA[-->
+			<!--insert into mman_user_info(-->
+				<!--id,-->
+				<!--user_name,-->
+				<!--password,-->
+				<!--pay_password,-->
+				<!--realname,-->
+				<!--realname_status,-->
+				<!--realname_time,-->
+				<!--id_number,-->
+				<!--user_sex,-->
+				<!--user_age,-->
+				<!--qq,-->
+				<!--user_phone,-->
+				<!--taobao_account,-->
+				<!--email,-->
+				<!--wechat_account,-->
+				<!--education,-->
+				<!--marital_status,-->
+				<!--present_address,-->
+				<!--present_address_distinct,-->
+				<!--present_latitude,-->
+				<!--present_longitude,-->
+				<!--present_period,-->
+				<!--company_name,-->
+				<!--company_address,-->
+				<!--company_address_distinct,-->
+				<!--company_longitude,-->
+				<!--company_latitude,-->
+				<!--company_phone,-->
+				<!--company_period,-->
+				<!--first_contact_name,-->
+				<!--first_contact_phone,-->
+				<!--frist_contact_relation,-->
+				<!--second_contact_name,-->
+				<!--second_contact_phone,-->
+				<!--second_contact_relation,-->
+				<!--create_time,-->
+				<!--create_ip,-->
+				<!--update_time,-->
+				<!--status,-->
+				<!--invite_userid,-->
+				<!--is_save,-->
+				<!--head_portrait,-->
+				<!--idcard_img_z,-->
+				<!--idcard_img_f,-->
+				<!--customer_type,-->
+				<!--amount_min,-->
+				<!--amount_max,-->
+				<!--amount_available,-->
+				<!--equipment_number,-->
+				<!--zm_score,-->
+				<!--zm_score_time,-->
+				<!--zm_industy_black,-->
+				<!--zm_over,-->
+				<!--zm_no_pay_over,-->
+				<!--zm_industy_time,-->
+				<!--zm_status,-->
+				<!--my_hb,-->
+				<!--my_hb_time,-->
+				<!--jxl_token,-->
+				<!--jxl_token_time,-->
+				<!--jxl_status,-->
+				<!--jxl_detail,-->
+				<!--jxl_detail_time,-->
+				<!--jxl_zj_dk_num,-->
+				<!--jxl_bj_dk_num,-->
+				<!--jxl_yj_hf,-->
+				<!--jxl_link2_days,-->
+				<!--jxl_link1_days,-->
+				<!--jxl_link2_num,-->
+				<!--jxl_link1_num,-->
+				<!--jxl_link2_order,-->
+				<!--jxl_link1_order,-->
+				<!--jxl_gj_ts,-->
+				<!--jxl_ht_phone_num,-->
+				<!--jxl_amth_num,-->
+				<!--jxl_phone_reg_days,-->
+				<!--jxl_time,-->
+				<!--user_contact_size,-->
+				<!--history_over_num,-->
+				<!--last_over_days,-->
+				<!--csjy,-->
+				<!--user_from-->
+			<!--)values(-->
+				<!--#{id},-->
+				<!--#{user_name},-->
+				<!--#{password},-->
+				<!--#{pay_password},-->
+				<!--#{realname},-->
+				<!--#{realname_status},-->
+				<!--#{realname_time},-->
+				<!--#{id_number},-->
+				<!--#{user_sex},-->
+				<!--#{user_age},-->
+				<!--#{qq},-->
+				<!--#{user_phone},-->
+				<!--#{taobao_account},-->
+				<!--#{email},-->
+				<!--#{wechat_account},-->
+				<!--#{education},-->
+				<!--#{marital_status},-->
+				<!--#{present_address},-->
+				<!--#{present_address_distinct},-->
+				<!--#{present_latitude},-->
+				<!--#{present_longitude},-->
+				<!--#{present_period},-->
+				<!--#{company_name},-->
+				<!--#{company_address},-->
+				<!--#{company_address_distinct},-->
+				<!--#{company_longitude},-->
+				<!--#{company_latitude},-->
+				<!--#{company_phone},-->
+				<!--#{company_period},-->
+				<!--#{first_contact_name},-->
+				<!--#{first_contact_phone},-->
+				<!--#{frist_contact_relation},-->
+				<!--#{second_contact_name},-->
+				<!--#{second_contact_phone},-->
+				<!--#{second_contact_relation},-->
+				<!--#{create_time},-->
+				<!--#{create_ip},-->
+				<!--#{update_time},-->
+				<!--#{status},-->
+				<!--#{invite_userid},-->
+				<!--#{is_save},-->
+				<!--#{head_portrait},-->
+				<!--#{idcard_img_z},-->
+				<!--#{idcard_img_f},-->
+				<!--#{customer_type},-->
+				<!--#{amount_min},-->
+				<!--#{amount_max},-->
+				<!--#{amount_available},-->
+				<!--#{equipment_number},-->
+				<!--#{zm_score},-->
+				<!--#{zm_score_time},-->
+				<!--#{zm_industy_black},-->
+				<!--#{zm_over},-->
+				<!--#{zm_no_pay_over},-->
+				<!--#{zm_industy_time},-->
+				<!--#{zm_status},-->
+				<!--#{my_hb},-->
+				<!--#{my_hb_time},-->
+				<!--#{jxl_token},-->
+				<!--#{jxl_token_time},-->
+				<!--#{jxl_status},-->
+				<!--#{jxl_detail},-->
+				<!--#{jxl_detail_time},-->
+				<!--#{jxl_zj_dk_num},-->
+				<!--#{jxl_bj_dk_num},-->
+				<!--#{jxl_yj_hf},-->
+				<!--#{jxl_link2_days},-->
+				<!--#{jxl_link1_days},-->
+				<!--#{jxl_link2_num},-->
+				<!--#{jxl_link1_num},-->
+				<!--#{jxl_link2_order},-->
+				<!--#{jxl_link1_order},-->
+				<!--#{jxl_gj_ts},-->
+				<!--#{jxl_ht_phone_num},-->
+				<!--#{jxl_amth_num},-->
+				<!--#{jxl_phone_reg_days},-->
+				<!--#{jxl_time},-->
+				<!--#{user_contact_size},-->
+				<!--#{history_over_num},-->
+				<!--#{last_over_days},-->
+				<!--#{csjy},-->
+				<!--#{user_from}-->
+			<!--)-->
+		<!--]]>-->
+	<!--</insert>-->
 	<insert id="saveMmanUserRela" parameterType="com.info.web.pojo.MmanUserRela">
 		<![CDATA[
 			insert into mman_user_rela(
