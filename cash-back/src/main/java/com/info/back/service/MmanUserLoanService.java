@@ -67,4 +67,14 @@ public class MmanUserLoanService implements IMmanUserLoanService{
 	public List<String> getOverdueOrderIds(Map<String, Object> map) {
 		return manUserLoanDao.getOverdueOrderIds(map);
 	}
+
+	@Override
+	public List<String> getOverdueOrderIdsNeedBeDispatch(Map<String, Object> map) {
+		return manUserLoanDao.getOverdueOrderIdsNeedBeDispatch(map);
+	}
+
+	@Override
+	public void updateRemark(List<String> list) {
+		manUserLoanDao.updateRemark(list);
+	}
 }

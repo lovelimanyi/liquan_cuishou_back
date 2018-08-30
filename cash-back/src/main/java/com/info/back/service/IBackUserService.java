@@ -151,4 +151,6 @@ public interface IBackUserService {
 
 
 	BackUser getUserByAccount(String userAccount);
+
+    List<BackUser> getUserByCompanyIdAndGroupLevel(Map<String, Object> userMap);
 }

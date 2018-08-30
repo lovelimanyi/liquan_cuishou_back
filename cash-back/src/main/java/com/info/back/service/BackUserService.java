@@ -294,4 +294,9 @@ public class BackUserService implements IBackUserService {
 	public BackUser getUserByAccount(String userAccount) {
 		return backUserDao.getUserByAccount(userAccount);
 	}
+
+	@Override
+	public List<BackUser> getUserByCompanyIdAndGroupLevel(Map<String, Object> userMap) {
+		return backUserDao.getUserByCompanyIdAndGroupLevel(userMap);
+	}
 }

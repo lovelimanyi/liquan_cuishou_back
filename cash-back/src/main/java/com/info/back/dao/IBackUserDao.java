@@ -168,4 +168,6 @@ public interface IBackUserDao {
     BackUser getUserByAccount(String userAccount);
 
     Integer selectUserCount4Estimate(@Param("groupLevel")String groupLevel);
+
+    List<BackUser> getUserByCompanyIdAndGroupLevel(Map<String, Object> userMap);
 }

@@ -262,4 +262,25 @@
 
         ]]>
     </select>
+
+    <select id="getOverdueOrderIdsNeedBeDispatch" parameterType="map" resultType="string">
+        SELECT id FROM mman_user_loan
+        <where>
+                AND IFNULL(loan_sys_status,0) != '1'
+            <if test="orderStatus != null and orderStatus != ''">
+                AND loan_status != #{orderStatus}
+            </if>
+            <if test="borrowingType != null and borrowingType != ''">
+                AND borrowing_type = #{borrowingType}
+            </if>
+        </where>
+        limit #{totalOrderCount}
+    </select>
+
+    <update id="updateRemark" parameterType="string">
+       UPDATE mman_user_loan SET loan_sys_status = '1' WHERE id IN
+       <foreach collection="list" separator="," item="id" open="(" close=")">
+           #{id}
+       </foreach>
+    </update>
 </mapper>

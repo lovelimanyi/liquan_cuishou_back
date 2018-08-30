@@ -32,4 +32,8 @@ public interface IMmanUserLoanService {
 	List<String> getOverdueOrder(Map<String, Object> map);
 
 	List<String> getOverdueOrderIds(Map<String, Object> map);
+
+	List<String> getOverdueOrderIdsNeedBeDispatch(Map<String, Object> map);
+
+	void updateRemark(List<String> list);
 }

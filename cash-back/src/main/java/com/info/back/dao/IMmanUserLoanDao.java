@@ -35,4 +35,8 @@ public interface IMmanUserLoanDao {
 	int selectCollectionCountByLoanEndTime(@Param("overDate")Date overDate);
 
 	List<HashMap<String,Object>> selectCollectionCountBetweenLoanEndTime(Map<String,Object> map);
+
+	List<String> getOverdueOrderIdsNeedBeDispatch(Map<String, Object> map);
+
+	void updateRemark(List<String> list);
 }

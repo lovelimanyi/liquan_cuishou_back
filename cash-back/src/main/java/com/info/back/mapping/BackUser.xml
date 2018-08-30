@@ -341,4 +341,20 @@
         SELECT COUNT(*)  FROM  back_user
         WHERE role_id =10021 and status=1 and group_level=${groupLevel}
     </select>
+
+    <select id="getUserByCompanyIdAndGroupLevel" parameterType="map" resultMap="BaseResultMap">
+        SELECT id,company_id,user_name,group_level,user_mobile,uuid FROM back_user
+        <where>
+            AND role_id = '10021'
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            <if test="companyId != null">
+                AND company_id = #{companyId}
+            </if>
+            <if test="groupLevel != null">
+                AND group_level = #{groupLevel}
+            </if>
+        </where>
+    </select>
 </mapper>
