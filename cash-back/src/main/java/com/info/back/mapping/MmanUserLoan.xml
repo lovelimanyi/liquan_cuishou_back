@@ -264,14 +264,17 @@
     </select>
 
     <select id="getOverdueOrderIdsNeedBeDispatch" parameterType="map" resultType="string">
-        SELECT id FROM mman_user_loan
+        SELECT l.id FROM mman_user_loan l LEFT JOIN mman_loan_collection_order o on l.id = o.loan_id
         <where>
-                AND IFNULL(loan_sys_status,0) != '1'
+                AND IFNULL(l.loan_sys_status,0) != '1'
             <if test="orderStatus != null and orderStatus != ''">
-                AND loan_status != #{orderStatus}
+                AND l.loan_status != #{orderStatus}
             </if>
             <if test="borrowingType != null and borrowingType != ''">
-                AND borrowing_type = #{borrowingType}
+                AND l.borrowing_type = #{borrowingType}
+            </if>
+            <if test="groupLevel != null and groupLevel != ''">
+                AND o.current_overdue_level = #{groupLevel}
             </if>
         </where>
         limit #{totalOrderCount}

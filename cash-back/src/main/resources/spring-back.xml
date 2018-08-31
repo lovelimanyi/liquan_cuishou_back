@@ -69,6 +69,7 @@
                         <value>/statisticsNew/doTodayStatistics</value>
                         <value>/other/collectionAdvice/get</value>
                         <value>/other/collectionAdvice/getAdviceList</value>
+                        <value>/order/reDispatch</value>
                     </list>
                 </property>
             </bean>

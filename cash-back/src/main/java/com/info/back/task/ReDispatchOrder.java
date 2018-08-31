@@ -46,6 +46,7 @@ public class ReDispatchOrder {
         Map<String, Object> map = new HashMap<>(2);
         map.put("orderStatus", BackConstant.XJX_COLLECTION_ORDER_STATE_PAYING);
         map.put("borrowingType", Constant.SMALL);
+        map.put("groupLevel", BackConstant.XJX_OVERDUE_LEVEL_M6P);
 
         // 查询所有的分单规则信息
         List<OrderDispatchRule> ruleList = ruleDao.listAllInfo();
@@ -111,7 +112,7 @@ public class ReDispatchOrder {
             for (String orderId : orderIds) {
                 //原始催收订单
                 MmanLoanCollectionOrder order = orderService.getOrderByLoanId(orderId);
-                if (checkOrderStatus(currentCollectionUserId, order)) {
+                if (checkOrderStatus(order)) {
                     continue;
                 }
                 try {
@@ -164,17 +165,13 @@ public class ReDispatchOrder {
         return null;
     }
 
-    private boolean checkOrderStatus(String currentCollectionUserId, MmanLoanCollectionOrder order) {
+    private boolean checkOrderStatus(MmanLoanCollectionOrder order) {
         if ("-1".equals(order.getStatus())) {
             log.info("停催订单不能转派！订单id " + order.getLoanId());
             return true;
         }
         if ("4".equals(order.getStatus())) {
             log.info("催收成功的订单不能转派!订单id " + order.getLoanId());
-            return true;
-        }
-        if (currentCollectionUserId.equals(order.getCurrentCollectionUserId())) {
-            log.info("自己不能转给自己");
             return true;
         }
         return false;
