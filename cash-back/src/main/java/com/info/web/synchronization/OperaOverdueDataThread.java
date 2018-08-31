@@ -66,9 +66,9 @@ public class OperaOverdueDataThread implements Runnable {
 				try {
 					HashMap<String, Object> borrowOrder = null;					//借款信息--app端
 					List<HashMap<String, Object>> repaymentDetailList = null;	//还款详情信息--app端
-					HashMap<String, Object> userInfo = null;					//用户信息--app端
-					HashMap<String, Object> cardInfo = null;					//银行卡--app端
-					List<HashMap<String, Object>> userContactsList = null;		//用户联系人--app端
+					Map<String, Object> userInfo = null;					//用户信息--app端
+					Map<String, Object> cardInfo = null;					//银行卡--app端
+					List<Map<String, Object>> userContactsList = null;		//用户联系人--app端
 
 					borrowOrder = this.dataDao.getAssetBorrowOrder(map);
 					loger.info("sync-borrowOrder:"+borrowOrder);
@@ -88,9 +88,9 @@ public class OperaOverdueDataThread implements Runnable {
 							Map<String, Object> o = (Map<String, Object>) JSONObject.parse(returnInfo);
 							if(o != null && "00".equals(String.valueOf(o.get("code")))){
 								Map<String,Object> data = (Map<String, Object>) o.get("data");
-								userInfo = (HashMap<String, Object>) data.get("user");
-								cardInfo = ((List<HashMap<String, Object>>) data.get("userCardInfoList")).get(0);
-								userContactsList = (List<HashMap<String, Object>>) data.get("userContacts");
+								userInfo = (Map<String, Object>) data.get("user");
+								cardInfo = ((List<Map<String, Object>>) data.get("userCardInfoList")).get(0);
+								userContactsList = (List<Map<String, Object>>) data.get("userContacts");
 							}
 						}catch (Exception e){
 							loger.error("调用cashman获取用户信息出错：" + e);
@@ -156,7 +156,7 @@ public class OperaOverdueDataThread implements Runnable {
 	 * @param repaymentMap  还款信息
 	 * @param borrowOrder  借款信息
 	 * */
-	public  void saveMmanUserLoan(HashMap<String,Object> borrowOrder,HashMap<String,Object> repaymentMap,HashMap<String,Object> userInfo){
+	public  void saveMmanUserLoan(HashMap<String,Object> borrowOrder,HashMap<String,Object> repaymentMap,Map<String,Object> userInfo){
 		loger.info("start-saveMmanUserLoan:"+String.valueOf(borrowOrder.get("id")));
 		MmanUserLoan mmanUserLoan = new MmanUserLoan();
 		mmanUserLoan.setId(String.valueOf(borrowOrder.get("id")));
