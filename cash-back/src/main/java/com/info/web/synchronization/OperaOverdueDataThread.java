@@ -114,7 +114,7 @@ public class OperaOverdueDataThread implements Runnable {
 							//保存用户信息表--联系人表--银行卡
 							syncUtils.saveUserInfo(localDataDao,payId,userId,userInfo,userContactsList,cardInfo);
 						}
-						this.orderService.dispatchOrderNew(loanId,userInfo.get("id_number").toString(),Constant.SMALL);
+						this.orderService.dispatchOrderNew(loanId,userInfo.get("idNumber").toString(),Constant.SMALL);
 //						this.taskJobMiddleService.dispatchforLoanId(loanId,userInfo.get("id_number").toString(),Constant.SMALL);
                         if (repaymentDetailList != null && repaymentDetailList.size()>0){
                             loger.info("未逾期部分还款:"+loanId);
