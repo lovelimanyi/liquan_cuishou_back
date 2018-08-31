@@ -1,14 +1,18 @@
 package com.info.web.synchronization;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.info.back.dao.ILocalDataDao;
 import com.info.back.service.IMmanLoanCollectionOrderService;
 import com.info.back.service.TaskJobMiddleService;
 import com.info.back.utils.IdGen;
 import com.info.back.vo.jxl.ContactList;
+import com.info.config.PayContents;
 import com.info.constant.Constant;
 import com.info.web.pojo.*;
 import com.info.web.synchronization.dao.IDataDao;
 import com.info.web.util.DateUtil;
+import com.info.web.util.HttpUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -16,6 +20,8 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 /**
  * 处理逾期数据
  * @author gaoyuhai
@@ -70,9 +76,29 @@ public class OperaOverdueDataThread implements Runnable {
 					loger.info("sync-repaymentDetailList:"+repaymentDetailList);
 					loger.info("开始:"+borrowOrder);
 					if (checkLoan(loanId)) {
-						userInfo = this.dataDao.getUserInfo(map);
-						cardInfo = this.dataDao.getUserCardInfo(map);
-						userContactsList = this.dataDao.getUserContacts(map);
+//						userInfo = this.dataDao.getUserInfo(map);
+//						cardInfo = this.dataDao.getUserCardInfo(map);
+//						userContactsList = this.dataDao.getUserContacts(map);
+						try{
+							Map<String, String> map2 = new HashMap();
+							map2.put("userId",borrowOrder.get("user_id").toString());
+							map2.put("merchantNumber","cjxjx");//默认小额推逾期，商户号都是cjxjx；如之后有其他商户渠道，则需修改
+							String returnInfo = HttpUtil.getInstance().doPost2(PayContents.XJX_GET_USERINFOS, JSON.toJSONString(map2));
+							loger.error("调用vip查询用户信息："+returnInfo);
+							Map<String, Object> o = (Map<String, Object>) JSONObject.parse(returnInfo);
+							if(o != null && "00".equals(String.valueOf(o.get("code")))){
+								Map<String,Object> data = (Map<String, Object>) o.get("data");
+								userInfo = (HashMap<String, Object>) data.get("user");
+								cardInfo = ((List<HashMap<String, Object>>) data.get("userCardInfoList")).get(0);
+								userContactsList = (List<HashMap<String, Object>>) data.get("userContacts");
+							}
+						}catch (Exception e){
+							loger.error("调用cashman获取用户信息出错：" + e);
+							e.printStackTrace();
+							return;
+						}
+
+
 						loger.info("loanId true:"+loanId);
 						if (null != userInfo && null != borrowOrder&& null != cardInfo&& null != repaymentDetailList) {
 							//保存用户借款表
