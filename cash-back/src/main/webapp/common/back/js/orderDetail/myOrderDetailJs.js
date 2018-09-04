@@ -454,19 +454,6 @@ $("input[name='isConnected']").change(function () {
     }
 });
 
-function doCheck() {
-    var msgTemplate = $("#msgTemplate").val();
-    if (msgTemplate == "") {
-        alertMsg.warn("请先选择短信模板");
-        return;
-    }
-    alertMsg.confirm("您确认要发送短信吗?", {
-        okCall: function () {
-            $("#frm").submit();
-        }
-    });
-}
-
 // 获取短信内容
 $("#msgTemplate").change(function () {
     var msgTemplate = $("#msgTemplate").val();
@@ -615,6 +602,8 @@ function saveCollectionRecord() {
         }
     }
 
+    var fengKongIds = getFengKongIds();
+    var advice = $("select[name='collectionAdvice'] option:selected").val();
     $.ajax({
         type: "POST",
         url: "/back/collectionRecord/saveRecord",
@@ -633,7 +622,9 @@ function saveCollectionRecord() {
             loanId: loanId,
             orderStatus: orderStatus,
             collectionRecordId: collectionRecordId,
-            isCloseRelation: isCloseRelation
+            isCloseRelation: isCloseRelation,
+            fengKongIds: fengKongIds,
+            advice: advice
         },
         success: function () {
             alertMsg.correct("添加催收记录成功！");
@@ -747,6 +738,10 @@ function clearRecord() {
     $("#collectionRecordId").val("");
     $("#notPromiseRepay").attr("checked", "checked");
     $("#promiseRepayTime").hide();
+    // 催收建议相关
+    $("input[name='fengkongLable']:checked").removeAttr("checked");
+    $("select[name='collectionAdvice'] option:selected").removeAttr("selected");
+    $("#defaultSelect").attr("selected", "selected");
 }
 
 
@@ -857,3 +852,16 @@ function getOrderLevel(level) {
         return "";
     }
 }
+
+function getFengKongIds() {
+    var ids = "";
+    $("input[name='fengkongLable']:checked").each(function () {
+        ids += $(this).val() + ",";
+    });
+    ids = ids.substring(0, ids.length - 1);
+    return ids;
+}
+
+$("input[name='isConnected']").click(function () {
+    $("input[name='communication']").removeAttr("checked");
+});

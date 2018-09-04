@@ -614,6 +614,8 @@ public class MyCollectionOrderController extends BaseController {
                 Map<String, Object> orderStatusMap = getOrderStatusMap();
                 // 沟通情况
                 Map<String, Object> communicationSituationsMap = getCommunicationSituationsMap(communicationSituations);
+                // 风控标签
+                Map<String,Object> fengKongLableMap = fengKongService.getFengKongLableMap();
                 // 逾期等级
                 Map<String, Object> overdueLevelMap = getOverdueLevelMap(getAllOverdueLevel());
                 int remainCount = msgCountLimit - count > 0 ? msgCountLimit - count : 0;
@@ -622,6 +624,7 @@ public class MyCollectionOrderController extends BaseController {
                 model.addAttribute("orderStatusMap", orderStatusMap);
                 model.addAttribute("remainMsgCount", remainCount);
                 model.addAttribute("msgCountLimit", msgCountLimit);
+                model.addAttribute("fengKongLableMap",fengKongLableMap);
                 model.addAttribute("msgs", msgs);
                 model.addAttribute("orderId", id);
                 model.addAttribute("phoneNumber", order.getLoanUserPhone());
@@ -1730,7 +1733,7 @@ public class MyCollectionOrderController extends BaseController {
     public String testGl(HttpServletRequest request) {
         try {
             Date date = new Date();
-            HashMap<String, Object> params = new HashMap<String, Object>();
+            HashMap<String, Object> params = new HashMap<>();
 //			params.put("currDate", DateUtil.getBeforeOrAfter(date,-1));
             params.put("currDate", request.getParameter("currDate"));
             params.put("begDate", DateUtil.getDayFirst());

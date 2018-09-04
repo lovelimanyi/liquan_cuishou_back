@@ -949,6 +949,8 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
             logger.info("催收完成订单不允许添加催收记录！订单id: " + collectionOrder.getLoanId());
             return;
         }
+        String recordId = IdGen.uuid();
+        params.put("recordId", recordId);
 
         //更新我的催收订单
         Date now = new Date();
@@ -1033,18 +1035,52 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
         }
         mmanLoanCollectionRecordDao.insert(record);
 
-//        String repaymentTime = params.get("repaymentTime") == null ? null : params.get("repaymentTime").toString();
-//        MmanLoanCollectionOrder order = new MmanLoanCollectionOrder();
-//        order.setId(params.get("orderId") == null ? null : params.get("orderId").toString());
-//        if (StringUtils.isNotEmpty(repaymentTime)) {
-//            // 更新承诺还款时间
-//            order.setPromiseRepaymentTime(DateUtil.getDateTimeFormat(repaymentTime, "yyyy-MM-dd"));
-//        } else {
-//            order.setPromiseRepaymentTime(collectionOrder.getPromiseRepaymentTime());
-//        }
-//        // 更新最新催收时间
-//        order.setLastCollectionTime(new Date());
-//        mmanLoanCollectionOrderDao.updateCollectionOrder(order);
+        String repaymentTime = params.get("repaymentTime") == null ? null : params.get("repaymentTime").toString();
+        MmanLoanCollectionOrder order = new MmanLoanCollectionOrder();
+        String orderId = params.get("orderId") == null ? null : params.get("orderId").toString();
+        order.setId(orderId);
+        if (StringUtils.isNotEmpty(repaymentTime)) {
+            // 更新承诺还款时间
+            order.setPromiseRepaymentTime(DateUtil.getDateTimeFormat(repaymentTime, "yyyy-MM-dd"));
+        } else {
+            order.setPromiseRepaymentTime(collectionOrder.getPromiseRepaymentTime());
+        }
+        // 更新最新催收时间
+        order.setLastCollectionTime(new Date());
+        mmanLoanCollectionOrderDao.updateCollectionOrder(order);
+
+        // 保存催收建议
+        CollectionAdvice advice = new CollectionAdvice();
+        String fengKongIds = params.get("fengKongIds") == null ? null : params.get("fengKongIds").toString();
+        advice.setLoanId(loanId);
+        advice.setOrderId(orderId);
+        advice.setId(IdGen.uuid());
+        advice.setCreateDate(new Date());
+        advice.setBackUserId(user.getId());
+        advice.setCollectionRecordId(recordId);
+        advice.setFengkongIds(fengKongIds);
+        advice.setLoanUserName(collectionOrder.getLoanUserName());
+        advice.setStatus(params.get("advice").toString());
+        advice.setLoanUserPhone(collectionOrder.getLoanUserPhone());
+        String fengKongLables = getLables(fengKongIds);
+        advice.setFkLabels(fengKongLables);
+        advice.setPayId(collectionOrder.getPayId());
+        advice.setUserId(collectionOrder.getUserId());
+        advice.setUserName(user.getUserName());
+        fengKongService.saveAdvice(advice);
+    }
+
+    private String getLables(String fengKongIds) {
+        if (StringUtils.isEmpty(fengKongIds)) {
+            return null;
+        }
+        String[] ids = fengKongIds.split(",");
+        StringBuilder sb = new StringBuilder(16);
+        Map<String,Object> fengKongLableMap = fengKongService.getFengKongLableMap();
+        for (String fengKongId : ids) {
+            sb.append(fengKongLableMap.get(fengKongId)).append(",");
+        }
+        return sb.toString().substring(0, sb.length() - 1);
     }
 
     // 获取当前联系人与借款人的关系
@@ -1093,7 +1129,7 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
     // 设置共用参数
     private MmanLoanCollectionRecord setRecordParam(HashMap<String, Object> params, BackUser user, MmanLoanCollectionOrder order) {
         MmanLoanCollectionRecord record = new MmanLoanCollectionRecord();
-        record.setId(IdGen.uuid());
+        record.setId(params.get("recordId").toString());
         record.setOrderId(params.get("orderId") == null ? null : params.get("orderId").toString());
         record.setCollectionDate(new Date());
         record.setContent(params.get("content") == null ? null : params.get("content").toString());

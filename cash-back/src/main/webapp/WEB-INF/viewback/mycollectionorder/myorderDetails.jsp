@@ -334,7 +334,7 @@
                 </ul>
             </div>
         </div>
-        <div class="tabsContent" style="height:600px;">
+        <div class="tabsContent" style="height:700px;">
             <div class="pageContent" style="width: 100%;">
                 <div class="pageFormContent" style="overflow: auto;">
                     <fieldset>
@@ -423,7 +423,6 @@
                             </fieldset>
                         </div>
                         <fieldset>
-                            <div class="divider"></div>
                             <dl>
                                 <dt style="width: 80px;">
                                     <label>
@@ -431,10 +430,49 @@
                                     </label>
                                 </dt>
                                 <dd>
-                                    <textarea name="content" rows="5" cols="80" maxlength="100" id="collectionContent"></textarea>
-                                    <div style="width: 500px;height: 20px;margin-top: 100px;">
-                                        <font style="color: #1b8d0f">温馨提示：</font><font style="color: #cd0a0a">如果不点选催收记录或通讯录中联系人则默认催收本人。</font>
-                                    </div>
+                                    <textarea placeholder="温馨提示：如果不点选催收记录或通讯录中联系人则默认催收本人。" name="content" rows="4" cols="80" maxlength="100" id="collectionContent"></textarea>
+                                </dd>
+                            </dl>
+                        </fieldset>
+                        <fieldset>
+                            <dl>
+                                <dt style="width: 80px;">
+                                    <label>
+                                        催收建议:
+                                    </label>
+                                </dt>
+                                <dd style="width: 700px;">
+                                    <select name="collectionAdvice">
+                                        <option value="1">通过</option>
+                                        <option value="2">拒绝</option>
+                                        <option value="3" selected="selected" id="defaultSelect">不建议</option>
+                                    </select>
+                                    <span style="margin-left: 10px;">
+                                        <font style="color: #1b8d0f">提示：</font><font style="color: #cd0a0a">所建议内容将直接影响用户未来借款成功与否，请如实、慎重选择！不提交则默认建议风控审核。</font>
+                                    </span>
+                                </dd>
+                            </dl>
+                        </fieldset>
+                        <fieldset>
+                            <dl>
+                                <dt style="width: 80px;">
+                                    <label>
+                                        风控标签:
+                                    </label>
+                                </dt>
+                                <dd>
+                                    <table>
+                                        <c:forEach items="${fengKongLableMap}" var="lable" varStatus="index">
+                                            <c:if test="${index.count eq 1 || (index.count) % 4 eq 1}">
+                                                <c:out value="<tr>" escapeXml="false"></c:out>
+                                            </c:if>
+                                            <td><label><input type="checkbox" name="fengkongLable" value="${lable.key}"/>${lable.value}</label>
+                                            </td>
+                                            <c:if test="${(index.count) % 4 eq 0}">
+                                                <c:out value="</tr>" escapeXml="false"></c:out>
+                                            </c:if>
+                                        </c:forEach>
+                                    </table>
                                 </dd>
                             </dl>
                         </fieldset>
@@ -483,38 +521,3 @@
 </body>
 
 </html>
-
-<script type="text/javascript">
-    /*
-     $(document).ready(function () {
-     $("#img1").imgbox({
-     'speedIn': 0,
-     'speedOut': 0,
-     'alignment': 'top',
-     'overlayShow': true,
-     'allowMultiple': false
-     });
-
-     $("#img2").imgbox({
-     'speedIn': 0,
-     'speedOut': 0,
-     'alignment': 'top',
-     'overlayShow': true,
-     'allowMultiple': false
-     });
-     if (${empty userInfo.idcardImgZ}) {
-     $("#img1").hide();
-     }
-     if (${empty userInfo.idcardImgF}) {
-     $("#img2").hide();
-     }
-     });
-     */
-    //var a = 'asdfsdfsdfsadf';
-    //a=a.split('');  //将a字符串转换成数组
-    //a.splice(1,1,'xxxxx'); //将1这个位置的字符，替换成'xxxxx'. 用的是原生js的splice方法。
-    //console.log(a);   //结果是：
-    //["a", "xxxxx", "d", "f", "s", "d", "f", "s", "d", "f", "s", "a", "d", "f"]
-    //
-    //a.join('');
-</script>

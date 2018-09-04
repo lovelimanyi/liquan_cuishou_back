@@ -54,4 +54,10 @@ public interface IFengKongService {
 	 * @return
 	 */
 	int saveAdvice(CollectionAdvice advice);
+
+	/**
+	 * 获取风控标签并封装成（id,lable）的形式的map
+	 * @return
+	 */
+	Map<String, Object> getFengKongLableMap();
 }
