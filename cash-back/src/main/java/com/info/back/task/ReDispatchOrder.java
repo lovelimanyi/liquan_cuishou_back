@@ -56,6 +56,7 @@ public class ReDispatchOrder {
         }
         long totalBeginTime = System.nanoTime();
         for (OrderDispatchRule rule : ruleList) {
+            int currentCount = 0;
             // 查询对应的公司对应催收员
             long beginTime = System.nanoTime();
             Map<String, Object> userMap = new HashMap<>();
@@ -81,9 +82,11 @@ public class ReDispatchOrder {
                 System.out.println("当前第 " + (i + 1) + " 个催收员，姓名：" + backUser.getUserName());
                 try {
                     // 转派
-                    dispatchOrder(list, backUser);
+                    dispatchOrder(list, backUser,currentCount);
                     //更新已经处理的订单（做标记）
                     loanService.updateRemark(list);
+                    System.out.println("当前 " + rule.getCompanyName() + " 公司第 " + (i + 1)  + " 个催收员派代完成，当前公司第 "
+                            + currentCount + " 单，剩余 " + (totalCount - currentCount) + " 单");
                 } catch (Exception e) {
                     log.error("转单出错！");
                     e.printStackTrace();
@@ -103,7 +106,7 @@ public class ReDispatchOrder {
      * @param currentUser
      * @return
      */
-    private JsonResult dispatchOrder(List<String> orderIds, BackUser currentUser) {
+    private JsonResult dispatchOrder(List<String> orderIds, BackUser currentUser,int totalCount) {
         JsonResult result = new JsonResult("-1", "转派失败，未知异常");
         //更新我的催收订单
         String currentCollectionUserId = currentUser.getUuid();
@@ -152,6 +155,7 @@ public class ReDispatchOrder {
                     saveLog(currentUser, order, beforeStatus, now);
                     successCount++;
                     System.out.println("转单成功：" + "当前第 " + successCount + " 单" + "【当前订单：" + orderId + "】,当前催收员：【" + currentUser.getUserName() + "】");
+                    totalCount ++;
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
