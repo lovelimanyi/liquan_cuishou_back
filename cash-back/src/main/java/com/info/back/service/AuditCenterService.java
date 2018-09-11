@@ -98,7 +98,6 @@ public class AuditCenterService implements IAuditCenterService {
     @Override
     public JsonResult updateAuditCenter(Map<String, String> params) {
         JsonResult result = new JsonResult("-1", "审核失败了");
-
         String ids = params.get("id");
         String[] auditIds = null;
         if(StringUtils.isNotBlank(ids)){
