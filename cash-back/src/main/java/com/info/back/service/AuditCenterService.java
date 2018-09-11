@@ -98,7 +98,7 @@ public class AuditCenterService implements IAuditCenterService {
     @Override
     public JsonResult updateAuditCenter(Map<String, String> params) {
         JsonResult result = new JsonResult("-1", "审核失败了");
-        logger.error("开始处理减免请求：" + params.toString());
+        System.out.println("开始处理减免请求：" + params.toString());
         String ids = params.get("id");
         String[] auditIds = null;
         if(StringUtils.isNotBlank(ids)){
@@ -179,9 +179,9 @@ public class AuditCenterService implements IAuditCenterService {
 
                             //调用减免http接口
                             String withholdPostUrl=PayContents.XJX_JIANMIAN_URL+"/"+auditCenter.getLoanUserId()+"/"+auditCenter.getPayId()+"/"+reductionMoney+"/"+auditCenter.getId()+"/"+sign;
-                            logger.error("调用减免接口，请求url: " + withholdPostUrl);
+                            System.out.println("调用减免接口，请求url: " + withholdPostUrl);
                             String xjxWithholdingStr = HttpUtil.getHttpMess(withholdPostUrl, "", "POST", "UTF-8");
-                            logger.error("调用减免接口返回数据 ：" + xjxWithholdingStr);
+                            System.out.println("调用减免接口返回数据 ：" + xjxWithholdingStr);
                             if(StringUtils.isNotBlank(xjxWithholdingStr)) {
                                 JSONObject jos = new JSONObject().fromObject(xjxWithholdingStr);
                                 logger.info("返回还款结果信息jos转换"+jos);
