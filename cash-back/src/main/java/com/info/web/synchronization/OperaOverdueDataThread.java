@@ -84,7 +84,7 @@ public class OperaOverdueDataThread implements Runnable {
 							map2.put("userId",borrowOrder.get("user_id").toString());
 							map2.put("merchantNumber","cjxjx");//默认小额推逾期，商户号都是cjxjx；如之后有其他商户渠道，则需修改
 							String returnInfo = HttpUtil.getInstance().doPost2(PayContents.XJX_GET_USERINFOS, JSON.toJSONString(map2));
-							loger.error("调用vip查询用户信息："+returnInfo);
+//							loger.error("调用vip查询用户信息："+returnInfo);
 							Map<String, Object> o = (Map<String, Object>) JSONObject.parse(returnInfo);
 							if(o != null && "00".equals(String.valueOf(o.get("code")))){
 								Map<String,Object> data = (Map<String, Object>) o.get("data");

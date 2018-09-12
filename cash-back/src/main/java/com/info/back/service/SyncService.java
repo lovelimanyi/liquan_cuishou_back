@@ -66,7 +66,7 @@ public class SyncService implements ISyncService {
                 map.put("userId", loan.getUserId());
                 map.put("merchantNumber",loan.getMerchantNo());
                 String returnInfo = HttpUtil.getInstance().doPost2(PayContents.XJX_GET_USERINFOS,JSON.toJSONString(map));
-                logger.error("调用vip查询用户信息："+returnInfo);
+//                logger.error("调用vip查询用户信息："+returnInfo);
                 Map<String, Object> o = (Map<String, Object>) JSONObject.parse(returnInfo);
                 if(o != null && "00".equals(String.valueOf(o.get("code")))){
                     Map<String,Object> data = (Map<String, Object>) o.get("data");
