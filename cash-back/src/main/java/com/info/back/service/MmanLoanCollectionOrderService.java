@@ -1116,22 +1116,28 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
             long secondOrderTime = DateUtils.parseDate("2018-03-01", "yyyy-MM-dd").getTime();
 
             if (loanEndTime >= newestOrderTime) {
-                // 按固定逾期费率收取
-                pmoney = (loanMoney.multiply(pRate).multiply(new BigDecimal(pday))).setScale(2, BigDecimal.ROUND_HALF_UP);
+                // 按固定逾期费率收取（砍头息滞纳金计算方式）
+                pmoney = getPayMoney(loanMoney, pday, pRate, paidMoney, pmoney);
             } else if (loanEndTime >= secondOrderTime) {
                 // 按(本金)日费率：首日（5%）、之后每日按千分之6收取
                 pmoney = (loanMoney.multiply(firstDayRate).add(loanMoney.multiply(pRate).multiply(new BigDecimal(pday - 1)))).setScale(2, BigDecimal.ROUND_HALF_UP);
             } else {
-                if (paidMoney != null && paidMoney.compareTo(BigDecimal.ZERO) > 0) {
-                    // 砍头息滞纳金计算方式
-                    pmoney = (paidMoney.multiply(pRate).multiply(new BigDecimal(pday))).setScale(2, BigDecimal.ROUND_HALF_UP);//逾期金额(部分还款算全罚息  服务费算罚息)
-                } else {
-                    pmoney = (loanMoney.multiply(pRate).multiply(new BigDecimal(pday))).setScale(2, BigDecimal.ROUND_HALF_UP);//逾期金额（部分还款算全罚息  服务费不算罚息)
-                }
+                pmoney = getPayMoney(loanMoney, pday, pRate, paidMoney, pmoney);
 
             }
         } catch (Exception e) {
             logger.error("calculate Penalty error！ loanId =" + loan.getId());
+        }
+        return pmoney;
+    }
+
+    // 根据paidMoney是否为空来判断计算滞纳金的方式
+    private BigDecimal getPayMoney(BigDecimal loanMoney, int pday, BigDecimal pRate, BigDecimal paidMoney, BigDecimal pmoney) {
+        if (paidMoney != null && paidMoney.compareTo(BigDecimal.ZERO) > 0) {
+            // 砍头息滞纳金计算方式
+            pmoney = (paidMoney.multiply(pRate).multiply(new BigDecimal(pday))).setScale(2, BigDecimal.ROUND_HALF_UP);//逾期金额(部分还款算全罚息  服务费算罚息)
+        } else {
+            pmoney = (loanMoney.multiply(pRate).multiply(new BigDecimal(pday))).setScale(2, BigDecimal.ROUND_HALF_UP);//逾期金额（部分还款算全罚息  服务费不算罚息)
         }
         return pmoney;
     }
