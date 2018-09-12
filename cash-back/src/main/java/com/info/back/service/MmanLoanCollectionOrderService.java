@@ -750,13 +750,13 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
             // 区分大小额分别处理
             Map<String, String> personMap = new HashMap<>();
             if (Constant.BIG.equals(type)) {
-                if(isBeforePeroidCollectionCompleted(loanId)){
+                if (isBeforePeroidCollectionCompleted(loanId)) {
                     personMap.put("beginDispatchTime", DateUtil.getDateFormat("yyyy-MM-dd 00:00:00"));
                     personMap.put("endDispatchTime", DateUtil.getDateFormat((DateUtil.getBeforeOrAfter(new Date(), 1)), "yyyy-MM-dd HH:mm:ss"));
                     personMap.put("groupLevel", BackConstant.XJX_OVERDUE_LEVEL_F_M1);
                     personMap.put("userStatus", BackConstant.ON);
                     personList = backUserDao.findUnCompleteCollectionOrderByCurrentUnCompleteCountListByMap(personMap);
-                }else {
+                } else {
                     personList = setPersonList(loanId);
                 }
 
@@ -1108,7 +1108,17 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
 
         // 计算订单罚息
         try {
-            if (loan.getLoanEndTime().getTime() >= DateUtils.parseDate("2018-03-01", "yyyy-MM-dd").getTime()) {
+            // 应还时间
+            long loanEndTime = loan.getLoanEndTime().getTime();
+            // 最近一次订单计费方式更改截止时间
+            long newestOrderTime = DateUtils.parseDate("2018-09-02", "yyyy-MM-dd").getTime();
+            // 最近一次订单计费方式更改截止时间
+            long secondOrderTime = DateUtils.parseDate("2018-03-01", "yyyy-MM-dd").getTime();
+
+            if (loanEndTime >= newestOrderTime) {
+                // 按固定逾期费率收取
+                pmoney = (loanMoney.multiply(pRate).multiply(new BigDecimal(pday))).setScale(2, BigDecimal.ROUND_HALF_UP);
+            } else if (loanEndTime >= secondOrderTime) {
                 // 按(本金)日费率：首日（5%）、之后每日按千分之6收取
                 pmoney = (loanMoney.multiply(firstDayRate).add(loanMoney.multiply(pRate).multiply(new BigDecimal(pday - 1)))).setScale(2, BigDecimal.ROUND_HALF_UP);
             } else {
