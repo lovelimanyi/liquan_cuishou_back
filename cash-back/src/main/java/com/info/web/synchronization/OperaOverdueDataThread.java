@@ -90,7 +90,7 @@ public class OperaOverdueDataThread implements Runnable {
 								Map<String,Object> data = (Map<String, Object>) o.get("data");
 								userInfo = (Map<String, Object>) data.get("user");
 								cardInfo = ((List<Map<String, Object>>) data.get("userCardInfoList")).get(0);
-								userContactsList = (List<Map<String, Object>>) data.get("userContacts");
+								userContactsList = (List<Map<String, Object>>) data.get("userContactsList");
 							}
 						}catch (Exception e){
 							loger.error("调用cashman获取用户信息出错：" + e);
