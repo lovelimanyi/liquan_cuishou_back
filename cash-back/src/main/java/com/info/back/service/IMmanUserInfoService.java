@@ -1,9 +1,11 @@
 package com.info.back.service;
 
 import com.info.web.pojo.ContactInfo;
+import com.info.web.pojo.EcommerceInfo;
 import com.info.web.pojo.MmanUserInfo;
 import org.springframework.ui.Model;
 
+import java.util.HashMap;
 import java.util.List;
 
 public interface IMmanUserInfoService {
@@ -41,5 +43,12 @@ public interface IMmanUserInfoService {
 	MmanUserInfo getUserInfoAccordId(String id);
 
 	void updateUserPhonesByUserId(MmanUserInfo info);
+
+	/**
+	 * 获取用户电商交易信息
+	 * @param map
+	 * @return
+	 */
+    List<EcommerceInfo> getEconmerceInfo(HashMap<String, Object> map);
 }
 

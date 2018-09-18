@@ -1,5 +1,7 @@
 package com.info.back.service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.info.back.dao.IChannelSwitchingDao;
 import com.info.back.dao.IMmanUserInfoDao;
@@ -13,15 +15,22 @@ import com.info.back.vo.jxl_jdq.JdqReport;
 import com.info.back.vo.jxl_jlm.JlmReport;
 import com.info.back.vo.jxl_lf.LfReport;
 import com.info.back.vo.jxl_rs.RsReport;
+import com.info.config.PayContents;
 import com.info.constant.Constant;
 import com.info.web.pojo.ContactInfo;
+import com.info.web.pojo.EcommerceInfo;
 import com.info.web.pojo.MmanUserInfo;
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.info.back.controller.BaseController.MESSAGE;
 
@@ -68,83 +77,113 @@ public class MmanUserInfoService implements IMmanUserInfoService {
         MmanUserInfo userInfo = mmanUserInfoDao.get(userId);
         String phone = userInfo.getUserPhone();
         String ossUrl = channelSwitchingDao.getChannelValue("jxl_oss_url").getChannelValue();
-        String url = ossUrl+phone;
+        String url = ossUrl + phone;
         String returnUrl = "";
 //        String phone = "18612567487";
 //        String url = "http://apigateway.cee10a53e8937498ab6c068afee5df20a.cn-hangzhou.alicontainer.com/api/storage/v1/report/"+phone+"?subtype=rs_detail";
 
         try {
             String jxlDetail = userInfo.getJxlDetail();
-            JxlResponse jxlResponse = HttpUtils.get(url,null);
-            if (jxlResponse != null){
+            JxlResponse jxlResponse = HttpUtils.get(url, null);
+            if (jxlResponse != null) {
                 String jxlType = jxlResponse.getJxlType();
                 String result = jxlResponse.getJxlData();
                 JSONObject jsonDetail = JSONObject.parseObject(result);
-                if (jxlType.equals(Constant.JLM_DEATIL) || jxlType.equals(Constant.FQGJ_DETAIL)){
-                    JlmReport jlmReport = JSONObject.toJavaObject(jsonDetail,JlmReport.class);
-                    model.addAttribute("calls",jlmReport.getCalls());
-                    model.addAttribute("transactions",jlmReport.getTransactions());
-                    model.addAttribute("basic",jlmReport.getBasic());
+                if (jxlType.equals(Constant.JLM_DEATIL) || jxlType.equals(Constant.FQGJ_DETAIL)) {
+                    JlmReport jlmReport = JSONObject.toJavaObject(jsonDetail, JlmReport.class);
+                    model.addAttribute("calls", jlmReport.getCalls());
+                    model.addAttribute("transactions", jlmReport.getTransactions());
+                    model.addAttribute("basic", jlmReport.getBasic());
                     //返回 借了吗或分期管家聚信立报告页面
                     returnUrl = "mycollectionorder/jlmReport";
-                }else if (jxlType.equals(Constant.R360_DETAIL)){
-                    Rong360Report rong360Report = JSONObject.toJavaObject(jsonDetail,Rong360Report.class);
+                } else if (jxlType.equals(Constant.R360_DETAIL)) {
+                    Rong360Report rong360Report = JSONObject.toJavaObject(jsonDetail, Rong360Report.class);
                     //返回 融360聚信立报告页面
-                    model.addAttribute("inputInfo",rong360Report.getInput_info());
-                    model.addAttribute("basicInfo",rong360Report.getBasic_info());
-                    model.addAttribute("emergencyAnalysis",rong360Report.getEmergency_analysis());
-                    model.addAttribute("callLog",rong360Report.getCall_log());
+                    model.addAttribute("inputInfo", rong360Report.getInput_info());
+                    model.addAttribute("basicInfo", rong360Report.getBasic_info());
+                    model.addAttribute("emergencyAnalysis", rong360Report.getEmergency_analysis());
+                    model.addAttribute("callLog", rong360Report.getCall_log());
                     returnUrl = "mycollectionorder/rong360Report";
-                }else if(jxlType.equals(Constant.JXL_DETAIL)){
-                    handleCashmanJxl(result,model);
+                } else if (jxlType.equals(Constant.JXL_DETAIL)) {
+                    handleCashmanJxl(result, model);
                     returnUrl = "mycollectionorder/jxlReport";
-                }else if(jxlType.equals(Constant.JDQ_DETAIL)){
-                    JdqReport jdqReport = JSONObject.toJavaObject(jsonDetail,JdqReport.class);
-                    model.addAttribute("calls",jdqReport.getCalls());
-                    model.addAttribute("transactions",jdqReport.getTransactions());
-                    model.addAttribute("basic",jdqReport.getBasic());
-                    model.addAttribute("smses",jdqReport.getSmses());
-                    model.addAttribute("datasource",jdqReport.getDatasource());
+                } else if (jxlType.equals(Constant.JDQ_DETAIL)) {
+                    JdqReport jdqReport = JSONObject.toJavaObject(jsonDetail, JdqReport.class);
+                    model.addAttribute("calls", jdqReport.getCalls());
+                    model.addAttribute("transactions", jdqReport.getTransactions());
+                    model.addAttribute("basic", jdqReport.getBasic());
+                    model.addAttribute("smses", jdqReport.getSmses());
+                    model.addAttribute("datasource", jdqReport.getDatasource());
                     //返回 借点钱聚信立报告页面
                     returnUrl = "mycollectionorder/jdqReport";
-                }else if (jxlType.equals(Constant.DK360_DETAIL)){
-                    Dk360Report dk360Report = JSONObject.toJavaObject(jsonDetail,Dk360Report.class);
-                    model.addAttribute("user",dk360Report.getUser());
-                    model.addAttribute("teleData",dk360Report.getTel().getTeldata());
+                } else if (jxlType.equals(Constant.DK360_DETAIL)) {
+                    Dk360Report dk360Report = JSONObject.toJavaObject(jsonDetail, Dk360Report.class);
+                    model.addAttribute("user", dk360Report.getUser());
+                    model.addAttribute("teleData", dk360Report.getTel().getTeldata());
                     returnUrl = "mycollectionorder/dk360Report";
-                }else if (jxlType.equals(Constant.RS_DETAIL)){
-                    RsReport rsReport = JSONObject.toJavaObject(jsonDetail,RsReport.class);
-                    model.addAttribute("basicInfo",rsReport.getBasicInfo());
-                    model.addAttribute("billSummary",rsReport.getBillSummaryList());
-                    model.addAttribute("callDetail",rsReport.getCallDetailList());
-                    model.addAttribute("smsDetail",rsReport.getSmsDetailList());
+                } else if (jxlType.equals(Constant.RS_DETAIL)) {
+                    RsReport rsReport = JSONObject.toJavaObject(jsonDetail, RsReport.class);
+                    model.addAttribute("basicInfo", rsReport.getBasicInfo());
+                    model.addAttribute("billSummary", rsReport.getBillSummaryList());
+                    model.addAttribute("callDetail", rsReport.getCallDetailList());
+                    model.addAttribute("smsDetail", rsReport.getSmsDetailList());
                     returnUrl = "mycollectionorder/rsReport";
-                }else if (jxlType.equals(Constant.LF_DETAIL)){
-                    LfReport lfReport = JSONObject.toJavaObject(jsonDetail,LfReport.class);
-                    model.addAttribute("basicInfo",lfReport.getCarrier_mobile_basic());
-                    model.addAttribute("call",lfReport.getCarrier_mobile_voice_call());
+                } else if (jxlType.equals(Constant.LF_DETAIL)) {
+                    LfReport lfReport = JSONObject.toJavaObject(jsonDetail, LfReport.class);
+                    model.addAttribute("basicInfo", lfReport.getCarrier_mobile_basic());
+                    model.addAttribute("call", lfReport.getCarrier_mobile_voice_call());
                     returnUrl = "mycollectionorder/lfReport";
-                }else {
+                } else {
                     //其他情况暂时先返回原始聚信立报告页面
-                    returnUrl = localJXLReport(jxlDetail,model,userInfo);
+                    returnUrl = localJXLReport(jxlDetail, model, userInfo);
                 }
-            }else {
-                returnUrl = localJXLReport(jxlDetail,model,userInfo);
+            } else {
+                returnUrl = localJXLReport(jxlDetail, model, userInfo);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             model.addAttribute(MESSAGE, "聚信立请求超时！");
             returnUrl = "mycollectionorder/jxlReport";
         }
-        model.addAttribute("name",userInfo.getRealname());
-        model.addAttribute("gender",userInfo.getUserSex());
-        model.addAttribute("idNumber",userInfo.getIdNumber());
-        model.addAttribute("age",userInfo.getUserAge());
+        model.addAttribute("name", userInfo.getRealname());
+        model.addAttribute("gender", userInfo.getUserSex());
+        model.addAttribute("idNumber", userInfo.getIdNumber());
+        model.addAttribute("age", userInfo.getUserAge());
         return returnUrl;
     }
 
     @Override
     public void updateUserPhonesByUserId(MmanUserInfo info) {
         mmanUserInfoDao.updateUserPhonesByUserId(info);
+    }
+
+    @Override
+    public List<EcommerceInfo> getEconmerceInfo(HashMap<String, Object> map) {
+        List<EcommerceInfo> list = new ArrayList<>(4);
+        String url = PayContents.GXB_ECOMMERCE_INFOS;
+        String phone = map.get("phone") == null ? null : map.get("phone").toString();
+        String userId = map.get("userId") == null ? null : map.get("userId").toString();
+        if (StringUtils.isNotEmpty(phone)) {
+            url += "?phone=" + phone;
+        } else if (StringUtils.isNotEmpty(userId)) {
+            url += "?userId=" + userId;
+        } else {
+            throw new RuntimeException("获取用户电商信息参数缺失");
+        }
+        String res = HttpUtils.doGet(url, null);
+        JSONObject jsonObject = JSONObject.parseObject(res);
+        String data = jsonObject.getString("data");
+        if (data == null) {
+            return null;
+        }
+        String authResultData = JSONObject.parseObject(data).getString("authResult");
+        String reportSummaryData = JSONObject.parseObject(authResultData).getString("reportSummary");
+        String taobaoAddressListData = JSONObject.parseObject(reportSummaryData).getString("taobaoAddressList");
+        JSONArray objects = JSONObject.parseArray(taobaoAddressListData);
+        for (int i = 0; i < objects.size(); i++) {
+            EcommerceInfo info = JSONObject.parseObject(objects.getString(i), EcommerceInfo.class);
+            list.add(info);
+        }
+        return list;
     }
 
 
@@ -158,15 +197,15 @@ public class MmanUserInfoService implements IMmanUserInfoService {
      */
     private String localJXLReport(String jxlDetail, Model model, MmanUserInfo userInfo) {
         String returnUrl = "";
-        if (StringUtils.isNotBlank(jxlDetail)){ //原始现金侠的聚信立报告-分为两种：从数据库中查出来解析
-            handleCashmanJxl(jxlDetail,model);
+        if (StringUtils.isNotBlank(jxlDetail)) { //原始现金侠的聚信立报告-分为两种：从数据库中查出来解析
+            handleCashmanJxl(jxlDetail, model);
             //返回 现金侠原始聚信立报告页面
-            model.addAttribute("name",userInfo.getRealname());
-            model.addAttribute("gender",userInfo.getUserSex());
-            model.addAttribute("idNumber",userInfo.getIdNumber());
-            model.addAttribute("age",userInfo.getUserAge());
+            model.addAttribute("name", userInfo.getRealname());
+            model.addAttribute("gender", userInfo.getUserSex());
+            model.addAttribute("idNumber", userInfo.getIdNumber());
+            model.addAttribute("age", userInfo.getUserAge());
             returnUrl = "mycollectionorder/jxlReport";
-        }else {
+        } else {
             model.addAttribute(MESSAGE, "暂无此客户的聚信立报告！");
             returnUrl = "mycollectionorder/jxlReport";
         }

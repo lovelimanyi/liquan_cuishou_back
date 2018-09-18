@@ -615,7 +615,7 @@ public class MyCollectionOrderController extends BaseController {
                 // 沟通情况
                 Map<String, Object> communicationSituationsMap = getCommunicationSituationsMap(communicationSituations);
                 // 风控标签
-                Map<String,Object> fengKongLableMap = fengKongService.getFengKongLableMap();
+                Map<String, Object> fengKongLableMap = fengKongService.getFengKongLableMap();
                 // 逾期等级
                 Map<String, Object> overdueLevelMap = getOverdueLevelMap(getAllOverdueLevel());
                 int remainCount = msgCountLimit - count > 0 ? msgCountLimit - count : 0;
@@ -624,7 +624,7 @@ public class MyCollectionOrderController extends BaseController {
                 model.addAttribute("orderStatusMap", orderStatusMap);
                 model.addAttribute("remainMsgCount", remainCount);
                 model.addAttribute("msgCountLimit", msgCountLimit);
-                model.addAttribute("fengKongLableMap",fengKongLableMap);
+                model.addAttribute("fengKongLableMap", fengKongLableMap);
                 model.addAttribute("msgs", msgs);
                 model.addAttribute("orderId", id);
                 model.addAttribute("phoneNumber", order.getLoanUserPhone());
@@ -1356,7 +1356,7 @@ public class MyCollectionOrderController extends BaseController {
             boolean smsResult = SmsSendUtil.sendSmsNew(mobile, msgParam, msgCode);
             if (smsResult) {
                 // 插入短信记录
-                insertMsg(mobile, order,msgCode, request);
+                insertMsg(mobile, order, msgCode, request);
                 return new ServiceResult("200", "发送短信成功！");
             } else {
                 return new ServiceResult("-9", "发送失败！");
@@ -1425,10 +1425,10 @@ public class MyCollectionOrderController extends BaseController {
      * @param
      * @param request
      */
-    private void insertMsg(String mobiles, MmanLoanCollectionOrder order,String msgCode, HttpServletRequest request) {
+    private void insertMsg(String mobiles, MmanLoanCollectionOrder order, String msgCode, HttpServletRequest request) {
         SmsUser msg = new SmsUser();
         BackUser user = this.loginAdminUser(request);
-        if(user == null){
+        if (user == null) {
             return;
         }
         msg.setSendUserId(user.getUuid());
@@ -1803,5 +1803,20 @@ public class MyCollectionOrderController extends BaseController {
             orderStatusMap.put(sysDict.getValue(), sysDict.getLabel());
         }
         return orderStatusMap;
+    }
+
+
+    @RequestMapping("/get-user-ecommerce-info")
+    @ResponseBody
+    public List<EcommerceInfo> getEconmerceInfo(HttpServletRequest request) {
+        HashMap<String, Object> map = getParametersO(request);
+        try {
+            List<EcommerceInfo> list = mmanUserInfoService.getEconmerceInfo(map);
+            return list;
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("获取用户电商信息失败 " + map.toString());
+        }
+        return null;
     }
 }

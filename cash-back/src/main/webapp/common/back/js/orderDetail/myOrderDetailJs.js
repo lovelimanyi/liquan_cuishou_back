@@ -806,6 +806,57 @@ function generateLog(log, index) {
     return res;
 }
 
+// 获取用户gxb报告
+function getEcommerceInfo() {
+    var phone = $("#phoneNumber").val();
+    var userId = $("#userId").val();
+    if (phone == null && userId == '') {
+        alertMsg.warn("参数错误，请稍后再试！");
+        return;
+    }
+    var orderStatus = $("#orderStatus").val();
+    if (orderStatus == 4) {
+        alertMsg.warn("催收完成订单不允许查看淘宝交易信息！");
+        return;
+    }
+    var ecommerceInfo = "";
+    $.ajax({
+        type: "GET",
+        url: "/back/collectionOrder/get-user-ecommerce-info",
+        contentType: "application/x-www-form-urlencoded; charset=utf-8",
+        dataType: "json",
+        data: {
+            phone: phone,
+            userId: userId
+        },
+        success: function (data) {
+            debugger;
+            if (data == null) {
+                alertMsg.info("暂无此用户相关报告或查询失败！");
+                return;
+            };
+            $.each(data, function (index,info) {
+                ecommerceInfo += generateEcommerceInfo(info)
+            });
+            $("#ecommerce").append(ecommerceInfo);
+        },
+        error: function () {
+            alertMsg("暂无此用户相关报告或查询失败！")
+        }
+    });
+}
+function generateEcommerceInfo(info) {
+    var ecommerceInfo = "<table class='ecommerceTable'><tbody>";
+    ecommerceInfo += '<tr><td class="xhtd" style="width:150px;">收&nbsp&nbsp货&nbsp&nbsp人:</td><td class="ettd" style="width:100px;">' + info.receiveName + '</td>';
+    ecommerceInfo += '<td class="ehtd" style="width:150px;">手&nbsp&nbsp机&nbsp&nbsp号:</td><td class="ettd" style="width:50px;">' + info.telNumber + '</td>';
+    ecommerceInfo += '<td class="ehtd" style="width:150px;">交易订单总数:</td><td class="ettd">' + info.tradeCount + '</td></tr>';
+
+    ecommerceInfo += '<tr><td class="xhtd" style="width:150px;">近3个月交易订单总数:</td><td class="ettd">' + info.tradeCountOf3m + '</td>';
+    ecommerceInfo += '<td class="xhtd" style="width:150px;">收货地址:</td><td class="ettd" style="width:500px;">' + info.address + '</td>';
+    ecommerceInfo += '</tr></tbody></table></p><div class="divider"></div>';
+    return ecommerceInfo;
+}
+
 function getLogType(type) {
     if (type == null || type == '') {
         return "";

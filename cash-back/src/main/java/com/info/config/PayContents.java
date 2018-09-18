@@ -22,4 +22,10 @@ public class PayContents {
     //获取商品名称
     public static final String PRODUCT_NAME_URL = propertiesLoader.getProperty("productName.rul");//获取商品名地址
     public static final String XJX_GET_USERINFOS = propertiesLoader.getProperty("XJX.GET.userInfos");//获取cashman库中用户个人用户信息、银行卡、联系人等信息
+    public static final String GXB_ECOMMERCE_INFOS = propertiesLoader.getProperty("XJX.ecommerce.info");// gxb电商报告获取地址
+    // Basic authentication信息
+    public static final String AUTHENTICATE_USERNAME = propertiesLoader.getProperty("XJX.authenticate.username");
+    public static final String AUTHENTICATE_PASSWORD = propertiesLoader.getProperty("XJX.authenticate.password");
+
+
 }

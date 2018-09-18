@@ -106,11 +106,41 @@
     width: 400px;
     height: 100px;
     position: absolute;
-    left:180px;
-    top:40px;
+    left: 180px;
+    top: 40px;
 }
 
 #msgNotice {
     margin-left: 180px;
     margin-top: 165px;
+}
+
+.ecommerceTable {
+    padding: 1px;
+    border: none;
+    width: 100%;
+    line-height: 21px;
+    font-size: 14px;
+}
+
+.ehtd {
+    text-align: right;
+    padding: 7px 2px 2px 2px;
+    font-size: 14px;
+    border-bottom: none;
+}
+
+.ettd {
+    text-align: left;
+    padding: 7px 2px 2px 2px;
+    font-size: 14px;
+    border-bottom: none;
+}
+
+.xhtd {
+    text-align: right;
+    padding: 7px 2px 2px 2px;
+    font-size: 14px;
+    border-bottom: none;
+    margin-left: 100px;
 }

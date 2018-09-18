@@ -1,6 +1,7 @@
 package com.info.back.utils;
 
 import com.info.back.vo.JxlResponse;
+import com.info.config.PayContents;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
@@ -30,17 +31,21 @@ import java.util.Map;
 
 public class HttpUtils {
 
+    private static final String JXL_URL = "/report/jxl_raw_report";
+
     private static final Logger logger = Logger.getLogger(HttpUtils.class);
+
     /**
      * Basic Auth认证头信息
+     *
      * @return authHeader
      */
-    private static String getAuthHeader(){
+    private static String getAuthHeader() {
 //        HashMap<String, String> map = SysCacheUtils.getConfigParams("GET_JXL");
 //        String key = map.get("JXL_GET_AUTH_NAME");
 //        String pwd = map.get("JXL_GET_AUTH_PWD");
 //        String auth = "xjx_application_client_stage"+":"+"xjx_stage";
-        String auth = "xjx_application_client"+":"+"xjx_123456";
+        String auth = PayContents.AUTHENTICATE_USERNAME + ":" + PayContents.AUTHENTICATE_PASSWORD;
         byte[] encodedAuth = Base64Utils.encode(auth.getBytes(Charset.forName("US-ASCII")));
         String authHeader = "Basic " + new String(encodedAuth);
         return authHeader;
@@ -48,7 +53,7 @@ public class HttpUtils {
 
     // 聚信立get
     public static JxlResponse get(String url, Map<String, Object> params) {
-        String phone =url.substring(url.length()-11,url.length());
+        String phone = url.substring(url.length() - 11, url.length());
         CloseableHttpClient httpClient = HttpClients.createDefault();
         //超时设置
         RequestConfig requestConfig = getRequestConfig();
@@ -57,19 +62,18 @@ public class HttpUtils {
             String requestParams = parseParams(params);
             String extraUrl = url + (StringUtils.isEmpty(requestParams) ? "" : "?" + requestParams);
             HttpGet get = new HttpGet(extraUrl);
-            if (url.contains("https://risk-internal.xianjinxia.com/api/storage/v1/report/")){
-                get.addHeader("Authorization",getAuthHeader());
+            if (url.contains(JXL_URL)) {
+                get.addHeader("Authorization", getAuthHeader());
             }
-//            get.addHeader("Authorization",getAuthHeader());
             get.setConfig(requestConfig);
             response = httpClient.execute(get);
-            String tuid = response.getFirstHeader("X-TUID")==null?null:response.getFirstHeader("X-TUID").getValue();
-            String subtype = response.getFirstHeader("X-SUBTYPE")==null?null:response.getFirstHeader("X-SUBTYPE").getValue();
-            logger.info(phone+" phone-jxlGetJsonData-tuid= " + tuid + ",subtype=" + subtype);
+            String tuid = response.getFirstHeader("X-TUID") == null ? null : response.getFirstHeader("X-TUID").getValue();
+            String subtype = response.getFirstHeader("X-SUBTYPE") == null ? null : response.getFirstHeader("X-SUBTYPE").getValue();
+            logger.info(phone + " phone-jxlGetJsonData-tuid= " + tuid + ",subtype=" + subtype);
             HttpEntity entity = response.getEntity();
 //            logger.info(phone+"phone-JxlData="+EntityUtils.toString(entity));
 //            String type= response.getFirstHeader("X-SUBTYPE").getValue();
-            if (StringUtils.isNoneBlank(subtype)){
+            if (StringUtils.isNoneBlank(subtype)) {
                 JxlResponse jxlResponse = new JxlResponse();
                 jxlResponse.setJxlType(subtype);
                 jxlResponse.setJxlData(EntityUtils.toString(entity));
@@ -81,7 +85,7 @@ public class HttpUtils {
             logger.error("访问链接异常[GET] url=" + url, e);
             return null;
         } finally {
-            if(response != null) {
+            if (response != null) {
                 try {
                     response.close();
                 } catch (IOException e) {
@@ -90,7 +94,8 @@ public class HttpUtils {
             }
         }
     }
-    public static String postJson(String apiURL, String params){
+
+    public static String postJson(String apiURL, String params) {
         HttpClient httpClient = new DefaultHttpClient();
         HttpPost httpPost = new HttpPost(apiURL);
         String body = null;
@@ -98,7 +103,7 @@ public class HttpUtils {
         try {
 
             // 建立一个NameValuePair数组，用于存储欲传送的参数
-            httpPost.addHeader("Content-type","application/json; charset=utf-8");
+            httpPost.addHeader("Content-type", "application/json; charset=utf-8");
             httpPost.setHeader("Accept", "application/json");
             if (params != null) {
                 // 设置字符集
@@ -125,6 +130,7 @@ public class HttpUtils {
         }
         return body;
     }
+
     public static String doGet(String url, Map<String, Object> params) {
         CloseableHttpClient httpClient = HttpClients.createDefault();
         //超时设置
@@ -134,8 +140,9 @@ public class HttpUtils {
             String requestParams = parseParams(params);
             String extraUrl = url + (StringUtils.isEmpty(requestParams) ? "" : "?" + requestParams);
             HttpGet get = new HttpGet(extraUrl);
-            String authHeader = getAuthHeader();
-            get.addHeader("Authorization",authHeader);
+            if (url.contains(PayContents.GXB_ECOMMERCE_INFOS)) {
+                get.addHeader("Authorization", getAuthHeader());
+            }
             get.setConfig(requestConfig);
             response = httpClient.execute(get);
             HttpEntity entity = response.getEntity();
@@ -144,7 +151,7 @@ public class HttpUtils {
             logger.error("访问链接异常[GET] url=" + url, e);
             return null;
         } finally {
-            if(response != null) {
+            if (response != null) {
                 try {
                     response.close();
                 } catch (IOException e) {
@@ -171,7 +178,7 @@ public class HttpUtils {
             logger.error("访问链接异常[POST] url=" + url, e);
             return null;
         } finally {
-            if(response != null) {
+            if (response != null) {
                 try {
                     response.close();
                 } catch (IOException e) {
@@ -197,7 +204,7 @@ public class HttpUtils {
             logger.error("访问链接异常[POST] url=" + url, e);
             return null;
         } finally {
-            if(response != null) {
+            if (response != null) {
                 try {
                     response.close();
                 } catch (IOException e) {
@@ -210,6 +217,7 @@ public class HttpUtils {
     /**
      * 设置HTTP配置
      * 3秒超时
+     *
      * @return
      */
     private static RequestConfig getRequestConfig() {
@@ -219,8 +227,8 @@ public class HttpUtils {
     }
 
     @SuppressWarnings("unchecked")
-    private static String parseParams(Map<String, Object> params) throws Exception{
-        if(CollectionUtils.isEmpty(params)) {
+    private static String parseParams(Map<String, Object> params) throws Exception {
+        if (CollectionUtils.isEmpty(params)) {
             return "";
         }
 
@@ -235,7 +243,7 @@ public class HttpUtils {
                     String item = URLEncoder.encode(Array.get(value, i).toString(), "UTF-8");
                     sb.append(key).append('=').append(item).append('&');
                 }
-            } else if(value instanceof List) {
+            } else if (value instanceof List) {
                 List<Object> items = (List<Object>) value;
                 for (Object item : items) {
                     String str = URLEncoder.encode(item.toString(), "UTF-8");
@@ -255,7 +263,7 @@ public class HttpUtils {
     @SuppressWarnings("unchecked")
     private static List<BasicNameValuePair> parsePairs(Map<String, Object> params) {
         List<BasicNameValuePair> list = new ArrayList<BasicNameValuePair>();
-        if(CollectionUtils.isEmpty(params)) {
+        if (CollectionUtils.isEmpty(params)) {
             return list;
         }
 
@@ -269,7 +277,7 @@ public class HttpUtils {
                     String item = Array.get(value, i).toString();
                     list.add(new BasicNameValuePair(key, item));
                 }
-            } else if(value instanceof List) {
+            } else if (value instanceof List) {
                 List<Object> items = (List<Object>) value;
                 for (Object item : items) {
                     String str = item.toString();
