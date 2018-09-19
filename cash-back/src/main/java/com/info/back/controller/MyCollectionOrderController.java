@@ -1811,6 +1811,7 @@ public class MyCollectionOrderController extends BaseController {
     public List<EcommerceInfo> getEconmerceInfo(HttpServletRequest request) {
         HashMap<String, Object> map = getParametersO(request);
         try {
+            logger.info("获取用户电商信息,手机号: " + map.get("phone"));
             List<EcommerceInfo> list = mmanUserInfoService.getEconmerceInfo(map);
             return list;
         } catch (Exception e) {

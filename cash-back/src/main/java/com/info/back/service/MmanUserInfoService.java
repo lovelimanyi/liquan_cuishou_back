@@ -1,6 +1,5 @@
 package com.info.back.service;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.info.back.dao.IChannelSwitchingDao;
@@ -20,8 +19,6 @@ import com.info.constant.Constant;
 import com.info.web.pojo.ContactInfo;
 import com.info.web.pojo.EcommerceInfo;
 import com.info.web.pojo.MmanUserInfo;
-import org.apache.commons.collections.MapUtils;
-import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,7 +27,6 @@ import org.springframework.ui.Model;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static com.info.back.controller.BaseController.MESSAGE;
 
@@ -173,11 +169,22 @@ public class MmanUserInfoService implements IMmanUserInfoService {
         JSONObject jsonObject = JSONObject.parseObject(res);
         String data = jsonObject.getString("data");
         if (data == null) {
-            return null;
+            String newUrl = PayContents.GXB_ECOMMERCE_INFOS + "?userId=" + userId;
+            String result = HttpUtils.doGet(newUrl, null);
+            JSONObject jsonResult = JSONObject.parseObject(result);
+            String jsonData = jsonResult.getString("data");
+            if (jsonData == null) {
+                return null;
+            } else {
+                data = jsonData;
+            }
         }
         String authResultData = JSONObject.parseObject(data).getString("authResult");
         String reportSummaryData = JSONObject.parseObject(authResultData).getString("reportSummary");
         String taobaoAddressListData = JSONObject.parseObject(reportSummaryData).getString("taobaoAddressList");
+        if (StringUtils.isEmpty(taobaoAddressListData)) {
+            return null;
+        }
         JSONArray objects = JSONObject.parseArray(taobaoAddressListData);
         for (int i = 0; i < objects.size(); i++) {
             EcommerceInfo info = JSONObject.parseObject(objects.getString(i), EcommerceInfo.class);
