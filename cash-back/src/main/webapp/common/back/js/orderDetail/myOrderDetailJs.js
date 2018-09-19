@@ -13,6 +13,7 @@ $(PostbirdImgGlass.init({
 
 // 获取用户聚信立报告信息
 function getJxlContent() {
+    $("#jxl").empty();
     var orderId = $("#orderId").val();
     $.ajax({
         type: "GET",

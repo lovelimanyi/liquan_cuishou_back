@@ -51,6 +51,17 @@ public class HttpUtils {
         return authHeader;
     }
 
+    private static String getOldAuthHeader() {
+//        HashMap<String, String> map = SysCacheUtils.getConfigParams("GET_JXL");
+//        String key = map.get("JXL_GET_AUTH_NAME");
+//        String pwd = map.get("JXL_GET_AUTH_PWD");
+        String auth = "xjx_application_client_stage"+":"+"xjx_stage";
+        byte[] encodedAuth = Base64Utils.encode(auth.getBytes(Charset.forName("US-ASCII")));
+        String authHeader = "Basic " + new String(encodedAuth);
+        return authHeader;
+    }
+
+
     // 聚信立get
     public static JxlResponse get(String url, Map<String, Object> params) {
         String phone = url.substring(url.length() - 11, url.length());
@@ -63,7 +74,7 @@ public class HttpUtils {
             String extraUrl = url + (StringUtils.isEmpty(requestParams) ? "" : "?" + requestParams);
             HttpGet get = new HttpGet(extraUrl);
             if (url.contains(JXL_URL)) {
-                get.addHeader("Authorization", getAuthHeader());
+                get.addHeader("Authorization", getOldAuthHeader());
             }
             get.setConfig(requestConfig);
             response = httpClient.execute(get);
