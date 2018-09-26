@@ -215,7 +215,7 @@
                     <li id="addressList"><a href="#" onclick="getUserRealContent();"><span>通讯录</span></a></li>
                     <li id="orderStatusChangeLog"><a href="#" onclick="getStatusChangeLogContent();"><span>订单流转日志</span></a></li>
                     <li id="jxlLable"><a href="#" onclick="getJxlContent();"><span>聚信立报告</span></a></li>
-                    <%--<li id="ecommerceInfo"><a href="#" onclick="getEcommerceInfo();"><span>淘宝交易信息</span></a></li>--%>
+                    <li id="ecommerceInfo"><a href="#" onclick="getEcommerceInfo();"><span>淘宝交易信息</span></a></li>
                 </ul>
             </div>
         </div>

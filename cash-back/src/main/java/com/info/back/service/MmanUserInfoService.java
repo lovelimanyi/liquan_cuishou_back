@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.info.back.dao.IChannelSwitchingDao;
 import com.info.back.dao.IMmanUserInfoDao;
 import com.info.back.utils.HttpUtils;
+import com.info.back.utils.HttpsUtil;
 import com.info.back.vo.JxlResponse;
 import com.info.back.vo.jxl.*;
 import com.info.back.vo.jxl2.JxlUserReport;
@@ -73,7 +74,7 @@ public class MmanUserInfoService implements IMmanUserInfoService {
         MmanUserInfo userInfo = mmanUserInfoDao.get(userId);
         String phone = userInfo.getUserPhone();
         String ossUrl = channelSwitchingDao.getChannelValue("jxl_oss_url").getChannelValue();
-        String url = ossUrl + phone;
+        String url = ossUrl + "?phone=" + phone;
         String returnUrl = "";
 //        String phone = "18612567487";
 //        String url = "http://apigateway.cee10a53e8937498ab6c068afee5df20a.cn-hangzhou.alicontainer.com/api/storage/v1/report/"+phone+"?subtype=rs_detail";
@@ -165,8 +166,11 @@ public class MmanUserInfoService implements IMmanUserInfoService {
         } else {
             throw new RuntimeException("获取用户电商信息参数缺失");
         }
-        String res = HttpUtils.doGet(url, null);
+        String res = HttpsUtil.httpsRequest(url, "GET", null);
         JSONObject jsonObject = JSONObject.parseObject(res);
+        if (StringUtils.isEmpty(res)) {
+            return null;
+        }
         String data = jsonObject.getString("data");
         if (data == null) {
             String newUrl = PayContents.GXB_ECOMMERCE_INFOS + "?userId=" + userId;
