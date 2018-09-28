@@ -166,7 +166,13 @@ public class MmanUserInfoService implements IMmanUserInfoService {
         } else {
             throw new RuntimeException("获取用户电商信息参数缺失");
         }
-        String res = HttpsUtil.httpsRequest(url, "GET", null);
+        String res;
+        // 预生产环境或测试环境接口使用http 生产接口为https
+        if (url.startsWith("https")) {
+            res = HttpsUtil.httpsRequest(url, "GET", null);
+        } else {
+            res = HttpUtils.doGet(url, null);
+        }
         JSONObject jsonObject = JSONObject.parseObject(res);
         if (StringUtils.isEmpty(res)) {
             return null;

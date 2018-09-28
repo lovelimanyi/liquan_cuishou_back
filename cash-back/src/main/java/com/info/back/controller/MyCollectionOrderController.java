@@ -56,8 +56,6 @@ public class MyCollectionOrderController extends BaseController {
 
     private static final String SHORT_MESSAGE_LIMIT_COUNT_REDIS_KEY = "msgCountLimit";
 
-    private static final String MERCHANT_INFO_REDIS_KEY = "merchants";
-
     private static final String DICTIONARY_TYPE_OVERDUE_LEVEL = "xjx_overdue_level";
 
     private static final String DICTIONARY_TYPE_ORDER_STATE = "xjx_collection_order_state";
@@ -121,8 +119,6 @@ public class MyCollectionOrderController extends BaseController {
     private ICollectionWithholdingRecordService collectionWithholdingRecordService;
 
     @Autowired
-    private IMerchantInfoDao merchantInfoDao;
-    @Autowired
     private IMmanUserLoanDao mmanUserLoanDao;
 
 
@@ -182,14 +178,16 @@ public class MyCollectionOrderController extends BaseController {
         }
 
         model.addAttribute("page", page);
-        model.addAttribute("params", params);
         model.addAttribute("userGropLeval", backUser.getRoleId());
         model.addAttribute("dictMap", BackConstant.groupNameMap);
         // 跟进等级
         List<SysDict> levellist = sysDictService.getStatus("xjx_stress_level");
+        // 商户信息
+        model.addAttribute("merchantMap", mmanLoanCollectionOrderService.getMerchantMap());
         HashMap<String, String> levelMap = BackConstant.orderState(levellist);
-        model.addAttribute("levellist", levellist);// 用于搜索框保留值
+        model.addAttribute("levellist", levellist);
         model.addAttribute("levelMap", levelMap);
+        model.addAttribute("params", params); // 用于搜索框保留值
         return "mycollectionorder/collectionOrder";
     }
 
@@ -1268,22 +1266,12 @@ public class MyCollectionOrderController extends BaseController {
      */
     private String getMerchantName(MmanLoanCollectionOrder order) {
         // 获取所有商户信息
-        List<MerchantInfo> list = new ArrayList<>(8);
+        Map<String, String> merchantMap = mmanLoanCollectionOrderService.getMerchantMap();
         String merchantNanme = null;
-        try {
-            list = JedisDataClient.getList(BackConstant.REDIS_KEY_PREFIX, MERCHANT_INFO_REDIS_KEY);
-            if (CollectionUtils.isEmpty(list)) {
-                list = merchantInfoDao.getAll();
-                JedisDataClient.setList(BackConstant.REDIS_KEY_PREFIX, MERCHANT_INFO_REDIS_KEY, list, 10 * 60);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("获取商户信息失败...");
-        }
         MmanUserLoan mmanUserLoan = mmanUserLoanService.get(order.getLoanId());
-        for (MerchantInfo merchantInfo : list) {
-            if (merchantInfo.getMerchantId().equals(mmanUserLoan.getMerchantNo())) {
-                merchantNanme = merchantInfo.getMerchantName();
+        for (Map.Entry<String,String> map : merchantMap.entrySet()) {
+            if (map.getKey().equals(mmanUserLoan.getMerchantNo())) {
+                merchantNanme = map.getValue();
                 break;
             }
         }
@@ -1820,4 +1808,5 @@ public class MyCollectionOrderController extends BaseController {
         }
         return null;
     }
+
 }

@@ -60,6 +60,8 @@ public class OrderBaseResult {
 
     private BigDecimal serviceCharge;
 
+    private String merchantNo;
+
     public BigDecimal getServiceCharge() {
         return serviceCharge;
     }
@@ -290,5 +292,13 @@ public class OrderBaseResult {
 
     public void setAccrual(BigDecimal accrual) {
         this.accrual = accrual;
+    }
+
+    public String getMerchantNo() {
+        return merchantNo;
+    }
+
+    public void setMerchantNo(String merchantNo) {
+        this.merchantNo = merchantNo;
     }
 }

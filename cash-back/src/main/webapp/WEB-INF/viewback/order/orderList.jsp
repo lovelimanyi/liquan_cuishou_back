@@ -77,6 +77,8 @@
 
                         </select>
                     </td>
+                </tr>
+                <tr>
                     <td>
                         催 收 状 态:
                         <select id="status" name="status">
@@ -92,11 +94,14 @@
                         </select>
                     </td>
                     <td>
-                        新 老 用 户:
-                        <select id="customerType" name="customerType">
-                            <option value="" <c:if test="${params.customerType eq ''}">selected="selected"</c:if>>全部</option>
-                            <option value="0" <c:if test="${params.customerType eq '0'}">selected="selected"</c:if>>新用户</option>
-                            <option value="1" <c:if test="${params.customerType eq '1'}">selected="selected"</c:if>>老用户</option>
+                        渠 道 来 源:
+                        <select id="merchantNo" name="merchantNo">
+                            <option value="">全部</option>
+                            <c:forEach var="merchant" items="${merchantMap }">
+                                <option value="${merchant.key }" <c:if test="${merchant.key eq params.merchantNo}">selected="selected"</c:if>>
+                                        ${merchant.value}
+                                </option>
+                            </c:forEach>
                         </select>
                     </td>
                     <td>
@@ -108,8 +113,6 @@
                             </div>
                         </div>
                     </td>
-                </tr>
-                <tr>
                 </tr>
             </table>
         </div>
@@ -146,7 +149,7 @@
                 <th align="center" width="60">
                     借款人手机号
                 </th>
-                <th align="center" width="80">
+                <th align="center" width="70">
                     借款人身份证
                 </th>
                 <th align="center" width="50">
@@ -184,6 +187,9 @@
                 </th>
                 <th align="center" width="50">
                     派单时间
+                </th>
+                <th align="center" width="50">
+                    渠道来源
                 </th>
                 <th align="center" width="50">
                     当前催收员
@@ -289,6 +295,9 @@
                     </td>
                     <td align="center" width="50">
                         <fmt:formatDate value="${order.dispatchTime}" pattern="yyyy-MM-dd HH:mm:ss"/>
+                    </td>
+                    <td align="center" width="50">
+                            ${merchantMap[order.merchantNo]}
                     </td>
                     <td align="center" width="50">
                             ${order.currUserName}

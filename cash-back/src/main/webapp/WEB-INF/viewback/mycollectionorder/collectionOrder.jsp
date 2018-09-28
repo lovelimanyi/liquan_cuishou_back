@@ -99,7 +99,6 @@
                                         ${group.value}
                                 </option>
                             </c:forEach>
-
                         </select>
                     </td>
                     <td>
@@ -137,6 +136,19 @@
                             <option value="" <c:if test="${params.customerType eq ''}">selected="selected"</c:if>>全部</option>
                             <option value="0" <c:if test="${params.customerType eq '0'}">selected="selected"</c:if>>新用户</option>
                             <option value="1" <c:if test="${params.customerType eq '1'}">selected="selected"</c:if>>老用户</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        渠 道 来 源:
+                        <select id="merchantNo" name="merchantNo">
+                            <option value="">全部</option>
+                            <c:forEach var="merchant" items="${merchantMap }">
+                                <option value="${merchant.key }" <c:if test="${merchant.key eq params.merchantNo}">selected="selected"</c:if>>
+                                        ${merchant.value}
+                                </option>
+                            </c:forEach>
                         </select>
                     </td>
                     <td>
@@ -213,6 +225,9 @@
                 </th>
                 <th align="center" width="50">
                     用户类型
+                </th>
+                <th align="center" width="50">
+                    渠道来源
                 </th>
                 <th align="center" width="80">
                     应还时间
@@ -311,6 +326,9 @@
                             <c:when test="${order.customerType eq '0'}">新用户</c:when>
                             <c:when test="${order.customerType eq '1'}">老用户</c:when>
                         </c:choose>
+                    </td>
+                    <td align="center" width="50">
+                            ${merchantMap[order.merchantNo]}
                     </td>
                     <td align="center" width="50">
                         <fmt:formatDate value="${order.loanEndTime}" pattern="yyyy-MM-dd"/>

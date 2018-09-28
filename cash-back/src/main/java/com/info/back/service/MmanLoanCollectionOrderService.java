@@ -54,6 +54,10 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
     private IOrderChangeRecordService orderChangeRecordService;
     @Autowired
     private IMmanLoanCollectionCompanyDao mmanLoanCollectionCompanyDao;
+    @Autowired
+    private IMerchantInfoDao merchantInfoDao;
+
+    private static final String MERCHANT_INFO_REDIS_KEY = "merchants";
 
     @Override
     public List<String> getOverdueOrder() {
@@ -1194,5 +1198,41 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
             JedisDataClient.set("OVERDUE_UPGRADE_DAY", String.valueOf(orderUpgradeDay), 60 * 60 * 6);
         }
         return orderUpgradeDay;
+    }
+
+    @Override
+    public Map<String, String> getMerchantMap() {
+        Map<String, String> result = new HashMap<>(4);
+        List<MerchantInfo> list = getAllMerchants();
+        if (org.apache.commons.collections.CollectionUtils.isNotEmpty(list)) {
+            for (MerchantInfo merchantInfo : list) {
+                String merchantId = merchantInfo.getMerchantId();
+                String merchantName = merchantInfo.getMerchantName();
+                if (StringUtils.isNotEmpty(merchantId) && StringUtils.isNotEmpty(merchantName)) {
+                    result.put(merchantId, merchantName);
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 获取所有的商户信息
+     *
+     * @return
+     */
+    private List<MerchantInfo> getAllMerchants() {
+        try {
+            List<MerchantInfo> merchantList = JedisDataClient.getList(BackConstant.REDIS_KEY_PREFIX, MERCHANT_INFO_REDIS_KEY);
+            if (org.apache.commons.collections.CollectionUtils.isEmpty(merchantList)) {
+                merchantList = merchantInfoDao.getAll();
+                JedisDataClient.setList(BackConstant.REDIS_KEY_PREFIX, MERCHANT_INFO_REDIS_KEY, merchantList, 10 * 60);
+            }
+            return merchantList;
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("获取商户信息失败...");
+        }
+        return null;
     }
 }

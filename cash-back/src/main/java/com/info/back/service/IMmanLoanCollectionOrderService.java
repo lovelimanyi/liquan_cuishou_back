@@ -154,4 +154,10 @@ public interface IMmanLoanCollectionOrderService {
 	void dealwithBigOrderUpgrade(String loanId);
 
     void updateProductName(MmanLoanCollectionOrder order);
+
+	/**
+	 * 获取商户信息map
+	 * @return
+	 */
+	Map<String, String> getMerchantMap();
 }
