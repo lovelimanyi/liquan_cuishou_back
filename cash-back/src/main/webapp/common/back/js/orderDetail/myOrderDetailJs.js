@@ -809,6 +809,7 @@ function generateLog(log, index) {
 
 // 获取用户gxb报告
 function getEcommerceInfo() {
+    $("#ecommerce").empty();
     var phone = $("#phoneNumber").val();
     var userId = $("#userId").val();
     if (phone == null && userId == '') {
