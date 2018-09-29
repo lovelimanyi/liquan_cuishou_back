@@ -176,7 +176,7 @@ public class OperaOverdueDataThread implements Runnable {
 		mmanUserLoan.setDelFlag("0");//0正常1：删除
 		mmanUserLoan.setCustomerType(Integer.valueOf(userInfo.get("customer_type") == null ? "0" : userInfo.get("customer_type").toString()));   // 标识新老用户 0 新用户  1 老用户
 		mmanUserLoan.setBorrowingType(Constant.SMALL);
-		mmanUserLoan.setMerchantNo(String.valueOf(userInfo.get("merchant_number")));
+		mmanUserLoan.setMerchantNo(String.valueOf(borrowOrder.get("merchant_number")));
 		this.localDataDao.saveMmanUserLoan(mmanUserLoan);
 		loger.info("end-saveMmanUserLoan:"+String.valueOf(borrowOrder.get("id")));
 	}
