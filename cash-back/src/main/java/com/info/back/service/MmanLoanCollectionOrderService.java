@@ -719,6 +719,12 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
         return personList;
     }
 
+    /**
+     * @Description 派新订单逻辑
+     * @param loanId 借款id
+     * @param idNumber 身份证号
+     * @param type 借款类型（1 大额   2 小额）
+     */
     @Override
     public void dispatchOrderNew(String loanId, String idNumber, String type) {
         try {
@@ -797,7 +803,7 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
                     personMap.put("beginDispatchTime", DateUtil.getDateFormat(date, "yyyy-MM-dd 00:00:00"));
                     personMap.put("endDispatchTime", DateUtil.getDateFormat((DateUtil.getBeforeOrAfter(new Date(), 1)), "yyyy-MM-dd HH:mm:ss"));
                     */
-                    personMap.put("groupLevel", BackConstant.XJX_OVERDUE_LEVEL_S1_OR_S2);
+                    personMap.put("groupLevel", BackConstant.XJX_OVERDUE_LEVEL_S1);
                     personMap.put("userStatus", BackConstant.ON);
                     personList = backUserDao.findUnCompleteCollectionOrderByCurrentUnCompleteCountListByMap(personMap);
                     if (CollectionUtils.isEmpty(personList)) {
@@ -880,7 +886,7 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
                 } else if (monthDiff >= 6) {
                     this.dispatchOrderToM6(order, orderList, personList);
                 }
-            } else if (dayNow >= 12) {
+            } else if (dayNow >= 8) {
                 // 默认逾期升级天数（用一月内,s1组逾期10天，第二天升级至S2组)
                 int orderUpgradeDay = getOrderUpgradeDay();
                 this.upGrageS1OrdersToS2Users(order, orderList, personList, loan, orderUpgradeDay);
