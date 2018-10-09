@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.info.back.service.ISyncService;
 import com.info.back.utils.JsonFormatUtil;
 import com.info.back.utils.MQResponse;
+import com.info.config.PayContents;
 import com.info.vo.bigAmount.BigAmountRequestParams;
 import com.info.vo.bigAmount.Loan;
 import com.info.vo.bigAmount.Repayment;
@@ -123,6 +124,11 @@ public class SyncController {
                 BigAmountRequestParams bigAmount = handleCollectionNotifyDto(collectionNotifyDto);
                 Loan loan = bigAmount.getLoan();
                 logger.info("repay_order_loanId_termNumber" + loan.getId().toString());
+                if (!loan.getMerchantNo().equals(PayContents.MERCHANT_NUMBER.toString())){
+                    JSONObject okResult = (JSONObject) JSONObject.toJSON(new MQResponse());
+                    logger.info("Invalid-MERCHANT_NUMBER" + loan.getTermNumber());
+                    return okResult.toString();
+                }
                 Repayment repayment = bigAmount.getRepayment();
                 List<RepaymentDetail> repaymentDetailList = bigAmount.getRepaymentDetailList();
                 if (loan != null && repayment != null && repaymentDetailList != null && repaymentDetailList.size() > 0) {

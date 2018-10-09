@@ -327,6 +327,14 @@
     </dependencies>
 
     <profiles>
+
+        <profile>
+            <!-- jxx生产环境 -->
+            <id>jxx</id>
+            <properties>
+                <environment>jxx</environment>
+            </properties>
+        </profile>
         <profile>
             <!-- 开发环境 -->
             <id>docker1</id>

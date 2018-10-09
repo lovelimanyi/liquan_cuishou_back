@@ -27,5 +27,6 @@ public class PayContents {
     public static final String AUTHENTICATE_USERNAME = propertiesLoader.getProperty("XJX.authenticate.username");
     public static final String AUTHENTICATE_PASSWORD = propertiesLoader.getProperty("XJX.authenticate.password");
 
-
+    // 商户号
+    public static final String MERCHANT_NUMBER = propertiesLoader.getProperty("merchant.number");
 }

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import com.info.back.service.IMmanLoanCollectionOrderService;
+import com.info.config.PayContents;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,10 +95,9 @@ public class DataSyncService {
 					if(StringUtils.isNotBlank(string)){
 						loger.info("redis-key:"+string);
 						if(JedisDataClient.exists(string)){
-//							if(!JedisDataClient.get(string).equals(LOCK_FLAG)){
-//								JedisDataClient.set(string, LOCK_FLAG);
-								if(string.startsWith(Constant.TYPE_OVERDUE_)){
-									overdueList.add(string.replace(Constant.TYPE_OVERDUE_, ""));
+							//根据配置的商户号进行筛选--只筛选当前商户号的
+								if(string.startsWith(Constant.TYPE_OVERDUE_) && string.endsWith(PayContents.MERCHANT_NUMBER.toString())){
+									overdueList.add(string.replace(Constant.TYPE_OVERDUE_, "").replace(PayContents.MERCHANT_NUMBER.toString(),"").replace("_",""));
 								}
 //							}
 						}

@@ -966,6 +966,9 @@ public class MyCollectionOrderController extends BaseController {
             logger.info("接收到代扣回调请求参数(小额)： " + text);
             JSONObject obj = JSONObject.parseObject(text);
             String uuid = (String) obj.get("uuid");
+            // 根据uuid查询代扣记录表，如果有就更新，没有就返回
+
+
             boolean code = (boolean) obj.get("result");
             Object msg = obj.get("msg");
             HashMap<String, Object> map = new HashMap<>();
