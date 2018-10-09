@@ -886,7 +886,7 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
                 } else if (monthDiff >= 6) {
                     this.dispatchOrderToM6(order, orderList, personList);
                 }
-            } else if (dayNow >= 8) {
+            } else if (dayNow >= 12) {
                 // 默认逾期升级天数（用一月内,s1组逾期10天，第二天升级至S2组)
                 int orderUpgradeDay = getOrderUpgradeDay();
                 this.upGrageS1OrdersToS2Users(order, orderList, personList, loan, orderUpgradeDay);
