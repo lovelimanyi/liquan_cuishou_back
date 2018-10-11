@@ -967,7 +967,11 @@ public class MyCollectionOrderController extends BaseController {
             JSONObject obj = JSONObject.parseObject(text);
             String uuid = (String) obj.get("uuid");
             // 根据uuid查询代扣记录表，如果有就更新，没有就返回
-
+            int counts = collectionWithholdingRecordService.getById(uuid);
+            if (counts < 1){
+                jsonResult.setCode("00");
+                return  jsonResult;
+            }
 
             boolean code = (boolean) obj.get("result");
             Object msg = obj.get("msg");

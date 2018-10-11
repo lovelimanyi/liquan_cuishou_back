@@ -25,4 +25,6 @@ public interface ICollectionWithholdingRecordService {
 	 * 分期记录 时间段内是否逾期
 	 */
 	 void updateOverdueStatus();
+
+    int getById(String uuid);
 }

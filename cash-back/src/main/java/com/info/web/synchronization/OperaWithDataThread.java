@@ -2,6 +2,7 @@ package com.info.web.synchronization;
 
 import java.util.HashMap;
 
+import com.info.config.PayContents;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -33,9 +34,9 @@ public class OperaWithDataThread implements Runnable {
 			HashMap<String, String> map = new HashMap<String, String>();
 			map.put("ID", withId);
 			this.localDataDao.updateWithHold(map);
-			RedisUtil.delRedisKey(Constant.TYPE_WITHHOLD_ + withId);
+			RedisUtil.delRedisKey(Constant.TYPE_WITHHOLD_ + withId+"_"+ PayContents.MERCHANT_NUMBER.toString());
 		}else{
-			RedisUtil.delRedisKey(Constant.TYPE_WITHHOLD_ + withId);
+			RedisUtil.delRedisKey(Constant.TYPE_WITHHOLD_ + withId+"_"+ PayContents.MERCHANT_NUMBER.toString());
 		}
 	}
 

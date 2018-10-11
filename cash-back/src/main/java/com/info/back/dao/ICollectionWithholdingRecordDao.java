@@ -29,4 +29,6 @@ public interface ICollectionWithholdingRecordDao {
 	 * @return
 	 */
 	CollectionWithholdingRecord getLatestWithholdRecord(String operationUserId);
+
+    int getById(String id);
 }

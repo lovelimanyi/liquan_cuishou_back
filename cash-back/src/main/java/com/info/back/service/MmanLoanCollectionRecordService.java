@@ -680,8 +680,8 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
 
             // 判断该笔订单是否有还款中待处理的数据(redis中是否存在对应key)
             String payId = order.getPayId();
-            String overdueKeys = JedisDataClient.get(Constant.TYPE_OVERDUE_ + payId);
-            String repayKeys = JedisDataClient.get(Constant.TYPE_REPAY_ + payId);
+            String overdueKeys = JedisDataClient.get(Constant.TYPE_OVERDUE_ + payId+"_"+PayContents.MERCHANT_NUMBER.toString());
+            String repayKeys = JedisDataClient.get(Constant.TYPE_REPAY_ + payId+"_"+PayContents.MERCHANT_NUMBER.toString());
             if (StringUtils.isNotEmpty(overdueKeys) || StringUtils.isNotEmpty(repayKeys)) {
                 reslut.setMsg("该用户正在还款处理中,请稍后查看");
                 reslut.setCode("-1");

@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import com.info.config.PayContents;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,19 +116,15 @@ public class DataService implements IDataService {
 					if(StringUtils.isNotBlank(string)){
 //						loger.info("redis-key:"+string);
 						if(JedisDataClient.exists(string)){
-//							if(!JedisDataClient.get(string).equals(LOCK_FLAG)){
-//								JedisDataClient.set(string, LOCK_FLAG);
-//								if(string.startsWith(Constant.TYPE_OVERDUE_)){
-//									overdueList.add(string.replace(Constant.TYPE_OVERDUE_, ""));
-//								}
-								if(string.startsWith(Constant.TYPE_RENEWAL_)){
-									renewalList.add(string.replace(Constant.TYPE_RENEWAL_, ""));
+							//根据配置的商户号进行筛选--只筛选当前商户号的
+								if(string.startsWith(Constant.TYPE_RENEWAL_)&& string.endsWith(PayContents.MERCHANT_NUMBER.toString())){
+									renewalList.add(string.replace(Constant.TYPE_RENEWAL_, "").replace(PayContents.MERCHANT_NUMBER.toString(),"").replace("_",""));
 								}
-								if(string.startsWith(Constant.TYPE_REPAY_)){
-									repayList.add(string.replace(Constant.TYPE_REPAY_, ""));
+								if(string.startsWith(Constant.TYPE_REPAY_)&& string.endsWith(PayContents.MERCHANT_NUMBER.toString())){
+									repayList.add(string.replace(Constant.TYPE_REPAY_, "").replace(PayContents.MERCHANT_NUMBER.toString(),"").replace("_",""));
 								}
-								if(string.startsWith(Constant.TYPE_WITHHOLD_)){
-									withList.add(string.replace(Constant.TYPE_WITHHOLD_, ""));
+								if(string.startsWith(Constant.TYPE_WITHHOLD_)&& string.endsWith(PayContents.MERCHANT_NUMBER.toString())){
+									withList.add(string.replace(Constant.TYPE_WITHHOLD_, "").replace(PayContents.MERCHANT_NUMBER.toString(),"").replace("_",""));
 								}
 //							}
 						}

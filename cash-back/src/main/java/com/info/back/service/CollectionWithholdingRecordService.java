@@ -34,4 +34,9 @@ public class CollectionWithholdingRecordService implements ICollectionWithholdin
     public void updateOverdueStatus() {
         collectionWithholdingRecordDao.updateOverdueStatus();
     }
+
+    @Override
+    public int getById(String id) {
+        return collectionWithholdingRecordDao.getById(id);
+    }
 }

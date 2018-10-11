@@ -4,6 +4,7 @@ import com.info.back.dao.ILocalDataDao;
 import com.info.back.service.TaskJobMiddleService;
 import com.info.back.utils.BackConstant;
 import com.info.back.utils.IdGen;
+import com.info.config.PayContents;
 import com.info.constant.Constant;
 import com.info.web.pojo.*;
 import com.info.web.synchronization.RedisUtil;
@@ -65,9 +66,9 @@ public class Test_RepayThread {
                             //保存还款详情表
                             syncUtils.saveCreditLoanPayDetail(localDataDao,repayment,payId, repaymentDetailList);
                         }
-                        RedisUtil.delRedisKey(Constant.TYPE_REPAY_+payId);
+                        RedisUtil.delRedisKey(Constant.TYPE_REPAY_+payId+"_"+ PayContents.MERCHANT_NUMBER.toString());
                     }else{
-                        RedisUtil.delRedisKey(Constant.TYPE_REPAY_+payId);
+                        RedisUtil.delRedisKey(Constant.TYPE_REPAY_+payId+"_"+ PayContents.MERCHANT_NUMBER.toString());
                     }
                 }catch(Exception e0){
                     e0.printStackTrace();

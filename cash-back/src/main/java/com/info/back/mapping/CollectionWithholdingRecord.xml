@@ -100,4 +100,9 @@
 		collection_withholding_record w WHERE w.`operation_user_id`=#{operationUserId}
 		ORDER BY w.`create_date` DESC limit 1
 	</select>
+
+
+	<select id="getById" parameterType="string" resultType="integer">
+		SELECT count(1) FROM  collection_withholding_record r WHERE  r.id = #{id}
+	</select>
 </mapper>

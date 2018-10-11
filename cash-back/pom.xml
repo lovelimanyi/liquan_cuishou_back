@@ -336,6 +336,13 @@
             </properties>
         </profile>
         <profile>
+            <!-- jyb生产环境 -->
+            <id>jyb</id>
+            <properties>
+                <environment>jyb</environment>
+            </properties>
+        </profile>
+        <profile>
             <!-- 开发环境 -->
             <id>docker1</id>
             <properties>

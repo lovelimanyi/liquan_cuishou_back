@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import com.info.config.PayContents;
 import com.info.web.pojo.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -48,7 +49,7 @@ public class OperaRenewalDataThread implements Runnable {
 					//删除对应的借款表，订单表，还款表，还款详情表，催收记录表，催收流转日志表
 					localDataDao.deleteOrderAndOther(loanId);
 
-					RedisUtil.delRedisKey(Constant.TYPE_RENEWAL_+repaymentId);
+					RedisUtil.delRedisKey(Constant.TYPE_RENEWAL_+repaymentId+"_"+ PayContents.MERCHANT_NUMBER.toString());
 					}catch(Exception e0) {
 					e0.printStackTrace();
 				}

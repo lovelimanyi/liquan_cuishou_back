@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import com.info.config.PayContents;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -81,7 +82,7 @@ public class OperaRepayDataThread implements Runnable {
                             loger.error("end-updateOrderAndLog-loanId:" + loanId);
 
                         }
-                        RedisUtil.delRedisKey(Constant.TYPE_REPAY_ + payId);
+                        RedisUtil.delRedisKey(Constant.TYPE_REPAY_ + payId+"_"+ PayContents.MERCHANT_NUMBER.toString());
                     }
                 } catch (Exception e0) {
                     e0.printStackTrace();
@@ -103,11 +104,11 @@ public class OperaRepayDataThread implements Runnable {
             userLoan = this.localDataDao.checkLoanStatus(map);
             if (userLoan == null){
                 // 如果没有该订单，不做处理
-                RedisUtil.delRedisKey(Constant.TYPE_REPAY_+payId);
+                RedisUtil.delRedisKey(Constant.TYPE_REPAY_+payId+"_"+ PayContents.MERCHANT_NUMBER.toString());
                 return true;
             }else if(userLoan.equals("5")){
                 // 如果还款完成，删除redis中的TYPE_REPAY
-                RedisUtil.delRedisKey(Constant.TYPE_REPAY_+payId);
+                RedisUtil.delRedisKey(Constant.TYPE_REPAY_+payId+"_"+ PayContents.MERCHANT_NUMBER.toString());
                 return true;
             }else {
                 return  false;
