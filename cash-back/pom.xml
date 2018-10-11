@@ -336,10 +336,24 @@
             </properties>
         </profile>
         <profile>
+            <!-- jxxDocker4环境 -->
+            <id>jxxDocker4</id>
+            <properties>
+                <environment>jxxDocker4</environment>
+            </properties>
+        </profile>
+        <profile>
             <!-- jyb生产环境 -->
             <id>jyb</id>
             <properties>
                 <environment>jyb</environment>
+            </properties>
+        </profile>
+        <profile>
+            <!-- jybDocker4环境 -->
+            <id>jybDocker4</id>
+            <properties>
+                <environment>jybDocker4</environment>
             </properties>
         </profile>
         <profile>
