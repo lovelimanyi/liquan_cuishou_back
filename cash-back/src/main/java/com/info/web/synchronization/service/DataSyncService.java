@@ -71,7 +71,7 @@ public class DataSyncService {
 	public void dataForOverdue(List<String> list){
 		if(null!=list && 0<list.size()){
 			try{
-				loger.info("处理逾期数据");
+//				loger.info("处理逾期数据");
 				SendOverdueManage dendOverdueManage = new SendOverdueManage(list,this.dataDao,this.localDataDao,this.orderService);
 				dendOverdueManage.send();
 			}catch(Exception e){
@@ -93,10 +93,12 @@ public class DataSyncService {
 			if(null!=keyList && 0<keyList.size()){
 				for(String string : keyList){
 					if(StringUtils.isNotBlank(string)){
-						loger.info("redis-key:"+string);
+						loger.error("redis-key:"+string);
 						if(JedisDataClient.exists(string)){
 							//根据配置的商户号进行筛选--只筛选当前商户号的
 								if(string.startsWith(Constant.TYPE_OVERDUE_) && string.endsWith(PayContents.MERCHANT_NUMBER.toString())){
+
+									loger.error("redis-key-payId:"+string.replace(Constant.TYPE_OVERDUE_, "").replace(PayContents.MERCHANT_NUMBER.toString(),"").replace("_",""));
 									overdueList.add(string.replace(Constant.TYPE_OVERDUE_, "").replace(PayContents.MERCHANT_NUMBER.toString(),"").replace("_",""));
 								}
 //							}

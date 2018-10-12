@@ -114,13 +114,14 @@ public class DataService implements IDataService {
 			if(null!=keyList && 0<keyList.size()){
 				for(String string : keyList){
 					if(StringUtils.isNotBlank(string)){
-//						loger.info("redis-key:"+string);
+						loger.error("redis-key:"+string);
 						if(JedisDataClient.exists(string)){
 							//根据配置的商户号进行筛选--只筛选当前商户号的
 								if(string.startsWith(Constant.TYPE_RENEWAL_)&& string.endsWith(PayContents.MERCHANT_NUMBER.toString())){
 									renewalList.add(string.replace(Constant.TYPE_RENEWAL_, "").replace(PayContents.MERCHANT_NUMBER.toString(),"").replace("_",""));
 								}
 								if(string.startsWith(Constant.TYPE_REPAY_)&& string.endsWith(PayContents.MERCHANT_NUMBER.toString())){
+									loger.error("redis-key-payId:"+string.replace(Constant.TYPE_REPAY_, "").replace(PayContents.MERCHANT_NUMBER.toString(),"").replace("_",""));
 									repayList.add(string.replace(Constant.TYPE_REPAY_, "").replace(PayContents.MERCHANT_NUMBER.toString(),"").replace("_",""));
 								}
 								if(string.startsWith(Constant.TYPE_WITHHOLD_)&& string.endsWith(PayContents.MERCHANT_NUMBER.toString())){
