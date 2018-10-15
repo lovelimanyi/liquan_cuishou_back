@@ -719,6 +719,12 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
         return personList;
     }
 
+    /**
+     * @Description 派新订单逻辑
+     * @param loanId 借款id
+     * @param idNumber 身份证号
+     * @param type 借款类型（1 大额   2 小额）
+     */
     @Override
     public void dispatchOrderNew(String loanId, String idNumber, String type) {
         try {
@@ -797,7 +803,7 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
                     personMap.put("beginDispatchTime", DateUtil.getDateFormat(date, "yyyy-MM-dd 00:00:00"));
                     personMap.put("endDispatchTime", DateUtil.getDateFormat((DateUtil.getBeforeOrAfter(new Date(), 1)), "yyyy-MM-dd HH:mm:ss"));
                     */
-                    personMap.put("groupLevel", BackConstant.XJX_OVERDUE_LEVEL_S1_OR_S2);
+                    personMap.put("groupLevel", BackConstant.XJX_OVERDUE_LEVEL_S1);
                     personMap.put("userStatus", BackConstant.ON);
                     personList = backUserDao.findUnCompleteCollectionOrderByCurrentUnCompleteCountListByMap(personMap);
                     if (CollectionUtils.isEmpty(personList)) {
@@ -882,8 +888,8 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
                 }
             } else if (dayNow >= 12) {
                 // 默认逾期升级天数（用一月内,s1组逾期10天，第二天升级至S2组)
-//                int orderUpgradeDay = getOrderUpgradeDay();
-//                this.upGrageS1OrdersToS2Users(order, orderList, personList, loan, orderUpgradeDay);
+                int orderUpgradeDay = getOrderUpgradeDay();
+                this.upGrageS1OrdersToS2Users(order, orderList, personList, loan, orderUpgradeDay);
             }
             mmanLoanCollectionRecordService.assignCollectionOrderToRelatedGroup(orderList, personList, new Date());
         } catch (Exception e) {
@@ -1159,8 +1165,10 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
      * @return
      */
     private boolean isMeetTheConditions(int pday, int orderUpgradeDay, MmanLoanCollectionOrder order) {
-        return BackConstant.XJX_OVERDUE_LEVEL_S1.equals(order.getCurrentOverdueLevel())
-                && pday > orderUpgradeDay && !checkLog(order.getOrderId());
+        boolean currentOverdueCondition = BackConstant.XJX_OVERDUE_LEVEL_S1.equals(order.getCurrentOverdueLevel());
+        boolean isGreaterThanRuleDays = pday >= orderUpgradeDay;
+        boolean hasLog = checkLog(order.getOrderId());
+        return currentOverdueCondition && isGreaterThanRuleDays && !hasLog;
     }
 
     /**
