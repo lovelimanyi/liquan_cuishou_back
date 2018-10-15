@@ -94,6 +94,7 @@ public class DataSyncService {
 				for(String string : keyList){
 					if(StringUtils.isNotBlank(string)){
 						loger.error("redis-key:"+string);
+						loger.error("config-MERCHANT_NUMBER:"+PayContents.MERCHANT_NUMBER.toString());
 						if(JedisDataClient.exists(string)){
 							//根据配置的商户号进行筛选--只筛选当前商户号的
 								if(string.startsWith(Constant.TYPE_OVERDUE_) && string.endsWith(PayContents.MERCHANT_NUMBER.toString())){
