@@ -327,12 +327,18 @@
     </dependencies>
 
     <profiles>
-
+        <profile>
+            <!-- jxx预生产环境 -->
+            <id>jxxPre</id>
+            <properties>
+                <environment>jxxPre</environment>
+            </properties>
+        </profile>
         <profile>
             <!-- jxx生产环境 -->
-            <id>jxx</id>
+            <id>jxxProd</id>
             <properties>
-                <environment>jxx</environment>
+                <environment>jxxProd</environment>
             </properties>
         </profile>
         <profile>
@@ -343,10 +349,17 @@
             </properties>
         </profile>
         <profile>
-            <!-- jyb生产环境 -->
-            <id>jyb</id>
+            <!-- jyb预生产环境 -->
+            <id>jybPre</id>
             <properties>
-                <environment>jyb</environment>
+                <environment>jybPre</environment>
+            </properties>
+        </profile>
+        <profile>
+            <!-- jyb生产环境 -->
+            <id>jybProd</id>
+            <properties>
+                <environment>jybProd</environment>
             </properties>
         </profile>
         <profile>
