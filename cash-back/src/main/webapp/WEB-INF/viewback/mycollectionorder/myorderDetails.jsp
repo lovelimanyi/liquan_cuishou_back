@@ -128,23 +128,23 @@
                             <td class="tdGround">现居住地址:</td>
                             <td colspan="5">${userInfo.presentAddress}${userInfo.presentAddressDistinct}</td>
                         </tr>
-                        <tr>
-                            <td class="tdGround" style="height: 116px;border-bottom: 0px;">身份证图片:</td>
-                            <td colspan="7" style="border-bottom: 0px;">
-                                <div style="margin: 2px 200px 2px;" id="userPhoto">
-                                    <c:if test="${userInfo.idcardImgZ!=null}">
-                                        <img id="imgZ" class="img-container" src="${userInfo.idcardImgZ}"/>
-                                    </c:if>
-                                    <c:if test="${userInfo.idcardImgF!=null}">
-                                        <img id="imgF" class="img-container" src="${userInfo.idcardImgF}"/>
-                                    </c:if>
-<%--                                    应产品需求，不需要显示人像自拍照
-                                    <c:if test="${userInfo.headPortrait!=null}">
-                                        <img class="img-container" src="${userInfo.headPortrait}"/>
-                                    </c:if>--%>
-                                </div>
-                            </td>
-                        </tr>
+                        <%--<tr>--%>
+                            <%--<td class="tdGround" style="height: 116px;border-bottom: 0px;">身份证图片:</td>--%>
+                            <%--<td colspan="7" style="border-bottom: 0px;">--%>
+                                <%--<div style="margin: 2px 200px 2px;" id="userPhoto">--%>
+                                    <%--<c:if test="${userInfo.idcardImgZ!=null}">--%>
+                                        <%--<img id="imgZ" class="img-container" src="${userInfo.idcardImgZ}"/>--%>
+                                    <%--</c:if>--%>
+                                    <%--<c:if test="${userInfo.idcardImgF!=null}">--%>
+                                        <%--<img id="imgF" class="img-container" src="${userInfo.idcardImgF}"/>--%>
+                                    <%--</c:if>--%>
+<%--&lt;%&ndash;                                    应产品需求，不需要显示人像自拍照--%>
+                                    <%--<c:if test="${userInfo.headPortrait!=null}">--%>
+                                        <%--<img class="img-container" src="${userInfo.headPortrait}"/>--%>
+                                    <%--</c:if>&ndash;%&gt;--%>
+                                <%--</div>--%>
+                            <%--</td>--%>
+                        <%--</tr>--%>
                     </table>
                 </fieldset>
             </div>
