@@ -112,9 +112,6 @@
                     当日催回本金
                 </th>
                 <th align="center" width="100">
-                    剩余未还本金
-                </th>
-                <th align="center" width="100">
                     当日本金催回率
                 </th>
                 <th align="center" width="100">
@@ -163,9 +160,6 @@
                     </td>
                     <td>
                             ${list.realgetTotalPrincipal}
-                    </td>
-                    <td>
-                            ${list.remainPrincipal}
                     </td>
                     <td>
                             ${list.repaymentProbability}%
