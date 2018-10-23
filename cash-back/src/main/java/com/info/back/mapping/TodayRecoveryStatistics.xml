@@ -323,10 +323,10 @@
         left join   (
         select
         a.pay_id id,
-        --   <![CDATA[   ]]>
+
         sum(if(<![CDATA[date(a.update_Date)<=DATE_ADD(curdate(),interval -1 day)]]>,a.real_money+ifnull(a.realget_accrual,0),0)) zqbj,
         sum(if(<![CDATA[date(a.update_Date)<=DATE_ADD(curdate(),interval -1 day)]]>,a.real_penlty,0)) zqznj,
-        sum(if(<![CDATA[date(a.update_Date)=date(NOW()), a.real_money+ifnull(a.realget_accrual,0),0))  drbj,
+        sum(if(date(a.update_Date)=date(NOW()), a.real_money+ifnull(a.realget_accrual,0),0))  drbj,
         sum(if(date(a.update_Date)=date(NOW()), a.real_penlty,0))  drznj
         from credit_loan_pay_detail a
         group by  a.pay_id
