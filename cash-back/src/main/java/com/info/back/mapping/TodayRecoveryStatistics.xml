@@ -2,6 +2,117 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.info.back.dao.ITodayRecoveryDao">
     <select id="doTodayPersonStatistics" resultType="com.info.web.pojo.TodayRecovery">
+        -- 个人
+        SELECT
+        now() AS 'createDate', -- 统计日期
+        x.gsmc AS 'companyName', -- 催收公司
+        x.companyId AS'companyId', -- 催收公司id
+        x.csyxm AS'backUserName', -- 用户名称
+        x.csyid AS 'uuid', -- 上一催收员id
+        x.yqdj AS'groupLevel', -- 催收组编号
+        x.lx AS'borrowingType', -- 借款类型 1 大额  2 小额    3分期商城
+
+        sum(x.ycbj) AS'totalPrincipal', -- 本金金额
+        sum(x.drbj) AS'realgetTotalPrincipal', -- 当日催回本金
+        round(ifnull(sum(x.drbj)/sum(x.ycbj),0)*100,2) AS 'repaymentProbability', -- 当日本金催回率
+
+        sum(x.ycznj) AS 'totalPenalty', -- 滞纳金总额
+        sum(x.drznj) AS 'realgetTotalPenalty', -- 当日滞纳金
+        round(ifnull(sum(x.drznj)/sum(x.ycznj),0)*100,2) AS 'penaltyProbability', -- 当日滞纳金催回率
+
+        count(*) AS 'totalOrderCount', -- 订单总数
+        sum(x.drhks) AS 'doneOrderCount', -- 当日催回订单数
+        round(ifnull(sum(x.drhks)/count(*),0)*100,2) AS 'orderProbability' -- 当日订单催回率
+        from
+        (
+        select
+        date(b.dispatch_time) dt,
+        b.current_collection_user_id csyid,
+        usr.user_name csyxm,
+        cmp.title gsmc,
+        cmp.id AS companyId,
+        d.borrowing_type AS lx,
+        usr.group_level AS yqdj,
+        if(d.borrowing_type=2 and  d.paid_money>0,d.paid_money,d.loan_money+ifnull(d.accrual,0))-ifnull(hk.zqbj,0)  ycbj, -- 当日入催本金
+        0  drbj, -- 当日催回本金
+        d.loan_penalty-ifnull(hk.zqznj,0)  ycznj, -- 当日入催滞纳金
+        0  drznj, -- 当日催回滞纳金
+        0 drhks -- 当日催回订单数
+        from        mman_loan_collection_order  b
+        left join   back_user usr ON  usr.uuid=b.current_collection_user_id
+        left join   mman_loan_collection_company cmp ON usr.company_id = cmp.id
+        left join   mman_user_loan d  on  d.id=b.loan_id
+        left join   bi_order  bo  on  d.user_id=bo.user_id
+        left join   credit_loan_pay  clp  on  clp.loan_id=b.loan_id
+        left join   (
+        select
+        a.pay_id id,
+        date(b.dispatch_time) dt,
+
+        sum(if(<![CDATA[date(a.update_Date)<=DATE_ADD(curdate(),interval -1 day)]]>,a.real_money+ifnull(a.realget_accrual,0),0)) zqbj,
+        sum(if(<![CDATA[date(a.update_Date)<=DATE_ADD(curdate(),interval -1 day)]]>,a.real_penlty,0)) zqznj,
+        sum(if(date(a.update_Date)=date(NOW()), a.real_money+ifnull(a.realget_accrual,0),0))  drbj,
+        sum(if(date(a.update_Date)=date(NOW()), a.real_penlty,0))  drznj
+        from credit_loan_pay_detail a
+        left join mman_loan_collection_order b on a.pay_id = b.pay_id
+        where b.dispatch_time >= CURDATE()
+        group by  a.pay_id
+        ) hk  on  hk.id=b.pay_id
+        where 1=1
+        #(b.dispatch_time>=DATE_ADD(curdate(),interval -day(curdate())+1 day)
+        and (<![CDATA[b.`status`<>4]]>
+        or date(clp.update_Date)>DATE_ADD(curdate(),interval -1 day)
+        and  cmp.title  is  not  null)
+        and usr.group_level in (3,4)
+        and b.dispatch_time >= curdate()
+
+        union all
+
+        select
+        hk.dt dt,
+        b.current_collection_user_id csyid,
+        usr.user_name csyxm,
+        cmp.title gsmc,
+        cmp.id AS companyId,
+        d.borrowing_type AS lx,
+        usr.group_level AS yqdj,
+        0  ycbj, -- 当日入催本金
+        ifnull(hk.drbj,0)  drbj, -- 当日催回本金
+        0  ycznj, -- 当日入催滞纳金
+        ifnull(hk.drznj,0)  drznj, -- 当日催回滞纳金
+        if(b.`status`=4 and date(clp.update_Date)=date(now()),1,0) drhks -- 当日催回订单数
+        from        mman_loan_collection_order  b
+        left join   back_user usr ON  usr.uuid=b.current_collection_user_id
+        left join   mman_loan_collection_company cmp ON usr.company_id = cmp.id
+        left join   mman_user_loan d  on  d.id=b.loan_id
+        left join   bi_order  bo  on  d.user_id=bo.user_id
+        left join   credit_loan_pay  clp  on  clp.loan_id=b.loan_id
+        left join   (
+        select
+        a.pay_id id,
+        date(a.update_Date) dt,
+        sum(if(<![CDATA[date(a.update_Date)<=DATE_ADD(curdate(),interval -1 day)]]>,a.real_money+ifnull(a.realget_accrual,0),0)) zqbj,
+        sum(if(<![CDATA[date(a.update_Date)<=DATE_ADD(curdate(),interval -1 day)]]>,a.real_penlty,0)) zqznj,
+        sum(if(date(a.update_Date)=date(NOW()), a.real_money+ifnull(a.realget_accrual,0),0))  drbj,
+        sum(if(date(a.update_Date)=date(NOW()), a.real_penlty,0))  drznj
+        from   credit_loan_pay_detail a
+        left join mman_loan_collection_order b on a.pay_id = b.pay_id
+        where b.dispatch_time >= CURDATE()
+        group by  a.pay_id
+        ) hk  on  hk.id=b.pay_id
+        where 1=1
+        #(b.dispatch_time>=DATE_ADD(curdate(),interval -day(curdate())+1 day)
+        and (<![CDATA[ b.`status`<>4 ]]>
+        or date(clp.update_Date)>DATE_ADD(curdate(),interval -1 day)
+        and  cmp.title  is  not  null)
+        and usr.group_level in (3,4)
+        and hk.dt >= CURDATE()
+        )  x
+        group by   x.companyId,x.csyid,x.yqdj,x.lx
+        -- order by  x.companyId,x.yqdj,x.csyid,x.lx
+
+        union all
+
         SELECT
         now() AS 'createDate',
         x.gsmc AS 'companyName',
@@ -13,7 +124,6 @@
 
         sum(x.ycbj) AS'totalPrincipal',
         sum(x.drbj) AS'realgetTotalPrincipal',
-        sum(x.sybj) AS'remainPrincipal',
         round(ifnull(sum(x.drbj)/sum(x.ycbj),0)*100,2) AS 'repaymentProbability',
 
         sum(x.ycznj) AS 'totalPenalty',
@@ -23,37 +133,156 @@
         count(*) AS 'totalOrderCount',
         sum(x.drhks) AS 'doneOrderCount',
         round(ifnull(sum(x.drhks)/count(*),0)*100,2) AS 'orderProbability'
-        from  (
-        select  b.current_collection_user_id csyid,usr.user_name csyxm,cmp.title gsmc,cmp.id AS companyId,	d.borrowing_type AS lx,usr.group_level AS yqdj,
+        from
+        (
+        select
+        b.current_collection_user_id csyid,
+        usr.user_name csyxm,
+        cmp.title gsmc,
+        cmp.id AS companyId,
+        d.borrowing_type AS lx,
+        usr.group_level AS yqdj,
         if(d.borrowing_type=2 and  d.paid_money>0,d.paid_money,d.loan_money+ifnull(d.accrual,0))-ifnull(hk.zqbj,0)  ycbj,
         ifnull(hk.drbj,0)  drbj,
         if(d.borrowing_type=2 and  d.paid_money>0,d.paid_money,d.loan_money+ifnull(d.accrual,0))-ifnull(hk.zqbj,0)-ifnull(hk.drbj,0)  sybj,
-        d.loan_penalty-ifnull(hk.zqznj,0)  ycznj, ifnull(hk.drznj,0)  drznj,
+        d.loan_penalty-ifnull(hk.zqznj,0)  ycznj,
+        ifnull(hk.drznj,0)  drznj,
         if(b.`status`=4 and date(clp.update_Date)=date(now()),1,0) drhks
-        from    mman_loan_collection_order  b
-        left  join   back_user usr ON  usr.uuid=b.current_collection_user_id
-        left join  mman_loan_collection_company cmp ON usr.company_id = cmp.id
-        left join mman_user_loan d  on  d.id=b.loan_id
-        left  join   bi_order  bo  on  d.user_id=bo.user_id
-        left  join  credit_loan_pay  clp  on  clp.loan_id=b.loan_id
-        left  join  (select  a.pay_id id,
+        from        mman_loan_collection_order  b
+        left join   back_user usr ON  usr.uuid=b.current_collection_user_id
+        left join   mman_loan_collection_company cmp ON usr.company_id = cmp.id
+        left join   mman_user_loan d  on  d.id=b.loan_id
+        left join   bi_order  bo  on  d.user_id=bo.user_id
+        left join   credit_loan_pay  clp  on  clp.loan_id=b.loan_id
+        left join   (
+        select
+        a.pay_id id,
         sum(if(<![CDATA[ date(a.update_Date)<=DATE_ADD(curdate(),interval -1 day)]]>,a.real_money+ifnull(a.realget_accrual,0),0)) zqbj,
         sum(if(<![CDATA[ date(a.update_Date)<=DATE_ADD(curdate(),interval -1 day)]]>,a.real_penlty,0)) zqznj,
         sum(if(date(a.update_Date)=date(NOW()), a.real_money+ifnull(a.realget_accrual,0),0))  drbj,
         sum(if(date(a.update_Date)=date(NOW()), a.real_penlty,0))  drznj
-        from   credit_loan_pay_detail a
-        group  by  a.pay_id
+        from credit_loan_pay_detail a
+        group by  a.pay_id
         ) hk  on  hk.id=b.pay_id
-        where
+        where 1=1
         #(b.dispatch_time>=DATE_ADD(curdate(),interval -day(curdate())+1 day)
-        <![CDATA[ b.`status`<>4 ]]> or date(clp.update_Date)>DATE_ADD(curdate(),interval -1 day)	 and  cmp.title  is  not  null
+        and (<![CDATA[ b.`status`<>4 ]]> or date(clp.update_Date)>DATE_ADD(curdate(),interval -1 day))
+        and  cmp.title  is  not  null
+        and usr.group_level not in (3,4)
         )  x
-        group  by   x.companyId,x.csyid,x.yqdj,x.lx
-        order  by  x.companyId,x.yqdj,x.csyid,x.lx
+        group by   x.companyId,x.csyid,x.yqdj,x.lx
+        -- order by  x.companyId,x.yqdj,x.csyid,x.lx
+
 
     </select>
 
     <select id="doTodayCompanyStatistics" resultType="com.info.web.pojo.TodayRecovery">
+
+        SELECT
+        now() AS 'createDate', -- 日期
+        x.gsmc AS 'companyName', -- 催收公司
+        x.companyId AS'companyId', -- 催收公司id
+        x.yqdj AS'groupLevel', -- 催收组编号
+        x.lx AS'borrowingType', -- 借款类型 1.大额  2.小额  3.分期商城
+
+        sum(x.ycbj) AS'totalPrincipal', -- 当日入催本金金额
+        sum(x.drbj) AS'realgetTotalPrincipal', -- 当日催回本金（当日入催本金中）
+        round(ifnull(sum(x.drbj)/sum(x.ycbj),0)*100,2) AS 'repaymentProbability', -- 当日本金催回率
+
+        sum(x.ycznj) AS 'totalPenalty', -- 当日入催滞纳金总额
+        sum(x.drznj) AS 'realgetTotalPenalty', -- 当日催回滞纳金（当日入催滞纳金中）
+        round(ifnull(sum(x.drznj)/sum(x.ycznj),0)*100,2) AS 'penaltyProbability', -- 当日滞纳金催回率
+
+        count(*) AS 'totalOrderCount', -- 当日入催订单总数
+        sum(x.drhks) AS 'doneOrderCount', -- 当日催回订单数
+        round(ifnull(sum(x.drhks)/count(*),0)*100,2) AS 'orderProbability' -- 当日订单催回率
+        from
+        (
+        select
+        date(b.dispatch_time) dt,
+        cmp.title gsmc,
+        d.borrowing_type AS lx,
+        cmp.id AS companyId,
+        usr.group_level AS yqdj	,
+        if(d.borrowing_type=2 and  d.paid_money>0,d.paid_money,d.loan_money+ifnull(d.accrual,0))-ifnull(hk.zqbj,0)  ycbj,
+        0  drbj,
+        d.loan_penalty-ifnull(hk.zqznj,0)  ycznj,
+        0 drznj,
+        0 drhks
+        from        mman_loan_collection_order  b
+        left join   back_user usr ON  usr.uuid=b.current_collection_user_id
+        left join   mman_loan_collection_company cmp ON usr.company_id = cmp.id
+        left join   mman_user_loan d  on  d.id=b.loan_id
+        left join   bi_order  bo  on  d.user_id=bo.user_id
+        left join   credit_loan_pay  clp  on  clp.loan_id=b.loan_id
+        left join   (
+        select
+        a.pay_id id,
+        date(b.dispatch_time) dt,
+
+        sum(if(<![CDATA[date(a.update_Date)<=DATE_ADD(curdate(),interval -1 day)]]>,a.real_money+ifnull(a.realget_accrual,0),0)) zqbj,
+        sum(if(<![CDATA[date(a.update_Date)<=DATE_ADD(curdate(),interval -1 day)]]>,a.real_penlty,0)) zqznj,
+        sum(if(date(a.update_Date)=date(NOW()), a.real_money+ifnull(a.realget_accrual,0),0))  drbj,
+        sum(if(date(a.update_Date)=date(NOW()), a.real_penlty,0))  drznj
+        from credit_loan_pay_detail a
+        left join mman_loan_collection_order b on a.pay_id = b.pay_id
+        where b.dispatch_time >= CURDATE()
+        group by  a.pay_id
+        ) hk  on  hk.id=b.pay_id
+        where 1=1
+        #(b.dispatch_time>=DATE_ADD(curdate(),interval -day(curdate())+1 day)
+        and (<![CDATA[b.`status`<>4]]>
+        or date(clp.update_Date)>DATE_ADD(curdate(),interval -1 day)
+        and  cmp.title  is  not  null)
+        and b.dispatch_time >= curdate()
+        and usr.group_level in (3,4)
+
+        union all
+
+        select
+        hk.dt dt,
+        cmp.title gsmc,
+        d.borrowing_type AS lx,
+        cmp.id AS companyId,
+        usr.group_level AS yqdj	,
+        0 ycbj,
+        ifnull(hk.drbj,0)  drbj,
+        0  ycznj,
+        ifnull(hk.drznj,0)  drznj,
+        if(b.`status`=4 and date(clp.update_Date)=date(now()),1,0) drhks
+        from        mman_loan_collection_order  b
+        left join   back_user usr ON  usr.uuid=b.current_collection_user_id
+        left join   mman_loan_collection_company cmp ON usr.company_id = cmp.id
+        left join   mman_user_loan d  on  d.id=b.loan_id
+        left join   bi_order  bo  on  d.user_id=bo.user_id
+        left join   credit_loan_pay  clp  on  clp.loan_id=b.loan_id
+        left join   (
+        select
+        a.pay_id id,
+        date(a.update_Date) dt,
+
+        sum(if(<![CDATA[date(a.update_Date)<=DATE_ADD(curdate(),interval -1 day)]]>,a.real_money+ifnull(a.realget_accrual,0),0)) zqbj,
+        sum(if(<![CDATA[date(a.update_Date)<=DATE_ADD(curdate(),interval -1 day)]]>,a.real_penlty,0)) zqznj,
+        sum(if(date(a.update_Date)=date(NOW()), a.real_money+ifnull(a.realget_accrual,0),0))  drbj,
+        sum(if(date(a.update_Date)=date(NOW()), a.real_penlty,0))  drznj
+        from credit_loan_pay_detail a
+        left join mman_loan_collection_order b on a.pay_id = b.pay_id
+        where b.dispatch_time >= CURDATE()
+        group by  a.pay_id
+        ) hk  on  hk.id=b.pay_id
+        where 1=1
+        #(b.dispatch_time>=DATE_ADD(curdate(),interval -day(curdate())+1 day)
+        and (<![CDATA[b.`status`<>4]]>
+        or date(clp.update_Date)>DATE_ADD(curdate(),interval -1 day)
+        and  cmp.title  is  not  null)
+        and hk.dt >= CURDATE()
+        and usr.group_level in (3,4)
+        )  x
+        group by x.companyId,x.yqdj,x.lx
+        -- order by x.companyId,x.yqdj,x.lx
+
+        union all
+
         SELECT
         now() AS 'createDate',
         x.gsmc AS 'companyName',
@@ -63,7 +292,6 @@
 
         sum(x.ycbj) AS'totalPrincipal',
         sum(x.drbj) AS'realgetTotalPrincipal',
-        sum(x.sybj) AS'remainPrincipal',
         round(ifnull(sum(x.drbj)/sum(x.ycbj),0)*100,2) AS 'repaymentProbability',
 
         sum(x.ycznj) AS 'totalPenalty',
@@ -73,36 +301,44 @@
         count(*) AS 'totalOrderCount',
         sum(x.drhks) AS 'doneOrderCount',
         round(ifnull(sum(x.drhks)/count(*),0)*100,2) AS 'orderProbability'
-        from  (
-        select  cmp.title gsmc,
+        from
+        (
+        select
+        cmp.title gsmc,
         d.borrowing_type AS lx,
         cmp.id AS companyId,
         usr.group_level AS yqdj	,
         if(d.borrowing_type=2 and  d.paid_money>0,d.paid_money,d.loan_money+ifnull(d.accrual,0))-ifnull(hk.zqbj,0)  ycbj,
         ifnull(hk.drbj,0)  drbj,
         if(d.borrowing_type=2 and  d.paid_money>0,d.paid_money,d.loan_money+ifnull(d.accrual,0))-ifnull(hk.zqbj,0)-ifnull(hk.drbj,0)  sybj,
-        d.loan_penalty-ifnull(hk.zqznj,0)  ycznj, ifnull(hk.drznj,0)  drznj,
+        d.loan_penalty-ifnull(hk.zqznj,0)  ycznj,
+        ifnull(hk.drznj,0)  drznj,
         if(b.`status`=4 and date(clp.update_Date)=date(now()),1,0) drhks
-        from    mman_loan_collection_order  b
-        left  join   back_user usr ON  usr.uuid=b.current_collection_user_id
-        left join  mman_loan_collection_company cmp ON usr.company_id = cmp.id
-        left join mman_user_loan d  on  d.id=b.loan_id
-        left  join   bi_order  bo  on  d.user_id=bo.user_id
-        left  join  credit_loan_pay  clp  on  clp.loan_id=b.loan_id
-        left  join  (select  a.pay_id id,
-        sum(if(<![CDATA[ date(a.update_Date)<=DATE_ADD(curdate(),interval -1 day)]]>,a.real_money+ifnull(a.realget_accrual,0),0)) zqbj,
-        sum(if(<![CDATA[ date(a.update_Date)<=DATE_ADD(curdate(),interval -1 day)]]>,a.real_penlty,0)) zqznj,
-        sum(if(date(a.update_Date)=date(NOW()), a.real_money+ifnull(a.realget_accrual,0),0))  drbj,
+        from        mman_loan_collection_order  b
+        left join   back_user usr ON  usr.uuid=b.current_collection_user_id
+        left join   mman_loan_collection_company cmp ON usr.company_id = cmp.id
+        left join   mman_user_loan d  on  d.id=b.loan_id
+        left join   bi_order  bo  on  d.user_id=bo.user_id
+        left join   credit_loan_pay  clp  on  clp.loan_id=b.loan_id
+        left join   (
+        select
+        a.pay_id id,
+        --   <![CDATA[   ]]>
+        sum(if(<![CDATA[date(a.update_Date)<=DATE_ADD(curdate(),interval -1 day)]]>,a.real_money+ifnull(a.realget_accrual,0),0)) zqbj,
+        sum(if(<![CDATA[date(a.update_Date)<=DATE_ADD(curdate(),interval -1 day)]]>,a.real_penlty,0)) zqznj,
+        sum(if(<![CDATA[date(a.update_Date)=date(NOW()), a.real_money+ifnull(a.realget_accrual,0),0))  drbj,
         sum(if(date(a.update_Date)=date(NOW()), a.real_penlty,0))  drznj
-        from   credit_loan_pay_detail a
-        group  by  a.pay_id
+        from credit_loan_pay_detail a
+        group by  a.pay_id
         ) hk  on  hk.id=b.pay_id
-        where
+        where 1=1
         #(b.dispatch_time>=DATE_ADD(curdate(),interval -day(curdate())+1 day)
-        <![CDATA[ b.`status`<>4 ]]> or date(clp.update_Date)>DATE_ADD(curdate(),interval -1 day)	and  cmp.title  is  not  null
+        and (<![CDATA[b.`status`<>4 ]]> or date(clp.update_Date)>DATE_ADD(curdate(),interval -1 day))
+        and  cmp.title  is  not  null
+        and usr.group_level not in (3,4)
         )  x
         group  by   x.companyId,x.yqdj,x.lx
-        order  by  x.companyId,x.yqdj,x.lx
+        -- order  by  x.companyId,x.yqdj,x.lx
     </select>
 
     <insert id="insertTodayPersonStatistics" parameterType="list">

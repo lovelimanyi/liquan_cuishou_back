@@ -3,11 +3,7 @@ package com.info.back.controller;
 import com.info.back.service.IBackUserService;
 import com.info.back.service.ICompanyIpAddressService;
 import com.info.back.service.IUserAccountWhiteListService;
-import com.info.back.utils.BackConstant;
-import com.info.back.utils.RequestUtils;
-import com.info.back.utils.ServiceResult;
-import com.info.back.utils.SmsSendUtil;
-import com.info.back.utils.SpringUtils;
+import com.info.back.utils.*;
 import com.info.constant.Constant;
 import com.info.web.pojo.BackUser;
 import com.info.web.pojo.CompanyIpAddressDto;
@@ -89,6 +85,7 @@ public class LoginController extends BaseController {
                 if (view != null) {
                     return view;
                 } else {
+                    model.addAttribute("merchantName", MerchantNoUtils.getMerchantName());
                     return "index";
                 }
             }
@@ -104,6 +101,7 @@ public class LoginController extends BaseController {
         } catch (Exception e) {
             logger.error("back login error ", e);
         }
+        model.addAttribute("merchantName", MerchantNoUtils.getMerchantName());
         return "login";
     }
 

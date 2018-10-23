@@ -18,7 +18,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <!-- <meta http-equiv="X-UA-Compatible" content="IE=7" /> -->
 <!-- <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE9" /> -->
-<title>现金侠催收管理系统 </title>
+<title>${merchantName } </title>
 <link href="${basePath }/themes/default/style.css" rel="stylesheet"
 	type="text/css" media="screen" />
 <link href="${basePath }/themes/css/core.css" rel="stylesheet"

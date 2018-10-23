@@ -6,6 +6,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.info.back.utils.MerchantNoUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -40,6 +41,7 @@ public class IndexController extends BaseController {
 			HashMap<String, Object> params = new HashMap<String, Object>();
 			BackUser backUser = loginAdminUser(request);
 			if (backUser == null) {
+				model.addAttribute("merchantName", MerchantNoUtils.getMerchantName());
 				return "login";
 			}
 			params.put("userId", backUser.getId());
@@ -66,6 +68,7 @@ public class IndexController extends BaseController {
 		} catch (Exception e) {
 			logger.error("back index error ", e);
 		}
+		model.addAttribute("merchantName", MerchantNoUtils.getMerchantName());
 		return "index";
 	}
 

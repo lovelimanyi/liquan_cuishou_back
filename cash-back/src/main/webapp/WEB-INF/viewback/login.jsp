@@ -7,7 +7,7 @@
 %>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <title>现金侠催收管理系统</title>
+    <title>${merchantName }</title>
     <link rel='icon' href='<%=path %>/admin-favicon.ico' type=‘image/x-ico’/>
     <script type="text/javascript" src="<%=path %>/common/back/js/jquery-1.7.2.js"></script>
     <script type="text/javascript" src="<%=path %>/resources/js/DD_belatedPNG.js"></script>
