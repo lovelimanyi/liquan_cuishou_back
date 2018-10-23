@@ -285,10 +285,10 @@
   ww.group_level AS 'groupLevel',
 
 
-  (IFNULL(sum(ww.`剩余应还本金(未)`),0)+IFNULL(sum(rc.`实收金额-入催`),0))AS 'totalPrincipal',
+  (IFNULL(sum(ww.`剩余应还本金(未)`),0)+IFNULL(sum(rc.`实收金额入催`),0))AS 'totalPrincipal',
   IFNULL(sum(hk.`实收金额`),0) AS 'realgetTotalPrincipal',
   IFNULL(sum(ww.`剩余应还本金(未)`),0) AS 'remainPrincipal',
-  IFNULL(ROUND(IFNULL(sum(hk.`实收金额`),0)/(IFNULL(sum(ww.`剩余应还本金(未)`),0)+IFNULL(rc.`实收金额-入催`,0))*100,2),0)AS 'repaymentProbability',
+  IFNULL(ROUND(IFNULL(sum(hk.`实收金额`),0)/(IFNULL(sum(ww.`剩余应还本金(未)`),0)+IFNULL(sum(rc.`实收金额入催`),0))*100,2),0)AS 'repaymentProbability',
 
 
   IFNULL(sum(yy.`总滞纳金`),0) AS'totalPenalty',
@@ -522,7 +522,7 @@
   a.user_name,
   a.group_level,
   a.uuid,
-  ifnull(sum(a.real_money),0) as '实收金额-入催',
+  ifnull(sum(a.real_money),0) as '实收金额入催',
   ifnull(sum(a.real_principle),0)
   FROM
   (
