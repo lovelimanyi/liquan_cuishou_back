@@ -103,7 +103,7 @@
   AND l.borrowing_type='2'
   and <![CDATA[ ch.create_date >= DATE_ADD(curdate(),interval -day(curdate())+1 day) ]]>
   and  <![CDATA[ ch.create_date <= last_day(curdate()) ]]>
-  and ch.current_collection_user_level in (3,4)
+  and ch.current_collection_user_level in (3)
   -- AND u.user_name='许娇'
   -- AND u.group_level IN ('5')
   GROUP BY o.order_id,ch.current_collection_user_id
@@ -282,6 +282,7 @@
   SELECT
 
   ww.company_id AS 'companyId',
+
   ww.group_level AS 'groupLevel',
 
 
@@ -289,7 +290,6 @@
   IFNULL(sum(hk.`实收金额`),0) AS 'realgetTotalPrincipal',
   IFNULL(sum(ww.`剩余应还本金(未)`),0) AS 'remainPrincipal',
   IFNULL(ROUND(IFNULL(sum(hk.`实收金额`),0)/(IFNULL(sum(ww.`剩余应还本金(未)`),0)+IFNULL(sum(rc.`实收金额入催`),0))*100,2),0)AS 'repaymentProbability',
-
 
   IFNULL(sum(yy.`总滞纳金`),0) AS'totalPenalty',
   (IFNULL(sum(yy.`实际还款滞纳金`),0)+ IFNULL(sum(yy.`不计入考核的减免滞纳金`),0)) AS'realgetTotalPenalty',
@@ -300,6 +300,8 @@
   IFNULL(sum(yy.doneCount),0)AS'doneOrderCount',
   IFNULL(sum(ww.`还款未完成个数`),0) AS 'undoneOrderCount',
   IFNULL(ROUND((IFNULL(sum(yy.doneCount),0))/(IFNULL(sum(yy.doneCount),0)+IFNULL(sum(ww.`还款未完成个数`),0))*100,2),0)AS'orderProbability'
+
+
 
   FROM
   (
@@ -333,13 +335,11 @@
   LEFT JOIN mman_user_loan l ON o.loan_id = l.id
   WHERE
   u.`status` = 1
-
-  AND <![CDATA[ o.`status` <> '4'  ]]>
-  and u.group_level not in (3,4)
+  AND <![CDATA[ o.`status` <> '4' ]]>
+  and u.group_level not in (3)
   AND l.borrowing_type='2'
   -- AND u.user_name='许娇'
   -- AND u.group_level IN ('5')
-
   AND <![CDATA[ l.create_time <= last_day(curdate()) ]]>
   GROUP BY u.id
 
@@ -375,20 +375,17 @@
   LEFT JOIN mman_user_loan l ON o.loan_id = l.id
   WHERE 1=1
   and u.`status` = 1
-
   AND <![CDATA[ o.`status` <> '4' ]]>
   and ch.after_status not in (4)
   AND l.borrowing_type='2'
-
-  and <![CDATA[ ch.create_date >= DATE_ADD(curdate(),interval -day(curdate())+1 day)]]>
+  and <![CDATA[ ch.create_date >= DATE_ADD(curdate(),interval -day(curdate())+1 day) ]]>
   and <![CDATA[ ch.create_date <= last_day(curdate()) ]]>
-  and ch.current_collection_user_level in (3,4)
+  and ch.current_collection_user_level in (3)
   -- AND u.user_name='许娇'
   -- AND u.group_level IN ('5')
   GROUP BY o.order_id,ch.current_collection_user_id
   ) a
   GROUP BY a.id
-
   ) ws
 
   LEFT JOIN
@@ -484,8 +481,8 @@
   AND o.`status` = '4'
   AND c.`status` = '5'
   AND c.type = '3'
-  AND <![CDATA[ p.update_Date >= DATE_ADD(curdate(),interval -day(curdate())+1 day) ]]>
-  AND <![CDATA[ p.update_Date <= last_day(curdate()) ]]>
+  AND <![CDATA[ p.update_Date >= DATE_ADD(curdate(),interval -day(curdate())+1 day)]]>
+  AND <![CDATA[ p.update_Date <= last_day(curdate())]]>
   GROUP BY u.id
   ORDER BY u.id
   ) t2 ON t1.id = t2.id
@@ -533,6 +530,7 @@
   u.company_id,
   u.user_name,
   u.group_level,
+  d.current_collection_user_id,
   u.uuid,
   d.real_money,
   d.real_principle
@@ -546,14 +544,15 @@
   AND u.role_id = '10021'
   AND <![CDATA[ d.update_Date >= DATE_ADD(curdate(),interval -day(curdate())+1 day)]]>
   AND <![CDATA[ d.update_Date <= last_day(curdate())]]>
-  and ch.after_status not in (4)
+  and  ch.after_status not in (4)
+  AND <![CDATA[ ch.create_date >= DATE_ADD(curdate(),interval -day(curdate())+1 day)]]>
+  -- and u.uuid= "0088bd8309414f36aebb9f3a563f8abe"
+  ORDER BY d.current_collection_user_id
   -- group by o.order_id,u.uuid
   ) a
   group by a.uuid
   ) rc ON ww.id = rc.id
-
   group by ww.company_id,ww.group_level ;
-
  </select>
  <insert id="insert" parameterType="com.info.web.pojo.PersonStatistics">
   INSERT INTO person_statistics(
