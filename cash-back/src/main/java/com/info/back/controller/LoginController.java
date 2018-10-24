@@ -4,6 +4,7 @@ import com.info.back.service.IBackUserService;
 import com.info.back.service.ICompanyIpAddressService;
 import com.info.back.service.IUserAccountWhiteListService;
 import com.info.back.utils.*;
+import com.info.config.PayContents;
 import com.info.constant.Constant;
 import com.info.web.pojo.BackUser;
 import com.info.web.pojo.CompanyIpAddressDto;
@@ -233,7 +234,9 @@ public class LoginController extends BaseController {
         if (BackConstant.userAccountWhiteListList.contains(userAccount)) {
             return true;
         }
-        String redisKey = BackConstant.REDIS_KEY_PREFIX + WHITE_LIST_REDIS_KEY;
+//        String redisKey = BackConstant.REDIS_KEY_PREFIX + WHITE_LIST_REDIS_KEY;
+        String merchentNum = PayContents.MERCHANT_NUMBER.toString();
+        String redisKey = BackConstant.REDIS_KEY_PREFIX + merchentNum + "_" + WHITE_LIST_REDIS_KEY;
         List<String> orayIps = JedisDataClient.getList(redisKey, 0, -1);
         if (CollectionUtils.isEmpty(orayIps)) {
             List<CompanyIpAddressDto> companyIps = companyIpAddressService.getAllIps();

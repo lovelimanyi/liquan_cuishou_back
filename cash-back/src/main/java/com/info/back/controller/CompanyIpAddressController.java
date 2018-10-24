@@ -5,6 +5,7 @@ import com.info.back.service.ICompanyIpAddressService;
 import com.info.back.service.IMmanLoanCollectionCompanyService;
 import com.info.back.utils.DwzResult;
 import com.info.back.utils.SpringUtils;
+import com.info.config.PayContents;
 import com.info.web.pojo.CompanyIpAddressDto;
 import com.info.web.pojo.MmanLoanCollectionCompany;
 import com.info.web.util.JedisDataClient;
@@ -164,7 +165,9 @@ public class CompanyIpAddressController extends BaseController {
      * @throws Exception
      */
     private void updateCompanyIpInfo() throws Exception {
-        JedisDataClient.del("cuishou:orayIps");
+//        JedisDataClient.del("cuishou:orayIps");
+        String merchentNum = PayContents.MERCHANT_NUMBER.toString();//区分不同商户号
+        JedisDataClient.del("cuishou:" + merchentNum + "_orayIps");
         List<String> ipList = new ArrayList<>();
         List<CompanyIpAddressDto> companyIps = companyIpAddressService.listAll();
         for (CompanyIpAddressDto companyIpAddress : companyIps) {
@@ -173,8 +176,8 @@ public class CompanyIpAddressController extends BaseController {
                 ipList.add(CompanyIps);
             }
         }
-
-        JedisDataClient.setList("cuishou:orayIps", ipList);
+//        JedisDataClient.setList("cuishou:orayIps", ipList);
+        JedisDataClient.setList("cuishou:" + merchentNum + "_orayIps", ipList);//exp:cuishou:cjxjx_orayIps
     }
 
 }
