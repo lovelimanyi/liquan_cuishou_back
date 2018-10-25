@@ -50,6 +50,15 @@ public class MmanUserLoan {
     private String termNumber;
     private String merchantNo;
     private String borrowingType;
+    private Integer repayChannel;
+
+    public Integer getRepayChannel() {
+        return repayChannel;
+    }
+
+    public void setRepayChannel(Integer repayChannel) {
+        this.repayChannel = repayChannel;
+    }
 
     public String getMerchantNo() {
         return merchantNo;
