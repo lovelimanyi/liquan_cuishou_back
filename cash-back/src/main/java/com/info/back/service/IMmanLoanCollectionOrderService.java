@@ -160,4 +160,9 @@ public interface IMmanLoanCollectionOrderService {
 	 * @return
 	 */
 	Map<String, String> getMerchantMap();
+	/**
+	 * 获取放款主体map
+	 * @return
+	 */
+	Map<Integer, String> getRepayChannelMap();
 }

@@ -97,6 +97,7 @@ public class MmanLoanCollectionOrderController extends BaseController {
                 model.addAttribute("ListMmanLoanCollectionCompany", mmanLoanCollectionCompanyService.getList(mmanLoanCollectionCompany));
                 model.addAttribute("dictMap", BackConstant.groupNameMap);
                 model.addAttribute("merchantMap", mmanLoanCollectionOrderService.getMerchantMap());
+                model.addAttribute("repayChannelMap", mmanLoanCollectionOrderService.getRepayChannelMap());
             }
 
         } catch (Exception e) {

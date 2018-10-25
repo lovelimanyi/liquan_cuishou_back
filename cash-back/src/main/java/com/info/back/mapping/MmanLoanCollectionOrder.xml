@@ -299,6 +299,9 @@
             <if test="merchantNo != null and merchantNo != ''">
                 AND d.merchant_no = #{merchantNo}
             </if>
+            <if test="repayChannel != null and repayChannel != ''">
+                AND d.repay_channel = #{repayChannel}
+            </if>
         </where>
         <if test="sortBy !=null and sortBy!=''">
             ORDER BY a.${sortBy}
@@ -402,7 +405,8 @@
 			a.second_day_flag,
 			a.dispatch_name AS dispatchName,
 			d.customer_type AS customerType,
-			d.merchant_no AS merchantNo
+			d.merchant_no AS merchantNo,
+			d.repay_channel AS repayChannel
 	</sql>
     <!-- 保存,保存不为NULL的字段 -->
     <insert id="saveNotNull" parameterType="com.info.web.pojo.MmanLoanCollectionOrder">INSERT INTO mman_loan_collection_order

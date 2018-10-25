@@ -184,6 +184,7 @@ public class MyCollectionOrderController extends BaseController {
         List<SysDict> levellist = sysDictService.getStatus("xjx_stress_level");
         // 商户信息
         model.addAttribute("merchantMap", mmanLoanCollectionOrderService.getMerchantMap());
+        model.addAttribute("repayChannelMap", mmanLoanCollectionOrderService.getRepayChannelMap());
         HashMap<String, String> levelMap = BackConstant.orderState(levellist);
         model.addAttribute("levellist", levellist);
         model.addAttribute("levelMap", levelMap);

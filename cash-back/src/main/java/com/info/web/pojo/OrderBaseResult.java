@@ -62,6 +62,16 @@ public class OrderBaseResult {
 
     private String merchantNo;
 
+    private Integer repayChannel;
+
+    public Integer getRepayChannel() {
+        return repayChannel;
+    }
+
+    public void setRepayChannel(Integer repayChannel) {
+        this.repayChannel = repayChannel;
+    }
+
     public BigDecimal getServiceCharge() {
         return serviceCharge;
     }

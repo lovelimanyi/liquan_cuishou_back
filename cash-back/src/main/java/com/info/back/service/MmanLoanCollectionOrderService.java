@@ -56,8 +56,12 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
     private IMmanLoanCollectionCompanyDao mmanLoanCollectionCompanyDao;
     @Autowired
     private IMerchantInfoDao merchantInfoDao;
+    @Autowired
+    private IRepayChannelConfigDao repayChannelConfigDao;
 
     private static final String MERCHANT_INFO_REDIS_KEY = "merchants";
+
+    private static final String REPAY_CHANNEL_REDIS_KEY = "repayChannel";
 
     @Override
     public List<String> getOverdueOrder() {
@@ -1222,6 +1226,42 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
             }
         }
         return result;
+    }
+
+    @Override
+    public Map<Integer, String> getRepayChannelMap() {
+        Map<Integer, String> result = new HashMap<>(4);
+        List<RepayChannelConfig> list = getAllRepayChannel();
+        if (org.apache.commons.collections.CollectionUtils.isNotEmpty(list)) {
+            for (RepayChannelConfig repayChannelConfig : list) {
+                Integer repayChannel = repayChannelConfig.getRepayChannel();
+                String repayChannelName = repayChannelConfig.getRepayChannelName();
+                if (null != repayChannel && StringUtils.isNotEmpty(repayChannelName)) {
+                    result.put(repayChannel, repayChannelName);
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 获取所有的放款主体信息
+     *
+     * @return
+     */
+    private List<RepayChannelConfig> getAllRepayChannel() {
+        try {
+            List<RepayChannelConfig> repayChannelList = JedisDataClient.getList(BackConstant.REDIS_KEY_PREFIX, REPAY_CHANNEL_REDIS_KEY);
+            if (org.apache.commons.collections.CollectionUtils.isEmpty(repayChannelList)) {
+                repayChannelList = repayChannelConfigDao.getAll();
+                JedisDataClient.setList(BackConstant.REDIS_KEY_PREFIX, REPAY_CHANNEL_REDIS_KEY, repayChannelList, 10 * 60);
+            }
+            return repayChannelList;
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("获取商户信息失败...");
+        }
+        return null;
     }
 
     /**

@@ -152,6 +152,17 @@
                         </select>
                     </td>
                     <td>
+                        放 款 主 体:
+                        <select id="repayChannel" name="repayChannel">
+                            <option value="">全部</option>
+                            <c:forEach var="repayChannel" items="${repayChannelMap }">
+                                <option value="${repayChannel.key }" <c:if test="${repayChannel.key eq params.repayChannel}">selected="selected"</c:if>>
+                                        ${repayChannel.value}
+                                </option>
+                            </c:forEach>
+                        </select>
+                    </td>
+                    <td>
                         <div class="buttonActive">
                             <div class="buttonContent">
                                 <button type="submit">
@@ -228,6 +239,9 @@
                 </th>
                 <th align="center" width="50">
                     渠道来源
+                </th>
+                <th align="center" width="50">
+                    放款主体
                 </th>
                 <th align="center" width="80">
                     应还时间
@@ -329,6 +343,9 @@
                     </td>
                     <td align="center" width="50">
                             ${merchantMap[order.merchantNo]}
+                    </td>
+                    <td align="center" width="50">
+                            ${repayChannelMap[order.repayChannel]}
                     </td>
                     <td align="center" width="50">
                         <fmt:formatDate value="${order.loanEndTime}" pattern="yyyy-MM-dd"/>
