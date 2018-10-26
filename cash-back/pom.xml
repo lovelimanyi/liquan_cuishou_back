@@ -328,6 +328,27 @@
 
     <profiles>
         <profile>
+            <!-- jqb预生产环境 -->
+            <id>jqbPre</id>
+            <properties>
+                <environment>jqbPre</environment>
+            </properties>
+        </profile>
+        <profile>
+            <!-- jqb生产环境 -->
+            <id>jqbProd</id>
+            <properties>
+                <environment>jqbProd</environment>
+            </properties>
+        </profile>
+        <profile>
+            <!-- jqbDocker4环境 -->
+            <id>jqbDocker4</id>
+            <properties>
+                <environment>jqbDocker4</environment>
+            </properties>
+        </profile>
+        <profile>
             <!-- jxx预生产环境 -->
             <id>jxxPre</id>
             <properties>
