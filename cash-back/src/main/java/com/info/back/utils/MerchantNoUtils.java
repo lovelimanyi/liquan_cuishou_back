@@ -18,6 +18,8 @@ public class MerchantNoUtils {
             merchantName = "金小侠催收系统";
         }else if ("jyb".equals(merchantNo)){
             merchantName = "急用帮催收系统";
+        }else if("jqb".equals(merchantNo)){
+            merchantName = "极速币下催收系统";
         }
         return merchantName;
     }
