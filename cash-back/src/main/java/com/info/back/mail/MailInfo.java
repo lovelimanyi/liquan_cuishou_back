@@ -15,7 +15,7 @@ public class MailInfo {
     private String fromAddress; // 邮件发送者的地址
     private String toAddress; // 邮件接收者的地址
     private String ccAddress; // 邮件抄送者的地址
-    private String fromUserName = "极速现金侠"; // 邮件发送者的名称，显示在他人邮件的发件人
+    private String fromUserName; // 邮件发送者的名称，显示在他人邮件的发件人
     private String mailSubject; // 邮件主题
     private String mailContent; // 邮件的文本内容
     private boolean authValidate = true; // 是否需要身份验证
@@ -24,11 +24,12 @@ public class MailInfo {
     public MailInfo() {
     }
 
-    public MailInfo(String title, String content,String receiver, List<String> ccList) {
+    public MailInfo(String title,String fromUserName,  String content,String receiver, List<String> ccList) {
         this.mailServerHost = MailCenterConstant.SMTP_SERVER;
         this.userName = MailCenterConstant.USER;
         this.userPassword = MailCenterConstant.PWD;
         this.fromAddress = MailCenterConstant.FROM_ADDRESS;
+        this.fromUserName = fromUserName;
         this.toAddress = receiver;
         this.ccAddress = ccList==null?"":listToStringFormat(ccList);
         this.mailSubject = title;

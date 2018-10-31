@@ -4,14 +4,13 @@ import com.info.back.mail.MailCenterConstant;
 import com.info.back.mail.MailInfo;
 import com.info.back.mail.MessageSender;
 import com.info.back.service.IMailCollectionService;
+import com.info.back.utils.MerchantNoUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +27,7 @@ public class TaskMailCollection {
     public void mailSendResult() {
     List<Map<String,Object>> list= iMailCollectionService.selectSendResult();
         if (list!=null&&list.size()>0) {
-            MailInfo mailInfo = new MailInfo(dateFormat.format(new Date()) + " 派单结果", sendResultlistHtml(list), MailCenterConstant.SEND_RESULE_MAIL, null);
+            MailInfo mailInfo = new MailInfo(dateFormat.format(new Date()) + " 派单结果", MerchantNoUtils.getMerchantName(),sendResultlistHtml(list), MailCenterConstant.SEND_RESULE_MAIL, null);
             MessageSender.sendHtmlMail(mailInfo);
         }
     }
@@ -38,7 +37,7 @@ public class TaskMailCollection {
     public void mailBeyondWarn() {
         List<Map<String,Object>> list= iMailCollectionService.selectBeyondWarn();
         if (list!=null&&list.size()>0){
-            MailInfo mailInfo = new MailInfo(dateFormat.format(new Date())+" 3日无催告警邮件",  beyondWarnlistHtml(list), MailCenterConstant.BEYOND_WARN, null);
+            MailInfo mailInfo = new MailInfo(dateFormat.format(new Date())+" 3日无催告警邮件", MerchantNoUtils.getMerchantName(), beyondWarnlistHtml(list), MailCenterConstant.BEYOND_WARN, null);
             MessageSender.sendHtmlMail(mailInfo);
         }
 
@@ -51,7 +50,7 @@ public class TaskMailCollection {
     //list转html拼接
     public static String beyondWarnlistHtml(List<Map<String,Object>> list){
         StringBuilder p=new StringBuilder();
-        p.append("<p>截止到今日，各公司3日无催记情况:</p>");
+        p.append("<p>截止到今日"+ MerchantNoUtils.getMerchantName()+"，各公司3日无催记情况:</p>");
         for (int i = 0; i <list.size() ; i++) {
             p.append("<p>");
             p.append("公司:"+list.get(i).get("公司"));
@@ -66,7 +65,7 @@ public class TaskMailCollection {
 
     public static String sendResultlistHtml(List<Map<String,Object>> list){
         StringBuilder p=new StringBuilder();
-        p.append("<p>以下是派单结果数据:</p>");
+        p.append("<p>以下是:"+ MerchantNoUtils.getMerchantName()+"派单结果数据:</p>");
         for (int i = 0; i <list.size() ; i++) {
             p.append("<p>");
             p.append("公司:"+list.get(i).get("公司"));
