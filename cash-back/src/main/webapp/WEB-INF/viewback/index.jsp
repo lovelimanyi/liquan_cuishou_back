@@ -28,7 +28,7 @@
 
 <link href="${basePath }/uploadify/css/uploadify.css" rel="stylesheet"
 	type="text/css" media="screen" />
-<link rel='icon' href='<%=path %>/admin-favicon.ico' type=‘image/x-ico’ />
+<link rel='icon' href='<%=path %>/favicon.ico' type=‘image/x-ico’ />
 <!--[if IE]>
 <link href="themes/css/ieHack.css" rel="stylesheet" type="text/css" media="screen"/>
 <![endif]-->

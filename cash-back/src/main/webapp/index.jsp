@@ -5,7 +5,7 @@
   <head>
 	<script type="text/javascript">
 		window.onload = function() {
-			location = "${pageContext.request.contextPath}/index";
+			location = "${pageContext.request.contextPath}/back/";
 		}
 	</script>
   </head>

@@ -63,7 +63,7 @@
   AND l.borrowing_type='2'
   -- AND u.user_name='许娇'
   -- AND u.group_level IN ('5')
-  AND <![CDATA[ l.create_time <= last_day(curdate()) ]]>
+  AND <![CDATA[ l.create_time <= DATE_FORMAT(last_day(curdate()),'%Y-%m-%d 23:59:59') ]]>
   GROUP BY u.id
 
   union all
@@ -102,7 +102,7 @@
   and ch.after_status not in (4)
   AND l.borrowing_type='2'
   and <![CDATA[ ch.create_date >= DATE_ADD(curdate(),interval -day(curdate())+1 day) ]]>
-  and  <![CDATA[ ch.create_date <= last_day(curdate()) ]]>
+  and  <![CDATA[ ch.create_date <= DATE_FORMAT(last_day(curdate()),'%Y-%m-%d 23:59:59') ]]>
   and ch.current_collection_user_level in (3)
   -- AND u.user_name='许娇'
   -- AND u.group_level IN ('5')
@@ -126,7 +126,7 @@
   AND d.remain_accrual IS NULL
   -- AND u.user_name='许娇'
   AND <![CDATA[ d.update_Date >= DATE_ADD(curdate(),interval -day(curdate())+1 day) ]]>
-  AND <![CDATA[ d.update_Date <= last_day(curdate()) ]]>
+  AND <![CDATA[ d.update_Date <= DATE_FORMAT(last_day(curdate()),'%Y-%m-%d 23:59:59') ]]>
   GROUP BY o.current_collection_user_id
   ORDER BY o.current_collection_user_id
   )wy ON ws.uuid = wy.current_collection_user_id
@@ -178,7 +178,7 @@
   AND p.remain_accrual IS NULL
   -- AND u.group_level IN ('5')
   AND <![CDATA[ d.update_Date >= DATE_ADD(curdate(),interval -day(curdate())+1 day) ]]>
-  AND <![CDATA[ d.update_Date <= last_day(curdate()) ]]>
+  AND <![CDATA[ d.update_Date <= DATE_FORMAT(last_day(curdate()),'%Y-%m-%d 23:59:59') ]]>
   GROUP BY o.loan_id
   ORDER BY u.id
   ) tt
@@ -205,7 +205,7 @@
   AND c.`status` = '5'
   AND c.type = '3'
   AND <![CDATA[ p.update_Date >= DATE_ADD(curdate(),interval -day(curdate())+1 day) ]]>
-  AND <![CDATA[ p.update_Date <= last_day(curdate())]]>
+  AND <![CDATA[ p.update_Date <= DATE_FORMAT(last_day(curdate()),'%Y-%m-%d 23:59:59')]]>
   GROUP BY u.id
   ORDER BY u.id
   ) t2 ON t1.id = t2.id
@@ -228,7 +228,7 @@
   and u.`status` = 1
   AND u.role_id = '10021'
   AND <![CDATA[ d.update_Date >= DATE_ADD(curdate(),interval -day(curdate())+1 day) ]]>
-  AND <![CDATA[ d.update_Date <= last_day(curdate()) ]]>
+  AND <![CDATA[ d.update_Date <= DATE_FORMAT(last_day(curdate()),'%Y-%m-%d 23:59:59') ]]>
   GROUP BY u.uuid
   ) hk ON ww.id = hk.id
 
@@ -266,7 +266,7 @@
   and u.`status` = 1
   AND u.role_id = '10021'
   AND <![CDATA[ d.update_Date >= DATE_ADD(curdate(),interval -day(curdate())+1 day) ]]>
-  AND <![CDATA[ d.update_Date <= last_day(curdate()) ]]>
+  AND <![CDATA[ d.update_Date <= DATE_FORMAT(last_day(curdate()),'%Y-%m-%d 23:59:59') ]]>
   and ch.after_status not in (4)
   AND <![CDATA[ ch.create_date >= DATE_ADD(curdate(),interval -day(curdate())+1 day) ]]>
   -- and u.uuid= "0088bd8309414f36aebb9f3a563f8abe"
@@ -340,7 +340,7 @@
   AND l.borrowing_type='2'
   -- AND u.user_name='许娇'
   -- AND u.group_level IN ('5')
-  AND <![CDATA[ l.create_time <= last_day(curdate()) ]]>
+  AND <![CDATA[ l.create_time <= DATE_FORMAT(last_day(curdate()),'%Y-%m-%d 23:59:59') ]]>
   GROUP BY u.id
 
   union all
@@ -379,7 +379,7 @@
   and ch.after_status not in (4)
   AND l.borrowing_type='2'
   and <![CDATA[ ch.create_date >= DATE_ADD(curdate(),interval -day(curdate())+1 day) ]]>
-  and <![CDATA[ ch.create_date <= last_day(curdate()) ]]>
+  and <![CDATA[ ch.create_date <= DATE_FORMAT(last_day(curdate()),'%Y-%m-%d 23:59:59') ]]>
   and ch.current_collection_user_level in (3)
   -- AND u.user_name='许娇'
   -- AND u.group_level IN ('5')
@@ -403,7 +403,7 @@
   AND d.remain_accrual IS NULL
   -- AND u.user_name='许娇'
   AND <![CDATA[ d.update_Date >= DATE_ADD(curdate(),interval -day(curdate())+1 day) ]]>
-  AND <![CDATA[ d.update_Date <= last_day(curdate()) ]]>
+  AND <![CDATA[ d.update_Date <= DATE_FORMAT(last_day(curdate()),'%Y-%m-%d 23:59:59') ]]>
   GROUP BY o.current_collection_user_id
   ORDER BY o.current_collection_user_id
   )wy ON ws.uuid = wy.current_collection_user_id
@@ -455,7 +455,7 @@
   AND p.remain_accrual IS NULL
   -- AND u.group_level IN ('5')
   AND <![CDATA[ d.update_Date >= DATE_ADD(curdate(),interval -day(curdate())+1 day)]]>
-  AND <![CDATA[ d.update_Date <= last_day(curdate())]]>
+  AND <![CDATA[ d.update_Date <= DATE_FORMAT(last_day(curdate()),'%Y-%m-%d 23:59:59')]]>
   GROUP BY o.loan_id
   ORDER BY u.id
   ) tt
@@ -482,7 +482,7 @@
   AND c.`status` = '5'
   AND c.type = '3'
   AND <![CDATA[ p.update_Date >= DATE_ADD(curdate(),interval -day(curdate())+1 day)]]>
-  AND <![CDATA[ p.update_Date <= last_day(curdate())]]>
+  AND <![CDATA[ p.update_Date <= DATE_FORMAT(last_day(curdate()),'%Y-%m-%d 23:59:59')]]>
   GROUP BY u.id
   ORDER BY u.id
   ) t2 ON t1.id = t2.id
@@ -505,7 +505,7 @@
   and u.`status` = 1
   AND u.role_id = '10021'
   AND <![CDATA[ d.update_Date >= DATE_ADD(curdate(),interval -day(curdate())+1 day)]]>
-  AND <![CDATA[ d.update_Date <= last_day(curdate())]]>
+  AND <![CDATA[ d.update_Date <= DATE_FORMAT(last_day(curdate()),'%Y-%m-%d 23:59:59')]]>
   GROUP BY u.uuid
   ) hk ON ww.id = hk.id
 
@@ -543,7 +543,7 @@
   and u.`status` = 1
   AND u.role_id = '10021'
   AND <![CDATA[ d.update_Date >= DATE_ADD(curdate(),interval -day(curdate())+1 day)]]>
-  AND <![CDATA[ d.update_Date <= last_day(curdate())]]>
+  AND <![CDATA[ d.update_Date <= DATE_FORMAT(last_day(curdate()),'%Y-%m-%d 23:59:59')]]>
   and  ch.after_status not in (4)
   AND <![CDATA[ ch.create_date >= DATE_ADD(curdate(),interval -day(curdate())+1 day)]]>
   -- and u.uuid= "0088bd8309414f36aebb9f3a563f8abe"
