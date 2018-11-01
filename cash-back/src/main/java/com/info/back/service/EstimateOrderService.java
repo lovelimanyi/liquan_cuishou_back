@@ -8,6 +8,8 @@ import com.info.back.dao.IEstimateOrderDao;
 import com.info.back.dao.IMmanLoanCollectionOrderDao;
 import com.info.back.dao.IMmanUserLoanDao;
 import com.info.back.utils.BackConstant;
+import com.info.back.utils.MerchantNoUtils;
+import com.info.config.PayContents;
 import com.info.web.pojo.EstimateOrder;
 import com.info.web.synchronization.dao.IDataDao;
 import com.info.web.util.HttpUtil;
@@ -57,7 +59,7 @@ public class EstimateOrderService implements IEstimateOrderService {
             } else {
                 now = yyyyMMddSdf.parse(testDate);
             }
-            String redisKey = BackConstant.REDIS_KEY_PREFIX + "estimate:" + yyyyMMddSdf.format(now);
+            String redisKey = BackConstant.REDIS_KEY_PREFIX+ PayContents.MERCHANT_NUMBER + "_estimate:" + yyyyMMddSdf.format(now);
             String estimateInfoStr = null;
             JSONObject estimateInfoJSON = null;
             if (StringUtils.isNotBlank(estimateInfoStr)) {
@@ -270,6 +272,7 @@ public class EstimateOrderService implements IEstimateOrderService {
             endCalendar.setTime(now);
             endCalendar.add(Calendar.DAY_OF_MONTH, 7);
             param.put("endTime", endCalendar.getTime());
+            param.put("merchantNumber", MerchantNoUtils.getMerchantNum());
             List<HashMap<String, Object>> smallOrderList = dataDao.getEstimateOrder(param);
             if (smallOrderList != null && smallOrderList.size() > 0) {
                 HashMap<String, BigDecimal> smallOldRateMap = getSmallOldCollectionRate(now);
@@ -369,6 +372,7 @@ public class EstimateOrderService implements IEstimateOrderService {
                 endCalendar.setTime(now);
                 endCalendar.add(Calendar.DAY_OF_MONTH, -7);
                 param.put("startTime", endCalendar.getTime());
+                param.put("merchantNumber", MerchantNoUtils.getMerchantNum());
                 List<HashMap<String, Object>> orderList = dataDao.getEstimateOrder(param);
                 System.out.println("小额到期数据：" + JSONObject.toJSONString(orderList));
                 rateMap = getRateMap(orderList, collectionCountMap);

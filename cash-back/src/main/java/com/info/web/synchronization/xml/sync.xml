@@ -31,9 +31,9 @@
 		<![CDATA[
 		select
 			count(0) as orderCount,
-			sum(repayment_amount) as principal,
-			DATE_FORMAT(repayment_time,'%Y-%m-%d') as repaymentTime
-		from asset_repayment where repayment_time>=#{startTime,jdbcType=TIMESTAMP} and repayment_time<#{endTime,jdbcType=TIMESTAMP}
+			sum(r.repayment_amount) as principal,
+			DATE_FORMAT(r.repayment_time,'%Y-%m-%d') as repaymentTime
+		from asset_repayment r LEFT JOIN asset_borrow_order o ON r.asset_order_id = o.id where r.repayment_time>=#{startTime,jdbcType=TIMESTAMP} and r.repayment_time<#{endTime,jdbcType=TIMESTAMP} and o.merchant_number = #{merchantNumber,jdbcType=INTEGER}
 		GROUP BY DATE_FORMAT(repayment_time,'%Y-%m-%d')
 		]]>
 	</select>
