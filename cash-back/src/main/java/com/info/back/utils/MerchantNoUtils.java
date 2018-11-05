@@ -38,4 +38,19 @@ public class MerchantNoUtils {
         }
         return merchantNum;
     }
+
+    public static String getMerchantName2(){
+        String merchantName = "";
+        String merchantNo = PayContents.MERCHANT_NUMBER.toString();
+        if ("cjxjx".equals(merchantNo)){
+            merchantName = "现金侠";
+        }else if ("jxx".equals(merchantNo)){
+            merchantName = "金小侠";
+        }else if ("jyb".equals(merchantNo)){
+            merchantName = "急用帮";
+        }else if("jqb".equals(merchantNo)){
+            merchantName = "极速币下";
+        }
+        return merchantName;
+    }
 }

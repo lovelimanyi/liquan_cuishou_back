@@ -1249,7 +1249,8 @@ public class MyCollectionOrderController extends BaseController {
         }
         MmanUserInfo userInfo = mmanUserInfoService.getUserInfoById(order.getUserId());
         // 获取所有商户信息
-        String merchantName = getMerchantName(order);
+//        String merchantName = getMerchantName(order);
+        String merchantName = MerchantNoUtils.getMerchantName2();
         StringBuilder msgParam = new StringBuilder();
         if (StringUtils.isNotEmpty(userInfo.getUserSex())) {
             if ("男".equals(userInfo.getUserSex())) {
