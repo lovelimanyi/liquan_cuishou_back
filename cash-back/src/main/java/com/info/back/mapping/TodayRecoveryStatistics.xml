@@ -20,7 +20,7 @@
         sum(x.drznj) AS 'realgetTotalPenalty', -- 当日滞纳金
         round(ifnull(sum(x.drznj)/sum(x.ycznj),0)*100,2) AS 'penaltyProbability', -- 当日滞纳金催回率
 
-        count(*) AS 'totalOrderCount', -- 订单总数
+        count(if(x.ycbj != 0,x.ycbj,null)) AS 'totalOrderCount', -- 订单总数
         sum(x.drhks) AS 'doneOrderCount', -- 当日催回订单数
         round(ifnull(sum(x.drhks)/count(*),0)*100,2) AS 'orderProbability' -- 当日订单催回率
         from
@@ -193,7 +193,7 @@
         sum(x.drznj) AS 'realgetTotalPenalty', -- 当日催回滞纳金（当日入催滞纳金中）
         round(ifnull(sum(x.drznj)/sum(x.ycznj),0)*100,2) AS 'penaltyProbability', -- 当日滞纳金催回率
 
-        count(*) AS 'totalOrderCount', -- 当日入催订单总数
+        count(if(x.ycbj != 0,x.ycbj,null)) AS 'totalOrderCount', -- 订单总数
         sum(x.drhks) AS 'doneOrderCount', -- 当日催回订单数
         round(ifnull(sum(x.drhks)/count(*),0)*100,2) AS 'orderProbability' -- 当日订单催回率
         from
