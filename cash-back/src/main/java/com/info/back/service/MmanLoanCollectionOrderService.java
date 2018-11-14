@@ -50,7 +50,8 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
     private IMmanLoanCollectionStatusChangeLogDao statusChangeLogDao;
     @Autowired
     private IChannelSwitchingDao channelSwitchingDao;
-
+    @Autowired
+    private IOrderChangeRecordService orderChangeRecordService;
 
     @Override
     public List<MmanLoanCollectionOrder> getOrderList(MmanLoanCollectionOrder mmanLoanCollectionOrder) {
@@ -304,6 +305,11 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
                 logger.error("逾期升级出错，订单已还款完成，借款id: " + loanId);
                 return;
             }
+            if (BackConstant.XJX_COLLECTION_ORDER_STATE_STOP.equals(order.getStatus())) {
+                logger.error("逾期升级出错，订单已停催，借款id: " + loanId);
+                return;
+            }
+
             // 计算订单逾期天数
             int dayCount = getOverdueDays(loan);
 
@@ -314,12 +320,35 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
             } else if (dayCount >= 181) {
                 this.dispatchOrderToFM6(order, orderList, personList);
             }
-
             mmanLoanCollectionRecordService.assignCollectionOrderToRelatedGroup(orderList, personList, new Date());
+            if (!CollectionUtils.isEmpty(personList) && !CollectionUtils.isEmpty(orderList)) {
+                saveRecord(personList, orderList);
+            }
         } catch (Exception e) {
             logger.error("处理订单逾期升级出错，借款id: " + loanId);
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 记录订单流转状态数据
+     *
+     * @param personList
+     * @param list
+     */
+    private void saveRecord(List<MmanLoanCollectionPerson> personList, List<MmanLoanCollectionOrder> list) {
+        OrderChangeRecord record = new OrderChangeRecord();
+        record.setId(IdGen.uuid());
+        record.setLoanId(list.get(0).getLoanId());
+        record.setCreateDate(new Date());
+        record.setCurrentUserId(list.get(0).getCurrentCollectionUserId());
+        record.setNextUserId(personList.get(0).getUserId());
+        CreditLoanPay pay = creditLoanPayDao.findByLoanId(list.get(0).getLoanId());
+        record.setRealgetAccrual(pay.getRealgetAccrual());
+        record.setRealgetPrinciple(pay.getRealgetPrinciple());
+        record.setRemainAccrual(pay.getRemainAccrual());
+        record.setRemainPrinciple(pay.getReceivablePrinciple());
+        orderChangeRecordService.insert(record);
     }
 
     /**
@@ -446,6 +475,11 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
         }
         if (BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())) {
             logger.error("更新逾期订单出错，该订单已还款完成，请核实，借款id: " + loanId);
+            return;
+        }
+
+        if (BackConstant.XJX_COLLECTION_ORDER_STATE_STOP.equals(order.getStatus())) {
+            logger.error("更新逾期订单出错，该订单已停催，请核实，借款id: " + loanId);
             return;
         }
 
@@ -627,6 +661,11 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
             order = orders.get(0);
             if (BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())) {
                 logger.error("逾期升级出错，订单已还款完成，借款id: " + loanId);
+                return;
+            }
+
+            if (BackConstant.XJX_COLLECTION_ORDER_STATE_STOP.equals(order.getStatus())) {
+                logger.error("逾期升级出错，订单已停催，借款id: " + loanId);
                 return;
             }
 

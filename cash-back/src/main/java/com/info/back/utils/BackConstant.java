@@ -68,6 +68,8 @@ public class BackConstant {
 
     public final static String XJX_COLLECTION_ORDER_STATE_SUCCESS = "4";// 现金侠催收状态催收成功
 
+    public final static String XJX_COLLECTION_ORDER_STATE_STOP = "4";// 现金侠催收状态催收成功
+
     public final static String XJX_COLLECTION_ORDER_STATE_PAYING = "5";// 现金侠催收状态续期（续期中不管之前怎样现在不能操作）
 
     public final static String XJX_COLLECTION_ORDER_STATE_ING = "1";// 现金侠催收状态催收中
