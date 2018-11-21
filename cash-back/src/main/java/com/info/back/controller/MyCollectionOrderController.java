@@ -1229,10 +1229,11 @@ public class MyCollectionOrderController extends BaseController {
      * @return
      */
     private List<TemplateSms> getAllMsg() {
-        List<TemplateSms> msgs = JedisDataClient.getList(BackConstant.REDIS_KEY_PREFIX, SHORT_MESSAGE_LIST_REDIS_KEY);
+        String msgKey = PayContents.MERCHANT_NUMBER+"_"+SHORT_MESSAGE_LIST_REDIS_KEY;
+        List<TemplateSms> msgs = JedisDataClient.getList(BackConstant.REDIS_KEY_PREFIX,msgKey);
         if (CollectionUtils.isEmpty(msgs)) {
             msgs = templateSmsDao.getMsgs();
-            JedisDataClient.setList(BackConstant.REDIS_KEY_PREFIX, SHORT_MESSAGE_LIST_REDIS_KEY, msgs, 60 * 60);
+            JedisDataClient.setList(BackConstant.REDIS_KEY_PREFIX, msgKey, msgs, 60 * 60);
         }
         return msgs;
     }
