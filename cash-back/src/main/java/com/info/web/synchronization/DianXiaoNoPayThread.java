@@ -44,6 +44,8 @@ public class DianXiaoNoPayThread implements Runnable {
         map.put("loanId", loanId);//借款id
         int orderCount = dianXiaoService.getDianXiaoOrderByLoanId(loanId);
         if (orderCount > 0){
+            //如果催收库已存在改定单，则不做处理并删除redis中的key
+//            RedisUtil.delRedisKey(Constant.DX_NOPAY + loanId);
             logger.error("sync-DianXiaoNoPay-orderExist="+loanId);
         }
 
