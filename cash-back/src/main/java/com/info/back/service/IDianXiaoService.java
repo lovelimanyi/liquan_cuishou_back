@@ -24,4 +24,7 @@ public interface IDianXiaoService {
     int getDianxiaoOrderCount(HashMap<String, Object> params);
 
     boolean dispatchDianXiaoOrder(HashMap<String, Object> borrowOrder);
+
+
+    int getDianXiaoOrderByLoanId(String loanId);
 }

@@ -302,6 +302,9 @@
             <if test="repayChannel != null and repayChannel != ''">
                 AND d.repay_channel = #{repayChannel}
             </if>
+            <!--<if test="channelFrom !=null and channelFrom!='' ">-->
+                <!--AND d.channel_from = #{channelFrom}-->
+            <!--</if>-->
         </where>
         <if test="sortBy !=null and sortBy!=''">
             ORDER BY a.${sortBy}
@@ -406,6 +409,8 @@
 			a.dispatch_name AS dispatchName,
 			d.customer_type AS customerType,
 			d.merchant_no AS merchantNo,
+			-- TODO 渠道来源
+		    -- d.channel_from AS  channelFrom,
 			d.repay_channel AS repayChannel
 	</sql>
     <!-- 保存,保存不为NULL的字段 -->

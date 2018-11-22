@@ -112,5 +112,10 @@ public class DianXiaoService implements IDianXiaoService {
         }
     }
 
+    @Override
+    public int getDianXiaoOrderByLoanId(String loanId) {
+        return dianXiaoDao.getDianXiaoOrderByLoanId(loanId);
+    }
+
 
 }

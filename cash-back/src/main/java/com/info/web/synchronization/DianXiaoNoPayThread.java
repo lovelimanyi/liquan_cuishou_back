@@ -42,6 +42,11 @@ public class DianXiaoNoPayThread implements Runnable {
         System.out.println(Thread.currentThread().getName() + "============================" + loanId);
         HashMap<String, String> map = new HashMap<String, String>();
         map.put("loanId", loanId);//借款id
+        int orderCount = dianXiaoService.getDianXiaoOrderByLoanId(loanId);
+        if (orderCount > 0){
+            logger.error("sync-DianXiaoNoPay-orderExist="+loanId);
+        }
+
         //从业务端获得该借款id的需要同步的借款定案
         HashMap<String, Object> borrowOrder = this.dataDao.getDianXiaoOrder(map);
         logger.error("sync-DianXiaoNoPay-borrowOrder="+borrowOrder);

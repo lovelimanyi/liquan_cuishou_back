@@ -342,7 +342,7 @@
                         </c:choose>
                     </td>
                     <td align="center" width="50">
-                            ${merchantMap[order.merchantNo]}
+                            ${channelFromMap[order.channelFrom]}
                     </td>
                     <td align="center" width="50">
                             ${repayChannelMap[order.repayChannel]}

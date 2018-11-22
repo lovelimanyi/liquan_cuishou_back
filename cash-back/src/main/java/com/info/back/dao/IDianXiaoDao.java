@@ -23,4 +23,6 @@ public interface IDianXiaoDao {
     void updateDianXiaoOrderStatus(String loanId);
 
     void insertDianXiaoOrder(DianXiaoOrder order);
+
+    int getDianXiaoOrderByLoanId(String loanId);
 }

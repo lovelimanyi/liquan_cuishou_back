@@ -122,4 +122,11 @@
         )VALUES (#{id},#{loanId},#{loanMoney},#{loanServiceCharge},#{loanUserName},#{loanUserPhone},#{loanStartDate},#{loanEndDate},#{orderStatus},#{currentCollectionUserId},#{currentCollectionUserName},#{merchantNo},#{createDate})
     </insert>
 
+    <select id="getDianXiaoOrderByLoanId" parameterType="string" resultType="integer" >
+        SELECT
+        count(1)
+        FROM dian_xiao_order dxo
+        WHERE dxo.loan_id = #{loanId}
+    </select>
+
 </mapper>
