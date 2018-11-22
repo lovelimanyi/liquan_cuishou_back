@@ -130,7 +130,16 @@ public class Constant {
 
     /**
      * 同步类型
+
      */
+    /**
+     * 电销未还款redis-key
+     */
+    public static final String DX_NOPAY = "dx:unrepay:";
+    /**
+     * 电销已还款redis-key
+     */
+    public static final String DX_PAY = "dx:repay:";
     /**
      * 逾期
      */

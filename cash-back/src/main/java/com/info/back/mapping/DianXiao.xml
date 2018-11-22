@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- column prefix alias: fk -->
+<mapper namespace="com.info.back.dao.IDianXiaoDao">
+
+    <sql id="sqlDianXiaoColumns">
+        id AS id,
+        loan_id AS loanId,
+        loan_money AS loanMoney,
+        loan_service_charge AS loanServiceCharge,
+        loan_user_name AS loanUserName,
+        loan_user_phone AS loanUserPhone,
+        loan_start_date AS loanStartDate,
+        loan_end_date AS loanEndDate,
+        order_status AS orderStatus,
+        current_collection_user_id AS currentCollectionUserId,
+        current_collection_user_name AS currentCollectionUserName,
+        merchant_no AS merchantNo,
+        repayment_intention AS repaymentIntention,
+        remark AS remark,
+        create_date AS createDate,
+        update_date AS updateDate
+    </sql>
+
+    <sql id="baseWhere">
+        <where>
+            <if test="loanUserName!=null and loanUserName!=''">
+                AND dxo.loan_user_name = #{loanUserName}
+            </if>
+            <if test="loanUserPhone!=null and loanUserPhone!=''">
+                AND dxo.loan_user_phone = #{loanUserPhone}
+            </if>
+            <if test="orderStatus!=null ">
+                AND dxo.order_status = #{orderStatus}
+            </if>
+            <if test="repaymentIntention!=null ">
+                AND dxo.repayment_intention = #{repaymentIntention}
+            </if>
+            <if test="currentCollectionUserName!=null and currentCollectionUserName !='' ">
+                AND dxo.current_collection_user_name = #{currentCollectionUserName}
+            </if>
+            <if test="TodayDate!=null and TodayDate!=''">
+                <![CDATA[ AND dxo.create_date >= #{TodayDate} ]]>
+            </if>
+            <if test="startDate!=null and startDate!=''">
+                <![CDATA[ AND dxo.loan_start_date >= #{startDate} ]]>
+            </if>
+            <if test="endDate!=null and endDate!=''">
+                <![CDATA[ AND dxo.loan_start_date <= #{endDate} ]]>
+            </if>
+
+        </where>
+    </sql>
+
+
+    <select id="findDianXiaoPage" resultType="com.info.web.pojo.DianXiaoOrder" parameterType="hashmap">
+        SELECT
+        <include refid="sqlDianXiaoColumns"/>
+        FROM dian_xiao_order dxo
+        <include refid="baseWhere"/>
+        ORDER BY dxo.loan_end_date DESC ,dxo.order_status ASC ,dxo.loan_money DESC
+
+
+    </select>
+
+    <select id="findDianXiaoCount" resultType="integer" parameterType="hashmap">
+        SELECT
+        count(1)
+        FROM dian_xiao_order dxo
+        <include refid="baseWhere"/>
+    </select>
+
+    <select id="getDianXiaoOrder" resultType="com.info.web.pojo.DianXiaoOrder" parameterType="hashmap">
+        SELECT
+        <include refid="sqlDianXiaoColumns"/>
+        FROM dian_xiao_order dxo
+        WHERE dxo.id = #{id}
+    </select>
+
+    <update id="updateDianXiaoOrder" parameterType="hashmap" >
+        UPDATE dian_xiao_order
+        <set>
+            <if test="repaymentIntention!=null">
+                repayment_intention = #{repaymentIntention},
+            </if>
+            <if test="remark!=null and remark != '' ">
+                remark = #{remark}
+            </if>
+        </set>
+        WHERE id = #{id}
+
+    </update>
+
+    <select id="getDianXiaoOrderList" parameterType="hashmap" resultType="com.info.web.pojo.DianXiaoOrder">
+        SELECT
+        <include refid="sqlDianXiaoColumns"/>
+        FROM dian_xiao_order dxo
+        <include refid="baseWhere"/>
+        ORDER BY dxo.loan_end_date DESC ,dxo.order_status ASC ,dxo.loan_money DESC
+
+    </select>
+
+    <select id="getDianxiaoOrderCount" parameterType="hashmap" resultType="integer">
+        SELECT
+        count(1)
+        FROM dian_xiao_order dxo
+        <include refid="baseWhere"/>
+    </select>
+
+
+    <update id="updateDianXiaoOrderStatus" parameterType="string">
+        UPDATE dian_xiao_order
+        SET order_status = 4,update_date = now()
+        WHERE loan_id = #{loanId}
+        -- 			  and order_status=1
+        <!--<![CDATA[ and create_date > curdate()]]>-->
+    </update>
+
+    <insert id="insertDianXiaoOrder" parameterType="com.info.web.pojo.DianXiaoOrder">
+        INSERT INTO dian_xiao_order(id,loan_id,loan_money,loan_service_charge,loan_user_name,loan_user_phone,loan_start_date,
+        loan_end_date,order_status,current_collection_user_id,current_collection_user_name,merchant_no,create_date
+        )VALUES (#{id},#{loanId},#{loanMoney},#{loanServiceCharge},#{loanUserName},#{loanUserPhone},#{loanStartDate},#{loanEndDate},#{orderStatus},#{currentCollectionUserId},#{currentCollectionUserName},#{merchantNo},#{createDate})
+    </insert>
+
+</mapper>

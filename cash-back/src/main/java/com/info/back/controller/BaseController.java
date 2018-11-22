@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.info.back.utils.BackConstant;
+import com.info.web.util.DateUtil;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -20,6 +22,7 @@ import com.info.constant.Constant;
 import com.info.back.utils.RequestUtils;
 import com.info.web.pojo.BackUser;
 import com.info.web.pojo.User;
+import sun.security.util.Cache;
 
 public class BaseController {
 	public static final String MESSAGE = "message";
@@ -186,5 +189,18 @@ public class BaseController {
 			}
 		}
 		return cookieMap;
+	}
+	/**
+	 * 检查登录用户
+	 *
+	 * @param backUser
+	 * @return
+	 */
+	public static void checkBackUser(BackUser backUser, HashMap<String, Object> params) {
+		if (BackConstant.SURPER_MANAGER_ROLE_ID.equals(backUser.getRoleId())){
+//			params.put("Admin",);
+		}else if (BackConstant.DIAN_XIAO_ROLE_ID.equals(backUser.getRoleId())){
+			params.put("currentCollectionUserId",backUser.getUuid());
+		}
 	}
 }

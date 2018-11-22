@@ -106,6 +106,8 @@
         <task:scheduled ref="taskJobStatistics" method="trackStatistics" cron="0 30 7-23 * * ?"/> <!-- 时间段累计统计 整点30 -->
         <task:scheduled ref="taskWithholdStatus" method="updateStatus" cron="0 25 10,14,21 * * ?"/>
         <task:scheduled ref="dataSyncService" method="syncOverdueDate" cron="0 40 2 * * ?"/><!--每天凌晨2点40跑逾期-->
+        <task:scheduled ref="dianXiaoDataService" method="syncDianXiaoNoPay" cron="0 30 5 * * ?"/><!--电销订单同步-->
+        <task:scheduled ref="dianXiaoDataService" method="syncDianXiaoPay" cron="0 0/2 6-23 * * ?"/><!--电销订单还款同步-->
         <!--3点开始跑逾期，到4点跑完了，先执行部分还款数据，5点开始跑全部还款数据(1-4之间不执行续期、还款、代扣，为了防止3点逾期还未推送，还款先推送了)-->
         <task:scheduled ref="twoMinSyncOperateService" method="twoMinSyncOverdue" cron="0 0/2 4-23 * * ?"/><!--4点到24点   每2分钟跑逾期(部分还款)-->
         <task:scheduled ref="twoMinSyncOperateService" method="twoMinSyncOther" cron="0 0/2 5-23 * * ?"/><!--5点到24点   每2分钟跑续期，还款，代扣 -->

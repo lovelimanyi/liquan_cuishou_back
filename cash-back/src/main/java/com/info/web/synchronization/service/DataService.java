@@ -30,39 +30,16 @@ public class DataService implements IDataService {
 	private IDataDao dataDao;
 	@Autowired
 	private ILocalDataDao localDataDao;
-	private static final String LOCK_FLAG = "1";
-//	@Autowired
-//	private TaskJobMiddleService taskJobMiddleService;
 
 	
 	/**
 	 * 同步数据
 	 */
 	public void syncDate(TaskJobMiddleService taskJobMiddleService){
-		/*try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
-		}*/
-		
-//		loger.info("获取数据 syncDate");
-//		while(true){
 			try {
 				loger.info("获取所有的redis数据");
-				HashMap<String,List<String>> hashMap =  getRedisAllData();
-				if(null!=hashMap){
-//					try{
-//						List<String> overdueList = hashMap.get(Constant.TYPE_OVERDUE);
-//						if(null!=overdueList && 0<overdueList.size()){
-//							loger.info("处理逾期数据");
-//							dataForOverdue(overdueList,taskJobMiddleService);//处理逾期
-//						}
-//					}catch(Exception e){
-//						loger.info("overdueList get exception..");
-//						e.printStackTrace();
-//					}
 					try{
-						List<String> renewalList = hashMap.get(Constant.TYPE_RENEWAL);
+						List<String> renewalList = JedisDataClient.getAllValuesByPattern(Constant.TYPE_RENEWAL_+"*_"+PayContents.MERCHANT_NUMBER);
 						if(null!=renewalList && 0<renewalList.size()){
 							loger.info("处理续期数据");
 							dataForRenewal(renewalList);//处理续期
@@ -72,7 +49,7 @@ public class DataService implements IDataService {
 						e.printStackTrace();
 					}
 					try{
-						List<String> repayList = hashMap.get(Constant.TYPE_REPAY);
+						List<String> repayList = JedisDataClient.getAllValuesByPattern(Constant.TYPE_REPAY_+"*_"+PayContents.MERCHANT_NUMBER);
 						if(null!=repayList && 0<repayList.size()){
 							loger.info("处理还款数据");
 							dataForRepay(repayList);//处理还款
@@ -82,7 +59,7 @@ public class DataService implements IDataService {
 						e.printStackTrace();
 					}
 					try{
-						List<String> withList = hashMap.get(Constant.TYPE_WITHHOLD);
+						List<String> withList = JedisDataClient.getAllValuesByPattern(Constant.TYPE_WITHHOLD_+"*_"+PayContents.MERCHANT_NUMBER);
 						if(null!=withList && 0<withList.size()){
 							loger.info("处理代扣数据");
 							dataForWithHold(withList);//处理还款
@@ -91,8 +68,6 @@ public class DataService implements IDataService {
 						loger.info("withList get exception..");
 						e.printStackTrace();
 					}
-				}
-//				Thread.sleep(1000*60*2);//频率间隔
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

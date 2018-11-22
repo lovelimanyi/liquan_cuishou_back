@@ -57,6 +57,7 @@ public class HttpsUtil {
             URL url = new URL(requestUrl);
             HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
             conn.addRequestProperty("Authorization", getAuthHeader());
+            conn.addRequestProperty(PayContents.XJX_HEADER_NAME, PayContents.XJX_HEADER_VALUE);
             conn.setSSLSocketFactory(ssf);
             conn.setDoOutput(true);
             conn.setDoInput(true);

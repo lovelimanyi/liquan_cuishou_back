@@ -521,6 +521,41 @@ public class JedisDataClient {
         }
     }
 
+
+    public static List<String> getAllValuesByPattern(String pattern) throws Exception {
+        Jedis jedisMaster = null;
+        List<String> valuesList = new ArrayList<String>();
+        try {
+            jedisMaster = getMasterJedis();
+            Set<String> keys = jedisMaster.keys(pattern);
+            Iterator<String> it = keys.iterator();
+            while (it.hasNext()) {
+                valuesList.add(jedisMaster.get(it.next()));
+            }
+            return valuesList;
+        } finally {
+            returnResource(jedisMaster, poolMaster);
+        }
+    }
+
+
+    public static List<String> getAllKeysByPattern(String pattern) throws Exception {
+        Jedis jedisMaster = null;
+        List<String> keyList = new ArrayList<String>();
+        try {
+            jedisMaster = getMasterJedis();
+            Set<String> keys = jedisMaster.keys(pattern);
+            Iterator<String> it = keys.iterator();
+            while (it.hasNext()) {
+                String key = it.next();
+                keyList.add(key);
+            }
+            return keyList;
+        } finally {
+            returnResource(jedisMaster, poolMaster);
+        }
+    }
+
     /**
      * 删除list中对应value的值
      *
@@ -731,4 +766,6 @@ public class JedisDataClient {
         }
         return null;
     }
+
+
 }

@@ -96,6 +96,7 @@ public class UserController extends BaseController {
             } else {
                 String[] dataComapnyIDs = request.getParameterValues("dataComapnyIDs");
                 backUser.setDataComapnyIDs(dataComapnyIDs);
+                backUser.setCompanyId(request.getParameter("companyId"));
                 // 更新或者添加操作
                 if (backUser.getId() != null) {
                     backUserService.updateById(backUser);

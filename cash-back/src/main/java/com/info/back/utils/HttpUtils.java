@@ -31,7 +31,7 @@ import java.util.Map;
 
 public class HttpUtils {
 
-    private static final String JXL_URL = "/report/jxl_raw_report";
+    private static final String JXL_URL = "/report/jxl_base_report";
 
     private static final Logger logger = Logger.getLogger(HttpUtils.class);
 
@@ -75,6 +75,7 @@ public class HttpUtils {
             HttpGet get = new HttpGet(extraUrl);
             if (url.contains(JXL_URL)) {
                 get.addHeader("Authorization", getAuthHeader());
+                get.addHeader(PayContents.XJX_HEADER_NAME, PayContents.XJX_HEADER_VALUE);
             }
             get.setConfig(requestConfig);
             response = httpClient.execute(get);
@@ -84,14 +85,16 @@ public class HttpUtils {
             HttpEntity entity = response.getEntity();
 //            logger.info(phone+"phone-JxlData="+EntityUtils.toString(entity));
 //            String type= response.getFirstHeader("X-SUBTYPE").getValue();
-            subtype = "jxl";
-            if (StringUtils.isNoneBlank(subtype)) {
+//            subtype = "jxl";
+//            String str = EntityUtils.toString(entity);
+//            System.out.println(str);
+//            if (StringUtils.isNoneBlank(subtype)) {
                 JxlResponse jxlResponse = new JxlResponse();
                 jxlResponse.setJxlType(subtype);
                 jxlResponse.setJxlData(EntityUtils.toString(entity));
                 return jxlResponse;
-            }
-            return null;
+//            }
+//            return null;
 
         } catch (Exception e) {
             logger.error("访问链接异常[GET] url=" + url, e);
@@ -154,6 +157,7 @@ public class HttpUtils {
             HttpGet get = new HttpGet(extraUrl);
             if (url.contains(PayContents.GXB_ECOMMERCE_INFOS)) {
                 get.addHeader("Authorization", getAuthHeader());
+                get.addHeader(PayContents.XJX_HEADER_NAME, PayContents.XJX_HEADER_VALUE);
             }
             get.setConfig(requestConfig);
             response = httpClient.execute(get);

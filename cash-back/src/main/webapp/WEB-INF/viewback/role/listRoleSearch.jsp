@@ -23,8 +23,7 @@
 				</c:if>
 				<div layoutH="14" id="roleBox" class="unitBox"
 					style="background: #fff;">
-					<form id="pagerForm" onsubmit="return divSearch(this, 'roleBox')"
-						method="post" action="xxx?myId=${params.myId}">
+					<form id="pagerForm" onsubmit="return divSearch(this, 'roleBox')" action="role/getRoleList?myId=${params.myId}&roleId=${params.roleId}&_=1542192210179">
 						
 						<div class="pageContent">
 							<jsp:include page="${BACK_URL}/rightSubList">

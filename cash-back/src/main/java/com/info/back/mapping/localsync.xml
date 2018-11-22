@@ -1252,4 +1252,19 @@
 		WHERE
 		l.id=#{loanId}
 	</delete>
+
+	<!--<select id="checkDianXiaoOrder" parameterType="string" resultType="boolean">-->
+		  <!--<![CDATA[ select count(loan_id) from dian_xiao_order where loan_id = #{loanId} ]]>-->
+	<!--</select>-->
+	<select id="checkDianXiaoOrder" parameterType="string" resultType="integer">
+		select count(1) FROM dian_xiao_order WHERE loan_id = #{loanId}
+	</select>
+	
+	
+	<update id="updateDianXiaoOrderStatus" parameterType="string">
+		UPDATE dian_xiao_order
+		SET order_status = 4 ,update_date = now()
+		WHERE loan_id = #{loanId} and order_status=1 and <![CDATA[ create_date > curdate()]]>
+	</update>
+
 </mapper>
