@@ -43,6 +43,7 @@
 				repay_channel,
 				accrual,
 				borrowing_type,
+				channel_from,
 				customer_type
 			)values(
 				#{id},
@@ -68,6 +69,7 @@
 				#{repayChannel},
 				#{accrual},
 				#{borrowingType},
+				#{channelFrom},
 				#{customerType}
 			)
 		]]>
