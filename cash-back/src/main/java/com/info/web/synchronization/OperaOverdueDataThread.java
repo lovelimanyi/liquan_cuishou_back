@@ -179,7 +179,7 @@ public class OperaOverdueDataThread implements Runnable {
 		mmanUserLoan.setMerchantNo(String.valueOf(borrowOrder.get("merchant_number")));
 		mmanUserLoan.setRepayChannel(Integer.parseInt(String.valueOf(repaymentMap.get("repay_channel"))));
 		//TODO 优化渠道来源
-//		mmanUserLoan.setChannelFrom(borrowOrder.get("order_from").toString());
+		mmanUserLoan.setChannelFrom(borrowOrder.get("order_from").toString());
 		this.localDataDao.saveMmanUserLoan(mmanUserLoan);
 		loger.info("end-saveMmanUserLoan:"+String.valueOf(borrowOrder.get("id")));
 	}
