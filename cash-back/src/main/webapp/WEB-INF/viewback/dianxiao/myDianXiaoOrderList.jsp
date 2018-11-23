@@ -96,7 +96,7 @@
                     还款状态
                 </th>
                 <th align="center" width="50">
-                    电催员姓名
+                    电销员姓名
                 </th>
                 <th align="center" width="80">
                     商户号

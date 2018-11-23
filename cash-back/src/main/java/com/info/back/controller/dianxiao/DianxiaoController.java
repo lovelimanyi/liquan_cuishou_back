@@ -56,12 +56,12 @@ public class DianxiaoController extends BaseController {
         try {
             BackUser backUser = loginAdminUser(request);
             HashMap<String, Object> params = getParametersO(request);
-//            if (BackConstant.DIAN_XIAO_ROLE_ID.equals(backUser.getRoleId())){
-//                params.put("currentCollectionUserId",backUser.getUuid());
-//                url = "dianxiao/myDianXiaoOrderList";
-//            }else {
-//                url = "dianxiao/totalDianXiaoOrderList";
-//            }
+            if (BackConstant.DIAN_XIAO_ROLE_ID.equals(backUser.getRoleId())){
+                params.put("currentCollectionUserId",backUser.getUuid());
+                url = "dianxiao/myDianXiaoOrderList";
+            }else {
+                url = "dianxiao/totalDianXiaoOrderList";
+            }
             params.put("TodayDate", DateUtil.getDateFormat("yyyy-MM-dd"));
             PageConfig<DianXiaoOrder> pageConfig = dianXiaoService.getDianXiaoPage(params);
             model.addAttribute("pm", pageConfig);

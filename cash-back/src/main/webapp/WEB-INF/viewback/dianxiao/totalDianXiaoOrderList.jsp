@@ -22,7 +22,7 @@
                         <input type="text" name="loanUserPhone" id="loanUserPhone" value="${params.loanUserPhone }" />
                     </td>
                     <td>
-                        电催员:
+                        电销员:
                         <input type="text" name="currentCollectionUserName" id="currentCollectionUserName" value="${params.currentCollectionUserName }" />
                     </td>
                     <td>
@@ -109,7 +109,7 @@
                     还款状态
                 </th>
                 <th align="center" width="50">
-                    电催员姓名
+                    电销员姓名
                 </th>
                 <th align="center" width="80">
                     商户号

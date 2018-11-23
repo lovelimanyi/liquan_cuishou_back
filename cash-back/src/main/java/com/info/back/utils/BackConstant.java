@@ -65,8 +65,8 @@ public class BackConstant {
 
     public final static Integer SURPER_MANAGER_ROLE_ID = 10001;
 
-    public final static Integer DIAN_XIAO_ROLE_ID = 10033; //电销员
-    public final static Integer DIAN_XIAO_MANAGER_ROLE_ID = 10034;//电销经理
+    public final static String DIAN_XIAO_ROLE_ID = "10033"; //电销员
+    public final static String DIAN_XIAO_MANAGER_ROLE_ID = "10034";//电销经理
 
 
     public final static Integer COLLECTION_ROLE_ID = 10021;//催收员的角色ID
