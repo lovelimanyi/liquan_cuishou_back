@@ -155,8 +155,12 @@ public class DianxiaoController extends BaseController {
                     conList[7] = order.getOrderStatus()== 1? "未还款":"已还款";
                     conList[8] = order.getCurrentCollectionUserName();
                     conList[9]= merchantNoMap.get(order.getMerchantNo());
-                    conList[10]= intentionMap.get(order.getRepaymentIntention().toString());
-                    conList[11]= order.getRemark();
+                    if (order.getRepaymentIntention() != null){
+                        conList[10]= intentionMap.get(order.getRepaymentIntention().toString());
+                    }else {
+                        conList[10] = "";
+                    }
+                    conList[11]= null == order.getRemark()? "":order.getRemark().toString();
                     contents.add(conList);
                 }
                 ExcelUtil.buildExcel(workbook, "电销总订单", titles, contents, i, sheetNo, os);
