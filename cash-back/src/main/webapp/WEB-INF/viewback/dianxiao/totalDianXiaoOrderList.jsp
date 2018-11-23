@@ -198,6 +198,10 @@
         debugger;
         var href = $(obj).attr("href");
         href = href.split("&")[0];
+        var merchantNo =  $("#merchantNo").val();
+        if(merchantNo != null && merchantNo != ''){
+            href += "&merchantNo=" + merchantNo;
+        }
         var loanUserName =  $("#loanUserName").val();
         if(loanUserName != null && loanUserName != ''){
             href += "&loanUserName=" + loanUserName;
