@@ -3,7 +3,9 @@ package com.info.web.synchronization.service;
 import com.info.back.dao.ILocalDataDao;
 import com.info.back.service.IDianXiaoService;
 import com.info.config.PayContents;
+import com.info.constant.Constant;
 import com.info.web.synchronization.DianXiaoNoPayThread;
+import com.info.web.synchronization.RedisUtil;
 import com.info.web.synchronization.dao.IDataDao;
 import com.info.web.util.JedisDataClient;
 import com.info.web.util.ThreadPoolInstance;
@@ -43,18 +45,18 @@ public class DianXiaoDataService{
                 //获取所有电销未还款的redis的key对应的value
                 valueList = JedisDataClient.getAllValuesByPattern("dx:unrepay:*");
             } catch (Exception e) {
-                loger.error("getAllNoPayValuesByPattern-exception"+e);
+                loger.error("getAllNoPayValuesByPattern-exception",e);
                 e.printStackTrace();
                 return;
             }
             //如果redis中存在未还款的value,则把订单同步到电销订单表
             if (CollectionUtils.isNotEmpty(valueList)){
                 for (String loanId : valueList){
-                    System.out.println("nopay_pay_loanId="+loanId);
+//                    System.out.println("nopay_pay_loanId="+loanId);
                     ThreadPoolInstance.getInstance().doExecute(new DianXiaoNoPayThread(loanId,dataDao,localDataDao,dianXiaoService));
                     try {
                         //可以根据实际情况做下发送速度控制
-                        Thread.sleep(500);
+                        Thread.sleep(50);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -77,7 +79,7 @@ public class DianXiaoDataService{
                 //获取所有电销已还款的redis的key对应的value
                 valueList = JedisDataClient.getAllValuesByPattern("dx:repay:*");
             } catch (Exception e) {
-                loger.error("getAllPayValuesByPattern-exception"+e);
+                loger.error("getAllPayValuesByPattern-exception",e);
                 e.printStackTrace();
                 return;
             }
@@ -92,17 +94,22 @@ public class DianXiaoDataService{
                             //检查催收库-电销表中是否有该订单id的未还款订单，如果有，更新为已还款，如果没有，删除redis中的key
                             int count = localDataDao.checkDianXiaoOrder(loanId);
                             if (count>0){
-                                localDataDao.updateDianXiaoOrderStatus(loanId);
-                                loger.error("update---------------------"+loanId);
-//                                RedisUtil.delRedisKey(Constant.DX_PAY+loanId);
+                                try {
+                                    localDataDao.updateDianXiaoOrderStatus(loanId);
+                                    RedisUtil.delRedisKey(Constant.DX_PAY+loanId);
+                                }catch (Exception e){
+                                    loger.error("update-exception"+loanId);
+                                    loger.error("update-exception=",e);
+                                }
+
                             }
-//                            RedisUtil.delRedisKey(Constant.DX_PAY+loanId);
-                            System.out.println(Thread.currentThread().getName()+"_"+loanId);
+                            RedisUtil.delRedisKey(Constant.DX_PAY+loanId);
+//                            System.out.println(Thread.currentThread().getName()+"_"+loanId);
                         }
                     });
                     try {
                         //可以根据实际情况做下发速度控制
-                        Thread.sleep(500);
+                        Thread.sleep(50);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
