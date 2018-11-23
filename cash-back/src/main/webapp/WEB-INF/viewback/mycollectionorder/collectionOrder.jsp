@@ -142,11 +142,11 @@
                 <tr>
                     <td>
                         渠 道 来 源:
-                        <select id="merchantNo" name="merchantNo">
+                        <select id="channelFrom" name="channelFrom">
                             <option value="">全部</option>
-                            <c:forEach var="merchant" items="${merchantMap }">
-                                <option value="${merchant.key }" <c:if test="${merchant.key eq params.merchantNo}">selected="selected"</c:if>>
-                                        ${merchant.value}
+                            <c:forEach var="channelFromMap" items="${channelFromMap }">
+                                <option value="${channelFromMap.key }" <c:if test="${channelFromMap.key eq params.channelFrom}">selected="selected"</c:if>>
+                                        ${channelFromMap.value}
                                 </option>
                             </c:forEach>
                         </select>
@@ -342,7 +342,7 @@
                         </c:choose>
                     </td>
                     <td align="center" width="50">
-                            ${merchantMap[order.merchantNo]}
+                            ${channelFromMap[order.channelFrom]}
                     </td>
                     <td align="center" width="50">
                             ${repayChannelMap[order.repayChannel]}

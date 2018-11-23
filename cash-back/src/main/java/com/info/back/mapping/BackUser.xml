@@ -107,6 +107,9 @@
             <if test="userQq != null and userQq != ''">
                 user_qq =#{userQq},
             </if>
+            <if test="companyId != null and companyId != ''">
+                company_id =#{companyId},
+            </if>
             <if test="remark != null and remark != ''">
                 remark =#{remark},
             </if>
@@ -357,4 +360,42 @@
             </if>
         </where>
     </select>
+
+
+    <select id="dianXiaoBackUserByOrderCount" resultType="com.info.web.pojo.DianXiaoBackUser" parameterType="map">
+
+        SELECT
+        u.id AS id,
+        u.uuid AS uuid,
+        u.user_name AS userName,
+        u.company_id AS companyId,
+        u.role_id AS roleId,
+        IFNULL(c.orderCount, 0) AS currentOrderCount,
+        u.status AS userStatus
+        FROM
+        back_user u
+        LEFT JOIN (
+            SELECT
+            o.current_collection_user_id AS currentCollectionUserId,
+            count(1) AS orderCount
+            FROM
+            dian_xiao_order o
+            WHERE
+            <![CDATA[ o.create_date > current_date() ]]>
+            GROUP BY
+            o.current_collection_user_id
+        ) c ON u.uuid = c.currentCollectionUserId
+        WHERE
+        u.status = 1
+        <if test="roleId != null and roleId != ''">
+            AND u.role_id=#{roleId}
+        </if>
+        ORDER BY orderCount
+        LIMIT 1
+
+
+
+
+    </select>
+
 </mapper>

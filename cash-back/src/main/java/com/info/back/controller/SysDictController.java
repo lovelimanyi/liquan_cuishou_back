@@ -50,7 +50,7 @@ public class SysDictController extends BaseController{
 			model.addAttribute("pm", pageConfig);
 			model.addAttribute("params", params);
 		} catch (Exception e) {
-			logger.error("params error", e);
+			logger.error("params error"+ e);
 			model.addAttribute(MESSAGE, "服务器异常，请稍后重试！");
 		}
 		return "sysDict/sysDictList";

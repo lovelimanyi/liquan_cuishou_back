@@ -48,4 +48,6 @@ public interface IDataDao {
 	 * @return
 	 */
 	List<HashMap<String, Object>> getEstimateOrder(HashMap<String,Object> map);
+
+	HashMap<String,Object> getDianXiaoOrder(HashMap<String, String> map);
 }

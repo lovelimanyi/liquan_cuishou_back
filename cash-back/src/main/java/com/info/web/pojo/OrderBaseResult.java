@@ -63,6 +63,15 @@ public class OrderBaseResult {
     private String merchantNo;
 
     private Integer repayChannel;
+    private String channelFrom;
+
+    public String getChannelFrom() {
+        return channelFrom;
+    }
+
+    public void setChannelFrom(String channelFrom) {
+        this.channelFrom = channelFrom;
+    }
 
     public Integer getRepayChannel() {
         return repayChannel;

@@ -183,12 +183,13 @@ public class MyCollectionOrderController extends BaseController {
         // 跟进等级
         List<SysDict> levellist = sysDictService.getStatus("xjx_stress_level");
         // 商户信息
-        model.addAttribute("merchantMap", mmanLoanCollectionOrderService.getMerchantMap());
+//        model.addAttribute("merchantMap", mmanLoanCollectionOrderService.getMerchantMap());
         model.addAttribute("repayChannelMap", mmanLoanCollectionOrderService.getRepayChannelMap());
         HashMap<String, String> levelMap = BackConstant.orderState(levellist);
         model.addAttribute("levellist", levellist);
         model.addAttribute("levelMap", levelMap);
         model.addAttribute("params", params); // 用于搜索框保留值
+        model.addAttribute("channelFromMap",BackConstant.channelFromMap);
         return "mycollectionorder/collectionOrder";
     }
 

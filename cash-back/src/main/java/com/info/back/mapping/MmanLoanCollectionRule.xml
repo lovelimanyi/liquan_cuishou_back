@@ -96,8 +96,8 @@
 		</set>
 		WHERE id = #{id,jdbcType=VARCHAR}
 	</update>
-	<select id="findCompanyGoupOnline" resultType="Integer" parameterType="HashMap" >
-		SELECT count(1) FROM mman_loan_collection_rule t  WHERE t.`collection_group`=#{grouplevel} AND t.`company_id`=#{companyId}
+	<select id="findCompanyGoupOnline" resultType="java.lang.Integer" parameterType="HashMap" >
+		SELECT t.every_limit FROM mman_loan_collection_rule t  WHERE t.`collection_group`=#{grouplevel} AND t.`company_id`=#{companyId}
 	</select>
 	
 	<select id="findList" resultMap="queryResultMap" parameterType="com.info.web.pojo.MmanLoanCollectionRule">

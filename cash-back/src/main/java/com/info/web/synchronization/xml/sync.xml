@@ -38,4 +38,15 @@
 		]]>
 	</select>
 
+
+	<select id="getDianXiaoOrder" resultType="hashmap" parameterType="hashmap">
+		  select id,money_amount,loan_interests,loan_time,loan_end_time,realname,user_phone,status,ifnull(merchant_number,0) AS merchant_number
+		  from asset_borrow_order
+		  where id  = #{loanId} and status= 21
+	</select>
+
+
+
+
+
 </mapper>

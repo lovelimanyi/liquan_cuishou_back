@@ -18,6 +18,9 @@ public class BackConstant {
     public static final Map<String, String> groupNameMap = new LinkedHashMap<>();
     public static final Map<String, String> smallGroupNameMap = new LinkedHashMap<>();
     public static final Map<String, String> bigGroupNameMap = new LinkedHashMap<>();
+    public static final Map<String, String> channelFromMap = new LinkedHashMap<>();
+
+
 
     public static final Map<String, String> groupNameTypeMap = new LinkedHashMap<String, String>();
     public static final Map<String, String> MTypeMap = new LinkedHashMap<String, String>();
@@ -61,6 +64,10 @@ public class BackConstant {
 
 
     public final static Integer SURPER_MANAGER_ROLE_ID = 10001;
+
+    public final static String DIAN_XIAO_ROLE_ID = "10033"; //电销员
+    public final static String DIAN_XIAO_MANAGER_ROLE_ID = "10034";//电销经理
+
 
     public final static Integer COLLECTION_ROLE_ID = 10021;//催收员的角色ID
 
@@ -131,6 +138,10 @@ public class BackConstant {
     public static final String REDIS_KEY_PREFIX = "cuishou:";
 
     static {
+        channelFromMap.put("0",MerchantNoUtils.getMerchantName2());
+        channelFromMap.put("ymgj","有米管家");
+
+
         groupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_S1, "S1");
         groupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_S2, "S2");
         groupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_M1_M2, "M1-M2");

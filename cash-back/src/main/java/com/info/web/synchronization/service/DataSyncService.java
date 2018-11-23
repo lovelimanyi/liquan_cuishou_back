@@ -44,10 +44,8 @@ public class DataSyncService {
 		loger.error("定时处理逾期数据..."+new Date());
 		try {
 //			loger.info("获取所有的redis数据");
-			HashMap<String,List<String>> hashMap =  getRedisAllData();
-			if(null!=hashMap){
 				try{
-					List<String> overdueList = hashMap.get(Constant.TYPE_OVERDUE);
+					List<String> overdueList = JedisDataClient.getAllValuesByPattern(Constant.TYPE_OVERDUE_+"*_"+PayContents.MERCHANT_NUMBER);
 					if(null!=overdueList && 0<overdueList.size()){
 						loger.info("处理逾期数据");
 						dataForOverdue(overdueList);//处理逾期
@@ -56,7 +54,6 @@ public class DataSyncService {
 					loger.info("overdueList get exception..");
 					e.printStackTrace();
 				}
-			}
 //			Thread.sleep(1000*60*200);//频率间隔
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -1,10 +1,10 @@
 package com.info.back.dao;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import com.info.web.pojo.AuditCenter;
@@ -17,7 +17,6 @@ import com.info.web.pojo.MmanLoanCollectionStatusChangeLog;
 import com.info.web.pojo.MmanUserLoan;
 import com.info.web.pojo.MmanUserRela;
 import com.info.web.pojo.SysUserBankCard;
-
 @Repository
 public interface ILocalDataDao {
 	
@@ -150,4 +149,12 @@ public interface ILocalDataDao {
 	void deleteOrderAndOther(String loanId);
 
     void saveMmanUserInfo(Map<String, Object> userInfo);
+
+//	boolean checkDianXiaoOrder(String loanId);
+	Integer checkDianXiaoOrder(String loanId);
+
+	void updateDianXiaoOrderStatus(String loanId);
+
+
+
 }

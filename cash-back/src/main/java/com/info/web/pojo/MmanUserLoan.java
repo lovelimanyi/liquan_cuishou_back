@@ -51,6 +51,16 @@ public class MmanUserLoan {
     private String merchantNo;
     private String borrowingType;
     private Integer repayChannel;
+    //渠道来源   本系统和有米管家两种
+    private String channelFrom;
+
+    public String getChannelFrom() {
+        return channelFrom;
+    }
+
+    public void setChannelFrom(String channelFrom) {
+        this.channelFrom = channelFrom;
+    }
 
     public Integer getRepayChannel() {
         return repayChannel;

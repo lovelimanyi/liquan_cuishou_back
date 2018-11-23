@@ -4,13 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.info.web.pojo.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
-
-import com.info.web.pojo.BackUser;
-import com.info.web.pojo.BackUserRole;
-import com.info.web.pojo.MmanLoanCollectionCompany;
-import com.info.web.pojo.MmanLoanCollectionPerson;
 
 /**
  * 类描述：用户dao层 <br>
@@ -170,4 +166,6 @@ public interface IBackUserDao {
     Integer selectUserCount4Estimate(@Param("groupLevel")String groupLevel);
 
     List<BackUser> getUserByCompanyIdAndGroupLevel(Map<String, Object> userMap);
+
+    DianXiaoBackUser dianXiaoBackUserByOrderCount(Map<String, Object> map);
 }

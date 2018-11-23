@@ -43,4 +43,9 @@ public class DataDao extends BaseDao implements IDataDao {
         return getSqlSessionTemplates().selectList("getEstimateOrder", map);
     }
 
+    @Override
+    public HashMap<String, Object> getDianXiaoOrder(HashMap<String, String> map) {
+        return getSqlSessionTemplates().selectOne("getDianXiaoOrder", map);
+    }
+
 }
