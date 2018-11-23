@@ -12,7 +12,17 @@
         <div class="searchBar">
             <table class="searchContent">
                 <tr>
-
+                    <td>
+                        商户号:
+                        <select id="merchantNo" name="merchantNo">
+                            <option value="">全部</option>
+                            <c:forEach var="merchantMap" items="${merchantMap }">
+                                <option value="${merchantMap.key }" <c:if test="${merchantMap.key eq params.merchantNo}">selected="selected"</c:if>>
+                                        ${merchantMap.value}
+                                </option>
+                            </c:forEach>
+                        </select>
+                    </td>
                     <td>
                         借款人:
                         <input type="text" name="loanUserName" id="loanUserName" value="${params.loanUserName }" />

@@ -33,6 +33,9 @@
             <if test="orderStatus!=null ">
                 AND dxo.order_status = #{orderStatus}
             </if>
+            <if test="merchantNo!=null and merchantNo!=''">
+                AND dxo.merchant_no = #{merchantNo}
+            </if>
             <if test="repaymentIntention!=null ">
                 AND dxo.repayment_intention = #{repaymentIntention}
             </if>
