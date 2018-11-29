@@ -140,8 +140,8 @@ public class MyCollectionOrderController extends BaseController {
     @RequestMapping("getListCollectionOrder")
     public String getListCollectionOrder(HttpServletRequest request, Model model) {
         HashMap<String, Object> params = this.getParametersO(request);
-        String status = params.get("status") == null ? "1":params.get("status").toString();
-        params.put("status",status);
+//        String status = params.get("status") == null ? "1":params.get("status").toString();
+//        params.put("status",status);
 
         BackUser backUser = (BackUser) request.getSession().getAttribute(
                 Constant.BACK_USER);

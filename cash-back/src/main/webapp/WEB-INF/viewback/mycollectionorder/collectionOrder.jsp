@@ -119,8 +119,8 @@
                     <td>
                         催 收 状 态:
                         <select id="status" name="status">
-                            <option value="1" <c:if test="${params.status eq '1'}">selected="selected"</c:if>> 催收中</option>
                             <option value="" <c:if test="${params.status eq '0'}">selected="selected"</c:if>>全部</option>
+                            <option value="1" <c:if test="${params.status eq '1'}">selected="selected"</c:if>> 催收中</option>
                             <option value="0" <c:if test="${params.status eq '0'}">selected="selected"</c:if>> 待催收</option>
                             <option value="2" <c:if test="${params.status eq '2'}">selected="selected"</c:if>> 承诺还款</option>
                             <option value="3" <c:if test="${params.status eq '3'}">selected="selected"</c:if>> 待催收（委外）</option>
