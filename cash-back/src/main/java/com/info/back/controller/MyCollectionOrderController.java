@@ -140,6 +140,8 @@ public class MyCollectionOrderController extends BaseController {
     @RequestMapping("getListCollectionOrder")
     public String getListCollectionOrder(HttpServletRequest request, Model model) {
         HashMap<String, Object> params = this.getParametersO(request);
+        String status = params.get("status") == null ? "1":params.get("status").toString();
+        params.put("status",status);
 
         BackUser backUser = (BackUser) request.getSession().getAttribute(
                 Constant.BACK_USER);
@@ -149,7 +151,6 @@ public class MyCollectionOrderController extends BaseController {
         if (CompanyPermissionsList != null && CompanyPermissionsList.size() > 0) {// 指定公司的订单
             params.put("CompanyPermissionsList", CompanyPermissionsList);
         }
-
         checkPermission(params, backUser);
         params.put("source", BackConstant.OPERATION_RECORD_SOURCE_MY_ORDER);  // 操作來源 我的催收订单
         // 查询公司列表

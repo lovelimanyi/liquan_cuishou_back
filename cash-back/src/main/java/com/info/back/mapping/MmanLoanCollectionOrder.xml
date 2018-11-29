@@ -309,8 +309,8 @@
         <if test="sortBy !=null and sortBy!=''">
             ORDER BY a.${sortBy}
         </if>
-        <if test="sortBy =null or sortBy==''">
-            ORDER BY a.top_important DESC, a.dispatch_time DESC, c.update_Date DESC
+        <if test="sortBy == null or sortBy==''">
+            ORDER BY a.overdueDays ASC, d.loan_money DESC, a.real_money DESC, a.dispatch_time DESC
         </if>
     </sql>
 
