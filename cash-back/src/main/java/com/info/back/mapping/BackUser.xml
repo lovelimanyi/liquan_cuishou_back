@@ -361,6 +361,10 @@
         </where>
     </select>
 
+    <select id="getUserByName" parameterType="String" resultMap="BaseResultMap">
+        SELECT id,user_name AS userName,uuid,`status`,company_id,group_level FROM back_user where user_name = #{username};
+    </select>
+
 
     <select id="dianXiaoBackUserByOrderCount" resultType="com.info.web.pojo.DianXiaoBackUser" parameterType="map">
 
