@@ -41,8 +41,8 @@ public class DealWithM6OrderTest {
 
     @Test
     public void dealM6Orders() {
-        String username = "陈雨";
-        String loadIds = "50340524";
+        String username = "张亚蒙";
+        String loadIds = "";
         BackUser user = backUserDao.getUserByName(username);
         if (user == null) {
             System.out.println("该催收员不存在或该催收员已被禁用，请核实！");

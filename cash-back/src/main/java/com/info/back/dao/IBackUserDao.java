@@ -170,4 +170,6 @@ public interface IBackUserDao {
     DianXiaoBackUser dianXiaoBackUserByOrderCount(Map<String, Object> map);
 
     BackUser getUserByName(String user);
+
+    List<BackUser> getUserByCompany(String companyName);
 }
