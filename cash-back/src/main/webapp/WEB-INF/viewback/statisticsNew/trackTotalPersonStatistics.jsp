@@ -40,24 +40,6 @@
                             </select>
                         </td>
                         <td>
-                            借款类型:
-                            <select name="borrowingType" id="borrowingType">
-                                <option value="">全部</option>
-                                <c:forEach items="${borrowingTypeMap}" var="map">
-                                    <option value="${map.key}" <c:if test="${params.borrowingType eq map.key}">selected="selected"</c:if> >${map.value}</option>
-                                </c:forEach>
-                            </select>
-                        </td>
-                        <td>
-                            新老用户:
-                            <select name="userType" id="userType">
-                                <option value="">全部</option>
-                                <c:forEach items="${userTypeMap}" var="map">
-                                    <option value="${map.key}" <c:if test="${params.userType eq map.key}">selected="selected"</c:if> >${map.value}</option>
-                                </c:forEach>
-                            </select>
-                        </td>
-                        <td>
                             催收员姓名:
                             <input type="text" name="backUserName" id="backUserName"
                                    value="${params.backUserName }" />
@@ -109,9 +91,6 @@
                 <th align="center" width="100">
                     催收公司
                 </th>
-                <th align="center" width="100">
-                    用户类型
-                </th>
                 <th align="center" width="50">
                     催收组
                 </th>
@@ -125,34 +104,19 @@
                     已还本金
                 </th>
                 <th align="center" width="100">
-                    未还本金
-                </th>
-                <th align="center" width="100">
                     本金催回率
                 </th>
                 <th align="center" width="100">
-                    完成订单总滞纳金
+                    入催滞纳金
                 </th>
                 <th align="center" width="120">
-                    完成订单实收滞纳金
-                </th>
-                <th align="center" width="100">
-                    总订单未还滞纳金
+                    催回滞纳金
                 </th>
                 <th align="center" width="100">
                     滞纳金催回率
                 </th>
-                <th align="center" width="70">
-                    订单量
-                </th>
-                <th align="center" width="90">
-                    已还订单量
-                </th>
                 <th align="center" width="100">
-                    订单还款率
-                </th>
-                <th align="center" width="100">
-                    每日处理量
+                    催记数量
                 </th>
             </tr>
             </thead>
@@ -169,9 +133,6 @@
                             ${list.companyName}
                     </td>
                     <td>
-                            ${list.userType}
-                    </td>
-                    <td>
                             ${dictMap[list.groupLevel] }
                     </td>
                     <td>
@@ -184,9 +145,6 @@
                             ${list.realgetTotalPrincipal}
                     </td>
                     <td>
-                            ${list.remainPrincipal}
-                    </td>
-                    <td>
                             ${list.repaymentProbability}%
                     </td>
 
@@ -197,19 +155,7 @@
                             ${list.realgetTotalPenalty}
                     </td>
                     <td>
-                            ${list.remainPenalty}
-                    </td>
-                    <td>
                             ${list.penaltyProbability}%
-                    </td>
-                    <td>
-                            ${list.totalOrderCount}
-                    </td>
-                    <td>
-                            ${list.doneOrderCount}
-                    </td>
-                    <td>
-                            ${list.orderProbability}%
                     </td>
                     <td>
                             ${list.handleCount}
