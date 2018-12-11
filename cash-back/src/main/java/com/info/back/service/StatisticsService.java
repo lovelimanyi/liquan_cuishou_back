@@ -54,13 +54,13 @@ public class StatisticsService implements IStatisticsService {
     @Override
     public PageConfig<TrackStatistics> findPage(HashMap<String, Object> params) {
         params.put(Constant.NAME_SPACE, "Statistics");
-        return paginationDao.findPage("findAll", "findAllCount", params, null);
+        return paginationDao.findPage("cumulativeStatisticsPerson", "cumulativeStatisticsPersonCount", params, null);
 }
 
     @Override
     public PageConfig<TrackStatistics> findCompanyPage(HashMap<String, Object> params) {
         params.put(Constant.NAME_SPACE, "Statistics");
-        return paginationDao.findPage("findAllCompany", "findAllCompanyCount", params, null);
+        return paginationDao.findPage("cumulativeStatisticsCompany", "cumulativeStatisticsCompanyCount", params, null);
     }
 
     @Override

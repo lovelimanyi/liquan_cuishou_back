@@ -87,19 +87,23 @@ public class DateKitUtils {
                 Calendar cal2 = Calendar.getInstance();
                 cal2.setTime(DateUtil.getDateTimeFormat(dispatchEndTime,"yyyy-MM-dd"));
                 int month2 = cal2.get(Calendar.MONTH)+1; //获取所选日期的月份
-                if (month != month2){ //如果起始日期和最后日期不在一个月，则最后日期为起始日期当月的最后一天
+                if (cal1.getTimeInMillis() > cal2.getTimeInMillis() ){
+                    dispatchEndTime = dispatchTime;
+                }else if (month != month2){ //如果起始日期和最后日期不在一个月，则最后日期为起始日期当月的最后一天
                     dispatchEndTime = DateUtil.getLastDayOfMonth(cal1.get(Calendar.YEAR),month);
                 }
             }
 
             params.put("dispatchTime",dispatchTime);
             params.put("dispatchEndTime",dispatchEndTime);
-            params.put("endTime",DateUtil.getLastDayOfMonth(cal1.get(Calendar.YEAR),month)); //统计截止日
+            params.put("statisticsTime",dispatchEndTime); //统计截止日
 
         }else{ //如果未选择任何值，则设置默认值
-            params.put("dispatchTime",DateUtil.getDateFormat(DateUtil.getDayFirst(),"yyyy-MM-dd"));
+//            params.put("dispatchTime",DateUtil.getDateFormat(DateUtil.getDayFirst(),"yyyy-MM-dd"));
+            params.put("dispatchTime",DateUtil.getDateFormat(new Date(),"yyyy-MM-dd"));
             params.put("dispatchEndTime",DateUtil.getDateFormat(new Date(),"yyyy-MM-dd"));
-            params.put("endTime",DateUtil.getDateFormat(DateUtil.getDayLast(),"yyyy-MM-dd"));//统计截止日
+            params.put("statisticsTime",DateUtil.getDateFormat(new Date(),"yyyy-MM-dd"));
+//            params.put("endTime",DateUtil.getDateFormat(DateUtil.getDayLast(),"yyyy-MM-dd"));//统计截止日
             System.out.println("ss");
         }
     }

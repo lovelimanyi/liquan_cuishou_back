@@ -52,8 +52,6 @@
                                 <option value="repaymentProbability DESC" <c:if test="${params.orderBy eq 'repaymentProbability DESC'}">selected="selected"</c:if>>按本金催回率降序</option>
                                 <option value="penaltyProbability ASC" <c:if test="${params.orderBy eq 'penaltyProbability ASC'}">selected="selected"</c:if>>按滞纳金催回率升序</option>
                                 <option value="penaltyProbability DESC" <c:if test="${params.orderBy eq 'penaltyProbability DESC'}">selected="selected"</c:if>>按滞纳金催回率降序</option>
-                                <option value="orderProbability ASC" <c:if test="${params.orderBy eq 'orderProbability ASC'}">selected="selected"</c:if>>按订单催回率升序</option>
-                                <option value="orderProbability DESC" <c:if test="${params.orderBy eq 'orderProbability DESC'}">selected="selected"</c:if>>按订单催回率降序</option>
                             </select>
                         </td>
                     </c:if>
@@ -84,9 +82,6 @@
             <tr>
                 <th align="center" width="40">
                     序号
-                </th>
-                <th align="center" width="100">
-                    派单日期
                 </th>
                 <th align="center" width="100">
                     催收公司
@@ -125,9 +120,6 @@
                 <tr>
                     <td>
                             ${status.count}
-                    </td>
-                    <td>
-                        <fmt:formatDate value="${list.dispatchTime}" pattern="yyyy-MM-dd"/>
                     </td>
                     <td>
                             ${list.companyName}

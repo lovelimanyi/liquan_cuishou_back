@@ -216,25 +216,19 @@
     <sql id="wherePersonColumn">
         <where>
             <if test="dispatchTime != null and dispatchTime != ''">
-                AND <![CDATA[ s.dispatchTime >= #{dispatchTime} ]]>
+                AND <![CDATA[ DATE_FORMAT(s.dispatchTime ,'%Y-%m-%d') >= #{dispatchTime} ]]>
             </if>
             <if test="dispatchEndTime != null and dispatchEndTime != ''">
-                AND <![CDATA[ s.dispatchTime <= #{dispatchEndTime} ]]>
+                AND <![CDATA[ DATE_FORMAT(s.dispatchTime ,'%Y-%m-%d') <= #{dispatchEndTime} ]]>
             </if>
-            <if test="endTime != null and endTime != ''">
-                AND <![CDATA[ s.dispatchTime <= #{endTime} ]]>
+            <if test="statisticsTime != null and statisticsTime != ''">
+                AND <![CDATA[ DATE_FORMAT(s.createDate ,'%Y-%m-%d') = #{statisticsTime} ]]>
             </if>
             <if test="backUserName != null and backUserName != ''">
                 AND s.backUserName = #{backUserName}
             </if>
             <if test="uuid != null and uuid != ''">
                 AND s.uuid = #{uuid}
-            </if>
-            <if test="borrowingType != null and borrowingType != ''">
-                AND s.borrowingType = #{borrowingType}
-            </if>
-            <if test="userType != null and userType != ''">
-                AND s.userType = #{userType}
             </if>
             <if test="companyId != null and companyId != ''">
                 AND s.companyId = #{companyId}
@@ -253,9 +247,7 @@
         s.backUserName,
         s.companyId,
         s.uuid,
-        s.groupLevel,
-        s.borrowingType,
-        s.userType
+        s.groupLevel
 
         <if test="orderBy != null and orderBy != ''">
             ORDER by ${orderBy}
@@ -264,19 +256,13 @@
     <sql id="whereCompanyColumn">
         <where>
             <if test="dispatchTime != null and dispatchTime != ''">
-                AND <![CDATA[ s.dispatchTime >= #{dispatchTime} ]]>
+                AND <![CDATA[ DATE_FORMAT(s.dispatchTime ,'%Y-%m-%d') >= #{dispatchTime} ]]>
             </if>
             <if test="dispatchEndTime != null and dispatchEndTime != ''">
-                AND <![CDATA[ s.dispatchTime <= #{dispatchEndTime} ]]>
+                AND <![CDATA[ DATE_FORMAT(s.dispatchTime ,'%Y-%m-%d') <= #{dispatchEndTime} ]]>
             </if>
-            <if test="endTime != null and endTime != ''">
-                AND <![CDATA[ s.dispatchTime <= #{endTime} ]]>
-            </if>
-            <if test="borrowingType != null and borrowingType != ''">
-                AND s.borrowingType = #{borrowingType}
-            </if>
-            <if test="userType != null and userType != ''">
-                AND s.userType = #{userType}
+            <if test="statisticsTime != null and statisticsTime != ''">
+                AND <![CDATA[ DATE_FORMAT(s.createDate ,'%Y-%m-%d') = #{statisticsTime} ]]>
             </if>
             <if test="companyId != null and companyId != ''">
                 AND s.companyId = #{companyId}
@@ -293,173 +279,102 @@
         </where>
         GROUP BY
         s.companyId,
-        s.groupLevel,
-        s.borrowingType,
-        s.userType
+        s.groupLevel
 
         <if test="orderBy != null and orderBy != ''">
             ORDER by ${orderBy}
         </if>
     </sql>
-    <select id="findAll" resultType="com.info.web.pojo.TrackStatistics" parameterType="HashMap">
+    <select id="cumulativeStatisticsPerson" resultType="com.info.web.pojo.TrackStatistics" parameterType="HashMap">
         SELECT
-			 s.dispatchTime AS 'dispatchTime',
        s.companyName AS 'companyName',
        s.companyId AS 'companyId',
+        s.groupLevel AS 'groupLevel',
        s.backUserName AS 'backUserName',
        s.uuid AS 'uuid',
-       s.groupLevel AS 'groupLevel',
-       s.borrowingType AS 'borrowingType',
-       s.userType AS 'userType',
 
        sum(s.totalPrincipal) AS 'totalPrincipal',
        sum(s.realgetTotalPrincipal) AS'realgetTotalPrincipal',
-       sum(s.remainPrincipal) AS'remainPrincipal',
 round(ifnull( sum(s.realgetTotalPrincipal)/ sum(s.totalPrincipal), 0) * 100,2) AS'repaymentProbability',
 
 
        sum(s.totalPenalty)AS'totalPenalty',
        sum(s.realgetTotalPenalty)AS'realgetTotalPenalty',
-       sum(s.remainPenalty)AS'remainPenalty',
 round(sum(s.realgetTotalPenalty) / sum(s.totalPenalty), 2) AS'penaltyProbability',
 
 
-       sum(s.totalOrderCount) AS 'totalOrderCount',
-       sum(s.doneOrderCount) AS 'doneOrderCount',
-       round(sum(s.doneOrderCount) / sum(s.totalOrderCount) * 100, 2) AS'orderProbability',
        sum(s.handleCount) AS 'handleCount'
-        FROM track_statistics s
+        FROM cumulative_statistics s
         <include refid="wherePersonColumn"/>
 
     </select>
-    <select id="findAllCount" resultType="Integer" parameterType="HashMap">
+    <select id="cumulativeStatisticsPersonCount" resultType="Integer" parameterType="HashMap">
         SELECT COUNT(1)
         FROM ( SELECT
-        s.dispatchTime AS 'dispatchTime',
         s.companyName AS 'companyName',
         s.companyId AS 'companyId',
+        s.groupLevel AS 'groupLevel',
         s.backUserName AS 'backUserName',
         s.uuid AS 'uuid',
-        s.groupLevel AS 'groupLevel',
-        s.borrowingType AS 'borrowingType',
-        s.userType AS 'userType',
-
         sum(s.totalPrincipal) AS 'totalPrincipal',
         sum(s.realgetTotalPrincipal) AS'realgetTotalPrincipal',
-        sum(s.remainPrincipal) AS'remainPrincipal',
         round(ifnull( sum(s.realgetTotalPrincipal)/ sum(s.totalPrincipal), 0) * 100,2) AS'repaymentProbability',
-
-
         sum(s.totalPenalty)AS'totalPenalty',
         sum(s.realgetTotalPenalty)AS'realgetTotalPenalty',
-        sum(s.remainPenalty)AS'remainPenalty',
         round(sum(s.realgetTotalPenalty) / sum(s.totalPenalty), 2) AS'penaltyProbability',
 
 
-        sum(s.totalOrderCount) AS 'totalOrderCount',
-        sum(s.doneOrderCount) AS 'doneOrderCount',
-        round(sum(s.doneOrderCount) / sum(s.totalOrderCount) * 100, 2) AS'orderProbability',
         sum(s.handleCount) AS 'handleCount'
-        FROM track_statistics s
+        FROM cumulative_statistics s
         <include refid="wherePersonColumn"/>) a
     </select>
-    <select id="findAllCompany" resultType="com.info.web.pojo.TrackStatistics" parameterType="HashMap">
+    <select id="cumulativeStatisticsCompany" resultType="com.info.web.pojo.TrackStatistics" parameterType="HashMap">
         SELECT
-			 s.dispatchTime AS 'dispatchTime',
        s.companyName AS 'companyName',
        s.companyId AS 'companyId',
        s.groupLevel AS 'groupLevel',
-       s.borrowingType AS 'borrowingType',
-       s.userType AS 'userType',
 
        sum(s.totalPrincipal) AS 'totalPrincipal',
        sum(s.realgetTotalPrincipal) AS'realgetTotalPrincipal',
-       sum(s.remainPrincipal) AS'remainPrincipal',
 round(ifnull( sum(s.realgetTotalPrincipal)/ sum(s.totalPrincipal), 0) * 100,2) AS'repaymentProbability',
 
 
        sum(s.totalPenalty)AS'totalPenalty',
        sum(s.realgetTotalPenalty)AS'realgetTotalPenalty',
-       sum(s.remainPenalty)AS'remainPenalty',
 round(sum(s.realgetTotalPenalty) / sum(s.totalPenalty), 2) AS'penaltyProbability',
 
 
-       sum(s.totalOrderCount) AS 'totalOrderCount',
-       sum(s.doneOrderCount) AS 'doneOrderCount',
-       round(sum(s.doneOrderCount) / sum(s.totalOrderCount) * 100, 2) AS'orderProbability',
        sum(s.handleCount) AS 'handleCount'
-        FROM track_statistics s
+        FROM cumulative_statistics s
         <include refid="whereCompanyColumn"/>
     </select>
-    <select id="findAllCompanyCount" resultType="Integer" parameterType="HashMap">
+    <select id="cumulativeStatisticsCompanyCount" resultType="Integer" parameterType="HashMap">
         SELECT COUNT(1)
         FROM ( SELECT
-        s.dispatchTime AS 'dispatchTime',
         s.companyName AS 'companyName',
         s.companyId AS 'companyId',
         s.groupLevel AS 'groupLevel',
-        s.borrowingType AS 'borrowingType',
-        s.userType AS 'userType',
 
         sum(s.totalPrincipal) AS 'totalPrincipal',
         sum(s.realgetTotalPrincipal) AS'realgetTotalPrincipal',
-        sum(s.remainPrincipal) AS'remainPrincipal',
         round(ifnull( sum(s.realgetTotalPrincipal)/ sum(s.totalPrincipal), 0) * 100,2) AS'repaymentProbability',
 
 
         sum(s.totalPenalty)AS'totalPenalty',
         sum(s.realgetTotalPenalty)AS'realgetTotalPenalty',
-        sum(s.remainPenalty)AS'remainPenalty',
         round(sum(s.realgetTotalPenalty) / sum(s.totalPenalty), 2) AS'penaltyProbability',
 
 
-        sum(s.totalOrderCount) AS 'totalOrderCount',
-        sum(s.doneOrderCount) AS 'doneOrderCount',
-        round(sum(s.doneOrderCount) / sum(s.totalOrderCount) * 100, 2) AS'orderProbability',
         sum(s.handleCount) AS 'handleCount'
-        FROM track_statistics s
+        FROM cumulative_statistics s
         <include refid="whereCompanyColumn"/>) a
     </select>
 
     <delete id="delTrackStatistics" parameterType="HashMap">
-        DELETE s FROM track_statistics s
+        DELETE s FROM cumulative_statistics s
         WHERE <![CDATA[ s.createDate >= #{beginTime} ]]>
               <![CDATA[ AND s.createDate <= #{endTime}  ]]>
     </delete>
-
-
-
-
-
-
-
-
-    <!--<select id="findAll" resultType="com.info.web.pojo.TrackStatistics" parameterType="HashMap">-->
-       <!--SELECT-->
-       <!--dispatchTime,-->
-       <!--companyName,-->
-       <!--companyId,-->
-       <!--backUserName,-->
-       <!--uuid,-->
-       <!--groupLevel,-->
-       <!--borrowingType,-->
-       <!--userType,-->
-       <!--totalPrincipal,-->
-       <!--realgetTotalPrincipal,-->
-       <!--remainPrincipal,-->
-       <!--repaymentProbability,-->
-       <!--totalPenalty,-->
-       <!--realgetTotalPenalty,-->
-       <!--remainPenalty,-->
-       <!--penaltyProbability,-->
-       <!--totalOrderCount,-->
-       <!--doneOrderCount,-->
-       <!--orderProbability,-->
-       <!--handleCount,-->
-       <!--createDate-->
-       <!--FROM track_statistics-->
-        <!--<include refid="wherePersonColumn"/>-->
-    <!--</select>-->
 
 
 </mapper>
