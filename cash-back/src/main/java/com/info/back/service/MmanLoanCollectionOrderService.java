@@ -790,16 +790,17 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
                 personMap.put("beginDispatchTime", DateUtil.getDateFormat("yyyy-MM-dd 00:00:00"));
                 personMap.put("endDispatchTime", DateUtil.getDateFormat((DateUtil.getBeforeOrAfter(new Date(), 1)), "yyyy-MM-dd HH:mm:ss"));
                 Calendar clrNow = Calendar.getInstance();
-                int dayNow = clrNow.get(Calendar.DAY_OF_MONTH);
-                if (dayNow == 1) {
-                    personMap.put("groupLevel", BackConstant.XJX_OVERDUE_LEVEL_M1_M2);
-                    personMap.put("userStatus", BackConstant.ON);
-                    personList = backUserDao.findUnCompleteCollectionOrderByCurrentUnCompleteCountListByMap(personMap);
-                    if (CollectionUtils.isEmpty(personList)) {
-                        inserWarnMsg();
-                        return;
-                    }
-                } else {
+//                int dayNow = clrNow.get(Calendar.DAY_OF_MONTH);
+                int dayNow = 1;
+//                if (dayNow == 1) {
+//                    personMap.put("groupLevel", BackConstant.XJX_OVERDUE_LEVEL_M1_M2);
+//                    personMap.put("userStatus", BackConstant.ON);
+//                    personList = backUserDao.findUnCompleteCollectionOrderByCurrentUnCompleteCountListByMap(personMap);
+//                    if (CollectionUtils.isEmpty(personList)) {
+//                        inserWarnMsg();
+//                        return;
+//                    }
+//                } else {
                     /*
                     Calendar cal = Calendar.getInstance();
                     cal.set(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), 2);
@@ -822,7 +823,7 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
                         logger.warn("所有公司S1、S2组查无可用催收人...");
                         return;
                     }
-                }
+//                }
             }
             mmanLoanCollectionRecordService.assignCollectionOrderToRelatedGroup(orderList, personList, now);
             logger.info("处理派单完成，借款id: " + loanId);
