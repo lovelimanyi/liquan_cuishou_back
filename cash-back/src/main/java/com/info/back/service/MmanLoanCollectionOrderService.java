@@ -790,7 +790,8 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
                 personMap.put("beginDispatchTime", DateUtil.getDateFormat("yyyy-MM-dd 00:00:00"));
                 personMap.put("endDispatchTime", DateUtil.getDateFormat((DateUtil.getBeforeOrAfter(new Date(), 1)), "yyyy-MM-dd HH:mm:ss"));
                 Calendar clrNow = Calendar.getInstance();
-                int dayNow = clrNow.get(Calendar.DAY_OF_MONTH);
+//                int dayNow = clrNow.get(Calendar.DAY_OF_MONTH);
+                int dayNow = 1;
                 //新订单进催收全部进s1组，原来逻辑-当月1号订单直接进入M1-M2组
 //                if (dayNow == 1) {
 //                    personMap.put("groupLevel", BackConstant.XJX_OVERDUE_LEVEL_M1_M2);
