@@ -11,6 +11,7 @@ import com.info.web.pojo.TodayRecovery;
 import com.info.web.pojo.TrackStatistics;
 import com.info.web.util.DateUtil;
 import com.info.web.util.PageConfig;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,8 +48,13 @@ public class StatisticsService implements IStatisticsService {
         statisticsDao.delTrackStatistics(delParam);
         //2.进行统计
         List<TrackStatistics>  trackPersonList = statisticsDao.doTrackStatistics();
-        //3.将统计数据保存至数据库
-        statisticsDao.insertTrackStatistics(trackPersonList);
+        if (CollectionUtils.isNotEmpty(trackPersonList)){
+            //3.将统计数据保存至数据库
+            statisticsDao.insertTrackStatistics(trackPersonList);
+        }else {
+            logger.info("无数据");
+        }
+
     }
 
     @Override
@@ -69,8 +75,13 @@ public class StatisticsService implements IStatisticsService {
         recoveryStatisticsDao.delRecoveryStatistics();
         //2.进行统计
         List<RecoveryRate> recoveryRateList = recoveryStatisticsDao.doRecoveryStatistics();
-        //3.将统计数据保存至数据库
-        recoveryStatisticsDao.insertRecoveryStatistics(recoveryRateList);
+        if (CollectionUtils.isNotEmpty(recoveryRateList)){
+            //3.将统计数据保存至数据库
+            recoveryStatisticsDao.insertRecoveryStatistics(recoveryRateList);
+        }else {
+            logger.info("无数据");
+        }
+
 
     }
 
@@ -184,10 +195,6 @@ public class StatisticsService implements IStatisticsService {
         return pageConfig;
     }
 
-
-
-
-
     @Override
     public PageConfig<TodayRecovery> findTodayPersonPage(HashMap<String, Object> params) {
         params.put(Constant.NAME_SPACE, "TodayRecovery");
@@ -208,9 +215,14 @@ public class StatisticsService implements IStatisticsService {
         //2.进行统计
         List<TodayRecovery> recoveryRateList =  todayRecoveryDao.doTodayPersonStatistics(); //个人
         List<TodayRecovery> recoveryRateList2 =  todayRecoveryDao.doTodayCompanyStatistics();//公司
-        //3.将统计数据保存至数据库
-        todayRecoveryDao.insertTodayPersonStatistics(recoveryRateList);
-        todayRecoveryDao.insertTodayCompanyStatistics(recoveryRateList2);
+        if (CollectionUtils.isNotEmpty(recoveryRateList)&&CollectionUtils.isNotEmpty(recoveryRateList2)){
+            //3.将统计数据保存至数据库
+            todayRecoveryDao.insertTodayPersonStatistics(recoveryRateList);
+            todayRecoveryDao.insertTodayCompanyStatistics(recoveryRateList2);
+        }else {
+            logger.info("无数据");
+        }
+
 
     }
 }

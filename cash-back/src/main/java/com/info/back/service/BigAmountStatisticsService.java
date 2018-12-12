@@ -7,7 +7,9 @@ import com.info.constant.Constant;
 import com.info.web.pojo.BigAmountStatistics;
 import com.info.web.util.DateUtil;
 import com.info.web.util.PageConfig;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +27,7 @@ import java.util.List;
  */
 @Service
 public class BigAmountStatisticsService implements IBigAmountStatisticsService {
+    private static Logger logger = Logger.getLogger(PersonStatisticsService.class);
     @Autowired
     private IPaginationDao paginationDao;
     @Autowired
@@ -123,29 +126,34 @@ public class BigAmountStatisticsService implements IBigAmountStatisticsService {
         HashMap<String, Object> paramss = DateKitUtils.defaultDate(beginTime,endTime);
         List<BigAmountStatistics> list = bigAmountStatisticsDao.getBigAmountPersonStatistics(paramss);
         List<BigAmountStatistics> list2 = bigAmountStatisticsDao.getBigAmountCompanyStatistics(paramss);
-
-        //保存至数据库
-        try {
-            String endTimes = paramss.get("endTime").toString();
-            for (BigAmountStatistics bigAmountStatistics : list){
-                if(StringUtils.isNotBlank(endTime)){
-                    bigAmountStatistics.setCreateDate(DateUtil.getDateTimeFormat(endTime,"yyyy-MM-dd HH:mm:ss"));
-                }else {
-                    bigAmountStatistics.setCreateDate(DateUtil.getDateTimeFormat(endTimes,"yyyy-MM-dd HH:mm:ss"));
+        if (CollectionUtils.isNotEmpty(list) && CollectionUtils.isNotEmpty(list2)){
+            //保存至数据库
+            try {
+                String endTimes = paramss.get("endTime").toString();
+                for (BigAmountStatistics bigAmountStatistics : list){
+                    if(StringUtils.isNotBlank(endTime)){
+                        bigAmountStatistics.setCreateDate(DateUtil.getDateTimeFormat(endTime,"yyyy-MM-dd HH:mm:ss"));
+                    }else {
+                        bigAmountStatistics.setCreateDate(DateUtil.getDateTimeFormat(endTimes,"yyyy-MM-dd HH:mm:ss"));
+                    }
+                    bigAmountStatisticsDao.insertPersonStatistics(bigAmountStatistics);
                 }
-                bigAmountStatisticsDao.insertPersonStatistics(bigAmountStatistics);
-            }
-            for (BigAmountStatistics bigAmountStatistics : list2){
-                if(StringUtils.isNotBlank(endTime)){
-                    bigAmountStatistics.setCreateDate(DateUtil.getDateTimeFormat(endTime,"yyyy-MM-dd HH:mm:ss"));
-                }else {
-                    bigAmountStatistics.setCreateDate(DateUtil.getDateTimeFormat(endTimes,"yyyy-MM-dd HH:mm:ss"));
+                for (BigAmountStatistics bigAmountStatistics : list2){
+                    if(StringUtils.isNotBlank(endTime)){
+                        bigAmountStatistics.setCreateDate(DateUtil.getDateTimeFormat(endTime,"yyyy-MM-dd HH:mm:ss"));
+                    }else {
+                        bigAmountStatistics.setCreateDate(DateUtil.getDateTimeFormat(endTimes,"yyyy-MM-dd HH:mm:ss"));
+                    }
+                    bigAmountStatisticsDao.insertCompanyStatistics(bigAmountStatistics);
                 }
-                bigAmountStatisticsDao.insertCompanyStatistics(bigAmountStatistics);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        }else {
+            logger.info("无数据");
         }
+
+
     }
 
 }
