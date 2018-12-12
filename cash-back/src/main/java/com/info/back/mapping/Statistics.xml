@@ -3,213 +3,1043 @@
 <mapper namespace="com.info.back.dao.IStatisticsDao">
 
     <select id="doTrackStatistics" resultType="com.info.web.pojo.TrackStatistics">
+        select
+        t2.dt AS 'dispatchTime', -- 派单时间
+        t2.gl AS 'groupLevel', -- 催收组编号
+        t2.cmid AS 'companyId',-- 催收公司代号
+        t2.cmn AS 'companyName', -- 催收公司名称
+        t2.uuid AS 'uuid',-- 催收员id
+        t2.cpn AS 'backUserName', -- 催收员姓名
+
+        ifnull(sum(t2.rcbj), 0) AS 'totalPrincipal', -- 入催本金
+        ifnull(sum(t2.chbj), 0) AS 'realgetTotalPrincipal', -- 催回本金
+        IFNULL(ROUND(ifnull(sum(t2.chbj), 0)/ifnull(sum(t2.rcbj), 0)*100,2),0) AS 'repaymentProbability', -- 本金催回率
+
+        ifnull(sum(t2.rcznj), 0) AS 'totalPenalty', -- 入催滞纳金
+        ifnull(sum(t2.chznj), 0) AS 'realgetTotalPenalty', -- 催回滞纳金
+        IFNULL(ROUND(ifnull(sum(t2.chznj), 0)/ifnull(sum(t2.rcznj), 0)*100,2),0)AS 'penaltyProbability', -- 滞纳金催回率
+
+        ifnull(sum(t2.cjsl), 0)AS 'handleCount'  -- 催记数量
+
+
+        from
+
+        (
+        -- s1入催本金、入催滞纳金
         SELECT
-        x.dt AS 'dispatchTime',
-        x.gsmc AS 'companyName',
-        x.companyId AS 'companyId',
-        x.csyxm AS 'backUserName',
-        x.csyid AS 'uuid',
-        x.csyfz AS 'groupLevel',
-        x.lx AS 'borrowingType',
-        x.yqdj,
-        x.type AS'userType',
+        lo.loan_id id, -- (和ul.id是一样的)
+        date(lo.create_date) dt, -- S1时入催时间
+        3 gl,
+        cmp.id cmid, -- 催收公司代号
+        cmp.title cmn, -- 催收公司名称
+        lo.current_collection_user_id uuid, -- 催收员uuid
+        usr.id cpid, -- 催收员id
+        usr.user_name cpn, -- 催收员姓名
+        ul.loan_money + ul.service_charge rcbj, -- S1入催本金
+        ul.loan_penalty rcznj, -- s1入催滞纳金
+        0 chbj,
+        0 chznj,
+        0 cjsl
+        from mman_user_loan ul
+        left join mman_loan_collection_order lo on ul.id = lo.loan_id
+        left join back_user usr on lo.current_collection_user_id = usr.uuid
+        left join mman_loan_collection_company cmp on usr.company_id = cmp.id
+        where 1=1
+        and usr.group_level in (3,4)
+        and usr.status = 1
+        and ul.borrowing_type = 2
+        and <![CDATA[ ul.create_time <= DATE_ADD(date_add(curdate(), interval +1 month),interval -day(date_add(curdate(), interval +1 month))+1 day) ]]>
+        and <![CDATA[ ul.create_time >= DATE_ADD(curdate(),interval -day(curdate())+1 day)]]>
+        group by lo.loan_id
 
-        sum(x.pdbj) AS'totalPrincipal',
-        sum(x.yhbj) AS'realgetTotalPrincipal',
-        sum(x.sybj) AS'remainPrincipal',
-        round(ifnull(sum(x.yhbj) / sum(x.pdbj), 0) * 100,2) AS'repaymentProbability',
+        union all
 
-        count(*) AS'totalOrderCount',
-        sum(x.yhds) AS'doneOrderCount',
-        round(sum(x.yhds) / count(*) * 100, 2) AS'orderProbability',
+        -- S2入催本金
+        select
+        t1.id,t1.dt,t1.gl,t1.cmid,t1.cmn,t1.uuid,t1.cpid,t1.cpn,
+        sum(t1.a+t1.b) rcbj, -- S2总入催本金
+        0 rcznj,
+        0 chbj,
+        0 chznj,
+        0 cjsl
+        from
+        (
+        select
+        ul.id id,
+        date(lo.dispatch_time) dt, -- S2时是派单时间
+        usr.group_level gl, -- 催收组编号
+        cmp.id cmid, -- 催收公司代号
+        cmp.title cmn, -- 催收公司名称
+        lo.current_collection_user_id uuid, -- 催收员uuid
+        usr.id cpid, -- 催收员id
+        usr.user_name cpn, -- 催收员姓名
+        if(ul.paid_money > 0,sum(ul.loan_money + ul.service_charge - p.realget_principle), sum(ul.loan_money - p.realget_principle)) a, -- 剩余应还本金
+        0 b
+        from mman_loan_collection_order lo
+        left join back_user usr on usr.uuid = lo.current_collection_user_id
+        left join mman_loan_collection_company cmp on usr.company_id = cmp.id
+        left join mman_user_loan ul ON ul.id = lo.loan_id
+        left join credit_loan_pay p on p.id = lo.pay_id
+        where 1=1
+        and usr.group_level in (4)
+        and usr.status = 1
+        and lo.status != 4
+        and ul.borrowing_type = 2
+        and <![CDATA[ ul.create_time <= DATE_ADD(date_add(curdate(), interval +1 month),interval -day(date_add(curdate(), interval +1 month))+1 day)]]>
+        and <![CDATA[ul.create_time >= DATE_ADD(curdate(),interval -day(curdate())+1 day) ]]>
+        group by ul.id
 
-        sum(x.zznj)AS'totalPenalty',
-        sum(x.sqznj) AS'realgetTotalPenalty',
-        sum(x.zznj) - sum(x.znjsq) AS'remainPenalty',
-        round(ifnull(sum(x.hksjznj) / sum(x.hkzznj),0) * 100,2) AS'penaltyProbability',
+        union ALL
 
-        sum(x.cll) AS 'handleCount'
-
+        SELECT
+        a.id id,a.dt,a.gl,a.cmid,a.cmn,a.uuid,a.cpid,a.cpn,
+        0 a,
+        ifnull(sum(a.real_money),0) as b
         FROM
         (
         SELECT
-        date(b.dispatch_time) dt,
-        b.current_collection_user_id csyid,
-        cmp.id AS companyId,
-        usr.user_name csyxm,
-        cmp.title gsmc,
-        usr.group_level csyfz,
-        d.borrowing_type lx,
+        ul.id id,
+        date(lo.dispatch_time) dt, -- S2时是派单时间
+        usr.group_level gl, -- 催收组编号
+        cmp.id cmid, -- 催收公司代号
+        cmp.title cmn, -- 催收公司名称
+        ch.current_collection_user_id uuid, -- 催收员uuid
+        usr.id cpid, -- 催收员id
+        usr.user_name cpn, -- 催收员姓名
+        sum(d.real_money) real_money -- 催回本金
+        from mman_loan_collection_order lo
+        left join mman_loan_collection_status_change_log ch on ch.loan_collection_order_id = lo.order_id
+        left join back_user usr on usr.uuid = ch.current_collection_user_id
+        left join credit_loan_pay_detail d on (d.pay_id = lo.pay_id and d.current_collection_user_id = usr.uuid)
+        left join mman_loan_collection_company cmp on usr.company_id = cmp.id
+        left join mman_user_loan ul ON ul.id = lo.loan_id
+        where 1=1
+        and usr.group_level in (4)
+        and d.update_Date >= ch.create_date
+        and usr.`status` = 1
+        AND usr.role_id = '10021'
+        and ul.borrowing_type = 2
+        and <![CDATA[ ul.create_time <= DATE_ADD(date_add(curdate(), interval +1 month),interval -day(date_add(curdate(), interval +1 month))+1 day)]]>
+        and <![CDATA[ul.create_time >= DATE_ADD(curdate(),interval -day(curdate())+1 day)]]>
+        and ch.after_status not in (4)
+        group by ul.id
+        ) a
+        group by a.id
+        ) t1
+        group by t1.id
+
+        union all
+
+        -- M1及以上等级入催本金
+        select
+        t1.id,t1.dt,t1.gl,t1.cmid,t1.cmn,t1.uuid,t1.cpid,t1.cpn,
+        sum(t1.a+t1.b) rcbj, -- S2总入催本金
+        0 rcznj,
+        0 chbj,
+        0 chznj,
+        0 cjsl
+        from
         (
-        CASE
-        WHEN b.current_overdue_level = 3 THEN
-        "S1"
-        WHEN b.current_overdue_level = 4 THEN
-        "S2"
-        WHEN b.current_overdue_level = 5 THEN
-        "MI-M2"
-        WHEN b.current_overdue_level = 6 THEN
-        "M2-M3"
-        WHEN b.current_overdue_level = 7 THEN
-        "M3+"
-        WHEN b.current_overdue_level = 8 THEN
-        "M6+"
-        WHEN b.current_overdue_level = 11 THEN
-        "F-M1"
-        WHEN b.current_overdue_level = 12 THEN
-        "F-M2"
-        WHEN b.current_overdue_level = 13 THEN
-        "F-M3"
-        WHEN b.current_overdue_level = 16 THEN
-        "F-M6"
-        ELSE
-        "未知"
-        END
-        ) yqdj,
+        select
+        ul.id id,
+        date(lo.dispatch_time) dt, -- S2时是派单时间
+        usr.group_level gl, -- 催收组编号
+        cmp.id cmid, -- 催收公司代号
+        cmp.title cmn, -- 催收公司名称
+        lo.current_collection_user_id uuid, -- 催收员uuid
+        usr.id cpid, -- 催收员id
+        usr.user_name cpn, -- 催收员姓名
+        if(ul.paid_money > 0,sum(ul.loan_money + ul.service_charge - p.realget_principle), sum(ul.loan_money - p.realget_principle)) a, -- 剩余应还本金
+        0 b
+        from mman_loan_collection_order lo
+        left join back_user usr on usr.uuid = lo.current_collection_user_id
+        left join mman_loan_collection_company cmp on usr.company_id = cmp.id
+        left join mman_user_loan ul ON ul.id = lo.loan_id
+        left join credit_loan_pay p on p.id = lo.pay_id
+        where 1=1
+        and usr.group_level in (5,6,7)
+        and usr.status = 1
+        and lo.status != 4
+        and ul.borrowing_type = 2
+        and lo.dispatch_time >= DATE_ADD(curdate(),interval -day(curdate())+1 day)
+        group by ul.id
+
+        union ALL
+
+        SELECT
+        a.id id,a.dt,a.gl,a.cmid,a.cmn,a.uuid,a.cpid,a.cpn,
+        0 a,
+        ifnull(sum(a.real_money),0) as b
+        FROM
         (
-        CASE
-        WHEN bo.user_flag = 3 THEN
-        "18老用户"
-        WHEN d.customer_type = 1 THEN
-        "17老用户"
-        WHEN d.customer_type = 0 THEN
-        "新用户"
-        ELSE
-        "未知"
-        END
-        ) type,
-
-        IF (
-        d.borrowing_type = 2
-        AND d.paid_money > 0,
-        d.paid_money,
-        d.loan_money + ifnull(d.accrual, 0)
-        ) zbj,
-
-        IF (
-        d.borrowing_type = 2
-        AND d.paid_money > 0,
-        d.paid_money,
-        d.loan_money + ifnull(d.accrual, 0)
-        ) - ifnull(hk.zqbj, 0) pdbj,
-
-        IF (
-        d.borrowing_type = 2
-        AND d.paid_money > 0,
-        d.paid_money,
-        d.loan_money + ifnull(d.accrual, 0)
-        ) - ifnull(hk.zqbj, 0) - ifnull(hk.yhbj, 0) sybj,
-        ifnull(hk.yhbj, 0) yhbj,
-
-        IF (b.`status` = 4, 1, 0) yhds,
-
-        IF (b.`status` = 4, hk.sjhkznj, 0) sqznj,
-
-        IF (b.`status` = 4, hk.znjsq, 0) znjsq,
-        ifnull(d.loan_penalty, 0) zznj,
-
-        IF (
-        b.`status` = 4,
-        hk.sjhkznj + ifnull(jmznj.bjrkhznj, 0),
-        0
-        ) hksjznj,
-
-        IF (
-        b.`status` = 4,
-        d.loan_penalty,
-        0
-        ) hkzznj,
-
-        IF (
-        csjl.dt >= b.dispatch_time,
-        1,
-        0
-        ) cll
-        FROM
-        mman_loan_collection_order b
-        LEFT JOIN back_user usr ON usr.uuid = b.current_collection_user_id
-        LEFT JOIN mman_loan_collection_company cmp ON usr.company_id = cmp.id
-        LEFT JOIN mman_user_loan d ON d.id = b.loan_id
-        LEFT JOIN bi_order bo ON d.user_id = bo.user_id
-        LEFT JOIN credit_loan_pay clp ON clp.loan_id = b.loan_id
-        LEFT JOIN (
         SELECT
-        a.pay_id id,
-        sum(
+        ul.id id,
+        date(lo.dispatch_time) dt, -- S2时是派单时间
+        usr.group_level gl, -- 催收组编号
+        cmp.id cmid, -- 催收公司代号
+        cmp.title cmn, -- 催收公司名称
+        ch.current_collection_user_id uuid, -- 催收员uuid
+        usr.id cpid, -- 催收员id
+        usr.user_name cpn, -- 催收员姓名
+        sum(d.real_money) real_money -- 催回本金
+        from mman_loan_collection_order lo
+        left join mman_loan_collection_status_change_log ch on ch.loan_collection_order_id = lo.order_id
+        left join back_user usr on usr.uuid = ch.current_collection_user_id
+        left join credit_loan_pay_detail d on (d.pay_id = lo.pay_id and d.current_collection_user_id = usr.uuid)
+        left join mman_loan_collection_company cmp on usr.company_id = cmp.id
+        left join mman_user_loan ul ON ul.id = lo.loan_id
+        where 1=1
+        and usr.group_level in (5,6,7)
+        and d.update_Date >= ch.create_date
+        and usr.`status` = 1
+        AND usr.role_id = '10021'
+        and ul.borrowing_type = 2
+        and lo.dispatch_time >= DATE_ADD(curdate(),interval -day(curdate())+1 day)
+        and ch.after_status not in (4)
+        group by ul.id
+        ) a
+        group by a.id
+        ) t1
+        group by t1.id
 
-        IF (
-        <![CDATA[ a.update_Date < (b.dispatch_time), ]]>
-        a.real_money + ifnull(a.realget_accrual, 0),
-        0
-        )
-        ) zqbj,
-        sum(
+        union all
 
-        IF (
-        a.update_Date >= (b.dispatch_time),
-        a.real_money + ifnull(a.realget_accrual, 0),
-        0
-        )
-        ) yhbj,
-        sum(a.real_penlty) - ifnull(clp.reduction_money, 0) sjhkznj,
-        sum(a.real_penlty) znjsq
-        FROM
-        credit_loan_pay_detail a
-        LEFT JOIN mman_loan_collection_order b ON a.pay_id = b.pay_id
-        LEFT JOIN mman_user_loan d ON d.id = b.loan_id
-        LEFT JOIN credit_loan_pay clp ON clp.loan_id = b.loan_id
-        GROUP BY
-        a.pay_id
-        ) hk ON hk.id = b.pay_id
-        LEFT JOIN (
+        -- S2入催滞纳金（总滞纳金 - s1阶段催回的滞纳金）
+        select
+        t1.id,t1.dt,t1.gl,t1.cmid,t1.cmn,t1.uuid,t1.cpid,t1.cpn,
+        0 rcbj,
+        (sum(t1.rcznj) - sum(t2.yhznj)) rcznj,
+        0 chbj,
+        0 chznj,
+        0 cjsl
+
+        from
+        (
         SELECT
-        loan_id id,
-        max(create_date) dt
-        FROM
-        mman_loan_collection_record
-        GROUP BY
-        loan_id
-        ) csjl ON b.loan_id = csjl.id
-        LEFT JOIN (
+        lo.loan_id id, -- (和ul.id是一样的)
+        date(lo.dispatch_time) dt, -- S2时是派单时间
+        usr.group_level gl, -- 催收组编号
+        cmp.id cmid, -- 催收公司代号
+        cmp.title cmn, -- 催收公司名称
+        lo.current_collection_user_id uuid, -- 催收员uuid
+        usr.id cpid, -- 催收员id
+        usr.user_name cpn, -- 催收员姓名
+        sum(ul.loan_penalty) rcznj, -- 总入催滞纳金
+        0 yhznj
+        from mman_user_loan ul
+        left join mman_loan_collection_order lo on ul.id = lo.loan_id
+        left join back_user usr on lo.current_collection_user_id = usr.uuid
+        left join mman_loan_collection_company cmp on usr.company_id = cmp.id
+        where 1=1
+        and usr.group_level in (3,4)
+        and usr.status = 1
+        and ul.borrowing_type = 2
+        and  <![CDATA[ ul.create_time <= DATE_ADD(date_add(curdate(), interval +1 month),interval -day(date_add(curdate(), interval +1 month))+1 day)]]>
+        and <![CDATA[ ul.create_time >= DATE_ADD(curdate(),interval -day(curdate())+1 day)]]>
+        group by lo.loan_id
+        ) t1
+
+        left join
+
+        (
         SELECT
-        pay_id id,
-        sum(reduction_money) bjrkhznj
+        lo.loan_id id, -- (和ul.id是一样的)
+        date(lo.create_date) dt, -- S1时入催时间
+        usr.group_level gl, -- 催收组编号
+        cmp.id cmid, -- 催收公司代号
+        cmp.title cmn, -- 催收公司名称
+        d.current_collection_user_id uuid, -- 催收员uuid
+        usr.id cpid, -- 催收员id
+        usr.user_name cpn, -- 催收员姓名
+        0 rcznj,
+        sum(d.real_penlty) yhznj
+        from mman_user_loan ul
+        left join mman_loan_collection_order lo on ul.id = lo.loan_id
+        left join credit_loan_pay_detail d on (lo.pay_id = d.pay_id)
+        left join back_user usr on d.current_collection_user_id = usr.uuid
+        left join mman_loan_collection_company cmp on usr.company_id = cmp.id
+        where 1=1
+        and usr.group_level in (3)
+        and usr.status = 1
+        and ul.borrowing_type = 2
+        and <![CDATA[ ul.create_time <= DATE_ADD(date_add(curdate(), interval +1 month),interval -day(date_add(curdate(), interval +1 month))+1 day)]]>
+        and <![CDATA[ ul.create_time >= DATE_ADD(curdate(),interval -day(curdate())+1 day)]]>
+        group by lo.loan_id
+        ) t2 on t1.id = t2.id
+        where t1.gl = 4
+        group by t1.id
+
+        union all
+
+        -- M1-M2入催滞纳金
+        select
+        t1.id,t1.dt,t1.gl,t1.cmid,t1.cmn,t1.uuid,t1.cpid,t1.cpn,
+        0 rcbj,
+        (sum(t1.rcznj) - sum(t2.yhznj)) rcznj,
+        0 chbj,
+        0 chznj,
+        0 cjsl
+        from
+        (
+        SELECT
+        lo.loan_id id, -- (和ul.id是一样的)
+        date(lo.dispatch_time) dt, -- S2时是派单时间
+        usr.group_level gl, -- 催收组编号
+        cmp.id cmid, -- 催收公司代号
+        cmp.title cmn, -- 催收公司名称
+        lo.current_collection_user_id uuid, -- 催收员uuid
+        usr.id cpid, -- 催收员id
+        usr.user_name cpn, -- 催收员姓名
+        sum(ul.loan_penalty) rcznj, -- 总入催滞纳金
+        0 yhznj
+        from mman_user_loan ul
+        left join mman_loan_collection_order lo on ul.id = lo.loan_id
+        left join back_user usr on lo.current_collection_user_id = usr.uuid
+        left join mman_loan_collection_company cmp on usr.company_id = cmp.id
+        where 1=1
+        and usr.group_level in (5)
+        and usr.status = 1
+        and ul.borrowing_type = 2
+        and lo.dispatch_time >= DATE_ADD(curdate(),interval -day(curdate())+1 day)
+        group by lo.loan_id
+        ) t1
+
+        left join
+
+        (
+        SELECT
+        lo.loan_id id, -- (和ul.id是一样的)
+        date(lo.create_date) dt, -- S1时入催时间
+        usr.group_level gl, -- 催收组编号
+        cmp.id cmid, -- 催收公司代号
+        cmp.title cmn, -- 催收公司名称
+        d.current_collection_user_id uuid, -- 催收员uuid
+        usr.id cpid, -- 催收员id
+        usr.user_name cpn, -- 催收员姓名
+        0 rcznj,
+        sum(d.real_penlty) yhznj
+        from mman_user_loan ul
+        left join mman_loan_collection_order lo on ul.id = lo.loan_id
+        left join credit_loan_pay_detail d on (lo.pay_id = d.pay_id )
+        left join back_user usr on d.current_collection_user_id = usr.uuid
+        left join mman_loan_collection_company cmp on usr.company_id = cmp.id
+        where 1=1
+        and usr.group_level in (3,4)
+        and usr.status = 1
+        and ul.borrowing_type = 2
+        and lo.dispatch_time >= DATE_ADD(curdate(),interval -day(curdate())+1 day)
+        and d.update_Date >= DATE_ADD(date_add(curdate(), interval -1 month),interval -day(date_add(curdate(), interval -1 month))+1 day)
+        and <![CDATA[ d.update_Date < DATE_ADD(curdate(),interval -day(curdate())+1 day) ]]>
+        group by lo.loan_id
+        ) t2 on t1.id = t2.id
+        where t1.gl = 5
+        group by t1.id
+
+        union all
+
+        -- M2-M3入催滞纳金
+        select
+        t1.id,
+        t1.dt,
+        t1.gl,
+        t1.cmid,
+        t1.cmn,
+        t1.uuid,
+        t1.cpid,
+        t1.cpn,
+        0 rcbj,
+        (sum(t1.rcznj) - sum(t2.yhznj)) rcznj,
+        0 chbj,
+        0 chznj,
+        0 cjsl
+
+        from
+        (
+        SELECT
+        lo.loan_id id, -- (和ul.id是一样的)
+        date(lo.dispatch_time) dt, -- S2时是派单时间
+        usr.group_level gl, -- 催收组编号
+        cmp.id cmid, -- 催收公司代号
+        cmp.title cmn, -- 催收公司名称
+        lo.current_collection_user_id uuid, -- 催收员uuid
+        usr.id cpid, -- 催收员id
+        usr.user_name cpn, -- 催收员姓名
+        sum(ul.loan_penalty) rcznj, -- 总入催滞纳金
+        0 yhznj
+        from mman_user_loan ul
+        left join mman_loan_collection_order lo on ul.id = lo.loan_id
+        left join back_user usr on lo.current_collection_user_id = usr.uuid
+        left join mman_loan_collection_company cmp on usr.company_id = cmp.id
+        where 1=1
+        and usr.group_level in (6)
+        and usr.status = 1
+        and ul.borrowing_type = 2
+        and lo.dispatch_time >= DATE_ADD(curdate(),interval -day(curdate())+1 day)
+        group by lo.loan_id
+        ) t1
+
+        left join
+
+        (
+        SELECT
+        lo.loan_id id, -- (和ul.id是一样的)
+        date(lo.create_date) dt, -- S1时入催时间
+        usr.group_level gl, -- 催收组编号
+        cmp.id cmid, -- 催收公司代号
+        cmp.title cmn, -- 催收公司名称
+        d.current_collection_user_id uuid, -- 催收员uuid
+        usr.id cpid, -- 催收员id
+        usr.user_name cpn, -- 催收员姓名
+        0 rcznj,
+        sum(d.real_penlty) yhznj
+        from mman_user_loan ul
+        left join mman_loan_collection_order lo on ul.id = lo.loan_id
+        left join credit_loan_pay_detail d on (lo.pay_id = d.pay_id )
+        left join back_user usr on d.current_collection_user_id = usr.uuid
+        left join mman_loan_collection_company cmp on usr.company_id = cmp.id
+        where 1=1
+        and usr.group_level in (3,4,5)
+        and usr.status = 1
+        and ul.borrowing_type = 2
+        and lo.dispatch_time >= DATE_ADD(curdate(),interval -day(curdate())+1 day)
+        and d.update_Date >= DATE_ADD(date_add(curdate(), interval -2 month),interval -day(date_add(curdate(), interval -2 month))+1 day)
+        and <![CDATA[ d.update_Date < DATE_ADD(curdate(), interval -day(curdate())+1 day)]]>
+        group by lo.loan_id
+        ) t2 on t1.id = t2.id
+        where t1.gl = 6
+        group by t1.id
+
+        union all
+
+        -- M3+入催滞纳金
+        select
+        t1.id,
+        t1.dt,
+        t1.gl,
+        t1.cmid,
+        t1.cmn,
+        t1.uuid,
+        t1.cpid,
+        t1.cpn,
+        0 rcbj,
+        (sum(t1.rcznj) - sum(t2.yhznj)) rcznj,
+        0 chbj,
+        0 chznj,
+        0 cjsl
+
+        from
+        (
+        SELECT
+        lo.loan_id id, -- (和ul.id是一样的)
+        date(lo.dispatch_time) dt, -- S2时是派单时间
+        usr.group_level gl, -- 催收组编号
+        cmp.id cmid, -- 催收公司代号
+        cmp.title cmn, -- 催收公司名称
+        lo.current_collection_user_id uuid, -- 催收员uuid
+        usr.id cpid, -- 催收员id
+        usr.user_name cpn, -- 催收员姓名
+        sum(ul.loan_penalty) rcznj, -- 总入催滞纳金
+        0 yhznj
+        from mman_user_loan ul
+        left join mman_loan_collection_order lo on ul.id = lo.loan_id
+        left join back_user usr on lo.current_collection_user_id = usr.uuid
+        left join mman_loan_collection_company cmp on usr.company_id = cmp.id
+        where 1=1
+        and usr.group_level in (7)
+        and usr.status = 1
+        and ul.borrowing_type = 2
+        and lo.dispatch_time >= DATE_ADD(curdate(),interval -day(curdate())+1 day)
+        group by lo.loan_id
+        ) t1
+
+        left join
+
+        (
+        SELECT
+        lo.loan_id id, -- (和ul.id是一样的)
+        date(lo.create_date) dt, -- S1时入催时间
+        usr.group_level gl, -- 催收组编号
+        cmp.id cmid, -- 催收公司代号
+        cmp.title cmn, -- 催收公司名称
+        d.current_collection_user_id uuid, -- 催收员uuid
+        usr.id cpid, -- 催收员id
+        usr.user_name cpn, -- 催收员姓名
+        0 rcznj,
+        sum(d.real_penlty) yhznj
+        from mman_user_loan ul
+        left join mman_loan_collection_order lo on ul.id = lo.loan_id
+        left join credit_loan_pay_detail d on (lo.pay_id = d.pay_id )
+        left join back_user usr on d.current_collection_user_id = usr.uuid
+        left join mman_loan_collection_company cmp on usr.company_id = cmp.id
+        where 1=1
+        and usr.group_level in (3,4,5,6)
+        and usr.status = 1
+        and ul.borrowing_type = 2
+        and lo.dispatch_time >= DATE_ADD(curdate(),interval -day(curdate())+1 day)
+        and d.update_Date >= DATE_ADD(date_add(curdate(), interval -5 month),interval -day(date_add(curdate(), interval -5 month))+1 day)
+        and <![CDATA[ d.update_Date < DATE_ADD(curdate(), interval -day(curdate())+1 day)]]>
+        group by lo.loan_id
+        ) t2 on t1.id = t2.id
+        where t1.gl = 7
+        group by t1.id
+
+        union all
+
+        -- s1催回本金
+        SELECT
+        lo.loan_id id, -- (和ul.id是一样的)
+        date(lo.create_date) dt, -- S1时入催时间
+        usr.group_level gl, -- 催收组编号
+        cmp.id cmid, -- 催收公司代号
+        cmp.title cmn, -- 催收公司名称
+        d.current_collection_user_id uuid, -- 催收员uuid
+        usr.id cpid, -- 催收员id
+        usr.user_name cpn, -- 催收员姓名
+        0 rcbj,
+        0 rcznj,
+        sum(d.real_money) chbj, -- 催回本金（仅计算s1)
+        0 chznj,
+        0 cjsl
+        from mman_loan_collection_order lo
+        left join mman_loan_collection_status_change_log ch on ch.loan_collection_order_id = lo.order_id
+        left join back_user usr on usr.uuid = ch.current_collection_user_id
+        left join mman_loan_collection_company cmp on usr.company_id = cmp.id
+        left join credit_loan_pay_detail d on (d.pay_id = lo.pay_id and d.current_collection_user_id = usr.uuid)
+        where 1=1
+        and d.update_Date >= ch.create_date
+        and usr.status = 1
+        AND usr.role_id = '10021'
+        and lo.create_date >= DATE_ADD(curdate(),interval -day(curdate())+1 day)
+        AND <![CDATA[ lo.create_Date <= DATE_ADD(date_add(curdate(), interval +1 month),interval -day(date_add(curdate(), interval +1 month))+1 day)]]>
+        AND d.update_Date >= DATE_ADD(curdate(),interval -day(curdate())+1 day)
+        AND <![CDATA[ d.update_Date < DATE_ADD(date_add(curdate(), interval +1 month),interval -day(date_add(curdate(), interval +1 month))+2 day)]]>
+        and ch.after_status not in (4)
+        and usr.group_level in (3)
+        group by lo.loan_id
+
+        union all
+
+        -- s2催回本金
+        SELECT
+        lo.loan_id id, -- (和ul.id是一样的)
+        date(lo.dispatch_time) dt, -- S2时派单时间
+        usr.group_level gl, -- 催收组编号
+        cmp.id cmid, -- 催收公司代号
+        cmp.title cmn, -- 催收公司名称
+        d.current_collection_user_id uuid, -- 催收员uuid
+        usr.id cpid, -- 催收员id
+        usr.user_name cpn, -- 催收员姓名
+        0 rcbj,
+        0 rcznj,
+        sum(d.real_money) chbj, -- 催回本金（仅计算s2)
+        0 chznj,
+        0 cjsl
+        from mman_loan_collection_order lo
+        left join mman_loan_collection_status_change_log ch on ch.loan_collection_order_id = lo.order_id
+        left join back_user usr on usr.uuid = ch.current_collection_user_id
+        left join mman_loan_collection_company cmp on usr.company_id = cmp.id
+        left join credit_loan_pay_detail d on (d.pay_id = lo.pay_id and d.current_collection_user_id = usr.uuid)
+        where 1=1
+        and d.update_Date >= ch.create_date
+        and usr.status = 1
+        AND usr.role_id = '10021'
+        and lo.create_date >= DATE_ADD(curdate(),interval -day(curdate())+1 day)
+        AND <![CDATA[ lo.create_Date <= DATE_ADD(date_add(curdate(), interval +1 month),interval -day(date_add(curdate(), interval +1 month))+1 day)]]>
+        AND d.update_Date >= DATE_ADD(curdate(),interval -day(curdate())+1 day)
+        AND <![CDATA[ d.update_Date < DATE_ADD(date_add(curdate(), interval +1 month),interval -day(date_add(curdate(), interval +1 month))+2 day)]]>
+        and ch.after_status not in (4)
+        and usr.group_level in (4)
+        group by lo.loan_id
+
+        union all
+
+        -- M1-M2、M2-M3催回本金
+        SELECT
+        lo.loan_id id, -- (和ul.id是一样的)
+        date(lo.dispatch_time) dt, -- 派单时间
+        usr.group_level gl, -- 催收组编号
+        cmp.id cmid, -- 催收公司代号
+        cmp.title cmn, -- 催收公司名称
+        d.current_collection_user_id uuid, -- 催收员uuid
+        usr.id cpid, -- 催收员id
+        usr.user_name cpn, -- 催收员姓名
+        0 rcbj,
+        0 rcznj,
+        sum(d.real_money) chbj, -- 催回本金
+        0 chznj,
+        0 cjsl
+        from mman_loan_collection_order lo
+        left join mman_loan_collection_status_change_log ch on ch.loan_collection_order_id = lo.order_id
+        left join back_user usr on usr.uuid = ch.current_collection_user_id
+        left join mman_loan_collection_company cmp on usr.company_id = cmp.id
+        left join credit_loan_pay_detail d on (d.pay_id = lo.pay_id and d.current_collection_user_id = usr.uuid)
+        where 1=1
+        and d.update_Date >= ch.create_date
+        and usr.status = 1
+        AND usr.role_id = '10021'
+        and lo.dispatch_time >= DATE_ADD(curdate(),interval -day(curdate())+1 day)
+        AND <![CDATA[ lo.dispatch_time <= DATE_ADD(date_add(curdate(), interval +1 month),interval -day(date_add(curdate(), interval +1 month))+1 day) ]]>
+        AND d.update_Date >= DATE_ADD(curdate(),interval -day(curdate())+1 day)
+        AND <![CDATA[ d.update_Date < DATE_ADD(date_add(curdate(), interval +1 month),interval -day(date_add(curdate(), interval +1 month))+2 day) ]]>
+        and ch.after_status not in (4)
+        and usr.group_level in (5,6)
+        group by lo.loan_id
+
+        union all
+
+        -- M3+催回本金
+        SELECT
+        lo.loan_id id, -- (和ul.id是一样的)
+        date(lo.dispatch_time) dt, -- 派单时间
+        usr.group_level gl, -- 催收组编号
+        cmp.id cmid, -- 催收公司代号
+        cmp.title cmn, -- 催收公司名称
+        d.current_collection_user_id uuid, -- 催收员uuid
+        usr.id cpid, -- 催收员id
+        usr.user_name cpn, -- 催收员姓名
+        0 rcbj,
+        0 rcznj,
+        sum(d.real_money) chbj, -- 催回本金
+        0 chznj,
+        0 cjsl
+        from mman_loan_collection_order lo
+        left join mman_loan_collection_status_change_log ch on ch.loan_collection_order_id = lo.order_id
+        left join back_user usr on usr.uuid = ch.current_collection_user_id
+        left join mman_loan_collection_company cmp on usr.company_id = cmp.id
+        left join credit_loan_pay_detail d on (d.pay_id = lo.pay_id and d.current_collection_user_id = usr.uuid)
+        where 1=1
+        and d.update_Date >= ch.create_date
+        and usr.status = 1
+        AND usr.role_id = '10021'
+        and lo.dispatch_time >= DATE_ADD(date_add(curdate(), interval -2 month),interval -day(date_add(curdate(), interval -2 month))+1 day)
+        AND <![CDATA[ lo.dispatch_time <= DATE_ADD(date_add(curdate(), interval +1 month),interval -day(date_add(curdate(), interval +1 month))+1 day)]]>
+        AND d.update_Date >= DATE_ADD(curdate(),interval -day(curdate())+1 day)
+        AND <![CDATA[ d.update_Date < DATE_ADD(date_add(curdate(), interval +1 month),interval -day(date_add(curdate(), interval +1 month))+2 day)]]>
+        and ch.after_status not in (4)
+        and usr.group_level in (7)
+        group by lo.loan_id
+
+        union all
+
+        -- s1催回滞纳金
+        SELECT
+        t1.id,t1.dt,t1.gl,t1.cmid,t1.cmn,t1.uuid,t1.cpid,t1.cpn,
+        0 rcbj,
+        0 rcznj,
+        0 chbj,
+        (sum(t1.shznj) + sum(t1.bjkh)) chznj,
+        0 cjsl
+        from
+        (
+        SELECT
+        tt.id,tt.dt,tt.gl,tt.cmid,tt.cmn,tt.uuid,tt.cpid,tt.cpn,
+        sum(tt.shznj) shznj,
+        0 bjkh
         FROM
-        audit_center
-        WHERE
-        type = 3
-        AND `status` IN (5)
-        GROUP BY
-        pay_id
-        ) jmznj ON jmznj.id = b.pay_id
-        WHERE
-        usr.`status` = 1
-        ) x
-        GROUP BY
-        x.gsmc,
-        x.csyid,
-        x.yqdj,
-        x.csyfz,
-        x.type,
-        x.lx,
-        x.dt
-        ORDER BY
-        x.dt,
-        x.gsmc,
-        x.yqdj,
-        x.csyid,
-        x.csyfz,
-        x.type,
-        x.lx
+        (
+        SELECT
+        lo.loan_id id, -- (和ul.id是一样的)
+        date(lo.create_date) dt, -- S1时入催时间
+        usr.group_level gl, -- 催收组编号
+        cmp.id cmid, -- 催收公司代号
+        cmp.title cmn, -- 催收公司名称
+        d.current_collection_user_id uuid, -- 催收员uuid
+        usr.id cpid, -- 催收员id
+        usr.user_name cpn, -- 催收员姓名
+        sum(d.real_penlty) - p.reduction_money AS shznj-- '实际还款滞纳金'
+        FROM mman_loan_collection_order lo
+        LEFT JOIN credit_loan_pay_detail d ON lo.pay_id = d.pay_id
+        LEFT JOIN back_user usr ON usr.uuid = d.current_collection_user_id
+        left join mman_loan_collection_company cmp on usr.company_id = cmp.id
+        left join mman_loan_collection_status_change_log ch on ch.loan_collection_order_id = lo.order_id
+        LEFT JOIN credit_loan_pay p ON lo.pay_id = p.id
+        WHERE 1=1
+        AND lo.status = '4'
+        AND p.remain_accrual IS NULL
+        and d.update_Date >= ch.create_date
+        and usr.status = 1
+        AND usr.role_id = '10021'
+        and lo.create_date >= DATE_ADD(curdate(),interval -day(curdate())+1 day)
+        AND <![CDATA[ lo.create_Date <= DATE_ADD(date_add(curdate(), interval +1 month),interval -day(date_add(curdate(), interval +1 month))+1 day) ]]>
+        AND d.update_Date >= DATE_ADD(curdate(),interval -day(curdate())+1 day)
+        AND <![CDATA[ d.update_Date < DATE_ADD(date_add(curdate(), interval +1 month),interval -day(date_add(curdate(), interval +1 month))+2 day)]]>
+        and ch.after_status not in (4)
+        and usr.group_level in (3)
+        GROUP BY lo.loan_id
+        ) tt
+        GROUP BY tt.id
+
+        union all
+
+        SELECT
+        lo.loan_id id, -- (和ul.id是一样的)
+        date(lo.create_date) dt, -- S1时入催时间
+        usr.group_level gl, -- 催收组编号
+        cmp.id cmid, -- 催收公司代号
+        cmp.title cmn, -- 催收公司名称
+        lo.current_collection_user_id uuid, -- 催收员uuid
+        usr.id cpid, -- 催收员id
+        usr.user_name cpn, -- 催收员姓名
+        0 shznj,
+        sum(c.reduction_money) bjkh -- 不计入考核的减免滞纳金
+        FROM mman_loan_collection_order lo
+        LEFT JOIN back_user usr ON lo.current_collection_user_id = usr.uuid
+        left join mman_loan_collection_company cmp on usr.company_id = cmp.id
+        LEFT JOIN audit_center c ON lo.loan_id = c.loan_id
+        LEFT JOIN credit_loan_pay p ON lo.pay_id = p.id
+        WHERE 1=1
+        and usr.status = 1
+        AND lo.status = '4'
+        AND c.status = '5'
+        AND c.type = '3'
+        AND p.update_Date >= DATE_ADD(curdate(),interval -day(curdate())+1 day)
+        AND <![CDATA[ p.update_Date <= DATE_ADD(date_add(curdate(), interval +1 month),interval -day(date_add(curdate(), interval +1 month))+1 day) ]]>
+        and usr.group_level in (3)
+        GROUP BY usr.id
+        ) t1
+        group by t1.id
+
+        union all
+
+        -- s2催回滞纳金
+        SELECT
+        t1.id,t1.dt,t1.gl,t1.cmid,t1.cmn,t1.uuid,t1.cpid,t1.cpn,
+        0 rcbj,
+        0 rcznj,
+        0 chbj,
+        (sum(t1.shznj) + sum(t1.bjkh)) chznj,
+        0 cjsl
+        from
+        (
+        SELECT
+        tt.id,tt.dt,tt.gl,tt.cmid,tt.cmn,tt.uuid,tt.cpid,tt.cpn,
+        sum(tt.shznj) shznj,
+        0 bjkh
+        FROM
+        (
+        SELECT
+        lo.loan_id id, -- (和ul.id是一样的)
+        date(lo.dispatch_time) dt, -- S1时派单时间
+        usr.group_level gl, -- 催收组编号
+        cmp.id cmid, -- 催收公司代号
+        cmp.title cmn, -- 催收公司名称
+        d.current_collection_user_id uuid, -- 催收员uuid
+        usr.id cpid, -- 催收员id
+        usr.user_name cpn, -- 催收员姓名
+        sum(d.real_penlty) - p.reduction_money AS shznj-- '实际还款滞纳金'
+        FROM mman_loan_collection_order lo
+        LEFT JOIN credit_loan_pay_detail d ON lo.pay_id = d.pay_id
+        LEFT JOIN back_user usr ON usr.uuid = d.current_collection_user_id
+        left join mman_loan_collection_company cmp on usr.company_id = cmp.id
+        left join mman_loan_collection_status_change_log ch on ch.loan_collection_order_id = lo.order_id
+        LEFT JOIN credit_loan_pay p ON lo.pay_id = p.id
+        WHERE 1=1
+        AND lo.status = '4'
+        AND p.remain_accrual IS NULL
+        and d.update_Date >= ch.create_date
+        and usr.status = 1
+        AND usr.role_id = '10021'
+        and lo.create_date >= DATE_ADD(curdate(),interval -day(curdate())+1 day)
+        AND <![CDATA[ lo.create_Date <= DATE_ADD(date_add(curdate(), interval +1 month),interval -day(date_add(curdate(), interval +1 month))+1 day)]]>
+        AND d.update_Date >= DATE_ADD(curdate(),interval -day(curdate())+1 day)
+        AND <![CDATA[ d.update_Date < DATE_ADD(date_add(curdate(), interval +1 month),interval -day(date_add(curdate(), interval +1 month))+2 day) ]]>
+        and ch.after_status not in (4)
+        and usr.group_level in (4)
+        GROUP BY lo.loan_id
+        ) tt
+        GROUP BY tt.id
+
+        union all
+
+        SELECT
+        lo.loan_id id, -- (和ul.id是一样的)
+        date(lo.dispatch_time) dt, -- S1时派单时间
+        usr.group_level gl, -- 催收组编号
+        cmp.id cmid, -- 催收公司代号
+        cmp.title cmn, -- 催收公司名称
+        lo.current_collection_user_id uuid, -- 催收员uuid
+        usr.id cpid, -- 催收员id
+        usr.user_name cpn, -- 催收员姓名
+        0 shznj,
+        sum(c.reduction_money) bjkh -- 不计入考核的减免滞纳金
+        FROM mman_loan_collection_order lo
+        LEFT JOIN back_user usr ON lo.current_collection_user_id = usr.uuid
+        left join mman_loan_collection_company cmp on usr.company_id = cmp.id
+        LEFT JOIN audit_center c ON lo.loan_id = c.loan_id
+        LEFT JOIN credit_loan_pay p ON lo.pay_id = p.id
+        WHERE 1=1
+        and usr.status = 1
+        AND lo.status = '4'
+        AND c.status = '5'
+        AND c.type = '3'
+        AND p.update_Date >= DATE_ADD(curdate(),interval -day(curdate())+1 day)
+        AND <![CDATA[ p.update_Date <= DATE_ADD(date_add(curdate(), interval +1 month),interval -day(date_add(curdate(), interval +1 month))+1 day)]]>
+        and usr.group_level in (4)
+        GROUP BY usr.id
+        ) t1
+        group by t1.id
+
+        union all
+
+        -- M1-M2、M2-M3催回滞纳金
+        SELECT
+        t1.id,t1.dt,t1.gl,t1.cmid,t1.cmn,t1.uuid,t1.cpid,t1.cpn,
+        0 rcbj,
+        0 rcznj,
+        0 chbj,
+        (sum(t1.shznj) + sum(t1.bjkh)) chznj,
+        0 cjsl
+        from
+        (
+        SELECT
+        tt.id,tt.dt,tt.gl,tt.cmid,tt.cmn,tt.uuid,tt.cpid,tt.cpn,
+        sum(tt.shznj) shznj,
+        0 bjkh
+        FROM
+        (
+        SELECT
+        lo.loan_id id, -- (和ul.id是一样的)
+        date(lo.dispatch_time) dt, -- S1时派单时间
+        usr.group_level gl, -- 催收组编号
+        cmp.id cmid, -- 催收公司代号
+        cmp.title cmn, -- 催收公司名称
+        d.current_collection_user_id uuid, -- 催收员uuid
+        usr.id cpid, -- 催收员id
+        usr.user_name cpn, -- 催收员姓名
+        sum(d.real_penlty) - p.reduction_money AS shznj-- '实际还款滞纳金'
+        FROM mman_loan_collection_order lo
+        LEFT JOIN credit_loan_pay_detail d ON lo.pay_id = d.pay_id
+        LEFT JOIN back_user usr ON usr.uuid = d.current_collection_user_id
+        left join mman_loan_collection_company cmp on usr.company_id = cmp.id
+        left join mman_loan_collection_status_change_log ch on ch.loan_collection_order_id = lo.order_id
+        LEFT JOIN credit_loan_pay p ON lo.pay_id = p.id
+        WHERE 1=1
+        AND lo.status = '4'
+        AND p.remain_accrual IS NULL
+        and d.update_Date >= ch.create_date
+        and usr.status = 1
+        AND usr.role_id = '10021'
+        and lo.dispatch_time >= DATE_ADD(curdate(),interval -day(curdate())+1 day)
+        AND <![CDATA[ lo.dispatch_time <= DATE_ADD(date_add(curdate(), interval +1 month),interval -day(date_add(curdate(), interval +1 month))+1 day)]]>
+        AND d.update_Date >= DATE_ADD(curdate(),interval -day(curdate())+1 day)
+        AND <![CDATA[ d.update_Date < DATE_ADD(date_add(curdate(), interval +1 month),interval -day(date_add(curdate(), interval +1 month))+2 day)]]>
+        and ch.after_status not in (4)
+        and usr.group_level in (5,6)
+        GROUP BY lo.loan_id
+        ) tt
+        GROUP BY tt.id
+
+        union all
+
+        SELECT
+        lo.loan_id id, -- (和ul.id是一样的)
+        date(lo.dispatch_time) dt, -- S1时派单时间
+        usr.group_level gl, -- 催收组编号
+        cmp.id cmid, -- 催收公司代号
+        cmp.title cmn, -- 催收公司名称
+        lo.current_collection_user_id uuid, -- 催收员uuid
+        usr.id cpid, -- 催收员id
+        usr.user_name cpn, -- 催收员姓名
+        0 shznj,
+        sum(c.reduction_money) bjkh -- 不计入考核的减免滞纳金
+        FROM mman_loan_collection_order lo
+        LEFT JOIN back_user usr ON lo.current_collection_user_id = usr.uuid
+        left join mman_loan_collection_company cmp on usr.company_id = cmp.id
+        LEFT JOIN audit_center c ON lo.loan_id = c.loan_id
+        LEFT JOIN credit_loan_pay p ON lo.pay_id = p.id
+        WHERE 1=1
+        and usr.status = 1
+        AND lo.status = '4'
+        AND c.status = '5'
+        AND c.type = '3'
+        AND p.update_Date >= DATE_ADD(curdate(),interval -day(curdate())+1 day)
+        AND <![CDATA[ p.update_Date <= DATE_ADD(date_add(curdate(), interval +1 month),interval -day(date_add(curdate(), interval +1 month))+1 day) ]]>
+        and usr.group_level in (5,6)
+        GROUP BY usr.id
+        ) t1
+        group by t1.id
+
+        union all
+
+        -- M3+催回滞纳金
+        SELECT
+        t1.id,t1.dt,t1.gl,t1.cmid,t1.cmn,t1.uuid,t1.cpid,t1.cpn,
+        0 rcbj,
+        0 rcznj,
+        0 chbj,
+        (sum(t1.shznj) + sum(t1.bjkh)) chznj,
+        0 cjsl
+        from
+        (
+        SELECT
+        tt.id,tt.dt,tt.gl,tt.cmid,tt.cmn,tt.uuid,tt.cpid,tt.cpn,
+        sum(tt.shznj) shznj,
+        0 bjkh
+        FROM
+        (
+        SELECT
+        lo.loan_id id, -- (和ul.id是一样的)
+        date(lo.dispatch_time) dt, -- S1时派单时间
+        usr.group_level gl, -- 催收组编号
+        cmp.id cmid, -- 催收公司代号
+        cmp.title cmn, -- 催收公司名称
+        d.current_collection_user_id uuid, -- 催收员uuid
+        usr.id cpid, -- 催收员id
+        usr.user_name cpn, -- 催收员姓名
+        sum(d.real_penlty) - p.reduction_money AS shznj-- '实际还款滞纳金'
+        FROM mman_loan_collection_order lo
+        LEFT JOIN credit_loan_pay_detail d ON lo.pay_id = d.pay_id
+        LEFT JOIN back_user usr ON usr.uuid = d.current_collection_user_id
+        left join mman_loan_collection_company cmp on usr.company_id = cmp.id
+        left join mman_loan_collection_status_change_log ch on ch.loan_collection_order_id = lo.order_id
+        LEFT JOIN credit_loan_pay p ON lo.pay_id = p.id
+        WHERE 1=1
+        AND lo.status = '4'
+        AND p.remain_accrual IS NULL
+        and d.update_Date >= ch.create_date
+        and usr.status = 1
+        AND usr.role_id = '10021'
+        and lo.dispatch_time >= DATE_ADD(date_add(curdate(), interval -2 month),interval -day(date_add(curdate(), interval -2 month))+1 day)
+        AND <![CDATA[lo.dispatch_time <= DATE_ADD(date_add(curdate(), interval +1 month),interval -day(date_add(curdate(), interval +1 month))+1 day)]]>
+        AND d.update_Date >= DATE_ADD(curdate(),interval -day(curdate())+1 day)
+        AND <![CDATA[ d.update_Date < DATE_ADD(date_add(curdate(), interval +1 month),interval -day(date_add(curdate(), interval +1 month))+2 day)]]>
+        and ch.after_status not in (4)
+        and usr.group_level in (7)
+        GROUP BY lo.loan_id
+        ) tt
+        GROUP BY tt.id
+
+        union all
+
+        SELECT
+        lo.loan_id id, -- (和ul.id是一样的)
+        date(lo.dispatch_time) dt, -- S1时派单时间
+        usr.group_level gl, -- 催收组编号
+        cmp.id cmid, -- 催收公司代号
+        cmp.title cmn, -- 催收公司名称
+        lo.current_collection_user_id uuid, -- 催收员uuid
+        usr.id cpid, -- 催收员id
+        usr.user_name cpn, -- 催收员姓名
+        0 shznj,
+        sum(c.reduction_money) bjkh -- 不计入考核的减免滞纳金
+        FROM mman_loan_collection_order lo
+        LEFT JOIN back_user usr ON lo.current_collection_user_id = usr.uuid
+        left join mman_loan_collection_company cmp on usr.company_id = cmp.id
+        LEFT JOIN audit_center c ON lo.loan_id = c.loan_id
+        LEFT JOIN credit_loan_pay p ON lo.pay_id = p.id
+        WHERE 1=1
+        and usr.status = 1
+        AND lo.status = '4'
+        AND c.status = '5'
+        AND c.type = '3'
+        AND p.update_Date >= DATE_ADD(curdate(),interval -day(curdate())+1 day)
+        AND <![CDATA[ p.update_Date <= DATE_ADD(date_add(curdate(), interval +1 month),interval -day(date_add(curdate(), interval +1 month))+1 day)]]>
+        and usr.group_level in (7)
+        GROUP BY usr.id
+        ) t1
+        group by t1.id
+
+        union all
+
+        -- s1催记数量
+        select
+        ul.id id,
+        date(lo.create_date) dt, -- S1时是入催时间
+        usr.group_level gl, -- 催收组编号
+        cmp.id cmid, -- 催收公司代号
+        cmp.title cmn, -- 催收公司名称
+        r.collection_id, -- 催收员uuid
+        usr.id cpid, -- 催收员id
+        usr.user_name cpn, -- 催收员姓名
+        0 rcbj,
+        0 rcznj,
+        0 chbj,
+        0 chznj,
+        count(r.order_id)
+        from mman_loan_collection_order lo
+        left join mman_loan_collection_record r on r.loan_id = lo.loan_id
+        left join back_user usr on usr.uuid = r.collection_id
+        left join mman_loan_collection_company cmp on usr.company_id = cmp.id
+        left join mman_user_loan ul ON ul.id = lo.loan_id
+        where 1=1
+        and usr.group_level in (3)
+        and usr.status = 1
+        and ul.borrowing_type = 2
+        and <![CDATA[ ul.create_time <= DATE_ADD(date_add(curdate(), interval +1 month),interval -day(date_add(curdate(), interval +1 month))+1 day)]]>
+        and ul.create_time >= DATE_ADD(curdate(),interval -day(curdate())+1 day)
+        group by ul.id
+
+        union all
+
+        -- S2、M1-M2、M2-M3催记数量
+        select
+        ul.id id,
+        date(lo.dispatch_time) dt, -- S1时是入催时间
+        usr.group_level gl, -- 催收组编号
+        cmp.id cmid, -- 催收公司代号
+        cmp.title cmn, -- 催收公司名称
+        r.collection_id uuid, -- 催收员uuid
+        usr.id cpid, -- 催收员id
+        usr.user_name cpn, -- 催收员姓名
+        0 rcbj,
+        0 rcznj,
+        0 chbj,
+        0 chznj,
+        count(r.order_id)
+        from mman_loan_collection_order lo
+        left join mman_loan_collection_record r on r.loan_id = lo.loan_id
+        left join back_user usr on usr.uuid = r.collection_id
+        left join mman_loan_collection_company cmp on usr.company_id = cmp.id
+        left join mman_user_loan ul ON ul.id = lo.loan_id
+        where 1=1
+        and usr.group_level in (4,5,6)
+        and usr.status = 1
+        and ul.borrowing_type = 2
+        and <![CDATA[ lo.dispatch_time <= DATE_ADD(date_add(curdate(), interval +1 month),interval -day(date_add(curdate(), interval +1 month))+1 day)  ]]>
+        and lo.dispatch_time >= DATE_ADD(curdate(),interval -day(curdate())+1 day)
+        group by ul.id,gl
+
+        union all
+
+        -- M3+催记数量
+        select
+        ul.id id,
+        date(lo.dispatch_time) dt, -- S1时是入催时间
+        usr.group_level gl, -- 催收组编号
+        cmp.id cmid, -- 催收公司代号
+        cmp.title cmn, -- 催收公司名称
+        r.collection_id uuid, -- 催收员uuid
+        usr.id cpid, -- 催收员id
+        usr.user_name cpn, -- 催收员姓名
+        0 rcbj,
+        0 rcznj,
+        0 chbj,
+        0 chznj,
+        count(r.order_id)
+        from mman_loan_collection_order lo
+        left join mman_loan_collection_record r on r.loan_id = lo.loan_id
+        left join back_user usr on usr.uuid = r.collection_id
+        left join mman_loan_collection_company cmp on usr.company_id = cmp.id
+        left join mman_user_loan ul ON ul.id = lo.loan_id
+        where 1=1
+        and usr.group_level in (7)
+        and usr.status = 1
+        and ul.borrowing_type = 2
+        and <![CDATA[ lo.dispatch_time < DATE_ADD(date_add(curdate(), interval +1 month),interval -day(date_add(curdate(), interval +1 month))+1 day) ]]>
+        and lo.dispatch_time >= DATE_ADD(date_add(curdate(), interval -2 month),interval -day(date_add(curdate(), interval -2 month))+1 day)
+        group by ul.id
+        ) t2
+
+        group by t2.dt,t2.gl,t2.cmid,t2.cmn,t2.cpid,t2.cpn
+        order by t2.dt,t2.gl,t2.cmid,t2.cmn,t2.cpid,t2.cpn
     </select>
 
-    <insert id="insertTrackStatistics" parameterType="List">
+    <insert id="insertTrackStatistics" parameterType="list">
         INSERT INTO track_statistics
-        (dispatchTime, companyName, companyId,backUserName,uuid,groupLevel,borrowingType,userType,totalPrincipal,realgetTotalPrincipal,remainPrincipal,repaymentProbability,totalPenalty,realgetTotalPenalty,remainPenalty,
-        penaltyProbability, totalOrderCount,doneOrderCount ,orderProbability,handleCount,createDate)
+        (dispatchTime, companyName, companyId,backUserName,uuid,groupLevel,totalPrincipal,realgetTotalPrincipal,repaymentProbability,totalPenalty,realgetTotalPenalty, penaltyProbability,handleCount,createDate)
         VALUES
         <foreach collection ="list" item="track" separator =",">
-            (#{track.dispatchTime}, #{track.companyName}, #{track.companyId},#{track.backUserName},#{track.uuid},#{track.groupLevel},#{track.borrowingType},#{track.userType},#{track.totalPrincipal},#{track.realgetTotalPrincipal},#{track.remainPrincipal},#{track.repaymentProbability},#{track.totalPenalty},#{track.realgetTotalPenalty},#{track.remainPenalty},#{track.penaltyProbability},#{track.totalOrderCount},#{track.doneOrderCount},#{track.orderProbability},#{track.handleCount}, now())
+            (#{track.dispatchTime}, #{track.companyName}, #{track.companyId},#{track.backUserName},#{track.uuid},#{track.groupLevel},#{track.totalPrincipal},#{track.realgetTotalPrincipal},#{track.repaymentProbability},#{track.totalPenalty},#{track.realgetTotalPenalty},#{track.penaltyProbability},#{track.handleCount}, now())
         </foreach >
     </insert>
 
@@ -304,7 +1134,7 @@ round(sum(s.realgetTotalPenalty) / sum(s.totalPenalty), 2) AS'penaltyProbability
 
 
        sum(s.handleCount) AS 'handleCount'
-        FROM cumulative_statistics s
+        FROM track_statistics s
         <include refid="wherePersonColumn"/>
 
     </select>
@@ -325,7 +1155,7 @@ round(sum(s.realgetTotalPenalty) / sum(s.totalPenalty), 2) AS'penaltyProbability
 
 
         sum(s.handleCount) AS 'handleCount'
-        FROM cumulative_statistics s
+        FROM track_statistics s
         <include refid="wherePersonColumn"/>) a
     </select>
     <select id="cumulativeStatisticsCompany" resultType="com.info.web.pojo.TrackStatistics" parameterType="HashMap">
@@ -345,7 +1175,7 @@ round(sum(s.realgetTotalPenalty) / sum(s.totalPenalty), 2) AS'penaltyProbability
 
 
        sum(s.handleCount) AS 'handleCount'
-        FROM cumulative_statistics s
+        FROM track_statistics s
         <include refid="whereCompanyColumn"/>
     </select>
     <select id="cumulativeStatisticsCompanyCount" resultType="Integer" parameterType="HashMap">
@@ -366,12 +1196,12 @@ round(sum(s.realgetTotalPenalty) / sum(s.totalPenalty), 2) AS'penaltyProbability
 
 
         sum(s.handleCount) AS 'handleCount'
-        FROM cumulative_statistics s
+        FROM track_statistics s
         <include refid="whereCompanyColumn"/>) a
     </select>
 
     <delete id="delTrackStatistics" parameterType="HashMap">
-        DELETE s FROM cumulative_statistics s
+        DELETE s FROM track_statistics s
         WHERE <![CDATA[ s.createDate >= #{beginTime} ]]>
               <![CDATA[ AND s.createDate <= #{endTime}  ]]>
     </delete>
