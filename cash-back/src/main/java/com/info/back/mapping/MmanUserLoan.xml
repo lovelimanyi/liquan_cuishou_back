@@ -44,6 +44,7 @@
         <result column="term_number" property="termNumber" jdbcType="VARCHAR"/>
         <result column="borrowing_type" property="borrowingType" jdbcType="VARCHAR"/>
         <result column="merchant_no" property="merchantNo" jdbcType="VARCHAR"/>
+        <result column="channel_from" property="channelFrom" jdbcType="VARCHAR"/>
     </resultMap>
     <!-- 保存,保存不为NULL的字段 -->
     <insert id="saveNotNull" parameterType="com.info.web.pojo.MmanUserLoan">
@@ -114,7 +115,7 @@
     <select id="get" resultMap="queryResultMap" parameterType="com.info.web.pojo.MmanUserLoan">
     SELECT t.id , t.user_id , t.loan_py_id , t.loan_money ,t.paid_money,t.loan_rate ,t.service_charge,t.paid_money, t.loan_penalty , t.loan_penalty_rate , t.loan_start_time , t.loan_end_time
      , t.loan_status , t.create_time , t.update_time , t.del_flag , t.loan_penalty_time , t.loan_sys_status , t.loan_sys_remark,
-     t.borrowing_type,t.term_number,t.accrual,t.merchant_no FROM
+     t.borrowing_type,t.term_number,t.accrual,t.merchant_no,channel_from FROM
      mman_user_loan t WHERE
      id = #{id,jdbcType=VARCHAR}</select>
     <!-- 根据主键删除记录 -->

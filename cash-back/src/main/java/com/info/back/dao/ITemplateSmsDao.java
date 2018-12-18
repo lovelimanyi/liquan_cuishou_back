@@ -35,10 +35,20 @@ public interface ITemplateSmsDao {
 	int delete(String id);
 	
 	/**
-	 * 查询所有的短信模板
+	 * 查询所有  cjxjx渠道来源  的短信模板
 	 * @return
 	 */
 	List<TemplateSms> getMsgs();
+	/**
+	 * 查询所有  有米管家渠道来源  的短信模板
+	 * @return
+	 */
+	List<TemplateSms> getYoumiAllMsg();
+	/**
+	 * 查询所有  渠道来源  的短信模板
+	 * @return
+	 */
+	List<TemplateSms> getAllMsg();
 	
 	List<TemplateSms> getType(HashMap<String, Object> params);
 

@@ -45,10 +45,18 @@
         </where>
     </select>
 
-    <!-- 查询所有可用的短信模板 -->
+    <!-- 查询所有  cjxjx渠道来源  的可用的短信模板 -->
     <select id="getMsgs" resultType="com.info.web.pojo.TemplateSms">
-		select id,`name`,contenttext from template_sms where status = '1'
+		select id,`name`,contenttext from template_sms where status = '1' and channel_from is null
 	</select>
+    <!-- 查询所有 有米管家渠道来源  的可用的短信模板 -->
+    <select id="getYoumiAllMsg" resultType="com.info.web.pojo.TemplateSms">
+        select id,`name`,contenttext from template_sms where status = '1' and channel_from = 'ymgj'
+    </select>
+    <!-- 查询所有 渠道来源  的可用的短信模板 -->
+    <select id="getAllMsg" resultType="com.info.web.pojo.TemplateSms">
+        select id,`name`,contenttext from template_sms where status = '1'
+    </select>
     <!-- 分組查詢  -->
     <sql id="base_select">
         t.id AS id,
