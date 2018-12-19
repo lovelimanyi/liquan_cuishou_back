@@ -54,7 +54,7 @@ public class MyCollectionOrderController extends BaseController {
 
     private static final String SHORT_MESSAGE_LIST_REDIS_KEY = "msgs";
     private static final String SHORT_MESSAGE_YOUMI_CHANNEL_FROM_REDIS_KEY = "ymgj";
-    private static final String SHORT_MESSAGE_YOUMI_MERCHANT_NO = "ymgj";
+    private static final String SHORT_MESSAGE_YOUMI_CHANNEL_FROM = "ymgj";
 
     private static final String SHORT_MESSAGE_LIMIT_COUNT_REDIS_KEY = "msgCountLimit";
 
@@ -1184,7 +1184,7 @@ public class MyCollectionOrderController extends BaseController {
         List<TemplateSms> msgs = new ArrayList<>();
         if (order != null) {
             MmanUserLoan userLoan = mmanUserLoanService.get(order.getLoanId());
-            if (SHORT_MESSAGE_YOUMI_MERCHANT_NO.equals(userLoan.getChannelFrom())){
+            if (SHORT_MESSAGE_YOUMI_CHANNEL_FROM.equals(userLoan.getChannelFrom())){
                 msgs = getYoumiAllMsg();
             }else {
                 msgs = getCjxjxAllMsg();
@@ -1313,7 +1313,7 @@ public class MyCollectionOrderController extends BaseController {
         String merchantNanme = null;
         MmanUserLoan mmanUserLoan = mmanUserLoanService.get(order.getLoanId());
         for (Map.Entry<String,String> map : merchantMap.entrySet()) {
-            if (map.getKey().equals(mmanUserLoan.getMerchantNo())) {
+            if (map.getKey().equals(mmanUserLoan.getChannelFrom())) {
                 merchantNanme = map.getValue();
                 break;
             }
@@ -1370,7 +1370,7 @@ public class MyCollectionOrderController extends BaseController {
                 return new ServiceResult("-6", "请选择正确的短信模板！");
             }
             String msgParam = null;
-            if(SHORT_MESSAGE_YOUMI_MERCHANT_NO.equals(getMerchantNo(order))){
+            if(SHORT_MESSAGE_YOUMI_CHANNEL_FROM.equals(getChannelFrom(order))){
                 msgParam = getYoumiMsgParam(order);
             }else {
                 msgParam = getMsgParam(order);
@@ -1390,7 +1390,12 @@ public class MyCollectionOrderController extends BaseController {
                 return new ServiceResult("-8", "今日该订单发送短信已达上限" + (msgCountLimit) + "条！");
             }
             logger.error("发送催收短信，参数：mobile:"+ mobile + "msgParam:" + JSONObject.toJSONString(msgParam) + "msgCode:" + msgCode);
-            boolean smsResult = SmsSendUtil.sendSmsNew(mobile, msgParam, msgCode);
+            boolean smsResult = false;
+            if (SHORT_MESSAGE_YOUMI_CHANNEL_FROM.equals(getChannelFrom(order))){
+                smsResult = SmsSendUtil.sendSmsYoumi(mobile, msgParam, msgCode);
+            }else {
+                smsResult = SmsSendUtil.sendSmsNew(mobile, msgParam, msgCode);
+            }
             if (smsResult) {
                 // 插入短信记录
                 insertMsg(mobile, order, msgCode, request);
@@ -1508,7 +1513,7 @@ public class MyCollectionOrderController extends BaseController {
                 }
             }
             String content = null;
-            if(SHORT_MESSAGE_YOUMI_MERCHANT_NO.equals(getMerchantNo(order))){
+            if(SHORT_MESSAGE_YOUMI_CHANNEL_FROM.equals(getChannelFrom(order))){
                 content = MessageFormat.format(templateSms.getContenttext(), StringUtils.split(getYoumiMsgParam(order), ','));
             }else {
                 content = MessageFormat.format(templateSms.getContenttext(), StringUtils.split(getMsgParam(order), ','));
@@ -1536,16 +1541,16 @@ public class MyCollectionOrderController extends BaseController {
     }
 
     //获取渠道来源
-    private String getMerchantNo(MmanLoanCollectionOrder order) {
+    private String getChannelFrom(MmanLoanCollectionOrder order) {
         if (order != null) {
             MmanUserLoan userLoan = mmanUserLoanService.get(order.getLoanId());
-            if (SHORT_MESSAGE_YOUMI_MERCHANT_NO.equals(userLoan.getChannelFrom())) {
+            if (SHORT_MESSAGE_YOUMI_CHANNEL_FROM.equals(userLoan.getChannelFrom())) {
                 return "ymgj";
             } else {
                 return userLoan.getChannelFrom();
             }
         }else {
-            logger.error("MmanLoanCollectionOrder 为null,获取渠道来源getMerchantNo出错！"+ JSONObject.toJSONString(order));
+            logger.error("MmanLoanCollectionOrder 为null,获取渠道来源getChannelFrom出错！"+ JSONObject.toJSONString(order));
             return null;
         }
     }
