@@ -1389,6 +1389,7 @@ public class MyCollectionOrderController extends BaseController {
             if (msgCountLimit <= count) {
                 return new ServiceResult("-8", "今日该订单发送短信已达上限" + (msgCountLimit) + "条！");
             }
+            logger.error("发送催收短信，参数：mobile:"+ mobile + "msgParam:" + JSONObject.toJSONString(msgParam) + "msgCode:" + msgCode);
             boolean smsResult = SmsSendUtil.sendSmsNew(mobile, msgParam, msgCode);
             if (smsResult) {
                 // 插入短信记录
