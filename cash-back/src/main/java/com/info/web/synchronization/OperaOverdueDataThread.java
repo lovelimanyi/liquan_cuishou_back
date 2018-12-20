@@ -32,7 +32,7 @@ public class OperaOverdueDataThread implements Runnable {
 //	天下粮仓
 	private static final String TXLC_MERCHANT_NUMBER = "1004";
 //  易秒借款
-	private static final String YMJK_MERCHANT_NUMBER = "1003";
+	private static final String YMJK_MERCHANT_NUMBER = "1005";
 
 	private static Logger loger = Logger.getLogger(OperaOverdueDataThread.class);
 	private String payId;
