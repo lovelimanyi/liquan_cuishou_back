@@ -1392,7 +1392,8 @@ public class MyCollectionOrderController extends BaseController {
             logger.error("发送催收短信，参数：mobile:"+ mobile + "msgParam:" + JSONObject.toJSONString(msgParam) + "msgCode:" + msgCode);
             boolean smsResult = false;
             if (SHORT_MESSAGE_YOUMI_CHANNEL_FROM.equals(getChannelFrom(order))){
-                smsResult = SmsSendUtil.sendSmsYoumi(mobile, msgParam, msgCode);
+                String merchantNo = PayContents.MERCHANT_NUMBER;
+                smsResult = SmsSendUtil.sendSmsYoumi(mobile, msgParam, msgCode,merchantNo);
             }else {
                 smsResult = SmsSendUtil.sendSmsNew(mobile, msgParam, msgCode);
             }

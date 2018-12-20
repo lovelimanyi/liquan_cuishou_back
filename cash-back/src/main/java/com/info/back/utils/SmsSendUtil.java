@@ -91,7 +91,7 @@ public class SmsSendUtil {
      * @param sms
      * @return
      */
-    public static boolean sendSmsYoumi(String telephone, String sms, String msgTemplateCode) {
+    public static boolean sendSmsYoumi(String telephone, String sms, String msgTemplateCode, String merchantNo) {
         loger.info("sendSms:" + telephone + "   sms=" + sms);
         String url = XJX_SMS_SEND_URL_NEW;
 
@@ -99,7 +99,7 @@ public class SmsSendUtil {
         HttpPost httppost = new HttpPost(url);
         httppost.addHeader("Content-Type", "application/json");
         MessageByTypePojo messageByTypePojo = new MessageByTypePojo();
-        messageByTypePojo.setMerchantNo("ymgj");
+        messageByTypePojo.setMerchantNo(merchantNo);
         messageByTypePojo.setTelephone(telephone);
         messageByTypePojo.setMsgSource("xianjinxia_back");//系统名称
         messageByTypePojo.setMsgBussinessId("login_" + telephone);//业务唯一标识
