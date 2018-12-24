@@ -288,6 +288,47 @@ public class JedisDataClient {
         }
     }
 
+    public static void rpush(String key, String listValue) throws Exception {
+        if (null == key || "".equals(key.trim())) {
+            throw new Exception("the key can not be null.");
+        }
+        Jedis jedisMaster = null;
+        try {
+            jedisMaster = getMasterJedis();
+            jedisMaster.rpush(key, listValue);
+        } finally {
+            returnResource(jedisMaster, poolMaster);
+        }
+    }
+    public static String lpop(String key) throws Exception {
+        if (null == key || "".equals(key.trim())) {
+            throw new Exception("the key can not be null.");
+        }
+        Jedis jedisMaster = null;
+        String value = "";
+        try {
+            jedisMaster = getMasterJedis();
+            value = jedisMaster.lpop(key);
+        } finally {
+            returnResource(jedisMaster, poolMaster);
+        }
+        return value;
+    }
+    public static Integer llen(String key) throws Exception {
+        if (null == key || "".equals(key.trim())) {
+            throw new Exception("the key can not be null.");
+        }
+        Jedis jedisMaster = null;
+        Integer length = null;
+        try {
+            jedisMaster = getMasterJedis();
+            length = jedisMaster.llen(key).intValue();
+        } finally {
+            returnResource(jedisMaster, poolMaster);
+        }
+        return length;
+    }
+
     /**
      * 向list加入数据放入缓存，并保持list中的数据不重复
      *
