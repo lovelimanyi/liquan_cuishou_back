@@ -5,11 +5,6 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.apache.log4j.Logger;
-import org.springframework.context.ApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
-
-import com.info.web.synchronization.service.IDataService;
-
 
 
 public class IndexInit implements ServletContextListener {

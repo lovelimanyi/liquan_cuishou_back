@@ -6,9 +6,7 @@ import javax.servlet.ServletContextListener;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import com.info.back.service.TaskJobMiddleService;
 import com.info.constant.Constant;
-import com.info.web.synchronization.service.IDataService;
 import com.info.web.util.ConfigConstant;
 
 

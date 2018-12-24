@@ -1,6 +1,5 @@
 package com.info.web.synchronization.service;
 
-import com.info.back.service.TaskJobMiddleService;
 import com.info.web.util.DateUtil;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +22,6 @@ public class TwoMinSyncOperateService {
     @Autowired
     private DataService dataService;
     @Autowired
-    private TaskJobMiddleService taskJobMiddleService;
 
     public void twoMinSyncOverdue() {
         loger.error("4点到24点   每2分钟跑逾期(部分还款)..." + DateUtil.getDateFormat(new Date(), "yyyy-MM-dd hh:mm:ss"));
@@ -39,7 +37,7 @@ public class TwoMinSyncOperateService {
         loger.error(" 每2分钟跑续期，还款，代扣..." + DateUtil.getDateFormat(new Date(), "yyyy-MM-dd hh:mm:ss"));
 
         try {
-            this.dataService.syncDate(this.taskJobMiddleService);
+            this.dataService.syncDate();
         } catch (Exception e) {
             e.printStackTrace();
         }

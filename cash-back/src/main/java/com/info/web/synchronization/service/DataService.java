@@ -1,31 +1,23 @@
 package com.info.web.synchronization.service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-
-import com.info.config.PayContents;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.info.back.dao.ILocalDataDao;
-import com.info.back.service.TaskJobMiddleService;
+import com.info.config.PayContents;
 import com.info.constant.Constant;
-import com.info.web.synchronization.SendOverdueManage;
-import com.info.web.synchronization.SendRenewalManage;
 import com.info.web.synchronization.SendRepayManage;
 import com.info.web.synchronization.SendWithManage;
 import com.info.web.synchronization.dao.IDataDao;
 import com.info.web.util.JedisDataClient;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
-@Service
-public class DataService implements IDataService {
+import java.util.List;
 
-	private static Logger loger = Logger.getLogger(DataService.class);
+@Component
+public class DataService{
+
+	private static Logger logger = Logger.getLogger(DataService.class);
 	@Autowired
 	private IDataDao dataDao;
 	@Autowired
@@ -33,125 +25,36 @@ public class DataService implements IDataService {
 
 	
 	/**
-	 * 同步数据
+	 * 全部还款数据同步
 	 */
-	public void syncDate(TaskJobMiddleService taskJobMiddleService){
+	public void syncDate(){
 			try {
-				loger.info("获取所有的redis数据");
+				logger.info("获取所有repay的redis数据");
 					try{
-						List<String> renewalList = JedisDataClient.getAllValuesByPattern(Constant.TYPE_RENEWAL_+"*_"+PayContents.MERCHANT_NUMBER);
-						if(null!=renewalList && 0<renewalList.size()){
-							loger.info("处理续期数据");
-							dataForRenewal(renewalList);//处理续期
-						}
-					}catch(Exception e){
-						loger.info("renewalList get exception..");
-						e.printStackTrace();
-					}
-					try{
-						List<String> repayList = JedisDataClient.getAllValuesByPattern(Constant.TYPE_REPAY_+"*_"+PayContents.MERCHANT_NUMBER);
+						List<String> repayList = JedisDataClient.getAllValuesByPattern(Constant.TYPE_REPAY_+"*");
 						if(null!=repayList && 0<repayList.size()){
-							loger.info("处理还款数据");
+							logger.info("处理还款数据");
 							dataForRepay(repayList);//处理还款
 						}
 					}catch(Exception e){
-						loger.info("repayList get exception..");
+						logger.info("repayList get exception..");
 						e.printStackTrace();
 					}
 					try{
 						List<String> withList = JedisDataClient.getAllValuesByPattern(Constant.TYPE_WITHHOLD_+"*_"+PayContents.MERCHANT_NUMBER);
 						if(null!=withList && 0<withList.size()){
-							loger.info("处理代扣数据");
+							logger.info("处理代扣数据");
 							dataForWithHold(withList);//处理还款
 						}
 					}catch(Exception e){
-						loger.info("withList get exception..");
+						logger.info("withList get exception..");
 						e.printStackTrace();
 					}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
-//	}
-	
-	/**
-	 * 获取所有的redis数据
-	 */
-	public HashMap<String,List<String>> getRedisAllData(){
-		HashMap<String,List<String>> hashMap = new HashMap<String,List<String>>();
-//		List<String> overdueList = new ArrayList<String>();//存放逾期
-		List<String> renewalList = new ArrayList<String>();//存放续期
-		List<String> repayList = new ArrayList<String>();//存放还款
-		List<String> withList = new ArrayList<String>();//存放代扣WITHHOLD_
-			
-		try {
-			List<String> keyList = JedisDataClient.getAllKeys();
-			if(null!=keyList && 0<keyList.size()){
-				for(String string : keyList){
-					if(StringUtils.isNotBlank(string)){
-						loger.error("redis-key:"+string);
-						if(JedisDataClient.exists(string)){
-							//根据配置的商户号进行筛选--只筛选当前商户号的
-								if(string.startsWith(Constant.TYPE_RENEWAL_)&& string.endsWith(PayContents.MERCHANT_NUMBER.toString())){
-									renewalList.add(string.replace(Constant.TYPE_RENEWAL_, "").replace(PayContents.MERCHANT_NUMBER.toString(),"").replace("_",""));
-								}
-								if(string.startsWith(Constant.TYPE_REPAY_)&& string.endsWith(PayContents.MERCHANT_NUMBER.toString())){
-									loger.error("redis-key-payId:"+string.replace(Constant.TYPE_REPAY_, "").replace(PayContents.MERCHANT_NUMBER.toString(),"").replace("_",""));
-									repayList.add(string.replace(Constant.TYPE_REPAY_, "").replace(PayContents.MERCHANT_NUMBER.toString(),"").replace("_",""));
-								}
-								if(string.startsWith(Constant.TYPE_WITHHOLD_)&& string.endsWith(PayContents.MERCHANT_NUMBER.toString())){
-									withList.add(string.replace(Constant.TYPE_WITHHOLD_, "").replace(PayContents.MERCHANT_NUMBER.toString(),"").replace("_",""));
-								}
-//							}
-						}
-					}
-				}
-			}
-//			hashMap.put(Constant.TYPE_OVERDUE, overdueList);
-			hashMap.put(Constant.TYPE_RENEWAL, renewalList);
-			hashMap.put(Constant.TYPE_REPAY, repayList);
-			hashMap.put(Constant.TYPE_WITHHOLD, withList);
-			return hashMap;
-		} catch (Exception e) {
-			loger.error("getRedisAllData-exception..."+new Date());
-			e.printStackTrace();
-			return null;
-		}
-	}
-	/**
-	 * 处理逾期数据
-	 * @return
-	 */
-//	@Transactional
-//	public void dataForOverdue(List<String> list,TaskJobMiddleService taskJobMiddleService){
-//		if(null!=list && 0<list.size()){
-//			try{
-//				loger.info("处理逾期数据");
-//				SendOverdueManage dendOverdueManage = new SendOverdueManage(list,this.dataDao,this.localDataDao,taskJobMiddleService);
-//				dendOverdueManage.send();
-//			}catch(Exception e){
-//				e.printStackTrace();
-//			}
-//		}
-//		
-//	}
-	/**
-	 * 处理续期数据
-	 * @return
-	 */
-	@Transactional
-	public void dataForRenewal(List<String> list){
-		if(null!=list && 0<list.size()){
-			try{
-				loger.info(" 处理续期数据");
-				SendRenewalManage sendRenewalManage = new SendRenewalManage(list,this.dataDao,this.localDataDao);
-				sendRenewalManage.send();
-			}catch(Exception e){
-				e.printStackTrace();
-			}
-		}
-		
-	}
+
 	/**
 	 * 处理还款数据
 	 * @return
@@ -160,7 +63,7 @@ public class DataService implements IDataService {
 	private void dataForRepay(List<String> list){
 		if(null!=list && 0<list.size()){
 			try{
-				loger.info("处理还款数据");
+				logger.info("处理还款数据");
 				SendRepayManage sendRepayManage = new SendRepayManage(list,this.dataDao,this.localDataDao);
 				sendRepayManage.send();
 					
@@ -175,7 +78,7 @@ public class DataService implements IDataService {
 	private void dataForWithHold(List<String> list){
 		if(null!=list && 0<list.size()){
 			try{
-				loger.info("处理代扣数据");
+				logger.info("处理代扣数据");
 				SendWithManage sendWithManage = new SendWithManage(list,this.localDataDao);
 				sendWithManage.send();
 					
