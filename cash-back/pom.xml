@@ -328,6 +328,27 @@
 
     <profiles>
         <profile>
+            <!-- ymjk预生产环境 -->
+            <id>ymjkPre</id>
+            <properties>
+                <environment>ymjkPre</environment>
+            </properties>
+        </profile>
+        <profile>
+            <!-- ymjk生产环境 -->
+            <id>ymjkProd</id>
+            <properties>
+                <environment>ymjkProd</environment>
+            </properties>
+        </profile>
+        <profile>
+            <!-- ymjkDocker4环境 -->
+            <id>ymjkDocker4</id>
+            <properties>
+                <environment>ymjkDocker4</environment>
+            </properties>
+        </profile>
+        <profile>
             <!-- jqb预生产环境 -->
             <id>jqbPre</id>
             <properties>
