@@ -21,7 +21,6 @@ public class TwoMinSyncOperateService {
     private DataSyncService dataSyncService;
     @Autowired
     private DataService dataService;
-    @Autowired
 
     public void twoMinSyncOverdue() {
         loger.error("4点到24点-每2分钟跑逾期(部分还款)..." + DateUtil.getDateFormat(new Date(), "yyyy-MM-dd hh:mm:ss"));

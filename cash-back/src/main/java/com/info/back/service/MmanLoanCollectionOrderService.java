@@ -1,5 +1,6 @@
 package com.info.back.service;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.info.back.dao.*;
 import com.info.back.result.JsonResult;
@@ -1288,31 +1289,40 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
      * 最新首逾派单逻辑
      */
     @Override
-    public void distributeOrder(MmanLoanCollectionOrder order, String merchantNumber) {
-        JSONObject backUser = null;
+    public Boolean distributeOrder(MmanLoanCollectionOrder order, String merchantNumber) {
+        JSONObject user = null;
         try {
-            backUser = (JSONObject) JSONObject.toJSON(JedisDataClient.lpop(BackConstant.DISTRIBUTE_BACK_USER));
+            String backUser = JedisDataClient.lpop(BackConstant.DISTRIBUTE_BACK_USER);
+            JedisDataClient.rpush(BackConstant.DISTRIBUTE_BACK_USER,backUser);
+            user = JSON.parseObject(backUser);
+            String currentCollectionUserId = user.get("uuid").toString();
+            String backUserName =  user.get("userName").toString();
+            String companyId = user.get("companyId").toString();
+            order.setCurrentCollectionUserId(currentCollectionUserId);
+            order.setOutsideCompanyId(companyId);
+            manLoanCollectionOrderDao.insertCollectionOrder(order);
+
+            //添加订单催收流转日志
+            insertMmanLoanCollectionStatusChangeLog(
+                    order.getOrderId(),
+                    BackConstant.XJX_COLLECTION_ORDER_STATE_WAIT,
+                    "1",
+                    "系统",
+                    "系统派单，催收员:" + backUserName,
+                    companyId,
+                    currentCollectionUserId,
+                    BackConstant.XJX_OVERDUE_LEVEL_S1,
+                    BackConstant.XJX_OVERDUE_LEVEL_S1);
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
-        order.setCurrentCollectionUserId(backUser.get("uuid").toString());
-        order.setOutsideCompanyId(backUser.get("companyId").toString());
-
-
-        //添加订单催收流转日志
-//        insertMmanLoanCollectionStatusChangeLog(BackConstant.XJX_COLLECTION_ORDER_STATE_WAIT,
-//                "1",
-//                "系统",
-//                "系统派单，催收员:" + order.getLoanUserName(),
-//                "",
-//                "",
-//                BackConstant.XJX_OVERDUE_LEVEL_S1,
-//                BackConstant.XJX_OVERDUE_LEVEL_S1);
-
     }
-    private void insertMmanLoanCollectionStatusChangeLog(String afterStatus, String type, String operatorName, String remark, String companyId, String currentCollectionUserId, String currentCollectionUserLevel, String currentCollectionOrderLevel) {
+    private void insertMmanLoanCollectionStatusChangeLog(String orderId,String afterStatus, String type, String operatorName, String remark, String companyId, String currentCollectionUserId, String currentCollectionUserLevel, String currentCollectionOrderLevel) {
         MmanLoanCollectionStatusChangeLog changeLog = new MmanLoanCollectionStatusChangeLog();
         changeLog.setId(IdGen.uuid());
+        changeLog.setLoanCollectionOrderId(orderId);
         changeLog.setAfterStatus(afterStatus);//订单状态 ：0:待催收 1:催收中  4:还款完成
         changeLog.setType(type);// 操作类型 1:入催  2:逾期升级  3:转单  4：还款完成
         changeLog.setCreateDate(new Date());
@@ -1322,6 +1332,7 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
         changeLog.setCurrentCollectionUserId(currentCollectionUserId);
         changeLog.setCurrentCollectionUserLevel(currentCollectionUserLevel);
         changeLog.setCurrentCollectionOrderLevel(currentCollectionOrderLevel);
+        statusChangeLogDao.insert(changeLog);
 
     }
 

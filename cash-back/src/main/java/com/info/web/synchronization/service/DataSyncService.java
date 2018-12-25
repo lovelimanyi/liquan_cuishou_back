@@ -1,5 +1,6 @@
 package com.info.web.synchronization.service;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.info.back.dao.IBackUserDao;
 import com.info.back.dao.ILocalDataDao;
@@ -60,31 +61,18 @@ public class DataSyncService {
 			JedisDataClient.expire(redisKey,60*60);
 		}
 
-//		JSONObject backUser = null;
-		String backUser = null;
+		logger.info("获取所有overdue的redis数据");
 		try {
-			backUser = JedisDataClient.lpop(BackConstant.DISTRIBUTE_BACK_USER);
+			List<String> overdueValueList = JedisDataClient.getAllValuesByPattern(Constant.TYPE_OVERDUE_ + "*");
+			if (CollectionUtils.isNotEmpty(overdueValueList)) {
+				logger.info("处理逾期数据");
+				dataForOverdue(overdueValueList);//处理逾期
+			}
+
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("getRedisValue-exception", e);
+			return;
 		}
-		System.out.println(backUser);
-//		System.out.println(backUser.get("uuid").toString());
-//		System.out.println(backUser.get("companyId").toString());
-
-
-
-//		logger.info("获取所有overdue的redis数据");
-//		try {
-//			List<String> overdueValueList = JedisDataClient.getAllValuesByPattern(Constant.TYPE_OVERDUE_ + "*");
-//			if (CollectionUtils.isNotEmpty(overdueValueList)) {
-//				logger.info("处理逾期数据");
-//				dataForOverdue(overdueValueList);//处理逾期
-//			}
-//
-//		} catch (Exception e) {
-//			logger.error("getRedisValue-exception", e);
-//			return;
-//		}
 	}
 	
 	/**

@@ -131,25 +131,26 @@ public class OperaOverdueDataThread implements Runnable {
 						order.setOperatorName("系统");
 						order.setRemark("系统派单");
 						order.setLoanUserName(userInfo.get("realname").toString());
-						order.setLoanUserPhone(userInfo.get("user_phone").toString());
+						order.setLoanUserPhone(userInfo.get("userPhone").toString());
 						order.setIdNumber(userInfo.get("idNumber").toString());
 						//分单逻辑
-						this.orderService.distributeOrder(order,borrowOrder.get("merchant_number").toString());
-
-
-
-
-
-
-
-
-						this.orderService.dispatchOrderNew(loanId,userInfo.get("idNumber").toString(),Constant.SMALL);
-//						this.taskJobMiddleService.dispatchforLoanId(loanId,userInfo.get("id_number").toString(),Constant.SMALL);
-						if (repaymentDetailList != null && repaymentDetailList.size()>0){
-							loger.info("未逾期部分还款:"+loanId);
-							syncUtils.updateMmanLoanCollectionOrder(localDataDao,loanId,repayment,Constant.STATUS_OVERDUE_ONE);
+						Boolean result = this.orderService.distributeOrder(order,borrowOrder.get("merchant_number").toString());
+						if (result){
+//							RedisUtil.delRedisKey(Constant.TYPE_OVERDUE_ + payId);
 						}
-						RedisUtil.delRedisKey(Constant.TYPE_OVERDUE_ + payId+"_"+PayContents.MERCHANT_NUMBER.toString());
+
+
+
+
+
+
+
+//						this.orderService.dispatchOrderNew(loanId,userInfo.get("idNumber").toString(),Constant.SMALL);
+//						this.taskJobMiddleService.dispatchforLoanId(loanId,userInfo.get("id_number").toString(),Constant.SMALL);
+//						if (repaymentDetailList != null && repaymentDetailList.size()>0){
+//							loger.info("未逾期部分还款:"+loanId);
+//							syncUtils.updateMmanLoanCollectionOrder(localDataDao,loanId,repayment,Constant.STATUS_OVERDUE_ONE);
+//						}
 					} else {
 						loger.info("loanId:"+loanId);
 						if (null != borrowOrder && null != repaymentDetailList) {
