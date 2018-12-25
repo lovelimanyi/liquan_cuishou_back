@@ -78,7 +78,7 @@ public class CollectionCompanyService implements ICollectionCompanyService{
 					mmanLoanCollectionRule.setCompanyId(mmanLoanCollectionCompany.getId());
 					mmanLoanCollectionRule.setCollectionGroup(dict.getValue());
 					if (dict.getValue().equals("4")){
-						mmanLoanCollectionRule.setEveryLimit(25);
+						mmanLoanCollectionRule.setEveryLimit(9999);
 					}else {
 						mmanLoanCollectionRule.setEveryLimit(99999);
 					}

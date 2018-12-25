@@ -168,4 +168,8 @@ public interface IBackUserDao {
     List<BackUser> getUserByCompanyIdAndGroupLevel(Map<String, Object> userMap);
 
     DianXiaoBackUser dianXiaoBackUserByOrderCount(Map<String, Object> map);
+
+    BackUser getUserByName(String user);
+
+    List<BackUser> getUserByCompany(String companyName);
 }
