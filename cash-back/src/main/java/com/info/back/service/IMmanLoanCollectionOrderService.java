@@ -165,4 +165,6 @@ public interface IMmanLoanCollectionOrderService {
 	 * @return
 	 */
 	Map<Integer, String> getRepayChannelMap();
+
+    void distributeOrder(MmanLoanCollectionOrder order, String merchant_number);
 }
