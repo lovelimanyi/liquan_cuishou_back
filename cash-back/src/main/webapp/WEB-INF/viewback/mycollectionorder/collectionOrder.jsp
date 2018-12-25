@@ -140,8 +140,30 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>
+<%--                    <td>
                         渠 道 来 源:
+                        <select id="channelFrom" name="channelFrom">
+                            <option value="">全部</option>
+                            <c:forEach var="channelFromMap" items="${channelFromMap }">
+                                <option value="${channelFromMap.key }" <c:if test="${channelFromMap.key eq params.channelFrom}">selected="selected"</c:if>>
+                                        ${channelFromMap.value}
+                                </option>
+                            </c:forEach>
+                        </select>
+                    </td>--%>
+                    <td>
+                        产 品 名 称:
+                        <select id="merchantNo" name="merchantNo">
+                            <option value="">全部</option>
+                            <c:forEach var="merchantNo" items="${merchantNoMap }">
+                                <option value="${merchantNo.key }" <c:if test="${merchantNo.key eq params.merchantNo}">selected="selected"</c:if>>
+                                        ${merchantNo.value}
+                                </option>
+                            </c:forEach>
+                        </select>
+                    </td>
+                    <td>
+                        是否来源于有米管家:
                         <select id="channelFrom" name="channelFrom">
                             <option value="">全部</option>
                             <c:forEach var="channelFromMap" items="${channelFromMap }">

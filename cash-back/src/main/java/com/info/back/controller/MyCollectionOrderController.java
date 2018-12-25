@@ -193,6 +193,7 @@ public class MyCollectionOrderController extends BaseController {
         model.addAttribute("levelMap", levelMap);
         model.addAttribute("params", params); // 用于搜索框保留值
         model.addAttribute("channelFromMap",BackConstant.channelFromMap);
+        model.addAttribute("merchantNoMap",BackConstant.merchantNoMap);
         return "mycollectionorder/collectionOrder";
     }
 
