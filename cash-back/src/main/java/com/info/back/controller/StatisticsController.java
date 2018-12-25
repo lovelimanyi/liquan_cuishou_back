@@ -46,7 +46,7 @@ public class StatisticsController extends BaseController {
 
         PageConfig<TrackStatistics> pageConfig = new PageConfig<>();
 
-        //处理选择的派单日期
+        //处理选择的派单日期 如果不选择，默认为当天
         DateKitUtils.handleSelectDate(params);
 
         //获取该登录人员可以查看的公司

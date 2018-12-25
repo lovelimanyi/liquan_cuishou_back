@@ -29,13 +29,20 @@ import java.util.List;
 @ContextConfiguration(locations={"file:src/main/resources/applicationContext.xml"})
 public class Test {
     protected Logger logger = Logger.getLogger(Test.class);
-    @Autowired
-    DianXiaoDataService dianXiaoDataService;
+//    @Autowired
+//    DianXiaoDataService dianXiaoDataService;
 
     @org.junit.Test
     public void test() {
+
+
+
+
+
+
+
 //        dianXiaoDataService.syncDianXiaoNoPay();
-        dianXiaoDataService.syncDianXiaoPay();
+//        dianXiaoDataService.syncDianXiaoPay();
 //        List<String> overdueList = null;
 //        try {
 //            overdueList = JedisDataClient.getAllValuesByPattern(Constant.TYPE_OVERDUE_+"*_"+PayContents.MERCHANT_NUMBER);
