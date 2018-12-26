@@ -406,4 +406,38 @@
 
     </select>
 
+
+    <select id="getBackUserGroupByOrderCount" parameterType="map" resultType="com.info.web.pojo.CollectionBackUser">
+         SELECT
+        u.id AS id,
+        u.uuid AS uuid,
+        u.user_name AS userName,
+        u.company_id AS companyId,
+        u.role_id AS roleId,
+        u.group_level AS groupLevel,
+        IFNULL(c.orderCount, 0) AS currentOrderCount,
+        u.status AS userStatus
+        FROM
+        back_user u
+        LEFT JOIN (
+            SELECT
+            o.current_collection_user_id AS currentCollectionUserId,
+            count(1) AS orderCount
+            FROM
+            mman_loan_collection_order o
+            WHERE
+             <![CDATA[ o.create_date > current_date() ]]>
+            GROUP BY
+            o.current_collection_user_id
+        ) c ON u.uuid = c.currentCollectionUserId
+        WHERE
+        u.status = 1
+        AND u.role_id = '10021'
+        <if test="groupLevel != null and groupLevel != ''">
+            AND u.group_level=#{groupLevel}
+        </if>
+        ORDER BY orderCount
+    </select>
+
+
 </mapper>

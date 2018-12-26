@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import com.alibaba.fastjson.JSONObject;
 import com.info.back.utils.ObjectTranscoderUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
@@ -286,6 +287,47 @@ public class JedisDataClient {
         } finally {
             returnResource(jedisMaster, poolMaster);
         }
+    }
+
+    public static void rpush(String key, String listValue) throws Exception {
+        if (null == key || "".equals(key.trim())) {
+            throw new Exception("the key can not be null.");
+        }
+        Jedis jedisMaster = null;
+        try {
+            jedisMaster = getMasterJedis();
+            jedisMaster.rpush(key, listValue);
+        } finally {
+            returnResource(jedisMaster, poolMaster);
+        }
+    }
+    public static String lpop(String key) throws Exception {
+        if (null == key || "".equals(key.trim())) {
+            throw new Exception("the key can not be null.");
+        }
+        Jedis jedisMaster = null;
+        String value = "";
+        try {
+            jedisMaster = getMasterJedis();
+            value = jedisMaster.lpop(key);
+        } finally {
+            returnResource(jedisMaster, poolMaster);
+        }
+        return value;
+    }
+    public static Integer llen(String key) throws Exception {
+        if (null == key || "".equals(key.trim())) {
+            throw new Exception("the key can not be null.");
+        }
+        Jedis jedisMaster = null;
+        Integer length = null;
+        try {
+            jedisMaster = getMasterJedis();
+            length = jedisMaster.llen(key).intValue();
+        } finally {
+            returnResource(jedisMaster, poolMaster);
+        }
+        return length;
     }
 
     /**

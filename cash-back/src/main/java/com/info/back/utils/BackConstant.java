@@ -12,6 +12,8 @@ public class BackConstant {
 
     public final static String OFF = "0";// 开关-关
 
+    public final static String DISTRIBUTE_BACK_USER = "distribute:backUserS1";
+
 
     public static final String CREDITLOANAPPLY_OVERDUE = "4";// 逾期
 

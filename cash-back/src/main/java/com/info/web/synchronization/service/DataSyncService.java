@@ -1,62 +1,77 @@
 package com.info.web.synchronization.service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-
-import com.info.back.service.IMmanLoanCollectionOrderService;
-import com.info.config.PayContents;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.info.back.dao.IBackUserDao;
 import com.info.back.dao.ILocalDataDao;
-import com.info.back.service.TaskJobMiddleService;
+import com.info.back.service.IMmanLoanCollectionOrderService;
+import com.info.back.utils.BackConstant;
 import com.info.constant.Constant;
+import com.info.web.pojo.CollectionBackUser;
 import com.info.web.synchronization.SendOverdueManage;
 import com.info.web.synchronization.dao.IDataDao;
 import com.info.web.util.JedisDataClient;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.map.HashedMap;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Map;
+
 /**
  * 定时跑逾期
  * @author Administrator
  *
  */
-@Service
+@Component
 public class DataSyncService {
 	
-	private static Logger loger = Logger.getLogger(DataSyncService.class);
-	
+	private static Logger logger = Logger.getLogger(DataSyncService.class);
 	@Autowired
 	private IDataDao dataDao;
 	@Autowired
 	private ILocalDataDao localDataDao;
 	@Autowired
+	private IBackUserDao backUserDao;
+	@Autowired
 	private IMmanLoanCollectionOrderService orderService;
-	private static final String LOCK_FLAG = "1";
-	
+
 	/**
-	 * 同步逾期数据
+	 * 首逾数据同步-逾期部分还款同步
 	 */
-	public void syncOverdueDate(){
-		loger.error("定时处理逾期数据..."+new Date());
-		try {
-//			loger.info("获取所有的redis数据");
-				try{
-					List<String> overdueList = JedisDataClient.getAllValuesByPattern(Constant.TYPE_OVERDUE_+"*_"+PayContents.MERCHANT_NUMBER);
-					if(null!=overdueList && 0<overdueList.size()){
-						loger.info("处理逾期数据");
-						dataForOverdue(overdueList);//处理逾期
+	public void syncOverdueDate() throws Exception {
+		//查询当前系统中S1可用催收员，并根据催收员今日派单量排序，缓存至redis中
+		Map<String, Object> map = new HashedMap();
+		map.put("groupLevel", BackConstant.XJX_OVERDUE_LEVEL_S1);
+		String redisKey = BackConstant.DISTRIBUTE_BACK_USER;
+		Integer length = JedisDataClient.llen(redisKey);
+		if (length <= 0){
+			List<CollectionBackUser> backUserList = backUserDao.getBackUserGroupByOrderCount(map);
+			if (CollectionUtils.isNotEmpty(backUserList)){
+				for (CollectionBackUser backUser : backUserList){
+					try {
+						JedisDataClient.rpush(redisKey , JSONObject.toJSONString(backUser));
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
-				}catch(Exception e){
-					loger.info("overdueList get exception..");
-					e.printStackTrace();
 				}
-//			Thread.sleep(1000*60*200);//频率间隔
+			}
+			JedisDataClient.expire(redisKey,60*60);
+		}
+
+		logger.info("获取所有overdue的redis数据");
+		try {
+			List<String> overdueValueList = JedisDataClient.getAllValuesByPattern(Constant.TYPE_OVERDUE_ + "*");
+			if (CollectionUtils.isNotEmpty(overdueValueList)) {
+				logger.info("处理逾期数据");
+				dataForOverdue(overdueValueList);//处理逾期
+			}
+
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("getRedisValue-exception", e);
+			return;
 		}
 	}
 	
@@ -64,54 +79,13 @@ public class DataSyncService {
 	 * 处理逾期数据
 	 * @return
 	 */
-	@Transactional
 	public void dataForOverdue(List<String> list){
-		if(null!=list && 0<list.size()){
-			try{
-//				loger.info("处理逾期数据");
-				SendOverdueManage dendOverdueManage = new SendOverdueManage(list,this.dataDao,this.localDataDao,this.orderService);
-				dendOverdueManage.send();
-			}catch(Exception e){
-				e.printStackTrace();
-			}
-		}
-		
-	}
-	
-	/**
-	 * 获取所有的redis数据
-	 */
-	public HashMap<String,List<String>> getRedisAllData(){
-		HashMap<String,List<String>> hashMap = new HashMap<String,List<String>>();
-		List<String> overdueList = new ArrayList<String>();//存放逾期
-			
-		try {
-			List<String> keyList = JedisDataClient.getAllKeys();
-			if(null!=keyList && 0<keyList.size()){
-				for(String string : keyList){
-					if(StringUtils.isNotBlank(string)){
-						loger.error("redis-key:"+string);
-						loger.error("config-MERCHANT_NUMBER:"+PayContents.MERCHANT_NUMBER.toString());
-						if(JedisDataClient.exists(string)){
-							//根据配置的商户号进行筛选--只筛选当前商户号的
-								if(string.startsWith(Constant.TYPE_OVERDUE_) && string.endsWith(PayContents.MERCHANT_NUMBER.toString())){
-
-									loger.error("redis-key-payId:"+string.replace(Constant.TYPE_OVERDUE_, "").replace(PayContents.MERCHANT_NUMBER.toString(),"").replace("_",""));
-									overdueList.add(string.replace(Constant.TYPE_OVERDUE_, "").replace(PayContents.MERCHANT_NUMBER.toString(),"").replace("_",""));
-								}
-//							}
-						}
-					}
-				}
-			}
-			hashMap.put(Constant.TYPE_OVERDUE, overdueList);
-			return hashMap;
-		} catch (Exception e) {
-			loger.error("getRedisAllData-exception..."+new Date());
-			e.printStackTrace();
-			return null;
+		try{
+			SendOverdueManage sendOverdueManage = new SendOverdueManage(list,this.dataDao,this.localDataDao,this.orderService);
+			sendOverdueManage.send();
+		}catch(Exception e){
+			logger.error("dataForOverdue-exception", e);
 		}
 	}
-	
 
 }
