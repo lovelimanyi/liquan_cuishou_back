@@ -30,6 +30,11 @@ import java.util.Map;
  */
 public class OperaOverdueDataThread implements Runnable {
 
+//	天下粮仓
+	private static final String TXLC_MERCHANT_NUMBER = "1004";
+//  易秒借款
+	private static final String YMJK_MERCHANT_NUMBER = "1005";
+
 	private static Logger loger = Logger.getLogger(OperaOverdueDataThread.class);
 	private String payId;
 	private IDataDao dataDao;
@@ -194,7 +199,13 @@ public class OperaOverdueDataThread implements Runnable {
 		mmanUserLoan.setLoanPyId(String.valueOf(borrowOrder.get("out_trade_no")));//第三方订单号
 		mmanUserLoan.setLoanMoney(new BigDecimal(Integer.parseInt(String.valueOf(borrowOrder.get("money_amount")))/100.00));
 		mmanUserLoan.setLoanRate(String.valueOf(borrowOrder.get("apr")));
-		mmanUserLoan.setPaidMoney(new BigDecimal(Integer.parseInt(String.valueOf(borrowOrder.get("paid_money")))/100.00));//服务费+本金
+		if (TXLC_MERCHANT_NUMBER.equals(String.valueOf(borrowOrder.get("merchant_number"))) || YMJK_MERCHANT_NUMBER.equals(String.valueOf(borrowOrder.get("merchant_number")))){
+			mmanUserLoan.setPaidMoney(new BigDecimal(0));
+		}else {
+			mmanUserLoan.setPaidMoney(new BigDecimal(Integer.parseInt(String.valueOf(borrowOrder.get("paid_money")))/100.00));//服务费+本金
+		}
+
+
 		mmanUserLoan.setLoanPenalty(new BigDecimal(Integer.parseInt(String.valueOf(repaymentMap.get("plan_late_fee")))/100.00));
 		mmanUserLoan.setServiceCharge(new BigDecimal(Integer.parseInt(String.valueOf(repaymentMap.get("repayment_interest")))/100.00));//服务费
 		mmanUserLoan.setLoanPenaltyRate(String.valueOf(repaymentMap.get("late_fee_apr")));

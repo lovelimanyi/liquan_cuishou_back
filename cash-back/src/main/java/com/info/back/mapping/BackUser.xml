@@ -361,6 +361,14 @@
         </where>
     </select>
 
+    <select id="getUserByName" parameterType="String" resultMap="BaseResultMap">
+        SELECT id,user_name AS userName,uuid,`status`,company_id,group_level FROM back_user where user_name = #{username};
+    </select>
+
+    <select id="getUserByCompany" parameterType="String" resultType="com.info.web.pojo.BackUser">
+        SELECT id,user_name AS userName from back_user where `status` = 1 AND company_id = (SELECT id from mman_loan_collection_company where title = #{companyName}) and
+        role_id = "10021" and group_level = "8"
+    </select>
 
     <select id="dianXiaoBackUserByOrderCount" resultType="com.info.web.pojo.DianXiaoBackUser" parameterType="map">
 
