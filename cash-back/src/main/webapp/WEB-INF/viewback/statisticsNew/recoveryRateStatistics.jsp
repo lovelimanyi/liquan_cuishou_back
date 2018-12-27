@@ -25,7 +25,17 @@
                             </c:forEach>
                         </select>
                     </td>
-
+                    <td>
+                        产 品 名 称:
+                        <select id="merchantNo" name="merchantNo">
+                            <option value="">全部</option>
+                            <c:forEach var="merchantNo" items="${merchantNoMap }">
+                                <option value="${merchantNo.key }" <c:if test="${merchantNo.key eq params.merchantNo}">selected="selected"</c:if>>
+                                        ${merchantNo.value}
+                                </option>
+                            </c:forEach>
+                        </select>
+                    </td>
                     <td>
                         <div class="buttonActive">
                             <div class="buttonContent">
@@ -57,6 +67,9 @@
                 </th>
                 <th align="center" width="100">
                     借款类型
+                </th>
+                <th align="center" width="100">
+                    产品名称
                 </th>
                 <th align="center" width="100">
                     S1入催率
@@ -116,6 +129,9 @@
                     </td>
                     <td>
                             ${borrowingTypeMap[list.borrowingType] }
+                    </td>
+                    <td>
+                            ${merchantNoMap[list.merchantNo]}
                     </td>
                     <td>
                             ${list.entryRate}

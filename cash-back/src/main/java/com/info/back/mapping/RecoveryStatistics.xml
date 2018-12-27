@@ -2,12 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.info.back.dao.IRecoveryStatisticsDao">
     <select id="doRecoveryStatistics" resultType="com.info.web.pojo.RecoveryRate">
+        <![CDATA[
         SELECT
         x.rcsj AS 'dispatchTime',
         x.lx AS 'borrowingType',
-        concat(	round(xx.rcds / xxx.sl * 100, 2),	"%") AS 'entryRate',
-
-        concat(round((xx.zbj-if(ifnull(x.hkze,0)>xx.zbj,xx.zbj,ifnull(x.hkze,0)))/xx.zbj*100,2),"%") AS 'unentryRate',
+        x.merchantNo as merchantNo,
+        concat(round(xx.rcds / xxx.sl * 100, 2),'%') AS 'entryRate',
+        concat(round((xx.zbj-if(ifnull(x.hkze,0)>xx.zbj,xx.zbj,ifnull(x.hkze,0)))/xx.zbj*100,2),'%') AS 'unentryRate',
         concat(round( x.`逾期1天`/xx.zbj*100,2),"%") AS 'oneDay', concat(round(x.`逾期2天`/xx.zbj*100,2),"%") AS 'twoDays',
         concat(round( x.`逾期3天`/xx.zbj*100,2),"%") AS 'threeDays', concat(round(x.`逾期4天`/xx.zbj*100,2),"%") AS 'fourDays',
         concat(round(x.`逾期5天`/xx.zbj*100,2),"%")   AS 'fiveDays', concat(round(x.`逾期6天`/xx.zbj*100,2),"%")  AS 'sixDays',
@@ -16,43 +17,61 @@
         concat(round(x.`逾期61_90天`/xx.zbj*100,2),"%")  AS 'toNinety', concat(round(x.`逾期91_180天`/xx.zbj*100,2),"%") AS 'toHundredEight',
         concat(round(x.`逾期180天以上`/xx.zbj*100,2),"%")  AS 'overHundredEight'
         from
-        (select  date(b.create_date) rcsj,d.borrowing_type lx,count(*) rcds,
-        sum(if(DATEDIFF(clpd.update_Date,d.loan_end_time)&lt;= 1,clpd.real_money+ifnull(clpd.realget_accrual,0),0)) 逾期1天,
+        (
+        select
+        d.merchant_no as merchantNo,
+        date(b.create_date) rcsj,
+        d.borrowing_type lx,
+        count(*) rcds,
+        sum(if(DATEDIFF(clpd.update_Date,d.loan_end_time)<= 1,clpd.real_money+ifnull(clpd.realget_accrual,0),0)) 逾期1天,
         sum(if(DATEDIFF(clpd.update_Date,d.loan_end_time)=2,clpd.real_money+ifnull(clpd.realget_accrual,0),0)) 逾期2天,
         sum(if(DATEDIFF(clpd.update_Date,d.loan_end_time)=3,clpd.real_money+ifnull(clpd.realget_accrual,0),0)) 逾期3天,
         sum(if(DATEDIFF(clpd.update_Date,d.loan_end_time)=4,clpd.real_money+ifnull(clpd.realget_accrual,0),0)) 逾期4天,
         sum(if(DATEDIFF(clpd.update_Date,d.loan_end_time)=5,clpd.real_money+ifnull(clpd.realget_accrual,0),0)) 逾期5天,
         sum(if(DATEDIFF(clpd.update_Date,d.loan_end_time)=6,clpd.real_money+ifnull(clpd.realget_accrual,0),0)) 逾期6天,
         sum(if(DATEDIFF(clpd.update_Date,d.loan_end_time)=7,clpd.real_money+ifnull(clpd.realget_accrual,0),0)) 逾期7天,
-        sum(if(DATEDIFF(clpd.update_Date,d.loan_end_time)&gt;=8 and DATEDIFF(clpd.update_Date,d.loan_end_time)&lt;=10,clpd.real_money+ifnull(clpd.realget_accrual,0),0)) 逾期8_10天,
-        sum(if(DATEDIFF(clpd.update_Date,d.loan_end_time)&lt;=30 and DATEDIFF(clpd.update_Date,d.loan_end_time)&gt;=11,clpd.real_money+ifnull(clpd.realget_accrual,0),0)) 逾期11_30天,
-        sum(if(DATEDIFF(clpd.update_Date,d.loan_end_time)&lt;=60 and DATEDIFF(clpd.update_Date,d.loan_end_time)&gt;=31,clpd.real_money+ifnull(clpd.realget_accrual,0),0)) 逾期31_60天,
-        sum(if(DATEDIFF(clpd.update_Date,d.loan_end_time)&lt;=90 and DATEDIFF(clpd.update_Date,d.loan_end_time)&gt;=61,clpd.real_money+ifnull(clpd.realget_accrual,0),0)) 逾期61_90天,
-        sum(if(DATEDIFF(clpd.update_Date,d.loan_end_time)&lt;=180 and DATEDIFF(clpd.update_Date,d.loan_end_time)&gt;=91,clpd.real_money+ifnull(clpd.realget_accrual,0),0)) 逾期91_180天,
+        sum(if(DATEDIFF(clpd.update_Date,d.loan_end_time)>=8 and DATEDIFF(clpd.update_Date,d.loan_end_time)<=10,clpd.real_money+ifnull(clpd.realget_accrual,0),0)) 逾期8_10天,
+        sum(if(DATEDIFF(clpd.update_Date,d.loan_end_time)<=30 and DATEDIFF(clpd.update_Date,d.loan_end_time)>=11,clpd.real_money+ifnull(clpd.realget_accrual,0),0)) 逾期11_30天,
+        sum(if(DATEDIFF(clpd.update_Date,d.loan_end_time)<=60 and DATEDIFF(clpd.update_Date,d.loan_end_time)>=31,clpd.real_money+ifnull(clpd.realget_accrual,0),0)) 逾期31_60天,
+        sum(if(DATEDIFF(clpd.update_Date,d.loan_end_time)<=90 and DATEDIFF(clpd.update_Date,d.loan_end_time)>=61,clpd.real_money+ifnull(clpd.realget_accrual,0),0)) 逾期61_90天,
+        sum(if(DATEDIFF(clpd.update_Date,d.loan_end_time)<=180 and DATEDIFF(clpd.update_Date,d.loan_end_time)>=91,clpd.real_money+ifnull(clpd.realget_accrual,0),0)) 逾期91_180天,
         sum(if(DATEDIFF(clpd.update_Date,d.loan_end_time)>180,clpd.real_money+ifnull(clpd.realget_accrual,0),0)) 逾期180天以上,
-        sum(clpd.real_money+ifnull(clpd.realget_accrual,0)) hkze from
-        mman_loan_collection_order  b
+        sum(clpd.real_money+ifnull(clpd.realget_accrual,0)) hkze
+        from mman_loan_collection_order  b
         left  join  credit_loan_pay_detail   clpd on  clpd.pay_id=b.pay_id
         left  join   mman_user_loan  d  on  d.id=b.loan_id
-        where  date(b.create_date) is  not  null
-        group  by  date(b.create_date),d.borrowing_type)  x
-        left  join   (select  date(b.create_date) rcsj,d.borrowing_type lx,count(*) rcds,
-        sum(if(d.borrowing_type=2 and  d.paid_money>0,d.paid_money,d.loan_money+ifnull(d.accrual,0))) zbj  from mman_loan_collection_order  b
+        where
+        date(b.create_date) is  not  null
+        group  by  d.merchant_no,date(b.create_date),d.borrowing_type
+        ) x
+        left  join   (
+        select
+        d.merchant_no as merchantNo,
+        date(b.create_date) rcsj,
+        d.borrowing_type lx,
+        count(*) rcds,
+        sum(if(d.borrowing_type=2 and  d.paid_money>0,d.paid_money,d.loan_money+ifnull(d.accrual,0))) zbj
+        from mman_loan_collection_order  b
         left  join  mman_user_loan  d  on  d.id=b.loan_id
-        group  by  date(b.create_date),d.borrowing_type
-        )xx  on x.rcsj=xx.rcsj  and   x.lx=xx.lx
-        left  join  (select DATE_ADD(dqr,INTERVAL 1 day) dqr,lx,sl  from  dqds )  xxx  on xxx.lx=x.lx  and  x.rcsj=xxx.dqr
-        order  by  x.rcsj  desc
+        group  by d.merchant_no, date(b.create_date),d.borrowing_type
+        )xx  on x.rcsj=xx.rcsj  and   x.lx=xx.lx and xx.merchantNo=x.merchantNo
+        left  join  (
+        select
+        DATE_ADD(dqr,INTERVAL 1 day) dqr,lx,sl
+        from  dqds
+        )  xxx on xxx.lx=x.lx  and  x.rcsj=xxx.dqr
+        order  by  x.merchantNo,x.rcsj  desc
+        ]]>
     </select>
 
     <insert id="insertRecoveryStatistics" parameterType="List">
         INSERT INTO recovery_rate_statistics
-        (dispatchTime,borrowingType,entryRate,unentryRate,oneDay,twoDays,threeDays,fourDays,fiveDays,sixDays,sevenDays,eightTOTen,toThirty,toSixty,toNinety,toHundredEight,overHundredEight,createDate)
+        (dispatchTime,borrowingType,entryRate,unentryRate,oneDay,twoDays,threeDays,fourDays,fiveDays,sixDays,sevenDays,eightTOTen,toThirty,toSixty,toNinety,toHundredEight,overHundredEight,createDate,merchantNo)
         VALUES
         <foreach collection ="list" item="recovery" separator =",">
             (#{recovery.dispatchTime},#{recovery.borrowingType},#{recovery.entryRate},#{recovery.unentryRate},
             #{recovery.oneDay},#{recovery.twoDays},#{recovery.threeDays},#{recovery.fourDays},#{recovery.fiveDays},
-            #{recovery.sixDays},#{recovery.sevenDays},#{recovery.eightTOTen},#{recovery.toThirty},#{recovery.toSixty},#{recovery.toNinety},#{recovery.toHundredEight},#{recovery.overHundredEight},now())
+            #{recovery.sixDays},#{recovery.sevenDays},#{recovery.eightTOTen},#{recovery.toThirty},#{recovery.toSixty},#{recovery.toNinety},#{recovery.toHundredEight},#{recovery.overHundredEight},now(),#{recovery.merchantNo})
 
         </foreach>
     </insert>
@@ -67,6 +86,9 @@
             </if>
             <if test="borrowingType != null and borrowingType != ''">
                 AND s.borrowingType = #{borrowingType}
+            </if>
+            <if test="merchantNo != null and merchantNo != ''">
+                AND s.merchantNo = #{merchantNo}
             </if>
         </where>
     </sql>
@@ -89,6 +111,7 @@
           s.toSixty AS 'toSixty',
           s.toNinety AS 'toNinety',
           s.toHundredEight AS 'toHundredEight',
+          s.merchantNo AS 'merchantNo',
           s.overHundredEight AS 'overHundredEight'
         FROM recovery_rate_statistics s
         <include refid="whereRecoveryColumn"/>
