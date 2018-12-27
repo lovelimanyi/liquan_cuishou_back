@@ -77,4 +77,9 @@ public class MmanUserLoanService implements IMmanUserLoanService{
 	public void updateRemark(List<String> list) {
 		manUserLoanDao.updateRemark(list);
 	}
+
+	@Override
+	public List<String> getNeedUpgradeOrderLoanIds() {
+		return manUserLoanDao.getNeedUpgradeOrderLoanIds();
+	}
 }

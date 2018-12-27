@@ -9,9 +9,11 @@ import com.info.web.pojo.*;
 import com.info.web.util.DateUtil;
 import com.info.web.util.JedisDataClient;
 import com.info.web.util.PageConfig;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.log4j.Logger;
+import org.omg.CORBA.PUBLIC_MEMBER;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -839,68 +841,125 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
      * @param loanId
      */
     @Override
-    public void orderUpgrade(String loanId) {
-        try {
-            MmanUserLoan loan = mmanUserLoanDao.get(loanId);
-            if (loan == null) {
-                logger.error("处理逾期订单升级出错(借款对象为空)，借款id: " + loanId);
-                return;
-            }
-            Calendar clrLoanEnd = Calendar.getInstance();
-            clrLoanEnd.setTime(loan.getLoanEndTime());
-            int yearLoanEnd = clrLoanEnd.get(Calendar.YEAR);
-            int monthLoanEnd = clrLoanEnd.get(Calendar.MONTH) + 1;
-            Calendar calendar = Calendar.getInstance();
-            int yearNow = calendar.get(Calendar.YEAR);
-            int monthNow = calendar.get(Calendar.MONTH) + 1;
-            int dayNow = calendar.get(Calendar.DAY_OF_MONTH);
-            int monthDiff = (yearNow * 12 + monthNow) - (yearLoanEnd * 12 + monthLoanEnd);
-
-            List<MmanLoanCollectionOrder> orderList = new ArrayList<>();
-            List<MmanLoanCollectionPerson> personList = new ArrayList<>();
-            MmanLoanCollectionOrder order = new MmanLoanCollectionOrder();
-            order.setLoanId(loanId);
-            List<MmanLoanCollectionOrder> orders = mmanLoanCollectionOrderDao.findList(order);
-            if (CollectionUtils.isEmpty(orders)) {
-                logger.error("逾期升级出错，订单为空，借款id: " + loanId);
-                return;
-            }
-            order = orders.get(0);
-            if (BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())) {
-                logger.error("逾期升级出错，订单已还款完成，借款id: " + loanId);
-                return;
-            }
-
-            if (BackConstant.XJX_COLLECTION_ORDER_STATE_STOP.equals(order.getStatus())) {
-                logger.error("逾期升级出错，订单已停催，借款id: " + loanId);
-                return;
-            }
-
-            if (dayNow == 1) {
-                // 跨越次数为0不处理
-                if (monthDiff == 0) {
-                    return;
-                }
-                if (monthDiff == 1) {
-                    this.dispatchOrderToM1(order, orderList, personList);
-                } else if (monthDiff == 2) {
-                    this.dispatchOrderToM2(order, orderList, personList);
-                } else if (monthDiff >= 3 && monthDiff < 6) {
-                    this.dispatchOrderToM3(order, orderList, personList);
-                } else if (monthDiff >= 6) {
-                    this.dispatchOrderToM6(order, orderList, personList);
-                }
-            } else if (dayNow >= 12) {
-                // 默认逾期升级天数（用一月内,s1组逾期10天，第二天升级至S2组)
-                int orderUpgradeDay = getOrderUpgradeDay();
-                this.upGrageS1OrdersToS2Users(order, orderList, personList, loan, orderUpgradeDay);
-            }
-            mmanLoanCollectionRecordService.assignCollectionOrderToRelatedGroup(orderList, personList, new Date());
-        } catch (Exception e) {
-            logger.error("处理订单逾期升级出错，借款id: " + loanId);
-            e.printStackTrace();
+    public void orderUpgrade(String loanId){
+        MmanLoanCollectionOrder order = new MmanLoanCollectionOrder();
+        order.setLoanId(loanId);
+        MmanUserLoan loan = mmanUserLoanDao.get(loanId);
+        if (loan == null) {
+            logger.error("逾期升级出错-loan表无该订单-loanId: " + loanId);
+            return;
         }
+        List<MmanLoanCollectionOrder> orders = mmanLoanCollectionOrderDao.findList(order);
+        order = orders.get(0);
+        if (BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())) {
+            logger.error("逾期升级出错-该订单已还款完成-loanId: " + loanId);
+            return;
+        }
+        if (BackConstant.XJX_COLLECTION_ORDER_STATE_STOP.equals(order.getStatus())) {
+            logger.error("逾期升级出错-该定单已停催-loanId: " + loanId);
+            return;
+        }
+
+
+        int overdueDays = order.getOverdueDays();
+        if (10 <= overdueDays && overdueDays < 30) {
+            //订单由S1组 升级至 S2组
+            handleOrderUpgrade(order, BackConstant.XJX_OVERDUE_LEVEL_S2);
+        }
+        if (30 <= overdueDays) {
+            //订单由S2组 升级至 M1-M2组
+            handleOrderUpgrade(order, BackConstant.XJX_OVERDUE_LEVEL_M1_M2);
+        }
+
+        List<MmanLoanCollectionOrder> orderList = new ArrayList<>();
+        List<MmanLoanCollectionPerson> personList = new ArrayList<>();
+        // 默认逾期升级天数（用一月内,s1组逾期10天，第二天升级至S2组)
+        this.upGrageS1OrdersToS2Users(order, orderList, personList, loan, order.getOverdueDays());
+        mmanLoanCollectionRecordService.assignCollectionOrderToRelatedGroup(orderList, personList, new Date());
     }
+
+    private void handleOrderUpgrade(MmanLoanCollectionOrder order, String groupLevel) {
+        Map<String,Object> param = new HashMap();
+        param.put("groupLevel",groupLevel);
+        BackUser collectionBackUser = backUserDao.getOneCollectionBackUserGroupByOrderCount(param);
+        if (null != collectionBackUser){
+            //订单升级
+            setCommonVariables(order);//设置逾期升级默认参数
+            order.setCurrentCollectionUserId(collectionBackUser.getUuid());//设置当前催收员
+            order.setCurrentOverdueLevel(groupLevel);
+            //添加催收流转日志
+            statusChangeLogDao.insert();
+
+        }else {
+            logger.error("fail-逾期升级至失败"+BackConstant.groupNameMap.get(groupLevel)+"组无可用催收员+loanId:"+order.getLoanId());
+        }
+
+    }
+
+
+//    @Override
+//    public void orderUpgrade1(String loanId) {
+//        try {
+//            MmanUserLoan loan = mmanUserLoanDao.get(loanId);
+//            if (loan == null) {
+//                logger.error("处理逾期订单升级出错(借款对象为空)，借款id: " + loanId);
+//                return;
+//            }
+//            Calendar clrLoanEnd = Calendar.getInstance();
+//            clrLoanEnd.setTime(loan.getLoanEndTime());
+//            int yearLoanEnd = clrLoanEnd.get(Calendar.YEAR);
+//            int monthLoanEnd = clrLoanEnd.get(Calendar.MONTH) + 1;
+//            Calendar calendar = Calendar.getInstance();
+//            int yearNow = calendar.get(Calendar.YEAR);
+//            int monthNow = calendar.get(Calendar.MONTH) + 1;
+//            int dayNow = calendar.get(Calendar.DAY_OF_MONTH);
+//            int monthDiff = (yearNow * 12 + monthNow) - (yearLoanEnd * 12 + monthLoanEnd);
+//
+//            List<MmanLoanCollectionOrder> orderList = new ArrayList<>();
+//            List<MmanLoanCollectionPerson> personList = new ArrayList<>();
+//            MmanLoanCollectionOrder order = new MmanLoanCollectionOrder();
+//            order.setLoanId(loanId);
+//            List<MmanLoanCollectionOrder> orders = mmanLoanCollectionOrderDao.findList(order);
+//            if (CollectionUtils.isEmpty(orders)) {
+//                logger.error("逾期升级出错，订单为空，借款id: " + loanId);
+//                return;
+//            }
+//            order = orders.get(0);
+//            if (BackConstant.XJX_COLLECTION_ORDER_STATE_SUCCESS.equals(order.getStatus())) {
+//                logger.error("逾期升级出错，订单已还款完成，借款id: " + loanId);
+//                return;
+//            }
+//
+//            if (BackConstant.XJX_COLLECTION_ORDER_STATE_STOP.equals(order.getStatus())) {
+//                logger.error("逾期升级出错，订单已停催，借款id: " + loanId);
+//                return;
+//            }
+//
+//            if (dayNow == 1) {
+//                // 跨越次数为0不处理
+//                if (monthDiff == 0) {
+//                    return;
+//                }
+//                if (monthDiff == 1) {
+//                    this.dispatchOrderToM1(order, orderList, personList);
+//                } else if (monthDiff == 2) {
+//                    this.dispatchOrderToM2(order, orderList, personList);
+//                } else if (monthDiff >= 3 && monthDiff < 6) {
+//                    this.dispatchOrderToM3(order, orderList, personList);
+//                } else if (monthDiff >= 6) {
+//                    this.dispatchOrderToM6(order, orderList, personList);
+//                }
+//            } else if (dayNow >= 12) {
+//                // 默认逾期升级天数（用一月内,s1组逾期10天，第二天升级至S2组)
+//                int orderUpgradeDay = getOrderUpgradeDay();
+//                this.upGrageS1OrdersToS2Users(order, orderList, personList, loan, orderUpgradeDay);
+//            }
+//            mmanLoanCollectionRecordService.assignCollectionOrderToRelatedGroup(orderList, personList, new Date());
+//        } catch (Exception e) {
+//            logger.error("处理订单逾期升级出错，借款id: " + loanId);
+//            e.printStackTrace();
+//        }
+//    }
 
 
     /**
@@ -1094,12 +1153,13 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
         String sysPromoteRemark = "逾期升级，系统重新派单";
         order.setDispatchName(sysName);
         order.setDispatchTime(new Date());
+        order.setUpdateDate(new Date());
         order.setS1Flag(null);   // 订单逾期升级  S1flg置为null
         order.setOperatorName(sysName);
         order.setRemark(sysPromoteRemark);
         order.setLastCollectionUserId(order.getCurrentCollectionUserId());//上一催收员
         //更新聚信立报告申请审核状态为初始状态，下一催收员要看需要重新申请
-        order.setJxlStatus(BackConstant.XJX_JXL_STATUS_REFUSE);
+//        order.setJxlStatus(BackConstant.XJX_JXL_STATUS_REFUSE);
     }
 
     /**

@@ -234,6 +234,12 @@
         </where>
     </select>
 
+    <select id="getNeedUpgradeOrderLoanIds" resultType="string">
+        SELECT loan_id FROM mman_loan_collection_order o
+        WHERE <![CDATA[ o.status <> '4' ]]> AND  o.overdueDays = 10 OR o.overdueDays = 30;
+
+    </select>
+
     <select id="getOverdueOrderIds" parameterType="Map" resultType="String">
         SELECT id FROM mman_user_loan
         <where>

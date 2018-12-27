@@ -39,4 +39,6 @@ public interface IMmanUserLoanDao {
 	List<String> getOverdueOrderIdsNeedBeDispatch(Map<String, Object> map);
 
 	void updateRemark(List<String> list);
+
+    List<String> getNeedUpgradeOrderLoanIds();
 }

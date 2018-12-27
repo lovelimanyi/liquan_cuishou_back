@@ -99,9 +99,6 @@
     </bean>
 
     <task:scheduled-tasks scheduler="myScheduler">
-        <!--<task:scheduled ref="taskJobMiddleService" method="autoDispatch" cron="0 11 1,12,20 * * ?" />&lt;!&ndash;每天凌晨3、5、9、20点11分 跑分单，逾期计算&ndash;&gt;-->
-        <task:scheduled ref="taskJobStatistics" method="callProcedure" cron="0 2 0,11,14,17,20,22 * * ?"/>
-        <task:scheduled ref="taskJobStatistics" method="callCountCollection" cron="0 1 0 * * ?"/> <!-- 催收记录统计 凌晨01分跑 -->
         <task:scheduled ref="taskJobStatistics" method="personAndCompanyStatistics" cron="0 45 7-23 * * ?"/>  <!-- 个人和公司统计 整点45 -->
         <task:scheduled ref="taskJobStatistics" method="trackStatistics" cron="0 30 7-23 * * ?"/> <!-- 时间段累计统计 整点30 -->
         <task:scheduled ref="taskWithholdStatus" method="updateStatus" cron="0 25 10,14,21 * * ?"/>
@@ -112,7 +109,7 @@
         <task:scheduled ref="twoMinSyncOperateService" method="twoMinSyncOverdue" cron="0 0/2 4-23 * * ?"/><!--4点到24点   每2分钟跑逾期(部分还款)-->
         <task:scheduled ref="twoMinSyncOperateService" method="twoMinSyncOther" cron="0 0/2 5-23 * * ?"/><!--5点到24点   每2分钟跑续期，还款，代扣 -->
         <task:scheduled ref="twoMinSyncOperateService" method="twoMinSyncOther" cron="0 0/2 0 * * ?"/><!--0点到1点   每2分钟跑续期，还款，代扣 -->
-        <task:scheduled ref="twoMinSyncOperateService" method="twoMinSyncOverdue" cron="0 0/6 0 * * ?"/><!--4点到24点   每2分钟跑逾期(部分还款)-->
+        <task:scheduled ref="twoMinSyncOperateService" method="twoMinSyncOverdue" cron="0 0/6 0 * * ?"/><!--0点到1点   每6分钟跑逾期(部分还款)-->
         <task:scheduled ref="taskJianmianStatus" method="updateStatus" cron="0 30 23 * * ?"/> <!-- 每天晚上11点30 跑减免失效状态 -->
         <task:scheduled ref="taskCleacUpOperationRecordData" method="cleacUpOperationRecordData" cron="0 30 23 * * ?"/> <!-- 清除操作记录数据 -->
         <task:scheduled ref="taskDisableOrEnableCollections" method="disableCollections" cron="0 5 0 1 * ?"/>
