@@ -38,4 +38,6 @@ public interface IMmanLoanCollectionStatusChangeLogService {
 	 * @return
 	 */
 	int deleteLogByOrderId(String orderId);
+
+    void insertMmanLoanCollectionStatusChangeLog(String orderId,String beforeStatus,String afterStatus, String type, String operatorName, String remark, String companyId, String currentCollectionUserId, String currentCollectionUserLevel, String currentCollectionOrderLevel);
 }

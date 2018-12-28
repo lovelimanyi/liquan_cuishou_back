@@ -1,6 +1,7 @@
 package com.info.back.test;
 
 import com.info.back.service.DianXiaoService;
+import com.info.back.service.MmanLoanCollectionOrderService;
 import com.info.back.utils.HttpUtils;
 import com.info.back.vo.JxlResponse;
 import com.info.config.PayContents;
@@ -31,10 +32,11 @@ public class Test {
     protected Logger logger = Logger.getLogger(Test.class);
 //    @Autowired
 //    DianXiaoDataService dianXiaoDataService;
-
+@Autowired
+MmanLoanCollectionOrderService orderService;
     @org.junit.Test
     public void test() {
-
+        orderService.orderUpgrade("545260388");
 
 
 

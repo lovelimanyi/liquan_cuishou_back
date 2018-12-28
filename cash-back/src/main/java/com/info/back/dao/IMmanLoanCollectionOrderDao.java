@@ -122,4 +122,6 @@ public interface IMmanLoanCollectionOrderDao {
     Integer selectOrderCount4BigEstemate(@Param("overdueDays")Integer overdueDays);
 
     void updateProductName(MmanLoanCollectionOrder order);
+
+    void updateUpgradeOrder(MmanLoanCollectionOrder order);
 }

@@ -9,11 +9,9 @@ import com.info.web.pojo.*;
 import com.info.web.util.DateUtil;
 import com.info.web.util.JedisDataClient;
 import com.info.web.util.PageConfig;
-import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.log4j.Logger;
-import org.omg.CORBA.PUBLIC_MEMBER;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -60,6 +58,10 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
     private IMerchantInfoDao merchantInfoDao;
     @Autowired
     private IRepayChannelConfigDao repayChannelConfigDao;
+    @Autowired
+    private IMmanLoanCollectionStatusChangeLogService  changeLogService;
+    @Autowired
+    private IAlertMsgService sysAlertMsgService;
 
     private static final String MERCHANT_INFO_REDIS_KEY = "merchants";
 
@@ -870,32 +872,46 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
             //订单由S2组 升级至 M1-M2组
             handleOrderUpgrade(order, BackConstant.XJX_OVERDUE_LEVEL_M1_M2);
         }
-
-        List<MmanLoanCollectionOrder> orderList = new ArrayList<>();
-        List<MmanLoanCollectionPerson> personList = new ArrayList<>();
-        // 默认逾期升级天数（用一月内,s1组逾期10天，第二天升级至S2组)
-        this.upGrageS1OrdersToS2Users(order, orderList, personList, loan, order.getOverdueDays());
-        mmanLoanCollectionRecordService.assignCollectionOrderToRelatedGroup(orderList, personList, new Date());
     }
 
     private void handleOrderUpgrade(MmanLoanCollectionOrder order, String groupLevel) {
         Map<String,Object> param = new HashMap();
         param.put("groupLevel",groupLevel);
-        BackUser collectionBackUser = backUserDao.getOneCollectionBackUserGroupByOrderCount(param);
+        CollectionBackUser collectionBackUser = backUserDao.getOneCollectionBackUserGroupByOrderCount(param);
         if (null != collectionBackUser){
             //订单升级
             setCommonVariables(order);//设置逾期升级默认参数
             order.setCurrentCollectionUserId(collectionBackUser.getUuid());//设置当前催收员
+            order.setOutsideCompanyId(collectionBackUser.getCompanyId());
             order.setCurrentOverdueLevel(groupLevel);
+            order.setStatus("0");
+            //更新订单
+            manLoanCollectionOrderDao.updateUpgradeOrder(order);
             //添加催收流转日志
-            statusChangeLogDao.insert();
-
+            changeLogService.insertMmanLoanCollectionStatusChangeLog(
+                    order.getOrderId(),
+                    order.getStatus(),
+                    BackConstant.XJX_COLLECTION_ORDER_STATE_WAIT,
+                    BackConstant.XJX_COLLECTION_STATUS_MOVE_TYPE_CONVERT,
+                    "系统",
+                    "逾期升级,当前催收员:" + collectionBackUser.getUserName(),
+                    collectionBackUser.getCompanyId(),
+                    collectionBackUser.getUuid(),
+                    groupLevel,
+                    groupLevel);
         }else {
-            logger.error("fail-逾期升级至失败"+BackConstant.groupNameMap.get(groupLevel)+"组无可用催收员+loanId:"+order.getLoanId());
+            logger.error("fail-逾期升级至失败"+BackConstant.groupNameMap.get(groupLevel)+"组无可用催收员-loanId:"+order.getLoanId());
+            SysAlertMsg alertMsg = new SysAlertMsg();
+            alertMsg.setTitle("逾期升级至"+BackConstant.groupNameMap.get(groupLevel)+"失败");
+            alertMsg.setContent(BackConstant.groupNameMap.get(groupLevel)+"组无可用催收员-loanId:"+order.getLoanId());
+            alertMsg.setDealStatus(BackConstant.OFF);
+            alertMsg.setStatus(BackConstant.OFF);
+            alertMsg.setType(SysAlertMsg.TYPE_COMMON);
+            sysAlertMsgService.insert(alertMsg);
+
         }
 
     }
-
 
 //    @Override
 //    public void orderUpgrade1(String loanId) {

@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -55,6 +56,26 @@ public class MmanLoanCollectionStatusChangeLogService implements
 	@Override
 	public int deleteLogByOrderId(String orderId) {
 		return mmanLoanCollectionStatusChangeLogDao.deleteLogByOrderId(orderId);
+	}
+
+	@Override
+	public void insertMmanLoanCollectionStatusChangeLog(String orderId, String beforeStatus, String afterStatus, String type, String operatorName, String remark, String companyId, String currentCollectionUserId, String currentCollectionUserLevel, String currentCollectionOrderLevel) {
+		MmanLoanCollectionStatusChangeLog changeLog = new MmanLoanCollectionStatusChangeLog();
+		changeLog.setId(IdGen.uuid());
+		changeLog.setLoanCollectionOrderId(orderId);
+		if (StringUtils.isNotBlank(beforeStatus)){
+			changeLog.setBeforeStatus(beforeStatus);
+		}
+		changeLog.setAfterStatus(afterStatus);//订单状态 ：0:待催收 1:催收中  4:还款完成
+		changeLog.setType(type);// 操作类型 1:入催  2:逾期升级  3:转单  4：还款完成
+		changeLog.setCreateDate(new Date());
+		changeLog.setOperatorName(operatorName);
+		changeLog.setRemark(remark);
+		changeLog.setCompanyId(companyId);
+		changeLog.setCurrentCollectionUserId(currentCollectionUserId);
+		changeLog.setCurrentCollectionUserLevel(currentCollectionUserLevel);
+		changeLog.setCurrentCollectionOrderLevel(currentCollectionOrderLevel);
+		mmanLoanCollectionStatusChangeLogDao.insert(changeLog);
 	}
 
 
