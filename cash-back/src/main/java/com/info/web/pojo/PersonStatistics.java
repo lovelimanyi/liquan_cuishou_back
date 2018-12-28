@@ -30,6 +30,15 @@ public class PersonStatistics {
     private BigDecimal orderProbability;//订单完成率
     private Date createDate;
     private String companyName;
+    private String merchantNo;
+
+    public String getMerchantNo() {
+        return merchantNo;
+    }
+
+    public void setMerchantNo(String merchantNo) {
+        this.merchantNo = merchantNo;
+    }
 
     public Date getCreateDate() {
         return createDate;

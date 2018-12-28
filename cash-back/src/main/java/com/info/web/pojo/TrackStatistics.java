@@ -34,6 +34,15 @@ public class TrackStatistics {
     private BigDecimal orderProbability;//订单完成率
     private int handleCount;//订单处理量
     private Date createDate;
+    private String merchantNo;
+
+    public String getMerchantNo() {
+        return merchantNo;
+    }
+
+    public void setMerchantNo(String merchantNo) {
+        this.merchantNo = merchantNo;
+    }
 
     public Long getId() {
         return id;

@@ -75,6 +75,7 @@ public class StatisticsController extends BaseController {
         model.addAttribute("list",pageConfig.getItems());
         model.addAttribute("pm", pageConfig);
         model.addAttribute("params", params);// 用于搜索框保留值
+        model.addAttribute("merchantNoMap",BackConstant.merchantNoMap);
         return pageUrl;
     }
     /**

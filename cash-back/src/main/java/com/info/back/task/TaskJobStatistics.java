@@ -93,6 +93,8 @@ public class TaskJobStatistics {
         String endTime = null;
         personStatisticsService.doStatistics(beginTime,endTime);
         logger.info("个人-公司统计执行完成,完成时间 :" + DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
+
+
         logger.info("大额统计开始.....");
         bigAmountStatisticsService.doStatistics(beginTime,endTime);
         logger.info("大额统计执行完成,完成时间 :" + DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
