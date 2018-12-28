@@ -277,6 +277,12 @@
                 <th align="center" width="70">
                     承诺还款时间
                 </th>
+                <th align="center" width="70">
+                    产品名称
+                </th>
+                <th align="center" width="90">
+                    是否来源有米管家
+                </th>
                 <%--<th align="center" width="70">
                     最新还款时间
                 </th>--%>
@@ -389,6 +395,12 @@
                         <%--<td align="center" width="50">
                                 ${order.dispatchName}
                         </td>--%>
+                    <td align="center" width="50">
+                            ${merchantNoMap[order.merchantNo]}
+                    </td>
+                    <td align="center" width="50">
+                            ${channelFromMap[order.channelFrom]}
+                    </td>
                     <td align="center" width="150">
                         <c:if test="${order.collectionStatus ne '4'}">
                             <a href="collectionOrder/toxianqin?id=${order.id }" target="navtab"

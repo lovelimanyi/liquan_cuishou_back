@@ -233,6 +233,12 @@
                 <th align="center" width="50">
                     派单人
                 </th>
+                <th align="center" width="70">
+                    产品名称
+                </th>
+                <th align="center" width="90">
+                    是否来源有米管家
+                </th>
             </tr>
             </thead>
             <tbody>
@@ -343,6 +349,12 @@
                     </td>
                     <td align="center" width="50">
                             ${order.dispatchName}
+                    </td>
+                    <td align="center" width="50">
+                            ${merchantNoMap[order.merchantNo]}
+                    </td>
+                    <td align="center" width="50">
+                            ${channelFromMap[order.channelFrom]}
                     </td>
                 </tr>
             </c:forEach>

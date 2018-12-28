@@ -1,5 +1,6 @@
 package com.info.back.controller;
 
+import com.info.back.dao.IRecoveryStatisticsDao;
 import com.info.back.service.IStatisticsService;
 import com.info.back.utils.BackConstant;
 import com.info.back.utils.CompanyUtils;
@@ -34,6 +35,8 @@ public class StatisticsController extends BaseController {
 
     @Autowired
     IStatisticsService statisticsService;
+    @Autowired
+    IRecoveryStatisticsDao recoveryStatisticsDao;
 
     /**
      * 时间段累计统计(页面)
@@ -98,6 +101,7 @@ public class StatisticsController extends BaseController {
         model.addAttribute("list",pageConfig.getItems());
         model.addAttribute("pm", pageConfig);
         model.addAttribute("params", params);// 用于搜索框保留值
+        model.addAttribute("merchantNoMap",BackConstant.merchantNoMap);
         return pageUrl;
     }
 
@@ -107,6 +111,7 @@ public class StatisticsController extends BaseController {
      */
     @RequestMapping("/doRecoveryStatistics")
     public void doRecoveryStatistics(){
+        recoveryStatisticsDao.delRecoveryStatistics();
         statisticsService.doRecoveryStatistics();
     }
 

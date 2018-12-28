@@ -28,11 +28,16 @@ public class RecoveryRate {
     private String toHundredEight;
     private String overHundredEight;
     private Date createDate;
+    private String merchantNo;
 
 
+    public String getMerchantNo() {
+        return merchantNo;
+    }
 
-
-
+    public void setMerchantNo(String merchantNo) {
+        this.merchantNo = merchantNo;
+    }
 
     public Long getId() {
         return id;
