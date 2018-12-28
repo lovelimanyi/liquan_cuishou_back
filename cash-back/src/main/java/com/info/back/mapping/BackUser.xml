@@ -426,7 +426,7 @@
         FROM
         mman_loan_collection_order o
         WHERE
-        <![CDATA[ o.create_date > current_date() ]]>
+        <![CDATA[ o.dispatch_time > current_date() ]]>
         GROUP BY
         o.current_collection_user_id
         ) c ON u.uuid = c.currentCollectionUserId
