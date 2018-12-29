@@ -3,6 +3,7 @@ package com.info.back.test;
 import com.info.back.service.DianXiaoService;
 import com.info.back.service.MmanLoanCollectionOrderService;
 import com.info.back.utils.HttpUtils;
+import com.info.back.utils.QRCodeUtil;
 import com.info.back.vo.JxlResponse;
 import com.info.config.PayContents;
 import com.info.constant.Constant;
@@ -35,8 +36,10 @@ public class Test {
 @Autowired
 MmanLoanCollectionOrderService orderService;
     @org.junit.Test
-    public void test() {
-        orderService.orderUpgrade("545260388");
+    public void test() throws Exception {
+
+        QRCodeUtil.encode("www.baidu.com","D:/b","D:/abc",false,"random2");
+//        orderService.orderUpgrade("545260388");
 
 
 
