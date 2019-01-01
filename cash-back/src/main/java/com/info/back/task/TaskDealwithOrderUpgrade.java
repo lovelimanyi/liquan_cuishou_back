@@ -42,38 +42,10 @@ public class TaskDealwithOrderUpgrade {
      * @Description: 订单逾期升级定时任务
      * @CreateTime 2018/12/27
      */
-//    public void orderUpgrade1() {
-//
-//        //查出逾期天数是10天，30天，且未还款完成的订单。
-//        List<String> loanIds = loanService.getNeedUpgradeOrderLoanIds();
-//        ThreadPoolDealwithOrderUpgrade pool = ThreadPoolDealwithOrderUpgrade.getInstance();
-//        pool.setDaemon(true);
-//        for (String loanId : loanIds) {
-//            try {
-//                if (StringUtils.isEmpty(loanId)) {
-//                    continue;
-//                }
-//                DealwithOrderUpgradeThread thread = new DealwithOrderUpgradeThread(loanId, orderService);
-//                pool.execute(thread);
-//            } catch (Exception e) {
-//                logger.error("处理逾期订单升级出错，借款id: " + loanId);
-//                e.printStackTrace();
-//                continue;
-//            }
-//        }
-//    }
-
-
-
-
-
-
     public void orderUpgrade() {
-        Map<String, Object> map = new HashMap<>();
-        //处理小额订单
-        map.put("orderStatus", BackConstant.XJX_LOAN_STATUS_RETURN_SUCCESS);
-        map.put("borrowingType", Constant.SMALL);
-        List<String> loanIds = loanService.getOverdueOrderIds(map);
+
+        //查出逾期天数是10天，30天，且未还款完成的订单。
+        List<String> loanIds = loanService.getNeedUpgradeOrderLoanIds();
         ThreadPoolDealwithOrderUpgrade pool = ThreadPoolDealwithOrderUpgrade.getInstance();
         pool.setDaemon(true);
         for (String loanId : loanIds) {
@@ -89,23 +61,51 @@ public class TaskDealwithOrderUpgrade {
                 continue;
             }
         }
-
-        //处理大额订单
-        map.put("borrowingType", Constant.BIG);
-        List<String> bigOrderloanIds = loanService.getOverdueOrderIds(map);
-        for (String loanId : bigOrderloanIds) {
-            try {
-                if (StringUtils.isEmpty(loanId)) {
-                    continue;
-                }
-//                DealwithBigOrderUpgradeThread thread = new DealwithBigOrderUpgradeThread(loanId, orderService);
-//                pool.execute(thread);
-                orderService.dealwithBigOrderUpgrade(loanId);
-            } catch (Exception e) {
-                logger.error("处理逾期订单升级出错，借款id: " + loanId);
-                e.printStackTrace();
-                continue;
-            }
-        }
     }
+
+
+
+
+
+
+//    public void orderUpgrade2() {
+//        Map<String, Object> map = new HashMap<>();
+//        //处理小额订单
+//        map.put("orderStatus", BackConstant.XJX_LOAN_STATUS_RETURN_SUCCESS);
+//        map.put("borrowingType", Constant.SMALL);
+//        List<String> loanIds = loanService.getOverdueOrderIds(map);
+//        ThreadPoolDealwithOrderUpgrade pool = ThreadPoolDealwithOrderUpgrade.getInstance();
+//        pool.setDaemon(true);
+//        for (String loanId : loanIds) {
+//            try {
+//                if (StringUtils.isEmpty(loanId)) {
+//                    continue;
+//                }
+//                DealwithOrderUpgradeThread thread = new DealwithOrderUpgradeThread(loanId, orderService);
+//                pool.execute(thread);
+//            } catch (Exception e) {
+//                logger.error("处理逾期订单升级出错，借款id: " + loanId);
+//                e.printStackTrace();
+//                continue;
+//            }
+//        }
+//
+//        //处理大额订单
+//        map.put("borrowingType", Constant.BIG);
+//        List<String> bigOrderloanIds = loanService.getOverdueOrderIds(map);
+//        for (String loanId : bigOrderloanIds) {
+//            try {
+//                if (StringUtils.isEmpty(loanId)) {
+//                    continue;
+//                }
+////                DealwithBigOrderUpgradeThread thread = new DealwithBigOrderUpgradeThread(loanId, orderService);
+////                pool.execute(thread);
+//                orderService.dealwithBigOrderUpgrade(loanId);
+//            } catch (Exception e) {
+//                logger.error("处理逾期订单升级出错，借款id: " + loanId);
+//                e.printStackTrace();
+//                continue;
+//            }
+//        }
+//    }
 }
