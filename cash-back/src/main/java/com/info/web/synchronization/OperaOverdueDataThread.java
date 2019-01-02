@@ -31,7 +31,7 @@ import java.util.Map;
 public class OperaOverdueDataThread implements Runnable {
 
 //	天下粮仓
-	private static final String TXLC_MERCHANT_NUMBER = "1004";
+	private static final String TXLC_MERCHANT_NUMBER = "1006";
 //  易秒借款
 	private static final String YMJK_MERCHANT_NUMBER = "1005";
 
