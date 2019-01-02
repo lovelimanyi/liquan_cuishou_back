@@ -32,6 +32,15 @@ public class TodayRecovery {
     private int totalOrderCount;//总订单数
     private int doneOrderCount;//完成订单数
     private BigDecimal orderProbability;//订单完成率
+    private String merchantNo;
+
+    public String getMerchantNo() {
+        return merchantNo;
+    }
+
+    public void setMerchantNo(String merchantNo) {
+        this.merchantNo = merchantNo;
+    }
 
     public Long getId() {
         return id;

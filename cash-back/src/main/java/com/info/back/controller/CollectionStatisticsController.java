@@ -547,7 +547,7 @@ public class CollectionStatisticsController extends BaseController {
 			model.addAttribute("list",pageConfig.getItems());
 			model.addAttribute("pm", pageConfig);
 			model.addAttribute("params", params);// 用于搜索框保留值
-
+			model.addAttribute("merchantNoMap",BackConstant.merchantNoMap);
 
 		}catch ( Exception e){
 			e.printStackTrace();
@@ -644,7 +644,12 @@ public class CollectionStatisticsController extends BaseController {
 	}
 
 
-
+	/**
+	 * 小额统计-个人    小额统计-公司
+	 * 大额统计-个人    大额统计-公司
+	 * @param beginTime
+	 * @param endTime
+	 */
 
 	@RequestMapping("doStatistics")
 	public void doStatistics(String beginTime,String endTime){

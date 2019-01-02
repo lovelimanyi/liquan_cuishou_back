@@ -12,6 +12,8 @@ public class BackConstant {
 
     public final static String OFF = "0";// 开关-关
 
+    public final static String DISTRIBUTE_BACK_USER = "distribute:backUserS1";
+
 
     public static final String CREDITLOANAPPLY_OVERDUE = "4";// 逾期
 
@@ -19,6 +21,7 @@ public class BackConstant {
     public static final Map<String, String> smallGroupNameMap = new LinkedHashMap<>();
     public static final Map<String, String> bigGroupNameMap = new LinkedHashMap<>();
     public static final Map<String, String> channelFromMap = new LinkedHashMap<>();
+    public static final Map<String, String> merchantNoMap = new LinkedHashMap<>();
 
 
 
@@ -138,8 +141,16 @@ public class BackConstant {
     public static final String REDIS_KEY_PREFIX = "cuishou:";
 
     static {
-        channelFromMap.put("0",MerchantNoUtils.getMerchantName2());
-        channelFromMap.put("ymgj","有米管家");
+        channelFromMap.put("0","否");
+        channelFromMap.put("ymgj","是");
+
+        merchantNoMap.put("0","极速金掌柜");//极速金掌柜（原极速现金侠）
+        merchantNoMap.put("1","快借钱包");
+        merchantNoMap.put("1000","急用帮");
+        merchantNoMap.put("1001","金小侠");
+        merchantNoMap.put("1002","极速币下");
+        merchantNoMap.put("1004","天下粮仓");
+        merchantNoMap.put("1005","易秒借款");
 
 
         groupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_S1, "S1");

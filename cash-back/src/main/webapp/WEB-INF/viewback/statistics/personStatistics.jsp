@@ -58,7 +58,17 @@
                     </td>
                     </c:if>
 
-
+                    <td>
+                        产 品 名 称:
+                        <select id="merchantNo" name="merchantNo">
+                            <option value="">全部</option>
+                            <c:forEach var="merchantNo" items="${merchantNoMap }">
+                                <option value="${merchantNo.key }" <c:if test="${merchantNo.key eq params.merchantNo}">selected="selected"</c:if>>
+                                        ${merchantNo.value}
+                                </option>
+                            </c:forEach>
+                        </select>
+                    </td>
                     <td>
                         <div class="buttonActive">
                             <div class="buttonContent">
@@ -87,6 +97,9 @@
                 </th>
                 <th align="center" width="100">
                     统计日期
+                </th>
+                <th align="center" width="100">
+                    产品名称
                 </th>
                 <th align="center" width="100">
                     催收公司
@@ -143,6 +156,9 @@
                     </td>
                     <td>
                         <fmt:formatDate value="${list.createDate}" pattern="yyyy-MM-dd"/>
+                    </td>
+                    <td align="center" width="50">
+                            ${merchantNoMap[list.merchantNo]}
                     </td>
                     <td>
                         <c:if test="${companyName == null}">

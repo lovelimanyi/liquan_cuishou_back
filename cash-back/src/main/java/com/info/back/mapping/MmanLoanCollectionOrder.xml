@@ -214,7 +214,7 @@
         <include refid="base_where"></include>
     </select>
     <select id="getCollectionOrderCount" resultType="Integer" parameterType="HashMap">
-		SELECT 
+		SELECT
 			count(*)
 			FROM mman_loan_collection_order a
 	</select>
@@ -302,8 +302,11 @@
             <if test="repayChannel != null and repayChannel != ''">
                 AND d.repay_channel = #{repayChannel}
             </if>
-            <if test="channelFrom !=null and channelFrom!='' ">
+            <if test='channelFrom=="ymgj" '>
                 AND d.channel_from = #{channelFrom}
+            </if>
+            <if test='channelFrom=="0" '>
+                AND (d.channel_from = #{channelFrom} or d.channel_from is null)
             </if>
         </where>
         <if test="sortBy !=null and sortBy!=''">

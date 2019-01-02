@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.info.back.dao.ILocalDataDao;
 import com.info.back.service.IMmanLoanCollectionOrderService;
 import com.info.back.service.TaskJobMiddleService;
+import com.info.back.utils.BackConstant;
 import com.info.back.utils.IdGen;
 import com.info.back.vo.jxl.ContactList;
 import com.info.config.PayContents;
@@ -66,7 +67,7 @@ public class OperaOverdueDataThread implements Runnable {
 			String repaymentMoney =String.valueOf(repayment.get("repayment_amount"));
 			String repaymentedMoney = String.valueOf(repayment.get("repaymented_amount"));
 			loger.info("sync-repaymentMoney:"+payId+":"+repaymentMoney);
-            loger.info("sync-repaymentedMoney:"+payId+":"+repaymentedMoney);
+			loger.info("sync-repaymentedMoney:"+payId+":"+repaymentedMoney);
 			if (null != repayment &&(!repaymentMoney.equals(repaymentedMoney))) {
 				try {
 					HashMap<String, Object> borrowOrder = null;					//借款信息--app端
@@ -119,13 +120,42 @@ public class OperaOverdueDataThread implements Runnable {
 							//保存用户信息表--联系人表--银行卡
 							syncUtils.saveUserInfo(localDataDao,payId,userId,userInfo,userContactsList,cardInfo);
 						}
-						this.orderService.dispatchOrderNew(loanId,userInfo.get("idNumber").toString(),Constant.SMALL);
-//						this.taskJobMiddleService.dispatchforLoanId(loanId,userInfo.get("id_number").toString(),Constant.SMALL);
-                        if (repaymentDetailList != null && repaymentDetailList.size()>0){
-                            loger.info("未逾期部分还款:"+loanId);
-							syncUtils.updateMmanLoanCollectionOrder(localDataDao,loanId,repayment,Constant.STATUS_OVERDUE_ONE);
+						MmanLoanCollectionOrder order = new MmanLoanCollectionOrder();
+						order.setId(IdGen.uuid());
+						order.setLoanId(loanId);
+						order.setPayId(payId);
+						order.setOrderId(String.valueOf(borrowOrder.get("out_trade_no")));
+						order.setUserId(userId);//借款用户id
+						order.setOverdueDays(Integer.valueOf(repayment.get("late_day").toString()));
+						order.setStatus(BackConstant.XJX_COLLECTION_ORDER_STATE_WAIT);//订单状态 默认为“待催收”
+						order.setRealMoney(new BigDecimal(Integer.parseInt(String.valueOf(repayment.get("repaymented_amount")))).divide(new BigDecimal(100)));//已还金额
+						order.setDispatchName("系统");
+						order.setDispatchTime(new Date());
+						order.setCurrentOverdueLevel(BackConstant.XJX_OVERDUE_LEVEL_S1);//逾期等级 默认为S1
+						order.setCreateDate(new Date());
+						order.setOperatorName("系统");
+						order.setRemark("系统派单");
+						order.setLoanUserName(userInfo.get("realname").toString());
+						order.setLoanUserPhone(userInfo.get("userPhone").toString());
+						order.setIdNumber(userInfo.get("idNumber").toString());
+						//分单逻辑
+						Boolean result = this.orderService.distributeOrder(order,borrowOrder.get("merchant_number").toString());
+						if (result){
+//							RedisUtil.delRedisKey(Constant.TYPE_OVERDUE_ + payId);
 						}
-						RedisUtil.delRedisKey(Constant.TYPE_OVERDUE_ + payId+"_"+PayContents.MERCHANT_NUMBER.toString());
+
+
+
+
+
+
+
+//						this.orderService.dispatchOrderNew(loanId,userInfo.get("idNumber").toString(),Constant.SMALL);
+//						this.taskJobMiddleService.dispatchforLoanId(loanId,userInfo.get("id_number").toString(),Constant.SMALL);
+//						if (repaymentDetailList != null && repaymentDetailList.size()>0){
+//							loger.info("未逾期部分还款:"+loanId);
+//							syncUtils.updateMmanLoanCollectionOrder(localDataDao,loanId,repayment,Constant.STATUS_OVERDUE_ONE);
+//						}
 					} else {
 						loger.info("loanId:"+loanId);
 						if (null != borrowOrder && null != repaymentDetailList) {

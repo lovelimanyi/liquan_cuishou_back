@@ -77,8 +77,6 @@
 
                         </select>
                     </td>
-                </tr>
-                <tr>
                     <td>
                         催 收 状 态:
                         <select id="status" name="status">
@@ -93,7 +91,9 @@
                             <option value="8" <c:if test="${params.status eq '8'}">selected="selected"</c:if>> 减免审核拒绝</option>
                         </select>
                     </td>
-                    <td>
+                </tr>
+                <tr>
+<%--                    <td>
                         渠 道 来 源:
                         <select id="channelFrom" name="channelFrom">
                             <option value="">全部</option>
@@ -103,7 +103,29 @@
                                 </option>
                             </c:forEach>
                         </select>
-                    </td>
+                    </td>--%>
+                <td>
+                    产 品 名 称:
+                    <select id="merchantNo" name="merchantNo">
+                        <option value="">全部</option>
+                        <c:forEach var="merchantNo" items="${merchantNoMap }">
+                            <option value="${merchantNo.key }" <c:if test="${merchantNo.key eq params.merchantNo}">selected="selected"</c:if>>
+                                    ${merchantNo.value}
+                            </option>
+                        </c:forEach>
+                    </select>
+                </td>
+                <td>
+                    是否来源于有米管家:
+                    <select id="channelFrom" name="channelFrom">
+                        <option value="">全部</option>
+                        <c:forEach var="channelFromMap" items="${channelFromMap }">
+                            <option value="${channelFromMap.key }" <c:if test="${channelFromMap.key eq params.channelFrom}">selected="selected"</c:if>>
+                                    ${channelFromMap.value}
+                            </option>
+                        </c:forEach>
+                    </select>
+                </td>
                     <td>
                         放 款 主 体:
                         <select id="repayChannel" name="repayChannel">
@@ -210,6 +232,12 @@
                 </th>
                 <th align="center" width="50">
                     派单人
+                </th>
+                <th align="center" width="70">
+                    产品名称
+                </th>
+                <th align="center" width="90">
+                    是否来源有米管家
                 </th>
             </tr>
             </thead>
@@ -321,6 +349,12 @@
                     </td>
                     <td align="center" width="50">
                             ${order.dispatchName}
+                    </td>
+                    <td align="center" width="50">
+                            ${merchantNoMap[order.merchantNo]}
+                    </td>
+                    <td align="center" width="50">
+                            ${channelFromMap[order.channelFrom]}
                     </td>
                 </tr>
             </c:forEach>

@@ -93,19 +93,25 @@ public class TaskJobStatistics {
         String endTime = null;
         personStatisticsService.doStatistics(beginTime,endTime);
         logger.info("个人-公司统计执行完成,完成时间 :" + DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
+
+
         logger.info("大额统计开始.....");
         bigAmountStatisticsService.doStatistics(beginTime,endTime);
         logger.info("大额统计执行完成,完成时间 :" + DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
     }
 
-    //时间段累计统计
+    //时间段累计统计  催收率统计  当日催回统计
     public void trackStatistics(){
         logger.info("时间段累计统计开始.....");
         statisticsService.doTrackStatistics();
         logger.info("时间段累计统计完成,完成时间 :" + DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
+
+
         logger.info("催回率计统计开始.....");
         statisticsService.doRecoveryStatistics();
         logger.info("催回率统计完成,完成时间 :" + DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
+
+
         logger.info("当日催回计统计开始.....");
         statisticsService.doTodayStatistics();
         logger.info("当日催回计统计完成,完成时间 :" + DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
