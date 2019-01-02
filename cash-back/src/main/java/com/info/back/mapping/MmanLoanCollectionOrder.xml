@@ -670,6 +670,7 @@
             <if test="loanUserPhone!= null and loanUserPhone!=''">loan_user_phone,</if>
             <if test="idNumber!= null and idNumber!=''">id_number,</if>
             <if test="secondDayFlag!= null and secondDayFlag!=''">second_day_flag,</if>
+            <if test="realMoney!= null">real_money,</if>
             <if test="totalOverdueDays!= null and totalOverdueDays!=''">total_overdueDays,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -715,6 +716,7 @@
             <if test="loanUserPhone!= null and loanUserPhone!=''">#{loanUserPhone},</if>
             <if test="idNumber!= null and idNumber!=''">#{idNumber},</if>
             <if test="secondDayFlag!= null and secondDayFlag!=''">#{secondDayFlag},</if>
+            <if test="realMoney!= null">#{realMoney},</if>
             <if test="totalOverdueDays!= null and totalOverdueDays!=''">#{totalOverdueDays},</if>
         </trim>
     </insert>
