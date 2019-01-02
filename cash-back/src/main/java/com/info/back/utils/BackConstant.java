@@ -149,7 +149,7 @@ public class BackConstant {
         merchantNoMap.put("1000","急用帮");
         merchantNoMap.put("1001","金小侠");
         merchantNoMap.put("1002","极速币下");
-        merchantNoMap.put("1004","天下粮仓");
+        merchantNoMap.put("1006","天下粮仓");
         merchantNoMap.put("1005","易秒借款");
 
 
