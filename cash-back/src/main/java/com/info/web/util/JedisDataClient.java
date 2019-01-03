@@ -563,6 +563,20 @@ public class JedisDataClient {
         }
     }
 
+    public static void batchDel(String pattern) throws Exception{
+        Jedis jedisMaster = null;
+        try {
+            jedisMaster = getMasterJedis();
+            Set<String> keys = jedisMaster.keys(pattern);
+            Iterator<String> it = keys.iterator();
+            while (it.hasNext()) {
+                String keyStr = it.next();
+                jedisMaster.del(keyStr);
+            }
+        } finally {
+            returnResource(jedisMaster, poolMaster);
+        }
+    }
 
     public static List<String> getAllValuesByPattern(String pattern) throws Exception {
         Jedis jedisMaster = null;

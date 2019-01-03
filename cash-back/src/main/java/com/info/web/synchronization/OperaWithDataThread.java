@@ -34,9 +34,9 @@ public class OperaWithDataThread implements Runnable {
 			HashMap<String, String> map = new HashMap<String, String>();
 			map.put("ID", withId);
 			this.localDataDao.updateWithHold(map);
-			RedisUtil.delRedisKey(Constant.TYPE_WITHHOLD_ + withId+"_"+ PayContents.MERCHANT_NUMBER.toString());
+			RedisUtil.delRedisKey2(Constant.TYPE_REPAY_ +withId+"*");
 		}else{
-			RedisUtil.delRedisKey(Constant.TYPE_WITHHOLD_ + withId+"_"+ PayContents.MERCHANT_NUMBER.toString());
+			RedisUtil.delRedisKey2(Constant.TYPE_REPAY_ +withId+"*");
 		}
 	}
 

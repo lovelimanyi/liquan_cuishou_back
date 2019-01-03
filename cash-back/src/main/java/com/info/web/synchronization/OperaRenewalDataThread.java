@@ -48,8 +48,7 @@ public class OperaRenewalDataThread implements Runnable {
 					String loanId = String.valueOf(repayment.get("asset_order_id"));//还款id
 					//删除对应的借款表，订单表，还款表，还款详情表，催收记录表，催收流转日志表
 					localDataDao.deleteOrderAndOther(loanId);
-
-					RedisUtil.delRedisKey(Constant.TYPE_RENEWAL_+repaymentId+"_"+ PayContents.MERCHANT_NUMBER.toString());
+					RedisUtil.delRedisKey2(Constant.TYPE_REPAY_ +repaymentId+"*");
 					}catch(Exception e0) {
 					e0.printStackTrace();
 				}

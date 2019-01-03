@@ -141,7 +141,7 @@ public class OperaOverdueDataThread implements Runnable {
 						//分单逻辑
 						Boolean result = this.orderService.distributeOrder(order,borrowOrder.get("merchant_number").toString());
 						if (result){
-//							RedisUtil.delRedisKey(Constant.TYPE_OVERDUE_ + payId);
+							RedisUtil.delRedisKey2(Constant.TYPE_OVERDUE_ +payId+"*");
 						}
 
 
@@ -174,14 +174,14 @@ public class OperaOverdueDataThread implements Runnable {
 						}
 //						//验证是否减免
 //						syncUtils.checkReduction(repayment,localDataDao);
-						RedisUtil.delRedisKey(Constant.TYPE_OVERDUE_ + payId+"_"+PayContents.MERCHANT_NUMBER.toString());
+						RedisUtil.delRedisKey2(Constant.TYPE_OVERDUE_ +payId+"*");
 					}
 				} catch (Exception e0) {
 					loger.error("OperaOverdueDataThread-异常-loanId"+loanId);
 					e0.printStackTrace();
 				}
 			}else{
-				RedisUtil.delRedisKey(Constant.TYPE_OVERDUE_ + payId+"_"+PayContents.MERCHANT_NUMBER.toString());
+				RedisUtil.delRedisKey2(Constant.TYPE_OVERDUE_ +payId+"*");
 			}
 		}
 	}

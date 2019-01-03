@@ -14,5 +14,12 @@ public class RedisUtil {
 			e.printStackTrace();
 		}
 	}
+	public static void delRedisKey2(String key){
+		try{
+			JedisDataClient.batchDel(key);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
 
 }
