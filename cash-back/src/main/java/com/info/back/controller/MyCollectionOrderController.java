@@ -31,8 +31,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.*;
@@ -1895,6 +1898,57 @@ public class MyCollectionOrderController extends BaseController {
             logger.error("获取用户电商信息失败 " + map.toString());
         }
         return null;
+    }
+
+    @RequestMapping("qrCode")
+    public String qrCode(HttpServletRequest request, Model model) {
+
+        HashMap<String, Object> params = this.getParametersO(request);
+        String id = params.get("id").toString();
+        MmanLoanCollectionOrder order = mmanLoanCollectionOrderService.getOrderById(id);
+        String assetRepaymentId = order.getPayId();
+
+        model.addAttribute("payId", assetRepaymentId);
+        model.addAttribute("params", params);
+        return "mycollectionorder/qrCodePage";
+
+    }
+
+    @RequestMapping("getQrCode")
+    public void getQrCode(HttpServletRequest request,HttpServletResponse response,String payId) {
+        CreditLoanPay creditLoanPay = creditLoanPayService.get(payId);
+        int receivableMoney = creditLoanPay.getReceivableMoney().multiply(new BigDecimal(100)).intValue();
+        int realMoney = creditLoanPay.getRealMoney().multiply(new BigDecimal(100)).intValue();
+        String assetRepaymentId = creditLoanPay.getId();
+        int withholdAmount = receivableMoney - realMoney;
+//        String assetRepaymentId= "154514530";
+//        int withholdAmount = 100;
+        String url = PayContents.QRCODE_URL + "?assetRepaymentId=" + assetRepaymentId+"&withholdAmount="+withholdAmount;
+        try {
+            URL urls = new URL(url);
+            HttpURLConnection connection = (HttpURLConnection) urls.openConnection();
+            connection.setDoOutput(true);
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setConnectTimeout(3000);
+            connection.connect();
+            int statusCode = connection.getResponseCode();
+            OutputStream outputStream = response.getOutputStream();
+            if (statusCode != HttpURLConnection.HTTP_OK) {/* 4 判断访问的状态码 */
+                return;
+            }else {
+                InputStream inputStream = connection.getInputStream();
+                int len = 0;
+                byte buffer[] = new byte[1024 * 10];
+                while((len=inputStream.read(buffer))>0){
+                    outputStream.write(buffer, 0, len);
+                }
+                inputStream.close();
+            }
+            outputStream.flush();
+            outputStream.close();
+        }catch (Exception e){
+            logger.error("getQrCode-exception", e);
+        }
     }
 
 }
