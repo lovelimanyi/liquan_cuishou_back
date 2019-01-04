@@ -201,8 +201,7 @@ public class OperaOverdueDataThread implements Runnable {
 		mmanUserLoan.setLoanPyId(String.valueOf(borrowOrder.get("out_trade_no")));//第三方订单号
 		mmanUserLoan.setLoanMoney(new BigDecimal(Integer.parseInt(String.valueOf(borrowOrder.get("money_amount")))/100.00));
 		mmanUserLoan.setLoanRate(String.valueOf(borrowOrder.get("apr")));
-		if (TXLC_MERCHANT_NUMBER.equals(String.valueOf(borrowOrder.get("merchant_number"))) || YMJK_MERCHANT_NUMBER.equals(String.valueOf(borrowOrder.get("merchant_number")))
-				|| JYB_MERCHANT_NUMBER.equals(String.valueOf(borrowOrder.get("merchant_number")))){
+		if (TXLC_MERCHANT_NUMBER.equals(String.valueOf(borrowOrder.get("merchant_number"))) || YMJK_MERCHANT_NUMBER.equals(String.valueOf(borrowOrder.get("merchant_number")))){
 			mmanUserLoan.setPaidMoney(new BigDecimal(0));
 		}else {
 			mmanUserLoan.setPaidMoney(new BigDecimal(Integer.parseInt(String.valueOf(borrowOrder.get("paid_money")))/100.00));//服务费+本金
