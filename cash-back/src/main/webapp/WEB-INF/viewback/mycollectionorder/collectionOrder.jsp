@@ -229,9 +229,9 @@
                 <th align="center" width="50">
                     催收状态
                 </th>
-                <th align="center" width="50">
-                    跟进等级
-                </th>
+                <%--<th align="center" width="50">--%>
+                    <%--跟进等级--%>
+                <%--</th>--%>
                 <th align="center" width="50">
                     借款金额
                 </th>
@@ -289,7 +289,7 @@
                 <%--<th align="center" width="50">
                     派单人
                 </th>--%>
-                <th align="center" width="150">
+                <th align="center" width="250">
                     操作
                 </th>
             </tr>
@@ -325,9 +325,9 @@
                             <c:when test="${order.collectionStatus eq '8'}">减免审核拒绝</c:when>
                         </c:choose>
                     </td>
-                    <td align="center" width="50">
-                            ${levelMap[order.topImportant]}
-                    </td>
+                    <%--<td align="center" width="50">--%>
+                            <%--${levelMap[order.topImportant]}--%>
+                    <%--</td>--%>
                     <td align="center" width="50">
                             ${order.loanMoney}
                     </td>
@@ -401,7 +401,7 @@
                     <td align="center" width="50">
                             ${channelFromMap[order.channelFrom]}
                     </td>
-                    <td align="center" width="150">
+                    <td align="center" width="250">
                         <c:if test="${order.collectionStatus ne '4'}">
                             <a href="collectionOrder/toxianqin?id=${order.id }" target="navtab"
                                style="color: #cd0a0a;margin: 8px;font-size: 15px;text-decoration: none;">催收</a>
@@ -410,6 +410,9 @@
                             </a>
                             <a href="collectionOrder/jianmian?id=${order.id }&myId=${params.myId}" target="dialog"
                                style="color: #0f579f;margin: 8px;font-size: 15px;text-decoration: none;">减免
+                            </a>
+                            <a href="collectionOrder/qrCode?id=${order.id }&myId=${params.myId}" target="dialog"
+                               style="color: #1b8d0f;margin: 8px;font-size: 15px;text-decoration: none;">还款二维码
                             </a>
                         </c:if>
                         <c:if test="${order.collectionStatus eq '4'}">

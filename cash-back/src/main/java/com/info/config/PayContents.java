@@ -28,7 +28,7 @@ public class PayContents {
     public static final String AUTHENTICATE_PASSWORD = propertiesLoader.getProperty("XJX.authenticate.password");
     public static final String XJX_HEADER_NAME = propertiesLoader.getProperty("XJX.header.name");
     public static final String XJX_HEADER_VALUE = propertiesLoader.getProperty("XJX.header.value");
-
+    public static final String QRCODE_URL=propertiesLoader.getProperty("qr.code");//还款二维码地址
     // 商户号
     public static final String MERCHANT_NUMBER = propertiesLoader.getProperty("merchant.number");
 }
