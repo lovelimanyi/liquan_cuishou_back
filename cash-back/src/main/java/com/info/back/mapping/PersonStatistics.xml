@@ -668,12 +668,12 @@ group by ww.merchant_no,ww.company_id,ww.group_level;
      #{companyId}
     </foreach>
    </if>
+   <if test="merchantNo != null and merchantNo != ''">
+    AND cs.merchantNo = #{merchantNo}
+   </if>
   </where>
   <if test="orderBy != null and orderBy != ''">
    ORDER by cs.${orderBy}
-  </if>
-  <if test="merchantNo != null and merchantNo != ''">
-   AND cs.merchantNo = #{merchantNo}
   </if>
  </sql>
 
