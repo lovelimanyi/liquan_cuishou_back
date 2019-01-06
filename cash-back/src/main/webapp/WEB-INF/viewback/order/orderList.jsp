@@ -221,9 +221,9 @@
                 <th align="center" width="50">
                     派单时间
                 </th>
-                <th align="center" width="50">
-                    渠道来源
-                </th>
+                <%--<th align="center" width="50">--%>
+                    <%--渠道来源--%>
+                <%--</th>--%>
                 <th align="center" width="50">
                     放款主体
                 </th>
@@ -338,9 +338,9 @@
                     <td align="center" width="50">
                         <fmt:formatDate value="${order.dispatchTime}" pattern="yyyy-MM-dd HH:mm:ss"/>
                     </td>
-                    <td align="center" width="50">
-                         ${channelFromMap[order.channelFrom]}
-                    </td>
+                    <%--<td align="center" width="50">--%>
+                         <%--${channelFromMap[order.channelFrom]}--%>
+                    <%--</td>--%>
                     <td align="center" width="50">
                             ${repayChannelMap[order.repayChannel]}
                     </td>

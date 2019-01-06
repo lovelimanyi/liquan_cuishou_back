@@ -259,9 +259,9 @@
                 <th align="center" width="50">
                     用户类型
                 </th>
-                <th align="center" width="50">
-                    渠道来源
-                </th>
+                <%--<th align="center" width="50">--%>
+                    <%--渠道来源--%>
+                <%--</th>--%>
                 <th align="center" width="50">
                     放款主体
                 </th>
@@ -369,9 +369,9 @@
                             <c:when test="${order.customerType eq '1'}">老用户</c:when>
                         </c:choose>
                     </td>
-                    <td align="center" width="50">
-                            ${channelFromMap[order.channelFrom]}
-                    </td>
+                    <%--<td align="center" width="50">--%>
+                            <%--${channelFromMap[order.channelFrom]}--%>
+                    <%--</td>--%>
                     <td align="center" width="50">
                             ${repayChannelMap[order.repayChannel]}
                     </td>

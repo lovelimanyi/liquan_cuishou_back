@@ -1508,6 +1508,9 @@ public class MyCollectionOrderController extends BaseController {
         Map<String, Object> map = new HashMap<>();
         if (StringUtils.isNotBlank(id)) {
             MmanLoanCollectionOrder order = mmanLoanCollectionOrderService.getOrderById(id);
+            if(null == order) {
+                logger.error("refreshMsg抛异常问题排查，催收订单id：" + id);
+            }
             List<TemplateSms> msgs = getMatchMsgsTemplate(order);
             TemplateSms templateSms = null;
             String msgId = params.get("msgId") + "";
