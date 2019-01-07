@@ -235,9 +235,9 @@
                 <th align="center" width="50">
                     借款金额
                 </th>
-                <th align="center" width="50">
-                    利息
-                </th>
+                <%--<th align="center" width="50">--%>
+                    <%--利息--%>
+                <%--</th>--%>
                 <th align="center" width="50">
                     服务费
                 </th>
@@ -331,14 +331,14 @@
                     <td align="center" width="50">
                             ${order.loanMoney}
                     </td>
-                    <td align="center" width="50">
-                        <c:if test="${order.accrual eq null}">
-                            0
-                        </c:if>
-                        <c:if test="${order.accrual ne null}">
-                            ${order.accrual}
-                        </c:if>
-                    </td>
+                    <%--<td align="center" width="50">--%>
+                        <%--<c:if test="${order.accrual eq null}">--%>
+                            <%--0--%>
+                        <%--</c:if>--%>
+                        <%--<c:if test="${order.accrual ne null}">--%>
+                            <%--${order.accrual}--%>
+                        <%--</c:if>--%>
+                    <%--</td>--%>
                     <td align="center" width="50">
                         <c:if test="${order.paidMoney > 0}">
                             ${order.serviceCharge}
@@ -401,7 +401,7 @@
                     <td align="center" width="50">
                             ${channelFromMap[order.channelFrom]}
                     </td>
-                    <td align="center" width="250">
+                    <td align="center" width="350">
                         <c:if test="${order.collectionStatus ne '4'}">
                             <a href="collectionOrder/toxianqin?id=${order.id }" target="navtab"
                                style="color: #cd0a0a;margin: 8px;font-size: 15px;text-decoration: none;">催收</a>
@@ -410,6 +410,9 @@
                             </a>
                             <a href="collectionOrder/jianmian?id=${order.id }&myId=${params.myId}" target="dialog"
                                style="color: #0f579f;margin: 8px;font-size: 15px;text-decoration: none;">减免
+                            </a>
+                            <a href="collectionOrder/jianmianQrCode?id=${order.id }&myId=${params.myId}" target="dialog"
+                               style="color: #cd0a0a;;margin: 8px;font-size: 15px;text-decoration: none;">减免还款二维码
                             </a>
                             <a href="collectionOrder/qrCode?id=${order.id }&myId=${params.myId}" target="dialog"
                                style="color: #1b8d0f;margin: 8px;font-size: 15px;text-decoration: none;">还款二维码

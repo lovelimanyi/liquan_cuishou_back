@@ -27,6 +27,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import sun.security.krb5.internal.PAData;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -1918,14 +1919,23 @@ public class MyCollectionOrderController extends BaseController {
     }
 
     @RequestMapping("getQrCode")
-    public void getQrCode(HttpServletRequest request,HttpServletResponse response,String payId) {
-        CreditLoanPay creditLoanPay = creditLoanPayService.get(payId);
-        int receivableMoney = creditLoanPay.getReceivableMoney().multiply(new BigDecimal(100)).intValue();
-        int realMoney = creditLoanPay.getRealMoney().multiply(new BigDecimal(100)).intValue();
-        String assetRepaymentId = creditLoanPay.getId();
-        int withholdAmount = receivableMoney - realMoney;
-//        String assetRepaymentId= "154514530";
-//        int withholdAmount = 100;
+    public void getQrCode(HttpServletRequest request,HttpServletResponse response,String payId,String payMoney) {
+
+        String assetRepaymentId ="";
+        int withholdAmount = 0;
+        if(StringUtils.isNotBlank(payMoney)){
+            assetRepaymentId = payId;
+            BigDecimal money = new BigDecimal(payMoney);
+            withholdAmount = money.multiply(new BigDecimal(100)).intValue();
+        }else {
+            CreditLoanPay creditLoanPay = creditLoanPayService.get(payId);
+            int receivableMoney = creditLoanPay.getReceivableMoney().multiply(new BigDecimal(100)).intValue();
+            int realMoney = creditLoanPay.getRealMoney().multiply(new BigDecimal(100)).intValue();
+            assetRepaymentId = creditLoanPay.getId();
+            withholdAmount = receivableMoney - realMoney;
+        }
+//        assetRepaymentId= "154514530";
+//        withholdAmount = 100;
         String url = PayContents.QRCODE_URL + "?assetRepaymentId=" + assetRepaymentId+"&withholdAmount="+withholdAmount;
         try {
             URL urls = new URL(url);
@@ -1953,5 +1963,26 @@ public class MyCollectionOrderController extends BaseController {
             logger.error("getQrCode-exception", e);
         }
     }
+
+
+    @RequestMapping("jianmianQrCode")
+    public String jianmianQrCode(HttpServletRequest request, Model model) {
+
+        HashMap<String, Object> params = this.getParametersO(request);
+        String id = params.get("id").toString();
+        MmanLoanCollectionOrder order = mmanLoanCollectionOrderService.getOrderById(id);
+        String assetRepaymentId = order.getPayId();
+        CreditLoanPay creditLoanPay = creditLoanPayService.get(assetRepaymentId);
+        BigDecimal remainMoney = creditLoanPay.getReceivableMoney().subtract(creditLoanPay.getRealMoney());
+        BigDecimal minMoney =creditLoanPay.getReceivablePrinciple();
+        model.addAttribute("minMoney", minMoney);
+        model.addAttribute("creditLoanPay", creditLoanPay);
+        model.addAttribute("remainMoney", remainMoney);
+        model.addAttribute("payId", assetRepaymentId);
+        model.addAttribute("params", params);
+        return "mycollectionorder/jianmianQrCodePage";
+
+    }
+
 
 }
