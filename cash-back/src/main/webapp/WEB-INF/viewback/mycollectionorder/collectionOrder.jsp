@@ -411,12 +411,13 @@
                             <a href="collectionOrder/jianmian?id=${order.id }&myId=${params.myId}" target="dialog"
                                style="color: #0f579f;margin: 8px;font-size: 15px;text-decoration: none;">减免
                             </a>
-                            <a href="collectionOrder/jianmianQrCode?id=${order.id }&myId=${params.myId}" target="dialog"
-                               style="color: #cd0a0a;;margin: 8px;font-size: 15px;text-decoration: none;">减免还款二维码
-                            </a>
                             <a href="collectionOrder/qrCode?id=${order.id }&myId=${params.myId}" target="dialog"
                                style="color: #1b8d0f;margin: 8px;font-size: 15px;text-decoration: none;">还款二维码
                             </a>
+                            <a href="collectionOrder/jianmianQrCode?id=${order.id }&myId=${params.myId}" target="dialog"
+                               style="color: #cd0a0a;;margin: 8px;font-size: 15px;text-decoration: none;">减免还款二维码
+                            </a>
+
                         </c:if>
                         <c:if test="${order.collectionStatus eq '4'}">
                             <a href="collectionOrder/toxianqin?id=${order.id }" target="navtab"
