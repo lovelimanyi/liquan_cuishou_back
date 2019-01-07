@@ -78,9 +78,6 @@
         if (payMoney > 3000) {
             alertMsg.warn("输入金额不能大于3000");
             return false;
-        }else if (payMoney < minMoney){
-            alertMsg.warn("输入金额不能小于应还本金");
-            return false;
         }else if(payMoney > remainMoney) {
             alertMsg.warn("金额不能大于剩余应还金额");
             return false;
