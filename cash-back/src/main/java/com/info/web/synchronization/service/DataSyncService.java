@@ -58,7 +58,7 @@ public class DataSyncService {
 					}
 				}
 			}
-			JedisDataClient.expire(redisKey,60*60);
+			JedisDataClient.expire(redisKey,60*60*4);
 		}
 
 		logger.info("获取所有overdue的redis数据");
