@@ -1376,7 +1376,7 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
             order.setCurrentCollectionUserId(currentCollectionUserId);
             order.setOutsideCompanyId(companyId);
             manLoanCollectionOrderDao.insertCollectionOrder(order);
-
+            logger.error("distributeOrder-end-loanId="+order.getLoanId());
             //添加订单催收流转日志
             insertMmanLoanCollectionStatusChangeLog(
                     order.getOrderId(),
@@ -1390,7 +1390,7 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
                     BackConstant.XJX_OVERDUE_LEVEL_S1);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("distributeOrder-exception-loanId="+order.getLoanId(),e);
             return false;
         }
     }
