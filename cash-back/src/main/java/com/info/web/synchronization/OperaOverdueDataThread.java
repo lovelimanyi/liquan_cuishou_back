@@ -55,7 +55,7 @@ public class OperaOverdueDataThread implements Runnable {
 			map.put("ID", payId);//还款id
 			//还款信息--app端
 			HashMap<String,Object> repayment = this.dataDao.getAssetRepayment(map);
-			logger.info("sync-repayment:"+repayment);
+			logger.info("sync-repayment："+repayment);
 			String loanId = String.valueOf(repayment.get("asset_order_id"));//借款id
 			String userId  = String.valueOf(repayment.get("user_id"));    	//用户id
 			map.put("ORDER_ID", loanId);
@@ -72,7 +72,7 @@ public class OperaOverdueDataThread implements Runnable {
 					List<Map<String, Object>> userContactsList = null;		//用户联系人--app端
 
 					borrowOrder = this.dataDao.getAssetBorrowOrder(map);
-					logger.info("sync-borrowOrder:"+borrowOrder);
+					logger.info("sync-borrowOrder："+borrowOrder);
 					repaymentDetailList = this.dataDao.getAssetRepaymentDetail(map);
 					if (checkLoan(loanId)) {
 						try{
@@ -102,16 +102,17 @@ public class OperaOverdueDataThread implements Runnable {
 							if (payCount < 1){
 								//保存还款表
 								saveCreditLoanPay(repayment);
-								logger.info("保存还款表-payId："+payId);
+								logger.info("保存还款表-end-payId："+payId);
 							}
 							if (CollectionUtils.isNotEmpty(repaymentDetailList)){
 								//保存还款详情表
-								logger.info("保存还款详情表-payId："+payId);
+
 								syncUtils.saveFirstPayDetail(localDataDao,repayment,payId, repaymentDetailList);
+								logger.info("保存还款详情表-end-payId："+payId);
 							}
 							int orderCount = localDataDao.checkOrder(loanId);
 							if (orderCount < 1){
-								logger.info("处理订单表-loanId："+loanId+"orderCount:"+orderCount);
+								logger.info("处理订单表-start-loanId："+loanId+"-orderCount:"+orderCount);
 								MmanLoanCollectionOrder order = new MmanLoanCollectionOrder();
 								order.setId(IdGen.uuid());
 								order.setLoanId(loanId);
@@ -131,24 +132,25 @@ public class OperaOverdueDataThread implements Runnable {
 								order.setLoanUserPhone(userPhone);
 								order.setIdNumber(idNumber);
 								//分单逻辑
-								logger.error("start-distributeOrder-loanId:"+loanId);
+								logger.error("start-distributeOrder-loanId："+loanId);
 								Boolean result = this.orderService.distributeOrder(order,borrowOrder.get("merchant_number").toString());
 								if (result){
-									logger.error("end-distributeOrder-loanId-result:"+loanId+result);
+									logger.error("end-distributeOrder-loanId-result："+loanId+result);
 								}else {
 									return;
 								}
 							}
 							if (checkLoan(loanId)){
 								//保存用户借款表
-								logger.info("保存用户借款表-start:");
+								logger.info("保存用户借款表-start-loanId："+loanId);
 								saveMmanUserLoan(borrowOrder,repayment);
-								logger.info("saveMmanUserLoan-end:");
+								logger.info("saveMmanUserLoan-end-loanId："+loanId);
 								RedisUtil.delRedisKey2(Constant.TYPE_OVERDUE_ +payId+"*");
 							}
 
 							//保存用户信息表--联系人表--银行卡
 							syncUtils.saveUserInfo(localDataDao,payId,userId,userInfo,userContactsList,cardInfo);
+							logger.info("saveUserInfo-end-userId："+userId);
 						}
 
 
