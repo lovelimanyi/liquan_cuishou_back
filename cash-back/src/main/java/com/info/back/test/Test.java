@@ -38,7 +38,16 @@ MmanLoanCollectionOrderService orderService;
     @org.junit.Test
     public void test() throws Exception {
 
-        QRCodeUtil.encode("www.baidu.com","D:/b","D:/abc",false,"random2");
+//        String payIds = "";
+//        String[] list = payIds.split(",");
+//        for (int i=0;i<list.length;i++){
+//            String payId = list[i];
+//            String key = "OVERDUE_"+payId;
+//            JedisDataClient.set(key,payId);
+//            System.out.println(list[i]);
+//        }
+
+//        QRCodeUtil.encode("www.baidu.com","D:/b","D:/abc",false,"random2");
 //        orderService.orderUpgrade("545260388");
 
 

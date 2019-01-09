@@ -156,5 +156,7 @@ public interface ILocalDataDao {
 	void updateDianXiaoOrderStatus(String loanId);
 
 
+    int checkPay(String payId);
 
+	int checkOrder(String loanId);
 }
