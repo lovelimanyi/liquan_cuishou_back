@@ -31,6 +31,51 @@ public class PersonStatistics {
     private Date createDate;
     private String companyName;
     private String merchantNo;
+    private int cleanOrderCount;
+    private BigDecimal cleanPrincipal; //结清本金
+    private BigDecimal cleanPenalty; //结清滞纳金
+    private BigDecimal cleanPrincipalProbability; // 本金结清率
+    private BigDecimal cleanPenaltyProbability; //滞纳金结清率
+
+    public BigDecimal getCleanPrincipalProbability() {
+        return cleanPrincipalProbability;
+    }
+
+    public void setCleanPrincipalProbability(BigDecimal cleanPrincipalProbability) {
+        this.cleanPrincipalProbability = cleanPrincipalProbability;
+    }
+
+    public BigDecimal getCleanPenaltyProbability() {
+        return cleanPenaltyProbability;
+    }
+
+    public void setCleanPenaltyProbability(BigDecimal cleanPenaltyProbability) {
+        this.cleanPenaltyProbability = cleanPenaltyProbability;
+    }
+
+    public int getCleanOrderCount() {
+        return cleanOrderCount;
+    }
+
+    public void setCleanOrderCount(int cleanOrderCount) {
+        this.cleanOrderCount = cleanOrderCount;
+    }
+
+    public BigDecimal getCleanPrincipal() {
+        return cleanPrincipal;
+    }
+
+    public void setCleanPrincipal(BigDecimal cleanPrincipal) {
+        this.cleanPrincipal = cleanPrincipal;
+    }
+
+    public BigDecimal getCleanPenalty() {
+        return cleanPenalty;
+    }
+
+    public void setCleanPenalty(BigDecimal cleanPenalty) {
+        this.cleanPenalty = cleanPenalty;
+    }
 
     public String getMerchantNo() {
         return merchantNo;
