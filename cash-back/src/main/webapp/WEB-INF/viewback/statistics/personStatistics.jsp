@@ -59,17 +59,6 @@
                     </c:if>
 
                     <td>
-                        产 品 名 称:
-                        <select id="merchantNo" name="merchantNo">
-                            <option value="">全部</option>
-                            <c:forEach var="merchantNo" items="${merchantNoMap }">
-                                <option value="${merchantNo.key }" <c:if test="${merchantNo.key eq params.merchantNo}">selected="selected"</c:if>>
-                                        ${merchantNo.value}
-                                </option>
-                            </c:forEach>
-                        </select>
-                    </td>
-                    <td>
                         <div class="buttonActive">
                             <div class="buttonContent">
                                 <button type="submit">
@@ -99,9 +88,6 @@
                     统计日期
                 </th>
                 <th align="center" width="100">
-                    产品名称
-                </th>
-                <th align="center" width="100">
                     催收公司
                 </th>
                 <th align="center" width="50">
@@ -111,40 +97,40 @@
                     催收员姓名
                 </th>
                 <th align="center" width="100">
-                    本金金额
+                    入催本金
                 </th>
                 <th align="center" width="100">
-                    已还本金
+                    入催滞纳金
                 </th>
                 <th align="center" width="100">
-                    未还本金
+                    入催订单数
+                </th>
+                <th align="center" width="100">
+                    催回本金
+                </th>
+                <th align="center" width="100">
+                    催回滞纳金
                 </th>
                 <th align="center" width="100">
                     本金催回率
                 </th>
                 <th align="center" width="100">
-                    完成订单总滞纳金
-                </th>
-                <th align="center" width="120">
-                    完成订单实收滞纳金
+                   滞纳金催回率
                 </th>
                 <th align="center" width="100">
-                    总订单未还滞纳金
+                    结清订单数
                 </th>
                 <th align="center" width="100">
-                    滞纳金催回率
+                    结清本金
+                </th>
+                <th align="center" width="100">
+                    结清滞纳金
                 </th>
                 <th align="center" width="70">
-                    订单量
+                    本金结清率
                 </th>
                 <th align="center" width="90">
-                    已还订单量
-                </th>
-                <th align="center" width="90">
-                    未还订单量
-                </th>
-                <th align="center" width="100">
-                    订单还款率
+                    滞纳金结清率
                 </th>
             </tr>
             </thead>
@@ -156,9 +142,6 @@
                     </td>
                     <td>
                         <fmt:formatDate value="${list.createDate}" pattern="yyyy-MM-dd"/>
-                    </td>
-                    <td align="center" width="50">
-                            ${merchantNoMap[list.merchantNo]}
                     </td>
                     <td>
                         <c:if test="${companyName == null}">
@@ -181,38 +164,39 @@
                             ${list.totalPrincipal}
                     </td>
                     <td>
+                            ${list.totalPenalty}
+                    </td>
+                    <td>
+                            ${list.totalOrderCount}
+                    </td>
+                    <td>
                             ${list.realgetTotalPrincipal}
                     </td>
                     <td>
-                            ${list.remainPrincipal}
+                            ${list.realgetTotalPenalty}
                     </td>
                     <td>
                             ${list.repaymentProbability}%
                     </td>
 
                     <td>
-                            ${list.totalPenalty}
-                    </td>
-                    <td>
-                            ${list.realgetTotalPenalty}
-                    </td>
-                    <td>
-                            ${list.remainPenalty}
-                    </td>
-                    <td>
                             ${list.penaltyProbability}%
-                    </td>
-                    <td>
-                            ${list.totalOrderCount}
                     </td>
                     <td>
                             ${list.doneOrderCount}
                     </td>
                     <td>
-                            ${list.undoneOrderCount}
+                            ${list.cleanPrincipal}
                     </td>
                     <td>
-                            ${list.orderProbability}%
+                            ${list.cleanPenalty}
+                    </td>
+                    <td>
+                            ${list.cleanPrincipalProbability}%
+                    </td>
+                    <td>
+                            ${list.cleanPenaltyProbability}%
+
                     </td>
                 </tr>
             </c:forEach>
