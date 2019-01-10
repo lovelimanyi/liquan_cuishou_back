@@ -6,11 +6,11 @@
 		select count(1) from mman_user_loan where id = #{ID}
 	</select>
 
-	<select id="checkPay"  resultType="Integer" parameterType="string">
+	<select id="checkOrder"  resultType="Integer" parameterType="string">
 		select count(1) from mman_loan_collection_order where loan_id = #{loanId}
 	</select>
 
-	<select id="checkOrder"  resultType="Integer" parameterType="string">
+	<select id="checkPay"  resultType="Integer" parameterType="string">
 		select count(1) from credit_loan_pay where id = #{payId}
 	</select>
 
