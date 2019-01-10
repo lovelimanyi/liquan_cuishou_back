@@ -859,9 +859,14 @@ group by ww.merchant_no,ww.company_id,ww.group_level;
 
  <!--</select>-->
  <select id="findCompanyAllCount" resultType="Integer" parameterType="HashMap">
-  SELECT COUNT(DISTINCT(ps.companyId))
+
+  SELECT COUNT(1) FROM
+  (
+  SELECT COUNT(1)
   FROM person_statistics ps
   <include refid="wherePersonColumn"/>
+  GROUP BY ps.companyId,ps.groupLevel
+  ) c
  </select>
 
  <delete id="delPersonStatistics" parameterType="HashMap">
