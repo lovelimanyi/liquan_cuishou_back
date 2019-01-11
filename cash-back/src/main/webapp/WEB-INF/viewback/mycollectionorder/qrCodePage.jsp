@@ -19,7 +19,7 @@
     <form id="frm" method="post" enctype="multipart/form-data" action="" onsubmit="return validateCallback(this, dialogAjaxDone);">
         <input type="hidden" name="parentId" value="${params.myId}"/>
         <div class="pageFormContent" layoutH="50" style="overflow: auto;">
-            <img height="300" width="300" id="qrCode" src="collectionOrder/getQrCode?payId=${payId}" alt="剩余应还金额与业务端不一致">
+            <img height="300" width="300" id="qrCode" src="collectionOrder/getQrCode?payId=${payId}" alt="该订单可能正在还款中，请稍等">
         </div>
         <div class="formBar">
             <ul>

@@ -34,7 +34,7 @@
             </dl>
             <div class="divider"></div>
             <dl id="erCode">
-                <img height="300" width="300" id="qrCode" alt="还款金额不正确">
+                <img height="300" width="300" id="qrCode" alt="该订单可能正在还款中，请稍等">
             </dl>
         </div>
 
