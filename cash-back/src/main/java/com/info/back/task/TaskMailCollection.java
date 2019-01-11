@@ -27,6 +27,7 @@ public class TaskMailCollection {
     public void mailSendResult() {
     List<Map<String,Object>> list= iMailCollectionService.selectSendResult();
         if (list!=null&&list.size()>0) {
+            logger.info("mailSendResult-list-count:"+list.size());
             MailInfo mailInfo = new MailInfo(dateFormat.format(new Date()) + " 派单结果", MerchantNoUtils.getMerchantName(),sendResultlistHtml(list), MailCenterConstant.SEND_RESULE_MAIL, null);
             MessageSender.sendHtmlMail(mailInfo);
         }
