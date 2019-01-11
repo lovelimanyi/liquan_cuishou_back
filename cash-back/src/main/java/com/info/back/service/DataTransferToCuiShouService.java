@@ -1,13 +1,17 @@
 package com.info.back.service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.info.back.dao.*;
 import com.info.back.utils.BackConstant;
 import com.info.back.utils.IdGen;
+import com.info.config.PayContents;
 import com.info.constant.Constant;
 import com.info.web.pojo.*;
 import com.info.web.synchronization.dao.IDataDao;
 import com.info.web.synchronization.syncUtils;
 import com.info.web.util.DateUtil;
+import com.info.web.util.HttpUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,7 +83,7 @@ public class DataTransferToCuiShouService {
             order.setRealMoney(new BigDecimal(Integer.parseInt(String.valueOf(repayment.get("repaymented_amount")))).divide(new BigDecimal(100)));//已还金额
             order.setDispatchName("系统");
             order.setDispatchTime(DateUtil.getDateTimeFormat(String.valueOf(disTime), "yyyy-MM-dd HH:mm:ss"));
-            order.setCurrentOverdueLevel(BackConstant.XJX_OVERDUE_LEVEL_S1);//逾期等级 默认为S1
+            order.setCurrentOverdueLevel(collectionUser.getGroupLevel());//逾期等级 默认为S1
             order.setCreateDate(DateUtil.getDateTimeFormat(String.valueOf(disTime), "yyyy-MM-dd HH:mm:ss"));
             order.setUpdateDate(DateUtil.getDateTimeFormat(String.valueOf(disTime), "yyyy-MM-dd HH:mm:ss"));
             order.setOperatorName("系统");
@@ -188,24 +192,24 @@ public class DataTransferToCuiShouService {
                     repaymentDetailList = this.dataDao.getAssetRepaymentDetail(map);
                     logger.info("sync-repaymentDetailList:"+repaymentDetailList);
                     logger.info("开始:"+borrowOrder);
-//                    try{
-//                        Map<String, String> map2 = new HashMap();
-//                        map2.put("userId",borrowOrder.get("user_id").toString());
-//                        map2.put("merchantNumber","cjxjx");//默认小额推逾期，商户号都是cjxjx；如之后有其他商户渠道，则需修改
-//                        String returnInfo = HttpUtil.getInstance().doPost2(PayContents.XJX_GET_USERINFOS, JSON.toJSONString(map2));
-////							loger.error("调用vip查询用户信息："+returnInfo);
-//                        Map<String, Object> o = (Map<String, Object>) JSONObject.parse(returnInfo);
-//                        if(o != null && "00".equals(String.valueOf(o.get("code")))){
-//                            Map<String,Object> data = (Map<String, Object>) o.get("data");
-//                            userInfo = (Map<String, Object>) data.get("user");
-//                            cardInfo = ((List<Map<String, Object>>) data.get("userCardInfoList")).get(0);
-//                            userContactsList = (List<Map<String, Object>>) data.get("userContactsList");
-//                        }
-//                    }catch (Exception e){
-//                        logger.error("调用cashman获取用户信息出错：" + e);
-//                        e.printStackTrace();
-//                        return "fail";
-//                    }
+                    try{
+                        Map<String, String> map2 = new HashMap();
+                        map2.put("userId",borrowOrder.get("user_id").toString());
+                        map2.put("merchantNumber","cjxjx");//默认小额推逾期，商户号都是cjxjx；如之后有其他商户渠道，则需修改
+                        String returnInfo = HttpUtil.getInstance().doPost2(PayContents.XJX_GET_USERINFOS, JSON.toJSONString(map2));
+//							loger.error("调用vip查询用户信息："+returnInfo);
+                        Map<String, Object> o = (Map<String, Object>) JSONObject.parse(returnInfo);
+                        if(o != null && "00".equals(String.valueOf(o.get("code")))){
+                            Map<String,Object> data = (Map<String, Object>) o.get("data");
+                            userInfo = (Map<String, Object>) data.get("user");
+                            cardInfo = ((List<Map<String, Object>>) data.get("userCardInfoList")).get(0);
+                            userContactsList = (List<Map<String, Object>>) data.get("userContactsList");
+                        }
+                    }catch (Exception e){
+                        logger.error("调用cashman获取用户信息出错：" + e);
+                        e.printStackTrace();
+                        return "fail";
+                    }
                     logger.info("loanId true:"+loanId);
                     if (null != userInfo && null != borrowOrder&& null != cardInfo&& null != repaymentDetailList) {
                         //保存用户借款表
@@ -232,7 +236,7 @@ public class DataTransferToCuiShouService {
                     order.setRealMoney(new BigDecimal(Integer.parseInt(String.valueOf(repayment.get("repaymented_amount")))).divide(new BigDecimal(100)));//已还金额
                     order.setDispatchName("系统");
                     order.setDispatchTime(DateUtil.getDateTimeFormat(String.valueOf(disTime), "yyyy-MM-dd HH:mm:ss"));
-                    order.setCurrentOverdueLevel(BackConstant.XJX_OVERDUE_LEVEL_S1);//逾期等级 默认为S1
+                    order.setCurrentOverdueLevel(collectionUser.getGroupLevel());//逾期等级 默认为S1
                     order.setCreateDate(DateUtil.getDateTimeFormat(String.valueOf(disTime), "yyyy-MM-dd HH:mm:ss"));
                     order.setUpdateDate(DateUtil.getDateTimeFormat(String.valueOf(disTime), "yyyy-MM-dd HH:mm:ss"));
                     order.setOperatorName("系统");
@@ -257,7 +261,8 @@ public class DataTransferToCuiShouService {
                     changeLog.setCurrentCollectionUserLevel(collectionUser.getGroupLevel());
                     changeLog.setCurrentCollectionOrderLevel(collectionUser.getGroupLevel());
                     statusChangeLogDao.insert(changeLog);
-
+                    saveFirstPayDetail2(localDataDao,repayment,payId, repaymentDetailList,collectionUser,disTime);
+                    logger.info("保存还款详情表");
 //
 //                    if (repaymentDetailList != null && repaymentDetailList.size()>0){
 //                        logger.info("未逾期部分还款:"+loanId);

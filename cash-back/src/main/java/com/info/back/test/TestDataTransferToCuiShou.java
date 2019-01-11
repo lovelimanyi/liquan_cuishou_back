@@ -62,12 +62,12 @@ public class TestDataTransferToCuiShou {
 
     @org.junit.Test
     public void test(){
-        String disTime = "2019-01-08 06:10:00";
-        String backUserName = "夏栋民";
-        String payIds = "50696037";
+        String disTime = "2019-01-01 06:10:00";
+        String backUserName = "韩志敏";
+        String payIds = "50438241";
 //
 //
-        cuiShouService.dataTransferToCuiShou2(backUserName,payIds,disTime);
+        cuiShouService.dataTransferToCuiShou(backUserName,payIds,disTime);
 
 
 
