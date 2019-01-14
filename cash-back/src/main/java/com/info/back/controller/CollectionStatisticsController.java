@@ -540,6 +540,9 @@ public class CollectionStatisticsController extends BaseController {
 					}
 				}
 				handleCompanyPermission(backUser,params,model);
+			}else if ("other".equals(Flag)){
+				url = "statistics/companyStatisticsOther";
+				pageConfig = personStatisticsService.findCompanyOtherPage(params);
 			}
 			model.addAttribute("groupLevelMap", BackConstant.smallGroupNameMap);
 			model.addAttribute("groupLevel", String.valueOf(params.get("groupLevel")));

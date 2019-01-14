@@ -19,4 +19,6 @@ public interface IPersonStatisticsService {
     PageConfig<PersonStatistics> findPage(HashMap<String, Object> params);
 
     PageConfig<PersonStatistics> findCompanyPage(HashMap<String, Object> params);
+
+    PageConfig<PersonStatistics> findCompanyOtherPage(HashMap<String, Object> params);
 }

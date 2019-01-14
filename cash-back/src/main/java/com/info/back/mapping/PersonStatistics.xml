@@ -769,7 +769,7 @@ group by ww.merchant_no,ww.company_id,ww.group_level;
   <include refid="wherePersonColumn"/>
     GROUP BY ps.backUserId
   <if test="orderBy != null and orderBy != ''">
-   ORDER by ps.${orderBy}
+   ORDER by ${orderBy}
   </if>
 
 
@@ -825,13 +825,54 @@ group by ww.merchant_no,ww.company_id,ww.group_level;
   <include refid="wherePersonColumn"/>
   GROUP BY ps.companyId ,ps.groupLevel
   <if test="orderBy != null and orderBy != ''">
-   ORDER by ps.${orderBy}
+   ORDER by ${orderBy}
   </if>
 
 
  </select>
 
 
+ <select id="findCompanyOtherAll" resultType="com.info.web.pojo.PersonStatistics" parameterType="HashMap">
+  SELECT
+  createDate,
+  companyId,
+  groupLevel,
+  merchantNo,
+  IFNULL(sum(totalPrincipal),0) AS 'totalPrincipal',
+  IFNULL(sum(totalPenalty),0) AS 'totalPenalty',
+  IFNULL(sum(totalOrderCount),0) AS 'totalOrderCount',
+
+  IFNULL(sum(realgetTotalPrincipal),0) AS 'realgetTotalPrincipal',
+  IFNULL(sum(realgetTotalPenalty),0) AS 'realgetTotalPenalty',
+
+  IFNULL(ROUND(IFNULL(sum(realgetTotalPrincipal),0)/IFNULL(sum(totalPrincipal),0)*100,2),0)AS 'repaymentProbability',
+  IFNULL(ROUND(IFNULL(sum(realgetTotalPenalty),0)/IFNULL(sum(totalPenalty),0)*100,2),0)AS 'penaltyProbability',
+
+  IFNULL(sum(doneOrderCount),0) AS 'doneOrderCount',
+  IFNULL(sum(cleanPrincipal),0) AS 'cleanPrincipal',
+  IFNULL(sum(cleanPenalty),0) AS 'cleanPenalty',
+
+  IFNULL(ROUND(IFNULL(sum(cleanPrincipal),0)/IFNULL(sum(totalPrincipal),0)*100,2),0)AS 'cleanPrincipalProbability',
+  IFNULL(ROUND(IFNULL(sum(cleanPenalty),0)/IFNULL(sum(totalPenalty),0)*100,2),0)AS 'cleanPenaltyProbability'
+  FROM person_statistics ps
+  LEFT JOIN mman_loan_collection_company cc ON ps.companyId = cc.id
+  <include refid="wherePersonColumn"/>
+  GROUP BY ps.merchantNo, ps.groupLevel
+  <if test="orderBy != null and orderBy != ''">
+   ORDER by ${orderBy}
+  </if>
+ </select>
+
+ <select id="findCompanyOtherAllCount" resultType="Integer" parameterType="HashMap">
+
+  SELECT COUNT(1) FROM
+  (
+  SELECT COUNT(1)
+  FROM person_statistics ps
+  <include refid="wherePersonColumn"/>
+  GROUP BY ps.merchantNo, ps.groupLevel
+  ) c
+ </select>
 
  <!--<select id="findCompanyAll" resultType="com.info.web.pojo.PersonStatistics" parameterType="HashMap">-->
   <!--SELECT-->

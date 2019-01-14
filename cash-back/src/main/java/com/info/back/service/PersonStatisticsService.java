@@ -103,4 +103,12 @@ public class PersonStatisticsService implements IPersonStatisticsService {
         return pageConfig;
     }
 
+    @Override
+    public PageConfig<PersonStatistics> findCompanyOtherPage(HashMap<String, Object> params) {
+        params.put(Constant.NAME_SPACE, "PersonStatistics");
+        PageConfig<PersonStatistics> pageConfig = new PageConfig<PersonStatistics>();
+        pageConfig = paginationDao.findPage("findCompanyOtherAll", "findCompanyOtherAllCount", params, null);
+        return pageConfig;
+    }
+
 }
