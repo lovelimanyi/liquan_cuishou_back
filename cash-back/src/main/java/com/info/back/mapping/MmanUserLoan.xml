@@ -293,4 +293,9 @@
            #{id}
        </foreach>
     </update>
+    <select id="getMerchantNoByLoanId" parameterType="String" resultType="String">
+        select merchant_no
+        from mman_user_loan
+        where id = #{loanId}
+    </select>
 </mapper>

@@ -38,4 +38,6 @@ public interface IMmanUserLoanService {
 	void updateRemark(List<String> list);
 
     List<String> getNeedUpgradeOrderLoanIds();
+
+    String getMerchantNoByLoanId(String loanId);
 }

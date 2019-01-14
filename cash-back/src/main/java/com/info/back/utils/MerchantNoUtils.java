@@ -39,17 +39,25 @@ public class MerchantNoUtils {
         return merchantNum;
     }
 
-    public static String getMerchantName2(){
+    public static String getMerchantName2(String merchantNo){
         String merchantName = "";
-        String merchantNo = PayContents.MERCHANT_NUMBER.toString();
-        if ("cjxjx".equals(merchantNo)){
-            merchantName = "现金侠";
-        }else if ("jxx".equals(merchantNo)){
-            merchantName = "金小侠";
-        }else if ("jyb".equals(merchantNo)){
+        if ("0".equals(merchantNo) || "xianjinxia".equals(merchantNo)  || "cjxjx".equals(merchantNo)  || "null".equals(merchantNo)){
+            merchantName = "极速现金侠";
+        }else if ("1".equals(merchantNo)){
+            merchantName = "快借钱包";
+        }
+        else if ("2".equals(merchantNo)){
+            merchantName = "匠心有品";
+        }else if ("1000".equals(merchantNo)){
             merchantName = "急用帮";
-        }else if("jqb".equals(merchantNo)){
+        }else if ("1001".equals(merchantNo)){
+            merchantName = "金小侠";
+        }else if("1002".equals(merchantNo)){
             merchantName = "极速币下";
+        }else if("1005".equals(merchantNo)){
+            merchantName = "易秒借款";
+        }else if("1006".equals(merchantNo)){
+            merchantName = "天下粮仓";
         }
         return merchantName;
     }

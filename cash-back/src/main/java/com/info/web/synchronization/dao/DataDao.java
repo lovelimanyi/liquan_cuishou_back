@@ -48,4 +48,9 @@ public class DataDao extends BaseDao implements IDataDao {
         return getSqlSessionTemplates().selectOne("getDianXiaoOrder", map);
     }
 
+    @Override
+    public String getMerchantNumberByLoanId(String loanId) {
+        return getMerchantNumberByLoanId(loanId);
+    }
+
 }

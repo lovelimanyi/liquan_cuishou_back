@@ -50,4 +50,6 @@ public interface IDataDao {
 	List<HashMap<String, Object>> getEstimateOrder(HashMap<String,Object> map);
 
 	HashMap<String,Object> getDianXiaoOrder(HashMap<String, String> map);
+
+	String getMerchantNumberByLoanId(String loanId);
 }

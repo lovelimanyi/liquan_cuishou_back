@@ -12,6 +12,7 @@ import com.info.back.utils.*;
 import com.info.config.PayContents;
 import com.info.constant.Constant;
 import com.info.web.pojo.*;
+import com.info.web.synchronization.dao.IDataDao;
 import com.info.web.util.*;
 import com.liquan.oss.OSSUpload;
 import com.sun.tracing.dtrace.ArgsAttributes;
@@ -126,6 +127,9 @@ public class MyCollectionOrderController extends BaseController {
 
     @Autowired
     private IMmanUserLoanDao mmanUserLoanDao;
+
+    @Autowired
+    private IDataDao dataDao;
 
 
     @Autowired
@@ -1283,26 +1287,42 @@ public class MyCollectionOrderController extends BaseController {
      * @param order
      * @return
      */
-    private String getMsgParam(MmanLoanCollectionOrder order) {
+    private String getMsgParam(MmanLoanCollectionOrder order,String msgId) {
         if (order == null) {
             return null;
         }
         MmanUserInfo userInfo = mmanUserInfoService.getUserInfoById(order.getUserId());
         // 获取所有商户信息
-        String merchantName = MerchantNoUtils.getMerchantName2();
+        String loanId = order.getLoanId();
+        //        String merchantNo = dataDao.getMerchantNumberByLoanId(loanId);//从业务库中查询
+        String merchantNo = mmanUserLoanService.getMerchantNoByLoanId(loanId);
+        String merchantName = MerchantNoUtils.getMerchantName2(merchantNo);
         StringBuilder msgParam = new StringBuilder();
-        if (StringUtils.isNotEmpty(userInfo.getUserSex())) {
-            if ("男".equals(userInfo.getUserSex())) {
-                msgParam.append(order.getLoanUserName() + "先生");
-            } else {
-                msgParam.append(order.getLoanUserName() + "女士");
+        if("notification-86".equals(msgId)
+                || "notification-87".equals(msgId)
+                || "notification-88".equals(msgId)){
+            msgParam.append(merchantName).append(",");
+            if (StringUtils.isNotEmpty(userInfo.getUserSex())) {
+                if ("男".equals(userInfo.getUserSex())) {
+                    msgParam.append(order.getLoanUserName() + "先生");
+                } else {
+                    msgParam.append(order.getLoanUserName() + "女士");
+                }
             }
+            msgParam.append(",");
+            msgParam.append(merchantName).append(",");
+            CreditLoanPay pay = creditLoanPayService.findByLoanId(order.getLoanId());
+            BigDecimal remainMoney = pay.getReceivableMoney().subtract(pay.getRealMoney());
+            msgParam.append(order.getOverdueDays()).append(",").append(remainMoney);
         }
-        msgParam.append(",");
-        msgParam.append(merchantName).append(",");
-        CreditLoanPay pay = creditLoanPayService.findByLoanId(order.getLoanId());
-        BigDecimal remainMoney = pay.getReceivableMoney().subtract(pay.getRealMoney());
-        msgParam.append(order.getOverdueDays()).append(",").append(remainMoney);
+        if ("notification-89".equals(msgId)
+                || "notification-90".equals(msgId)
+                || "notification-91".equals(msgId)
+                || "notification-92".equals(msgId)){
+            msgParam.append(merchantName).append(",");
+            msgParam.append(merchantName).append(",");
+            msgParam.append(merchantName).append(",");
+        }
         return msgParam.toString();
     }
 
@@ -1378,7 +1398,7 @@ public class MyCollectionOrderController extends BaseController {
             if(SHORT_MESSAGE_YOUMI_CHANNEL_FROM.equals(getChannelFrom(order))){
                 msgParam = getYoumiMsgParam(order);
             }else {
-                msgParam = getMsgParam(order);
+                msgParam = getMsgParam(order,msgCode);
             }
             if (msgParam == null) {
                 return new ServiceResult("-7", "短信参数异常！");
@@ -1489,7 +1509,7 @@ public class MyCollectionOrderController extends BaseController {
                 sms = s;
             }
         }
-        String msgContent = MessageFormat.format(sms.getContenttext(), StringUtils.split(getMsgParam(order), ','));
+        String msgContent = MessageFormat.format(sms.getContenttext(), StringUtils.split(getMsgParam(order,sms.getId()), ','));
         msg.setSmsContent(msgContent);
         msg.setUserPhone(mobiles);
         msg.setUserName(order.getLoanUserName() == null ? mobiles : order.getLoanUserName());
@@ -1525,7 +1545,7 @@ public class MyCollectionOrderController extends BaseController {
             if(SHORT_MESSAGE_YOUMI_CHANNEL_FROM.equals(getChannelFrom(order))){
                 content = MessageFormat.format(templateSms.getContenttext(), StringUtils.split(getYoumiMsgParam(order), ','));
             }else {
-                content = MessageFormat.format(templateSms.getContenttext(), StringUtils.split(getMsgParam(order), ','));
+                content = MessageFormat.format(templateSms.getContenttext(), StringUtils.split(getMsgParam(order,templateSms.getId()), ','));
             }
             map.put("msgContent", content);
             map.put("msgId", templateSms.getId());
@@ -1543,7 +1563,10 @@ public class MyCollectionOrderController extends BaseController {
         if (order == null) {
             return null;
         }
-        String merchantName = MerchantNoUtils.getMerchantName2();
+        String loanId = order.getLoanId();
+//        String merchantNo = dataDao.getMerchantNumberByLoanId(loanId);//从业务库中查询
+        String merchantNo = mmanUserLoanService.getMerchantNoByLoanId(loanId);
+        String merchantName = MerchantNoUtils.getMerchantName2(merchantNo);
         StringBuilder msgParam = new StringBuilder();
         msgParam.append(merchantName).append(",").append(merchantName);
         return msgParam.toString();
