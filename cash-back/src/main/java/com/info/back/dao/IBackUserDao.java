@@ -176,4 +176,6 @@ public interface IBackUserDao {
     List<BackUser> getUserByCompany(String companyName);
 
     CollectionBackUser getOneCollectionBackUserGroupByOrderCount(Map<String, Object> param);
+
+    List<CollectionBackUser> getXiaoShouBackUser();
 }

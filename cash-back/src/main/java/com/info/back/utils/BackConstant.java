@@ -14,6 +14,8 @@ public class BackConstant {
 
     public final static String DISTRIBUTE_BACK_USER = "distribute:backUserS1";
 
+    public final static String XIAO_SHOU_BACK_USER = "xiaoshou:backUser";
+
 
     public static final String CREDITLOANAPPLY_OVERDUE = "4";// 逾期
 
