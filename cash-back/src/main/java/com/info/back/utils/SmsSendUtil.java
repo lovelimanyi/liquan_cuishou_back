@@ -34,7 +34,7 @@ public class SmsSendUtil {
      * @param sms
      * @return
      */
-    public static boolean sendSmsNew(String telephone, String sms, String msgTemplateCode) {
+    public static boolean sendSmsNew(String telephone, String sms, String msgTemplateCode,String merchantNo) {
         loger.info("sendSms:" + telephone + "   sms=" + sms);
         String url = XJX_SMS_SEND_URL_NEW;
 
@@ -47,6 +47,7 @@ public class SmsSendUtil {
         messageByTypePojo.setMsgBussinessId("login_" + telephone);//业务唯一标识
         messageByTypePojo.setMsgTemplateCode(msgTemplateCode);//验证码模板编号
         messageByTypePojo.setValues(sms);
+        messageByTypePojo.setMerchantNo(merchantNo);
 
         HttpEntity entity;
         try {
@@ -91,7 +92,7 @@ public class SmsSendUtil {
      * @param sms
      * @return
      */
-    public static boolean sendSmsYoumi(String telephone, String sms, String msgTemplateCode, String merchantNo) {
+/*    public static boolean sendSmsYoumi(String telephone, String sms, String msgTemplateCode, String merchantNo) {
         loger.info("sendSms:" + telephone + "   sms=" + sms);
         String url = XJX_SMS_SEND_URL_NEW;
 
@@ -139,5 +140,5 @@ public class SmsSendUtil {
             e.printStackTrace();
         }
         return false;
-    }
+    }*/
 }

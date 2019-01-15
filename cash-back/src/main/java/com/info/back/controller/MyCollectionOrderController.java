@@ -1292,10 +1292,7 @@ public class MyCollectionOrderController extends BaseController {
             return null;
         }
         MmanUserInfo userInfo = mmanUserInfoService.getUserInfoById(order.getUserId());
-        // 获取所有商户信息
-        String loanId = order.getLoanId();
-        //        String merchantNo = dataDao.getMerchantNumberByLoanId(loanId);//从业务库中查询
-        String merchantNo = mmanUserLoanService.getMerchantNoByLoanId(loanId);
+        String merchantNo = getMerchantNoByOrder(order);
         String merchantName = MerchantNoUtils.getMerchantName2(merchantNo);
         StringBuilder msgParam = new StringBuilder();
         if("notification-86".equals(msgId)
@@ -1326,6 +1323,41 @@ public class MyCollectionOrderController extends BaseController {
         return msgParam.toString();
     }
 
+    //拼接发送短信的参数（传值给短信系统，不包含签名参数）
+    private String getMsgParam2(MmanLoanCollectionOrder order,String msgId) {
+        if (order == null) {
+            return null;
+        }
+        MmanUserInfo userInfo = mmanUserInfoService.getUserInfoById(order.getUserId());
+        String merchantNo = getMerchantNoByOrder(order);
+        String merchantName = MerchantNoUtils.getMerchantName2(merchantNo);
+        StringBuilder msgParam = new StringBuilder();
+        if("notification-86".equals(msgId)
+                || "notification-87".equals(msgId)
+                || "notification-88".equals(msgId)){
+            if (StringUtils.isNotEmpty(userInfo.getUserSex())) {
+                if ("男".equals(userInfo.getUserSex())) {
+                    msgParam.append(order.getLoanUserName() + "先生");
+                } else {
+                    msgParam.append(order.getLoanUserName() + "女士");
+                }
+            }
+            msgParam.append(",");
+            msgParam.append(merchantName).append(",");
+            CreditLoanPay pay = creditLoanPayService.findByLoanId(order.getLoanId());
+            BigDecimal remainMoney = pay.getReceivableMoney().subtract(pay.getRealMoney());
+            msgParam.append(order.getOverdueDays()).append(",").append(remainMoney);
+        }
+        if ("notification-89".equals(msgId)
+                || "notification-90".equals(msgId)
+                || "notification-91".equals(msgId)
+                || "notification-92".equals(msgId)){
+            msgParam.append(merchantName).append(",");
+            msgParam.append(merchantName).append(",");
+            msgParam.append(merchantName).append(",");
+        }
+        return msgParam.toString();
+    }
     /**
      * 获取订单对应的商户名
      *
@@ -1398,7 +1430,7 @@ public class MyCollectionOrderController extends BaseController {
             if(SHORT_MESSAGE_YOUMI_CHANNEL_FROM.equals(getChannelFrom(order))){
                 msgParam = getYoumiMsgParam(order);
             }else {
-                msgParam = getMsgParam(order,msgCode);
+                msgParam = getMsgParam2(order,msgCode);
             }
             if (msgParam == null) {
                 return new ServiceResult("-7", "短信参数异常！");
@@ -1416,12 +1448,15 @@ public class MyCollectionOrderController extends BaseController {
             }
             logger.error("发送催收短信，参数：mobile:"+ mobile + "msgParam:" + JSONObject.toJSONString(msgParam) + "msgCode:" + msgCode);
             boolean smsResult = false;
-            if (SHORT_MESSAGE_YOUMI_CHANNEL_FROM.equals(getChannelFrom(order))){
-                String merchantNo = PayContents.MERCHANT_NUMBER;
-                smsResult = SmsSendUtil.sendSmsYoumi(mobile, msgParam, msgCode,merchantNo);
-            }else {
-                smsResult = SmsSendUtil.sendSmsNew(mobile, msgParam, msgCode);
-            }
+//            if (SHORT_MESSAGE_YOUMI_CHANNEL_FROM.equals(getChannelFrom(order))){
+//                String merchantNo = PayContents.MERCHANT_NUMBER;
+//                smsResult = SmsSendUtil.sendSmsYoumi(mobile, msgParam, msgCode,merchantNo);
+//            }else {
+//                String merchantNo = getMerchantNoByOrder(order);
+//                smsResult = SmsSendUtil.sendSmsNew(mobile, msgParam, msgCode,merchantNo);
+//            }
+            String merchantNo = getMerchantNoByOrder(order);
+            smsResult = SmsSendUtil.sendSmsNew(mobile, msgParam, msgCode,merchantNo);
             if (smsResult) {
                 // 插入短信记录
                 insertMsg(mobile, order, msgCode, request);
@@ -1434,6 +1469,17 @@ public class MyCollectionOrderController extends BaseController {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private String getMerchantNoByOrder(MmanLoanCollectionOrder order) {
+        String merchantNo = null;
+        if (null == order){
+            return merchantNo;
+        }
+        String loanId = order.getLoanId();
+//        String merchantNo = dataDao.getMerchantNumberByLoanId(loanId);//从业务库中查询
+        merchantNo = mmanUserLoanService.getMerchantNoByLoanId(loanId);//从催收库中查询
+        return merchantNo;
     }
 
     /**

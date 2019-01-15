@@ -42,7 +42,7 @@ public class MerchantNoUtils {
     public static String getMerchantName2(String merchantNo){
         String merchantName = "";
         if ("0".equals(merchantNo) || "xianjinxia".equals(merchantNo)  || "cjxjx".equals(merchantNo)  || "null".equals(merchantNo)){
-            merchantName = "极速现金侠";
+            merchantName = "极速金掌柜";
         }else if ("1".equals(merchantNo)){
             merchantName = "快借钱包";
         }
