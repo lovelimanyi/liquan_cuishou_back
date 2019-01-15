@@ -1456,6 +1456,7 @@ public class MyCollectionOrderController extends BaseController {
 //                smsResult = SmsSendUtil.sendSmsNew(mobile, msgParam, msgCode,merchantNo);
 //            }
             String merchantNo = getMerchantNoByOrder(order);
+            merchantNo = MerchantNoUtils.getMerchantNo(merchantNo);
             smsResult = SmsSendUtil.sendSmsNew(mobile, msgParam, msgCode,merchantNo);
             if (smsResult) {
                 // 插入短信记录

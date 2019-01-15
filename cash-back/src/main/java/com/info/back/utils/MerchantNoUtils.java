@@ -39,6 +39,28 @@ public class MerchantNoUtils {
         return merchantNum;
     }
 
+    public static String getMerchantNo(String merchantNo){
+        String merchantNoTemp = "cjxjx";
+        if ("0".equals(merchantNo)){
+            merchantNoTemp = "cjxjx";
+        }else if ("1".equals(merchantNo)){
+            merchantNoTemp = "kjqb";
+        }else if ("2".equals(merchantNo)){
+            merchantNoTemp = "jxyp";
+        }else if("1000".equals(merchantNo)){
+            merchantNoTemp = "jyb";
+        }else if("1001".equals(merchantNo)){
+            merchantNoTemp = "jxx";
+        }else if("1002".equals(merchantNo)){
+            merchantNoTemp = "jqb";
+        }else if("1005".equals(merchantNo)){
+            merchantNoTemp = "ymjk";
+        }else if("1006".equals(merchantNo)){
+            merchantNoTemp = "txlc";
+        }
+        return merchantNoTemp;
+    }
+
     public static String getMerchantName2(String merchantNo){
         String merchantName = "";
         if ("0".equals(merchantNo) || "xianjinxia".equals(merchantNo)  || "cjxjx".equals(merchantNo)  || "null".equals(merchantNo)){
