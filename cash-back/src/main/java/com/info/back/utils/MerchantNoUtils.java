@@ -61,6 +61,29 @@ public class MerchantNoUtils {
         return merchantNoTemp;
     }
 
+    public static String getMerchantNoByMerchantName(String merchantName){
+        String merchantNoTemp = "0";
+        merchantName = merchantName.trim();
+        if ("极速现金侠".equals(merchantName) || "极速金掌柜".equals(merchantName)){
+            merchantNoTemp = "0";
+        }else if ("快借钱包".equals(merchantName)){
+            merchantNoTemp = "1";
+        }else if ("匠心有品".equals(merchantName)){
+            merchantNoTemp = "2";
+        }else if("急用帮".equals(merchantName)){
+            merchantNoTemp = "1000";
+        }else if("金小侠".equals(merchantName)){
+            merchantNoTemp = "1001";
+        }else if("借钱呗".equals(merchantName) || "极速币下".equals(merchantName)){
+            merchantNoTemp = "1002";
+        }else if("易秒借款".equals(merchantName)){
+            merchantNoTemp = "1005";
+        }else if("天下粮仓".equals(merchantName)){
+            merchantNoTemp = "1006";
+        }
+        return merchantNoTemp;
+    }
+
     public static String getMerchantName2(String merchantNo){
         String merchantName = "";
         if ("0".equals(merchantNo) || "xianjinxia".equals(merchantNo)  || "cjxjx".equals(merchantNo)  || "null".equals(merchantNo)){
