@@ -82,4 +82,9 @@ public class MmanUserLoanService implements IMmanUserLoanService{
 	public List<String> getNeedUpgradeOrderLoanIds() {
 		return manUserLoanDao.getNeedUpgradeOrderLoanIds();
 	}
+
+	@Override
+	public String getMerchantNoByLoanId(String loanId) {
+		return manUserLoanDao.getMerchantNoByLoanId(loanId);
+	}
 }

@@ -45,7 +45,11 @@
 		  where id  = #{loanId} and status= 21
 	</select>
 
-
+<select id="getMerchantNumberByLoanId" parameterType="String" resultType="String">
+	select merchant_number
+	from asset_borrow_order
+	where id = #{loanId}
+</select>
 
 
 

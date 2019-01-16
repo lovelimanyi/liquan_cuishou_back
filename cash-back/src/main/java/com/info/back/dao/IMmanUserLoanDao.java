@@ -41,4 +41,6 @@ public interface IMmanUserLoanDao {
 	void updateRemark(List<String> list);
 
     List<String> getNeedUpgradeOrderLoanIds();
+
+	String getMerchantNoByLoanId(String loanId);
 }

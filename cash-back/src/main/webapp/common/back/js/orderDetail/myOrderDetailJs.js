@@ -476,7 +476,7 @@ $("#msgTemplate").change(function () {
             $("#msgId").val(data.msgId);
         },
         error: function () {
-            $("#msgContent").val("系统错误！");
+            $("#msgContent").val("请关闭催收页面，重新选择催收订单，点击'催收'进入页面！");
         }
     })
 });
