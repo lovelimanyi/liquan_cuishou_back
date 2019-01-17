@@ -12,4 +12,7 @@ public interface IXiaoShouOrderDao {
     PageConfig<XiaoShouOrder> findAllUser(HashMap<String, Object> params);
     Integer findAllUserCount(HashMap<String, Object> params);
 
+    Long getMaxBatchId();
+
+    void setBatchId(Long BatchId);
 }

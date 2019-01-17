@@ -2,7 +2,6 @@ package com.info.back.service;
 
 import com.info.back.controller.BaseController;
 import com.info.back.dao.IPaginationDao;
-import com.info.back.dao.IXiaoShouDao;
 import com.info.back.dao.IXiaoShouOrderDao;
 import com.info.back.exception.BizException;
 import com.info.back.utils.ExcelReader;
@@ -16,13 +15,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
 @Service
 public class XiaoShouService  extends BaseController implements IXiaoShouService{
     private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(XiaoShouService.class);
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     @Autowired
     IXiaoShouOrderDao xiaoShouOrderDao;
     @Autowired
@@ -34,7 +33,18 @@ public class XiaoShouService  extends BaseController implements IXiaoShouService
         // 解析Excel
         List<Map<String, Object>> paramList = getExcelInfo(multipartFile);
         Integer count = xiaoShouOrderDao.importExcel(paramList);
+        setBatchId();
         return count;
+    }
+
+    private void setBatchId() {
+        Long maxBatchId = xiaoShouOrderDao.getMaxBatchId();
+        if (null == maxBatchId){
+            maxBatchId = 0L + 1L;
+        }else {
+            maxBatchId = maxBatchId + 1;
+        }
+        xiaoShouOrderDao.setBatchId(maxBatchId);
     }
 
     @Override
@@ -67,14 +77,18 @@ public class XiaoShouService  extends BaseController implements IXiaoShouService
                 continue;
             }
             //商户号
-            String merchantNo = MerchantNoUtils.getMerchantNoByMerchantName(rows[0]);
+            String merchantNo = MerchantNoUtils.getMerchantNoByMerchantName(String.valueOf(rows[0]));
             execlParams.put("merchantNo",merchantNo);
             //User ID
             execlParams.put("userId",rows[1]);
             //用户姓名
             execlParams.put("userName",rows[2]);
             //注册时间
-            execlParams.put("registerTime",rows[3]);
+            try{
+                execlParams.put("registerTime",rows[3]);
+            }catch (Exception e){
+                execlParams.put("registerTime",null);
+            }
             paramList.add(execlParams);
         }
         return paramList;

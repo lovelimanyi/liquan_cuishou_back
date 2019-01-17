@@ -76,8 +76,7 @@ public class BackConstant {
 
     public final static Integer COLLECTION_ROLE_ID = 10021;//催收员的角色ID
 
-    public final static Integer SALER_ROLE_ID = 10036;//坐席人员（销售人员）
-    public final static Integer SALER_MANAGER_ROLE_ID = 10035;//坐席人员（销售人员）
+    public final static Integer SALER_ROLE_ID = 10036;//坐席（销售人员）
 
     public final static Integer OUTSOURCE_MANAGER_ROLE_ID = 10022;//委外经理角色ID
 

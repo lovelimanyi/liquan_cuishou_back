@@ -17,7 +17,7 @@
     }
 </style>
 
-<form id="pagerForm" onsubmit="return navTabSearch(this);" action="xiaoShou/getAllXiaoShouOrder?myId=${params.myId}" method="post">
+<form id="pagerForm" onsubmit="return navTabSearch(this);" action="xiaoShou/getMyXiaoShouOrder?myId=${params.myId}" method="post">
     <div class="pageHeader">
         <input type="hidden" id="parentId" name="parentId" value="${params.myId}">
         <div class="searchBar">
@@ -33,7 +33,7 @@
                             </c:forEach>
                         </select>
                     </td>
-                    <td>批次: <input type="text" id="batchId" name="batchId" value="${params.batchId}"/></td>
+                    <%--<td>批次: <input type="text" id="batchId" name="batchId" value="${params.batchId}"/></td>--%>
                     <td>用户意向:
                         <select id="userIntention" name="userIntention">
                             <option value="">全部</option>
@@ -44,17 +44,17 @@
                             </c:forEach>
                         </select>
                     </td>
-                    <td>销售公司:
-                        <select id="saleCompany" name="saleCompany">
-                            <option value="">全部</option>
-                            <c:forEach var="saleCompany" items="${saleCompanyMap }">
-                                <option value="${saleCompany.key }" <c:if test="${saleCompany.key eq params.saleCompany}">selected="selected"</c:if>>
-                                        ${saleCompany.value}
-                                </option>
-                            </c:forEach>
-                        </select>
-                    </td>
-                    <td>坐席: <input type="text" id="saler" name="saler" value="${params.currentCollectionUserName}"/></td>
+                    <%--<td>销售公司:--%>
+                        <%--<select id="saleCompany" name="saleCompany">--%>
+                            <%--<option value="">全部</option>--%>
+                            <%--<c:forEach var="saleCompany" items="${saleCompanyMap }">--%>
+                                <%--<option value="${saleCompany.key }" <c:if test="${saleCompany.key eq params.saleCompany}">selected="selected"</c:if>>--%>
+                                        <%--${saleCompany.value}--%>
+                                <%--</option>--%>
+                            <%--</c:forEach>--%>
+                        <%--</select>--%>
+                    <%--</td>--%>
+                    <%--<td>坐席: <input type="text" id="saler" name="saler" value="${params.currentCollectionUserName}"/></td>--%>
                     <td>
                         分单时间:
                         <input type="text" id="startDispatcherTime" name="startDispatcherTime" value="${params.startDispatcherTime}" class="date textInput readonly"
@@ -86,12 +86,12 @@
                 <th align="center" width="50">
                     序号
                 </th>
-                <th align="center" width="50">
-                    批次
-                </th>
-                <th align="center" width="50">
-                    销售公司
-                </th>
+                <%--<th align="center" width="50">--%>
+                    <%--批次--%>
+                <%--</th>--%>
+                <%--<th align="center" width="50">--%>
+                    <%--销售公司--%>
+                <%--</th>--%>
                 <th align="center" width="50">
                     坐席
                 </th>
@@ -133,12 +133,12 @@
                     <td align="center" width="50">
                             ${status.count}
                     </td>
-                    <td align="center" width="50">
-                            ${order.batchId}
-                    </td>
-                    <td align="center" width="100">
-                            ${saleCompanyMap[order.companyId]}
-                    </td>
+                    <%--<td align="center" width="50">--%>
+                            <%--${order.batchId}--%>
+                    <%--</td>--%>
+                    <%--<td align="center" width="100">--%>
+                            <%--${saleCompanyMap[order.companyId]}--%>
+                    <%--</td>--%>
                     <td align="center" width="50">
                             ${order.currentCollectionUserName}
                     </td>

@@ -7,6 +7,8 @@ import com.info.back.service.IXiaoShouService;
 import com.info.back.utils.BackConstant;
 import com.info.back.utils.DwzResult;
 import com.info.back.utils.SpringUtils;
+import com.info.constant.Constant;
+import com.info.web.pojo.BackUser;
 import com.info.web.pojo.XiaoShouOrder;
 import com.info.web.util.PageConfig;
 import org.apache.commons.collections.map.HashedMap;
@@ -23,6 +25,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.info.back.utils.BackConstant.SALER_ROLE_ID;
 
 @Controller
 @RequestMapping("xiaoShou/")
@@ -114,9 +118,25 @@ public class XiaoShouController  extends BaseController {
         model.addAttribute("params",params);
         model.addAttribute("merchantNoMap", BackConstant.merchantNoMap);
         model.addAttribute("saleCompanyMap", saleCompanyMap);
-
-
         return "xiaoshou/allXiaoShouOrder";
+    }
+
+    @RequestMapping("getMyXiaoShouOrder")
+    public String getMyXiaoShouOrder(HttpServletRequest request, Model model) {
+        HashMap<String, Object> params = this.getParametersO(request);
+        BackUser backUser = (BackUser) request.getSession().getAttribute(
+                Constant.BACK_USER);
+        if (String.valueOf(SALER_ROLE_ID).equals(backUser.getRoleId())){
+            params.put("currentCollectionUserId",backUser.getUuid());
+        }
+        PageConfig<XiaoShouOrder> page = xiaoShouService.findAllUserPage(params);
+        List<Map<String,String>> saleCompanyList = mmanLoanCollectionCompanyDao.getAllSaleCompany();
+        Map<String,String> saleCompanyMap = getSaleCompanyMap(saleCompanyList);
+
+        model.addAttribute("page",page);
+        model.addAttribute("params",params);
+        model.addAttribute("merchantNoMap", BackConstant.merchantNoMap);
+        return "xiaoshou/myXiaoShouOrder";
     }
 
     private Map<String,String> getSaleCompanyMap(List<Map<String, String>> saleCompanyList) {
