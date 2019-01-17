@@ -12,4 +12,9 @@ public interface IXiaoShouOrderDao {
     PageConfig<XiaoShouOrder> findAllUser(HashMap<String, Object> params);
     Integer findAllUserCount(HashMap<String, Object> params);
 
+    List<XiaoShouOrder> getXiaoShouOrder();
+
+    void insertXiaoShouOrder(XiaoShouOrder order);
+
+    void delXiaoShouInfo(Long id);
 }
