@@ -10,6 +10,7 @@
      <context:component-scan base-package="com.info">
 		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" />
 	</context:component-scan>
+    <import resource="apollo.xml"/>
      <import resource="spring-mybatis.xml"/>  
      
 </beans>
