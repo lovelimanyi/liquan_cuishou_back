@@ -39,13 +39,16 @@
         <span>
             <input type="button" id="upload" value="导入订单" onclick="check()"/>
         </span>
+        <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+        <span>
+            <input type="button" id="dispatcherOrderId" value="开始分单" onclick="dispatcherOrder()"/>
+        </span>
     </div>
 </form>
 </body>
 
 <script>
     function check() {
-        debugger;
         var file;
         file = $("input[name=file]").val();
         if (file == '' || file == '') {
@@ -64,18 +67,23 @@
             alertMsg.warn("导入文件大小不能操作4M！");
             return false;
         }
-        // $.ajax({
-        //     type: "POST",
-        //     scriptCharset: "utf-8",
-        //     success: function (result) {
-        //         debugger;
-        //         // if ('200' == data.code) {
-        //         //     alertMsg.error("系统中已存在姓名为 " + username + " 的催收员，请核实！");
-        //         // }
-        //         alertMsg.success(result);
-        //     }
-        // });
         $("form").submit();
     }
+
+
+    //开始分单
+    function dispatcherOrder() {
+        debugger;
+        $.ajax({
+            url: "xiaoShou/dispatcherOrder",
+            type: "GET",
+            success: function (data) {
+                alertMsg.info("已完成分单!");
+            },
+            error: function () {
+                alertMsg.error("分单处理异常!")
+            }
+        })
+    };
 </script>
 </html>

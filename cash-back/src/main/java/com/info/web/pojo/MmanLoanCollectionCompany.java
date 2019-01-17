@@ -19,6 +19,8 @@ public class MmanLoanCollectionCompany {
     private String status;
     // 是否是自营团队，1是，0不是
     private String selfBusiness;
+    // 是否是销售公司，1是，0不是
+    private String saleCompany;
     //修改时间
     private Date updateDate;
     //地区
@@ -27,6 +29,14 @@ public class MmanLoanCollectionCompany {
     private Integer peopleCount;
     // 公司ip地址
     private String companyAddress;
+
+    public String getSaleCompany() {
+        return saleCompany;
+    }
+
+    public void setSaleCompany(String saleCompany) {
+        this.saleCompany = saleCompany;
+    }
 
     public void setId(String id) {
         this.id = id;

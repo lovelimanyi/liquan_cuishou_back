@@ -46,6 +46,7 @@
         priority as priority,
         status as status,
         self_business as selfBusiness,
+        sale_company as saleCompany,
         update_date as updateDate,
         region as region,
         (select count(1) from back_user u where u.`company_id`= o.id) as peopleCount
@@ -111,6 +112,7 @@
             <if test="priority != null">`priority`,</if>
             <if test="status != null">`status`,</if>
             <if test="selfBusiness != null">`self_business`,</if>
+            <if test="saleCompany != null">`sale_company`,</if>
             <if test="region!=null">region,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -120,6 +122,7 @@
             <if test="priority != null">#{priority,jdbcType=VARCHAR},</if>
             <if test="status != null">#{status,jdbcType=VARCHAR},</if>
             <if test="selfBusiness != null">#{selfBusiness,jdbcType=VARCHAR},</if>
+            <if test="saleCompany != null">#{saleCompany,jdbcType=VARCHAR},</if>
             <if test="region!=null">#{region},</if>
         </trim>
     </insert>
@@ -201,4 +204,7 @@
             #{id}
         </foreach>
 	</select>
+    <select id="getAllSaleCompany" resultType="map">
+        SELECT id,title from mman_loan_collection_company WHERE `status` = 1 AND sale_company='1'
+    </select>
 </mapper>

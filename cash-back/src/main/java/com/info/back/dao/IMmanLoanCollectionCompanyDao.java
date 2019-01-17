@@ -3,6 +3,7 @@ package com.info.back.dao;
 import java.util.List;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.stereotype.Repository;
 
@@ -98,4 +99,6 @@ public interface IMmanLoanCollectionCompanyDao {
     List<MmanLoanCollectionCompany> getCompanyIps();
 
     List<MmanLoanCollectionCompany> getCompanyByIds(HashMap<String, Object> param);
+
+    List<Map<String,String>> getAllSaleCompany();
 }

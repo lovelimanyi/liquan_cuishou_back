@@ -56,6 +56,11 @@ public class CollectionCompanyService implements ICollectionCompanyService{
 			}else{
 				mmanLoanCollectionCompany.setSelfBusiness(params.get("selfBusiness"));
 			}
+			if(params.get("saleCompany")==null || params.get("saleCompany")==""){
+				mmanLoanCollectionCompany.setSaleCompany("0");
+			}else{
+				mmanLoanCollectionCompany.setSaleCompany(params.get("saleCompany"));
+			}
 			if(params.get("priority")==null || params.get("priority")==""){
 				mmanLoanCollectionCompany.setPriority("1");
 			}else{
