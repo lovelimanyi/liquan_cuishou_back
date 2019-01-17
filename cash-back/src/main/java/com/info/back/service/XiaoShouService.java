@@ -93,5 +93,20 @@ public class XiaoShouService  extends BaseController implements IXiaoShouService
         }
         return paramList;
     }
+    @Override
+    public List<XiaoShouOrder> getXiaoShouOrder() {
+        return xiaoShouOrderDao.getXiaoShouOrder();
+    }
+
+    @Override
+    public void insertXiaoShouOrder(XiaoShouOrder order) {
+        xiaoShouOrderDao.insertXiaoShouOrder(order);
+    }
+
+    @Override
+    public void delXiaoShouInfo(Long id) {
+        xiaoShouOrderDao.delXiaoShouInfo(id);
+    }
+
 
 }

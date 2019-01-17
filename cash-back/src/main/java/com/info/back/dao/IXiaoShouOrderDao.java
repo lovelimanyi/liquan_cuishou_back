@@ -15,4 +15,9 @@ public interface IXiaoShouOrderDao {
     Long getMaxBatchId();
 
     void setBatchId(Long BatchId);
+    List<XiaoShouOrder> getXiaoShouOrder();
+
+    void insertXiaoShouOrder(XiaoShouOrder order);
+
+    void delXiaoShouInfo(Long id);
 }

@@ -3,6 +3,7 @@ package com.info.back.controller.xiaoshou;
 import com.info.back.controller.BaseController;
 import com.info.back.dao.IMmanLoanCollectionCompanyDao;
 import com.info.back.result.JsonResult;
+import com.info.back.service.DistributeXiaoShouOrderService;
 import com.info.back.service.IXiaoShouService;
 import com.info.back.utils.BackConstant;
 import com.info.back.utils.DwzResult;
@@ -38,6 +39,8 @@ public class XiaoShouController  extends BaseController {
     IXiaoShouService xiaoShouService;
     @Autowired
     IMmanLoanCollectionCompanyDao mmanLoanCollectionCompanyDao;
+    @Autowired
+    DistributeXiaoShouOrderService distributeXiaoShouOrderService;
 
     /**
      * 导入客户信息页面
@@ -91,9 +94,7 @@ public class XiaoShouController  extends BaseController {
         JsonResult result = new JsonResult("-1", "分单失败！");
         try{
 
-
-
-
+            distributeXiaoShouOrderService.handleXiaoShouOrder();
             result.setCode("0");
             result.setMsg("已完成分单！");
         }catch (Exception e){
