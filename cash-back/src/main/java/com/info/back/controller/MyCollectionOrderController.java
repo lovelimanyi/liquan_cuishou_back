@@ -1981,9 +1981,11 @@ public class MyCollectionOrderController extends BaseController {
         String id = params.get("id").toString();
         MmanLoanCollectionOrder order = mmanLoanCollectionOrderService.getOrderById(id);
         String assetRepaymentId = order.getPayId();
-
         model.addAttribute("payId", assetRepaymentId);
         model.addAttribute("params", params);
+        MmanUserLoan loan = mmanUserLoanService.get(order.getLoanId());
+        model.addAttribute("loanUserName", order.getLoanUserName());
+        model.addAttribute("merchantNo", MerchantNoUtils.getMerchantName2(loan.getMerchantNo()));
         return "mycollectionorder/qrCodePage";
 
     }
@@ -2050,6 +2052,9 @@ public class MyCollectionOrderController extends BaseController {
         model.addAttribute("remainMoney", remainMoney);
         model.addAttribute("payId", assetRepaymentId);
         model.addAttribute("params", params);
+        MmanUserLoan loan = mmanUserLoanService.get(order.getLoanId());
+        model.addAttribute("loanUserName", order.getLoanUserName());
+        model.addAttribute("merchantNo", MerchantNoUtils.getMerchantName2(loan.getMerchantNo()));
         return "mycollectionorder/jianmianQrCodePage";
 
     }
