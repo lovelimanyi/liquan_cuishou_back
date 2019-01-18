@@ -10,6 +10,7 @@ import com.info.web.synchronization.dao.IDataDao;
 import com.info.web.util.JedisDataClient;
 import com.info.web.util.ThreadPoolInstance;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -92,8 +93,13 @@ public class DistributeXiaoShouOrderService {
                 order.setDispatcherTime(new Date());
                 HashMap<String,String> map = new HashMap<String,String>();
                 map.put("USER_ID", userId);//还款id
-//                Map<String, Object> userInfo = dataDao.getUserInfo(map);
-//                order.setMobile(userInfo.get("user_name").toString());
+                Map<String, Object> userInfo = dataDao.getUserInfo(map);
+                if (null != userInfo && null != userInfo.get("user_name")){
+                    order.setMobile(userInfo.get("user_name").toString());
+                }else {
+                    order.setMobile("");
+                }
+
                 order.setMobile("18737191376");
                 xiaoShouService.insertXiaoShouOrder(order);
 //                xiaoShouService.delXiaoShouInfo(order.getId());
