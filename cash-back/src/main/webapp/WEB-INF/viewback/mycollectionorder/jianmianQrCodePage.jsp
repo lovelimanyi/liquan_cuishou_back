@@ -22,20 +22,15 @@
         <input type="hidden" name="loanId" id="loanId" value="${params.loanId}">
         <input type="hidden" name="payId" id="payId" value="${payId}">
         <div class="pageFormContent" layoutH="50" style="overflow: auto;">
-            <dl>
-                <dt style="width: 80px;">
-                    <label>
-                        还款金额:
-                    </label>
-                </dt>
-                <dd>
-                    <input type="text" id="payMoney" name="payMoney" class="required number" onfocus="hideErCode();">
-                </dd>
-            </dl>
+
+            <label style="width: 70px">还款金额:</label><input type="text" id="payMoney" name="payMoney" class="required number" onfocus="hideErCode();">
             <div class="divider"></div>
+            <div class="divider"></div>
+            <span style="font-size: 14px; color: red ">&nbsp;&nbsp;&nbsp;借款人： ${loanUserName}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;借款平台：${merchantNo}</span>
             <dl id="erCode">
                 <img height="300" width="300" id="qrCode" alt="该订单可能正在还款中，请稍等">
             </dl>
+
         </div>
 
         <div class="formBar">
@@ -57,7 +52,7 @@
 <script type="text/javascript">
 
     $(function () {
-        $.pdialog.resizeDialog({style: {width: 800, height: 370}}, $.pdialog.getCurrent(), "");
+        $.pdialog.resizeDialog({style: {width: 330, height: 470}}, $.pdialog.getCurrent(), "");
 
         $("#erCode").hide();
     });

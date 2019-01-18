@@ -19,6 +19,7 @@
     <form id="frm" method="post" enctype="multipart/form-data" action="" onsubmit="return validateCallback(this, dialogAjaxDone);">
         <input type="hidden" name="parentId" value="${params.myId}"/>
         <div class="pageFormContent" layoutH="50" style="overflow: auto;">
+            <span style="font-size: 14px; color: red ">&nbsp;&nbsp;&nbsp;借款人： ${loanUserName}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;借款平台：${merchantNo}</span>
             <img height="300" width="300" id="qrCode" src="collectionOrder/getQrCode?payId=${payId}" alt="该订单可能正在还款中，请稍等">
         </div>
         <div class="formBar">
@@ -42,7 +43,7 @@
 <script type="text/javascript">
 
     $(function () {
-        $.pdialog.resizeDialog({style: {width: 330, height: 399}}, $.pdialog.getCurrent(), "");
+        $.pdialog.resizeDialog({style: {width: 330, height: 420}}, $.pdialog.getCurrent(), "");
     });
 
 </script>
