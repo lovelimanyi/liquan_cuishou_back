@@ -84,9 +84,9 @@ public class DistributeXiaoShouOrderService {
                 String currentCollectionUserId = user.get("uuid").toString();
                 String backUserName =  user.get("userName").toString();
                 String companyId = user.get("companyId").toString();
-                String batchId = user.get("batchId").toString();
+                Long batchId = order.getBatchId();
                 String userId = order.getUserId();
-                order.setBatchId(Long.valueOf(batchId));
+                order.setBatchId(batchId);
                 order.setCurrentCollectionUserId(currentCollectionUserId);
                 order.setCurrentCollectionUserName(backUserName);
                 order.setCompanyId(companyId);
