@@ -41,6 +41,7 @@
         </span>
         <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
         <span>
+            <label style="width: 500px"></label>
             <input type="button" id="dispatcherOrderId" value="开始分单" onclick="dispatcherOrder()"/>
         </span>
     </div>

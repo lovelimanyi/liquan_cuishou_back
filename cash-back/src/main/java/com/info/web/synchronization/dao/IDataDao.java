@@ -2,6 +2,7 @@ package com.info.web.synchronization.dao;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Repository;
 
@@ -52,4 +53,6 @@ public interface IDataDao {
 	HashMap<String,Object> getDianXiaoOrder(HashMap<String, String> map);
 
 	String getMerchantNumberByLoanId(String loanId);
+
+	HashMap<String,String> getBorrowOrderOnBorrowing2(HashMap<String, String> map);
 }

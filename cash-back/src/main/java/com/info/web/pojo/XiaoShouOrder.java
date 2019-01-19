@@ -13,8 +13,8 @@ public class XiaoShouOrder {
     private Date dispatcherTime;
     private Date startDispatcherTime;
     private Date endDispatcherTime;
-    private Integer loanOrderStatus;
-    private Integer userIntention;
+    private Integer loanOrderStatus;//0 无在借订单；1 有在借订单
+    private Integer userIntention;//用户意向：1有意向；2无意向；3 未接通
     private String remark;
     private String currentCollectionUserId;
     private String currentCollectionUserName;

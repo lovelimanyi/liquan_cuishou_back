@@ -2,6 +2,7 @@ package com.info.web.synchronization.dao;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Repository;
 
@@ -53,4 +54,9 @@ public class DataDao extends BaseDao implements IDataDao {
         return getMerchantNumberByLoanId(loanId);
     }
 
+
+    @Override
+    public HashMap<String, String> getBorrowOrderOnBorrowing2(HashMap<String, String> map) {
+        return getSqlSessionTemplates().selectOne("getBorrowOrderOnBorrowing2", map);
+    }
 }

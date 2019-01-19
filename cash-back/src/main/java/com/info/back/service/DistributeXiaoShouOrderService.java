@@ -84,8 +84,9 @@ public class DistributeXiaoShouOrderService {
                 String currentCollectionUserId = user.get("uuid").toString();
                 String backUserName =  user.get("userName").toString();
                 String companyId = user.get("companyId").toString();
+                String batchId = user.get("batchId").toString();
                 String userId = order.getUserId();
-                order.setBatchId(1l);
+                order.setBatchId(Long.valueOf(batchId));
                 order.setCurrentCollectionUserId(currentCollectionUserId);
                 order.setCurrentCollectionUserName(backUserName);
                 order.setCompanyId(companyId);
@@ -102,7 +103,7 @@ public class DistributeXiaoShouOrderService {
 
                 order.setMobile("18737191376");
                 xiaoShouService.insertXiaoShouOrder(order);
-//                xiaoShouService.delXiaoShouInfo(order.getId());
+                xiaoShouService.delXiaoShouInfo(order.getId());
             } catch (Exception e) {
                 e.printStackTrace();
             }

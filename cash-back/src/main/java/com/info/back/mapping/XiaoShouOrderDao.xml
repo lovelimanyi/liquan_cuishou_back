@@ -45,8 +45,8 @@
 		<if test="userName != null and userName !=''">
 			and user_name = #{userName}
 		</if>
-		<if test="currentCollectionUserId != null and currentCollectionUserId !=''">
-			and current_collection_user_id = #{currentCollectionUserId}
+		<if test="currentCollectionUserName != null and currentCollectionUserName !=''">
+			and current_collection_user_name = #{currentCollectionUserName}
 		</if>
 		<if test="startDispatcherTime != null and startDispatcherTime !=''">
 			<![CDATA[and dispatcher_time >= #{startDispatcherTime}]]>
@@ -102,6 +102,7 @@
 			merchant_no AS merchantNo,
 			user_id AS userId,
 			user_name AS userName,
+			batch_id AS batchId,
 			register_time AS registerTime
 		from xiao_shou_info;
 	</select>
@@ -112,5 +113,17 @@
 	<delete id="delXiaoShouInfo" parameterType="long">
 		DELETE FROM xiao_shou_info WHERE id = #{id};
 	</delete>
+	<update id="updateRemark" parameterType="com.info.web.pojo.XiaoShouOrder">
+		UPDATE xiao_shou_order
+		SET remark = #{remark}
+		WHERE
+			id = #{id}
+	</update>
+	<update id="updateUserIntention" parameterType="com.info.web.pojo.XiaoShouOrder">
+		UPDATE xiao_shou_order
+		SET user_intention = #{userIntention}
+		WHERE
+		id = #{id}
+	</update>
 
 </mapper>

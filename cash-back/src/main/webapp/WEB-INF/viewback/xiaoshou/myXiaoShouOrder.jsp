@@ -44,17 +44,6 @@
                             </c:forEach>
                         </select>
                     </td>
-                    <%--<td>销售公司:--%>
-                        <%--<select id="saleCompany" name="saleCompany">--%>
-                            <%--<option value="">全部</option>--%>
-                            <%--<c:forEach var="saleCompany" items="${saleCompanyMap }">--%>
-                                <%--<option value="${saleCompany.key }" <c:if test="${saleCompany.key eq params.saleCompany}">selected="selected"</c:if>>--%>
-                                        <%--${saleCompany.value}--%>
-                                <%--</option>--%>
-                            <%--</c:forEach>--%>
-                        <%--</select>--%>
-                    <%--</td>--%>
-                    <%--<td>坐席: <input type="text" id="saler" name="saler" value="${params.currentCollectionUserName}"/></td>--%>
                     <td>
                         分单时间:
                         <input type="text" id="startDispatcherTime" name="startDispatcherTime" value="${params.startDispatcherTime}" class="date textInput readonly"
@@ -77,6 +66,9 @@
         </div>
     </div>
     <div class="pageContent">
+        <jsp:include page="${BACK_URL}/rightSubList">
+            <jsp:param value="${params.myId}" name="parentId"/>
+        </jsp:include>
         <c:set var="page" value="${page}"></c:set>
         <%@ include file="/WEB-INF/viewback/page.jsp" %>
         <table class="table" style="width: 100%;" layoutH="160"
@@ -86,12 +78,6 @@
                 <th align="center" width="50">
                     序号
                 </th>
-                <%--<th align="center" width="50">--%>
-                    <%--批次--%>
-                <%--</th>--%>
-                <%--<th align="center" width="50">--%>
-                    <%--销售公司--%>
-                <%--</th>--%>
                 <th align="center" width="50">
                     坐席
                 </th>
@@ -110,7 +96,7 @@
                 <th align="center" width="50">
                     注册时间
                 </th>
-                <th align="center" width="50">
+                <th align="center" width="80">
                     当前状态
                 </th>
                 <th align="center" width="50">
@@ -133,12 +119,12 @@
                     <td align="center" width="50">
                             ${status.count}
                     </td>
-                    <%--<td align="center" width="50">--%>
-                            <%--${order.batchId}--%>
-                    <%--</td>--%>
-                    <%--<td align="center" width="100">--%>
-                            <%--${saleCompanyMap[order.companyId]}--%>
-                    <%--</td>--%>
+                        <%--<td align="center" width="50">--%>
+                        <%--${order.batchId}--%>
+                        <%--</td>--%>
+                        <%--<td align="center" width="100">--%>
+                        <%--${saleCompanyMap[order.companyId]}--%>
+                        <%--</td>--%>
                     <td align="center" width="50">
                             ${order.currentCollectionUserName}
                     </td>
@@ -152,38 +138,40 @@
                             ${order.userName}
                     </td>
                     <td align="center" width="50">
-                            ${order.mobile}
+                            ${fn:substring(order.mobile, 0,3)}****${fn:substring(order.mobile, 7,-1)}
                     </td>
                     <td align="center" width="100">
-                            <fmt:formatDate value="${order.registerTime}" pattern="yyyy-MM-dd HH:mm:ss"/>
+                        <fmt:formatDate value="${order.registerTime}" pattern="yyyy-MM-dd HH:mm:ss"/>
                     </td>
-                    <td align="center" width="50">
+                    <td align="center" width="80">
                         <c:choose>
                             <c:when test="${order.loanOrderStatus eq 0}">无在借订单</c:when>
                             <c:when test="${order.loanOrderStatus eq 1}">有在借订单</c:when>
                         </c:choose>
                     </td>
                     <td>
-                        <select id="userIntention2" name="userIntention2">
-                            <option value="${order.userIntention }" <c:if test="${order.userIntention eq null}">selected="selected"</c:if>>请选择</option>
-                            <option value="${order.userIntention }" <c:if test="${order.userIntention eq 1}">selected="selected"</c:if>>有意向</option>
-                            <option value="${order.userIntention }" <c:if test="${order.userIntention eq 2}">selected="selected"</c:if>>无意向</option>
-                            <option value="${order.userIntention }" <c:if test="${order.userIntention eq 3}">selected="selected"</c:if>>未接通</option>
-                        </select>
+                        <c:choose>
+                            <c:when test="${order.userIntention eq 1}">有意向</c:when>
+                            <c:when test="${order.userIntention eq 2}">无意向</c:when>
+                            <c:when test="${order.userIntention eq 3}">未接通</c:when>
+                        </c:choose>
                     </td>
                     <td align="center" width="150">
                             ${order.remark}
                     </td>
                     <td align="center" width="100">
-                            <fmt:formatDate value="${order.dispatcherTime}" pattern="yyyy-MM-dd HH:mm:ss"/>
+                        <fmt:formatDate value="${order.dispatcherTime}" pattern="yyyy-MM-dd HH:mm:ss"/>
                     </td>
                     <td align="center" width="350">
-                        <%--<a href="collectionOrder/toxianqin?id=${order.id }" target="navtab"--%>
-                           <%--style="color: #cd0a0a;margin: 8px;font-size: 15px;text-decoration: none;">查看手机号--%>
-                        <%--</a>--%>
-                        <%--<a href="collectionOrder/tokokuan?id=${order.id }&myId=${params.myId}" target="dialog"--%>
-                           <%--style="color: #1b8d0f;margin: 8px;font-size: 15px;text-decoration: none;">添加备注--%>
-                        <%--</a>--%>
+                        <a href="xiaoShou/getUserMobile?mobile=${order.mobile }&myId=${params.myId}" target="dialog"
+                           style="color: #1b8d0f;margin: 8px;font-size: 15px;text-decoration: none;">查看手机号
+                        </a>
+                        <a href="xiaoShou/addRemarkPage?id=${order.id }&remark=${order.remark }&myId=${params.myId}" target="dialog"
+                           style="color: #0f579f;margin: 8px;font-size: 15px;text-decoration: none;">添加备注
+                        </a>
+                        <a href="xiaoShou/updateUserIntentionPage?id=${order.id }&userIntention=${order.userIntention }&myId=${params.myId}" target="dialog"
+                           style="color: #0f579f;margin: 8px;font-size: 15px;text-decoration: none;">修改用户意向
+                        </a>
                     </td>
                 </tr>
             </c:forEach>
@@ -192,57 +180,5 @@
 
     </div>
 
-    <script type="text/javascript">
-        function getMsg(obj) {
-            var tt = $(".pageContent tbody tr").is(':checked').value();
-            var bol = $(obj).is(':checked');
-            var text = bol.get(1).text();
-            console.log(text);
-        }
-
-    </script>
-
 </form>
 
-<script type="text/javascript">
-    function checkAll(obj) {
-        var bol = $(obj).is(':checked');
-        $("input[name='checkItem']").attr("checked", bol);
-    }
-    function sel(obj) {
-        var bol = true;
-        var check = $(obj).find("input[name='checkItem']");
-        if ($(check).is(':checked')) {
-            bol = false;
-        }
-        $(check).attr("checked", bol);
-    }
-    function getOrderIds(obj) {
-        var href = $(obj).attr("href");
-        if (href.indexOf('&ids') > -1) {
-            href = href.substring(0, href.indexOf('&ids'));
-        }
-        var hasDifferentGroup = '0';
-        var selectedGroup = "";
-        $("input[name='checkItem']:checked").each(function () {
-            var group = $(this).attr("group");
-            if (group != undefined && group != '') {
-                if (selectedGroup == '') {
-                    selectedGroup = group;//第一次赋值
-                } else if (selectedGroup != group) {// 之后和第一次的值比较，有不同就GG
-                    hasDifferentGroup = '1';
-                }
-            }
-        })
-        if (hasDifferentGroup) {
-            var ids = "";
-            $("input[name='checkItem']:checked").each(function () {
-                ids = ids + "," + $(this).val();
-            });
-            var toHref = href + "&ids=" + ids.substring(1) + "&groupStatus=" + hasDifferentGroup;
-            $(obj).attr("href", toHref);
-        } else {
-            return;
-        }
-    }
-</script>

@@ -20,4 +20,8 @@ public interface IXiaoShouOrderDao {
     void insertXiaoShouOrder(XiaoShouOrder order);
 
     void delXiaoShouInfo(Long id);
+
+    int updateRemark(XiaoShouOrder xiaoShouOrder);
+
+    int updateUserIntention(XiaoShouOrder xiaoShouOrder);
 }
