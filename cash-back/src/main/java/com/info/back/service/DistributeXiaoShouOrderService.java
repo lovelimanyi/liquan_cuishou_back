@@ -101,7 +101,7 @@ public class DistributeXiaoShouOrderService {
                     order.setMobile("");
                 }
 
-                order.setMobile("18737191376");
+//                order.setMobile("18737191376");
                 xiaoShouService.insertXiaoShouOrder(order);
                 xiaoShouService.delXiaoShouInfo(order.getId());
             } catch (Exception e) {
