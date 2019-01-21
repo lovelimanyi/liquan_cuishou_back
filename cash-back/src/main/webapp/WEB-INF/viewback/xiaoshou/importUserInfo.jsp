@@ -44,6 +44,13 @@
             <label style="width: 500px"></label>
             <input type="button" id="dispatcherOrderId" value="开始分单" onclick="dispatcherOrder()"/>
         </span>
+
+        <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+        <div>
+            温馨提示：请关闭其他标签页（客户总列表、我的客户列表页面），再进行导入操作
+        </div>
+
+
     </div>
 </form>
 </body>
