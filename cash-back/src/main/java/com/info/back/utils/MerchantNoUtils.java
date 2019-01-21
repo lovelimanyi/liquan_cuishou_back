@@ -1,6 +1,10 @@
 package com.info.back.utils;
 
 import com.info.config.PayContents;
+import org.apache.commons.collections.map.HashedMap;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 类描述：
@@ -8,6 +12,17 @@ import com.info.config.PayContents;
  * 创建时间：2018/10/23 0023下午 05:32
  */
 public class MerchantNoUtils {
+//
+//    public static Map<String,String> getMerchantNoMap(){
+//        Map<String,String> map = new HashedMap();
+//        map.put("0","极速金掌柜");
+//        map.put("1000","急用帮");
+//        map.put("1001","金小侠");
+//        map.put("1002","极速币下");
+//        map.put("1005","易秒借款");
+//        map.put("1006","天下粮仓");
+//        return map;
+//    }
 
     public static String getMerchantName(){
         String merchantName = "";
@@ -57,6 +72,29 @@ public class MerchantNoUtils {
             merchantNoTemp = "ymjk";
         }else if("1006".equals(merchantNo)){
             merchantNoTemp = "txlc";
+        }
+        return merchantNoTemp;
+    }
+
+    public static String getMerchantNoByMerchantName(String merchantName){
+        String merchantNoTemp = "0";
+        merchantName = merchantName.trim();
+        if ("极速现金侠".equals(merchantName) || "极速金掌柜".equals(merchantName)){
+            merchantNoTemp = "0";
+        }else if ("快借钱包".equals(merchantName)){
+            merchantNoTemp = "1";
+        }else if ("匠心有品".equals(merchantName)){
+            merchantNoTemp = "2";
+        }else if("急用帮".equals(merchantName)){
+            merchantNoTemp = "1000";
+        }else if("金小侠".equals(merchantName)){
+            merchantNoTemp = "1001";
+        }else if("借钱呗".equals(merchantName) || "极速币下".equals(merchantName)){
+            merchantNoTemp = "1002";
+        }else if("易秒借款".equals(merchantName)){
+            merchantNoTemp = "1005";
+        }else if("天下粮仓".equals(merchantName) || "猪有钱".equals(merchantName)){
+            merchantNoTemp = "1006";
         }
         return merchantNoTemp;
     }

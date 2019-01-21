@@ -66,6 +66,9 @@
 							自营团队
 						</th>
 						<th align="center" width="30">
+							销售公司
+						</th>
+						<th align="center" width="30">
 							地区
 						</th>
 						<th align="center" width="100">
@@ -101,6 +104,12 @@
 							<td>
 								<c:choose>
 									<c:when test="${company.selfBusiness eq '1' }">是</c:when>
+									<c:otherwise>否</c:otherwise>
+								</c:choose>
+							</td>
+							<td>
+								<c:choose>
+									<c:when test="${company.saleCompany eq '1' }">是</c:when>
 									<c:otherwise>否</c:otherwise>
 								</c:choose>
 							</td>

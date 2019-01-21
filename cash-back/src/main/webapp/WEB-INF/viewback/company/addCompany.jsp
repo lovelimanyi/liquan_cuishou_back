@@ -67,6 +67,22 @@
 							否
 						</dd>
 					</dl>
+					<div class="divider"></div>
+					<dl>
+						<dt style="width: 80px;">
+							<label>
+								是否销售公司:
+							</label>
+						</dt>
+						<dd>
+							<label style="width: 300px;">
+								<select name="saleCompany">
+									<option value="0">否</option>
+									<option value="1">是</option>
+								</select>
+							</label>
+						</dd>
+					</dl>
 				</div>
 				<div class="formBar">
 					<ul>

@@ -14,6 +14,8 @@ public class BackConstant {
 
     public final static String DISTRIBUTE_BACK_USER = "distribute:backUserS1";
 
+    public final static String XIAO_SHOU_BACK_USER = "xiaoshou:backUser";
+
 
     public static final String CREDITLOANAPPLY_OVERDUE = "4";// 逾期
 
@@ -73,6 +75,8 @@ public class BackConstant {
 
 
     public final static Integer COLLECTION_ROLE_ID = 10021;//催收员的角色ID
+
+    public final static Integer SALER_ROLE_ID = 10036;//坐席（销售人员）
 
     public final static Integer OUTSOURCE_MANAGER_ROLE_ID = 10022;//委外经理角色ID
 
@@ -145,12 +149,12 @@ public class BackConstant {
         channelFromMap.put("ymgj","是");
 
         merchantNoMap.put("0","极速金掌柜");//极速金掌柜（原极速现金侠）
-        merchantNoMap.put("1","快借钱包");
+//        merchantNoMap.put("1","快借钱包");
         merchantNoMap.put("1000","急用帮");
         merchantNoMap.put("1001","金小侠");
         merchantNoMap.put("1002","极速币下");
-        merchantNoMap.put("1006","天下粮仓");
         merchantNoMap.put("1005","易秒借款");
+        merchantNoMap.put("1006","猪有钱");
 
 
         groupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_S1, "S1");

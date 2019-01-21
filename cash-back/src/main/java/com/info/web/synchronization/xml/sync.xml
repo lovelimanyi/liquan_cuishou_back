@@ -51,6 +51,19 @@
 	where id = #{loanId}
 </select>
 
-
+<select id="getBorrowOrderOnBorrowing2" resultType="hashmap" parameterType="hashmap">
+		SELECT
+			id AS loanId,
+			user_id AS userId,
+			merchant_number AS merchantNumber,
+			`status` AS `status`,
+			user_phone AS mobile
+		FROM
+			asset_borrow_order
+		WHERE
+			user_id = #{userId}
+		AND merchant_number = #{merchantNo}
+		AND `status` IN (- 20 ,- 11, 0, 1, 20, 21, 22, 23);
+</select>
 
 </mapper>
