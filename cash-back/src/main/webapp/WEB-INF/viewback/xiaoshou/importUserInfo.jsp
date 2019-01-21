@@ -81,7 +81,7 @@
 
     //开始分单
     function dispatcherOrder() {
-        debugger;
+        // debugger;
         $.ajax({
             url: "xiaoShou/dispatcherOrder",
             type: "GET",
