@@ -32,6 +32,8 @@ public class XiaoShouService  extends BaseController implements IXiaoShouService
         logger.info("解析excel ");
         // 解析Excel
         List<Map<String, Object>> paramList = getExcelInfo(multipartFile);
+        //导入操作前，删除xiao_shou_info表原来表所有数据(同一个excel操作两次导入)
+        xiaoShouOrderDao.deleteAllOrder();
         Integer count = xiaoShouOrderDao.importExcel(paramList);
         setBatchId();
         return count;

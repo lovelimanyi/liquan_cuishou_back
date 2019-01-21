@@ -24,4 +24,6 @@ public interface IXiaoShouOrderDao {
     int updateRemark(XiaoShouOrder xiaoShouOrder);
 
     int updateUserIntention(XiaoShouOrder xiaoShouOrder);
+
+    void deleteAllOrder();
 }

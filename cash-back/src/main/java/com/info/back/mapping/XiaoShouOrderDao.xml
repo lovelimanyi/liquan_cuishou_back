@@ -125,5 +125,8 @@
 		WHERE
 		id = #{id}
 	</update>
+    <delete id="deleteAllOrder">
+        delete from xiao_shou_info;
+    </delete>
 
 </mapper>
