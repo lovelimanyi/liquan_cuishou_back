@@ -516,7 +516,7 @@
                 </div>
                 <ul>
                     <li>
-                        <button style="margin-left: 110px;width: 70px;height: 25px;" type="button" id="addCollectionRecord">
+                        <button style="margin-left: 110px;width: 70px;height: 25px;" type="button"  onclick="addCollectionRecord222()">
                             添加催记
                         </button>
                     </li>

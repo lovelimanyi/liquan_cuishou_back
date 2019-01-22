@@ -494,7 +494,20 @@ $("select[name='collectionMode']").change(function () {
 });
 
 
-$("#addCollectionRecord").click(function () {
+// $("#addCollectionRecord222").click(function () {
+//     var val = $("select[name='collectionMode'] option:selected").val();
+//     if (val == '1') {
+//         // alertMsg.warn("打电话...电话催收");
+//         // 保存对应的催收记录
+//         saveCollectionRecord();
+//     } else {
+//         // alertMsg.info("发送短信...短信催收");
+//         // 发送短信
+//         sendMsg();
+//     }
+// });
+
+function addCollectionRecord222() {
     var val = $("select[name='collectionMode'] option:selected").val();
     if (val == '1') {
         // alertMsg.warn("打电话...电话催收");
@@ -505,7 +518,7 @@ $("#addCollectionRecord").click(function () {
         // 发送短信
         sendMsg();
     }
-});
+}
 
 // 获取订单的所有催收记录
 function getRecordLists() {
@@ -528,7 +541,7 @@ function getRecordLists() {
             }
         }
     });
-};
+}
 
 // 依据条件动态查询订单对应催收记录
 $("#searchOrderCollectionRecord").click(function () {
