@@ -206,12 +206,12 @@
         var href=$(obj).attr("href");
         href = href.split("&")[0];
         var createDate=$("#createDate").val();
-        var personName = $("#backUserName").val() == undefined ? '' : $("#backUserName").val();
+        var backUserName = $("#backUserName").val() == undefined ? '' : $("#backUserName").val();
         var groupLevel = $("#groupLevel").val() == undefined ? '' : $("#groupLevel").val();
         var companyId = $("#companyId").val() == undefined ? '' : $("#companyId").val();
         var orderBy = $("#orderBy").val() == undefined ? null : $("#orderBy").val();
         var Flag='personNew';
-        var toHref=href+"&createDate="+createDate+"&personName="+personName+"&groupLevel="+groupLevel+"&companyId="+companyId
+        var toHref=href+"&createDate="+createDate+"&backUserName="+backUserName+"&groupLevel="+groupLevel+"&companyId="+companyId
             +"&Flag="+Flag +"&orderBy="+orderBy;
 
         $(obj).attr("href",toHref);
