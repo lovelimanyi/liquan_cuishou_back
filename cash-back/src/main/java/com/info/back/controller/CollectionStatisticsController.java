@@ -17,9 +17,11 @@ import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import sun.java2d.pipe.SpanIterator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -516,12 +518,17 @@ public class CollectionStatisticsController extends BaseController {
 		String url = "";
 		try {
 			HashMap<String, Object> params = getParametersO(request);
+			if (StringUtils.isEmpty(params.get("orderBy"))){
+				params.put("orderBy","groupLevel");
+			}
 			BackUser backUser = (BackUser) request.getSession().getAttribute(Constant.BACK_USER);
 			if(StringUtils.isEmpty(params.get("createDate")) && StringUtils.isEmpty(params.get("createDate"))){
 				params.put("createDate",DateUtil.getDateFormat(new Date(),"yyyy-MM-dd"));
 			}
 			//设置登录账户可查看的公司权限
 			PageConfig<PersonStatistics> pageConfig = new PageConfig<>();
+
+			PageConfig<PersonNewStatistics> pageConfigNew = new PageConfig<>();
 
 			//如果Flag 为person则查看个人统计，如果为 company则查看公司统计
 			if ("person".equals(Flag)){
@@ -543,11 +550,28 @@ public class CollectionStatisticsController extends BaseController {
 			}else if ("other".equals(Flag)){
 				url = "statistics/companyStatisticsOther";
 				pageConfig = personStatisticsService.findCompanyOtherPage(params);
+			}else if ("personNew".equals(Flag)){
+				handleCompanyPermission(backUser,params,model);
+				url = "statistics/personNewPage";
+				pageConfigNew = personStatisticsService.personNewPage(params);
+			}else if("companyNew".equals(Flag)){
+				url = "statistics/companyNewPage";
+				pageConfigNew = personStatisticsService.companyNewPage(params);
+				List<String> companyIds = getCompanyIds(backUser);
+				if(pageConfigNew.getItems() != null && pageConfigNew.getItems().size() > 0){
+					for (int i = 0; i < pageConfigNew.getItems().size(); i ++) {
+						if(!companyIds.contains(pageConfigNew.getItems().get(i).getCompanyId())){
+							pageConfigNew.getItems().get(i).setCompanyName("* * * * * * * * ");
+						}
+					}
+				}
+				handleCompanyPermission(backUser,params,model);
 			}
 			model.addAttribute("groupLevelMap", BackConstant.smallGroupNameMap);
 			model.addAttribute("groupLevel", String.valueOf(params.get("groupLevel")));
 			model.addAttribute("dictMap",BackConstant.groupNameMap);
 			model.addAttribute("list",pageConfig.getItems());
+			model.addAttribute("listNew",pageConfigNew.getItems());
 			model.addAttribute("pm", pageConfig);
 			model.addAttribute("params", params);// 用于搜索框保留值
 			model.addAttribute("merchantNoMap",BackConstant.merchantNoMap);
@@ -557,6 +581,112 @@ public class CollectionStatisticsController extends BaseController {
 		}
 		return url;
 	}
+	/**
+	 * 小额统计导出
+	 * @param
+	 */
+	@RequestMapping("/reportExcel")
+	public void reportExport(HttpServletResponse response, HttpServletRequest request, Model model) {
+		try {
+
+			String title = "";
+			String[] titles = null; // "已操作订单","风控标记单量",
+
+		HashMap<String, Object> params = getParametersO(request);
+		if (StringUtils.isEmpty(params.get("orderBy"))){
+			params.put("orderBy","groupLevel");
+		}
+		BackUser backUser = (BackUser) request.getSession().getAttribute(Constant.BACK_USER);
+		if(StringUtils.isEmpty(params.get("createDate")) && StringUtils.isEmpty(params.get("createDate"))){
+			params.put("createDate",DateUtil.getDateFormat(new Date(),"yyyy-MM-dd"));
+		}
+		List<PersonNewStatistics> list = new ArrayList<>();
+		String Flag = params.get("Flag").toString();
+        if ("personNew".equals(Flag)){
+			handleCompanyPermission(backUser,params,model);
+			list = personStatisticsService.personNewList(params);
+			title = "小额个人统计";
+			titles= new String[] {  "统计日期", "催收公司", "催收组", "入催本金",
+					"入催订单数", "当日完成单数", "当日完成金额", "完成单数", "完成本金",
+					"完成订单滞纳金", "实收滞纳金","不考核滞纳金","本金完成率","滞纳金完成率","催收员姓名" };
+
+		}else if("companyNew".equals(Flag)){
+			list = personStatisticsService.companyNewList(params);
+			List<String> companyIds = getCompanyIds(backUser);
+				for (int i = 0; i < list.size(); i ++) {
+					if(!companyIds.contains(list.get(i).getCompanyId())){
+						list.get(i).setCompanyName("* * * * * * * * ");
+					}
+				}
+			handleCompanyPermission(backUser,params,model);
+			title = "小额公司统计";
+			titles= new String[] {  "统计日期", "催收公司", "催收组", "入催本金",
+					"入催订单数", "当日完成单数", "当日完成金额", "完成单数", "完成本金",
+					"完成订单滞纳金", "实收滞纳金","不考核滞纳金","本金完成率","滞纳金完成率" };
+		}
+		int count = list.size();
+		int size = 50000;
+		int totalSheetNum = 0;
+		params.put(Constant.PAGE_SIZE, size);
+		if (count > 0) {
+			if (count % size > 0) {
+				totalSheetNum = count / size + 1;
+			} else {
+				totalSheetNum = count / size;
+			}
+		}
+
+		OutputStream os = response.getOutputStream();
+
+		response.reset();// 清空输出流
+		ExcelUtil.setFileDownloadHeader(request, response, title+".xlsx");
+		response.setContentType("application/msexcel");// 定义输出类型
+		SXSSFWorkbook workbook = new SXSSFWorkbook(10000);
+
+
+		for (int i = 1;i<=totalSheetNum;i++){
+			List<Object[]> contents = new ArrayList<Object[]>();
+			for (PersonNewStatistics report : list){
+				String[] conList = new String[titles.length];
+				conList[0] = DateUtil.getDateFormat(report.getCreateDate(),"yyyy-MM-dd");
+				if ("personNew".equals(Flag)){
+					MmanLoanCollectionCompany company = mmanLoanCollectionCompanyService.getCompanyById(report.getCompanyId());
+					conList[1] = company.getTitle();
+					conList[14] = report.getBackUserName();
+				}else if("companyNew".equals(Flag)){
+					conList[1] = report.getCompanyName();
+				}
+				conList[2] = BackConstant.groupNameMap.get(report.getGroupLevel());
+				conList[3] = report.getTotalPrincipal().toString();
+//				conList[4] = report.getTotalPenalty().toString();
+				conList[4] = String.valueOf(report.getTotalOrderCount());
+				conList[5] = String.valueOf(report.getTodayDoneCount());
+				conList[6] = report.getTodayDoneMoney().toString();
+				conList[7] = String.valueOf(report.getDoneOrderCount());
+				conList[8] = report.getDonePrincipal().toString();
+				conList[9] = report.getDonePenalty().toString();
+				conList[10] = report.getRealgetPenalty().toString();
+				conList[11] = report.getNoCheckPenalty().toString();
+				conList[12] = report.getCleanPrincipalProbability().toString()+"%";
+				conList[13] = report.getCleanPenaltyProbability().toString()+"%";
+
+				contents.add(conList);
+
+			}
+			ExcelUtil.buildExcel(workbook, title, titles, contents, i, totalSheetNum, os);
+		}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+
+
+	}
+
+
+
+
 
 	/**
 	 * 大额统计
@@ -657,7 +787,8 @@ public class CollectionStatisticsController extends BaseController {
 	@RequestMapping("doStatistics")
 	public void doStatistics(String beginTime,String endTime){
 		personStatisticsService.doStatistics(beginTime,endTime);
-		bigAmountStatisticsService.doStatistics(beginTime,endTime);
+		personStatisticsService.doNewStatistics(beginTime,endTime);
+//		bigAmountStatisticsService.doStatistics(beginTime,endTime);
 	}
 
 

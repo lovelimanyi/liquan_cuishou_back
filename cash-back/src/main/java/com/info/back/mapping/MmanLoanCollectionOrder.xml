@@ -1026,4 +1026,19 @@
 
         ]]>
     </select>
+
+    <select id="getLastMonthOrder" resultType="com.info.web.pojo.MmanLoanCollectionOrder" parameterType="string">
+        <![CDATA[
+        SELECT o.loan_id AS loanId,o.order_id AS orderId,o.outside_company_id AS outsideCompanyId,o.current_collection_user_id AS currentCollectionUserId,o.current_overdue_level AS currentOverdueLevel
+        FROM mman_loan_collection_order o WHERE o.overdueDays <> 10 AND o.overdueDays <> 30
+        AND  o.status<>4 AND o.dispatch_time > #{getLastMonthOrder}
+        ]]>
+    </select>
+    <update id="updateVirtualDispathTime" parameterType="string">
+          UPDATE mman_loan_collection_order o
+        SET o.virtual_dispath_time = now()
+        WHERE o.loan_id = #{loanId}
+
+    </update>
+
 </mapper>

@@ -1,5 +1,6 @@
 package com.info.back.service;
 
+import com.info.web.pojo.PersonNewStatistics;
 import com.info.web.pojo.PersonStatistics;
 import com.info.web.util.PageConfig;
 
@@ -21,4 +22,14 @@ public interface IPersonStatisticsService {
     PageConfig<PersonStatistics> findCompanyPage(HashMap<String, Object> params);
 
     PageConfig<PersonStatistics> findCompanyOtherPage(HashMap<String, Object> params);
+
+    PageConfig<PersonNewStatistics> personNewPage(HashMap<String, Object> params);
+
+    PageConfig<PersonNewStatistics> companyNewPage(HashMap<String, Object> params);
+
+    List<PersonNewStatistics> personNewList(HashMap<String, Object> params);
+
+    List<PersonNewStatistics> companyNewList(HashMap<String, Object> params);
+
+    void doNewStatistics(String beginTime, String endTime);
 }

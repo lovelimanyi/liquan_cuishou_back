@@ -136,6 +136,12 @@
                 <th align="center" width="100">
                     当日订单催回率
                 </th>
+                <th align="center" width="90">
+                    当日结清单数
+                </th>
+                <th align="center" width="90">
+                    当日结清金额
+                </th>
             </tr>
             </thead>
             <tbody>
@@ -186,6 +192,12 @@
                     </td>
                     <td>
                             ${list.orderProbability}%
+                    </td>
+                    <td>
+                            ${list.todayDoneCount}
+                    </td>
+                    <td>
+                            ${list.todayDoneMoney}
                     </td>
                 </tr>
             </c:forEach>

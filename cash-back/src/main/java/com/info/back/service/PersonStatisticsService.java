@@ -1,11 +1,13 @@
 package com.info.back.service;
 
 import com.info.back.dao.IPaginationDao;
+import com.info.back.dao.IPersonNewStatisticsDao;
 import com.info.back.dao.IPersonStatisticsDao;
 import com.info.back.test.TestAutoDispatch;
 import com.info.back.utils.DateKitUtils;
 import com.info.constant.Constant;
 import com.info.web.pojo.AuditCenter;
+import com.info.web.pojo.PersonNewStatistics;
 import com.info.web.pojo.PersonStatistics;
 import com.info.web.util.DateUtil;
 import com.info.web.util.PageConfig;
@@ -33,6 +35,8 @@ public class PersonStatisticsService implements IPersonStatisticsService {
     private static Logger logger = Logger.getLogger(PersonStatisticsService.class);
     @Autowired
     private IPersonStatisticsDao personStatisticsDao;
+    @Autowired
+    private IPersonNewStatisticsDao personNewStatisticsDao;
 
     @Autowired
     private IPaginationDao paginationDao;
@@ -109,6 +113,62 @@ public class PersonStatisticsService implements IPersonStatisticsService {
         PageConfig<PersonStatistics> pageConfig = new PageConfig<PersonStatistics>();
         pageConfig = paginationDao.findPage("findCompanyOtherAll", "findCompanyOtherAllCount", params, null);
         return pageConfig;
+    }
+
+    @Override
+    public PageConfig<PersonNewStatistics> personNewPage(HashMap<String, Object> params) {
+        params.put(Constant.NAME_SPACE, "PersonNewStatistics");
+        PageConfig<PersonNewStatistics> pageConfig = new PageConfig<PersonNewStatistics>();
+        pageConfig = paginationDao.findPage("personNewAll", "personNewAllCount", params, null);
+        return pageConfig;
+    }
+
+    @Override
+    public PageConfig<PersonNewStatistics> companyNewPage(HashMap<String, Object> params) {
+        params.put(Constant.NAME_SPACE, "PersonNewStatistics");
+        PageConfig<PersonNewStatistics> pageConfig = new PageConfig<PersonNewStatistics>();
+        pageConfig = paginationDao.findPage("companyNewAll", "companyNewAllCount", params, null);
+        return pageConfig;
+    }
+
+    @Override
+    public List<PersonNewStatistics> personNewList(HashMap<String, Object> params) {
+        return personNewStatisticsDao.personNewAll(params);
+    }
+
+    @Override
+    public List<PersonNewStatistics> companyNewList(HashMap<String, Object> params) {
+        return personNewStatisticsDao.companyNewAll(params);
+    }
+
+    @Override
+    public void doNewStatistics(String beginTime, String endTime) {
+        //先删除本日的统计
+        HashMap<String, Object> delParam = DateKitUtils.delDate();
+        personNewStatisticsDao.delNewPersonStatistics(delParam);
+
+        //进行统计
+        HashMap<String, Object> paramss = DateKitUtils.defaultDate(beginTime,endTime);
+        List<PersonNewStatistics> list = personNewStatisticsDao.getPersonNewStatistics(paramss);
+        if (CollectionUtils.isNotEmpty(list)){
+            //将统计数据保存至数据库
+            try {
+                String endTimes = paramss.get("endTime").toString();
+                for (PersonNewStatistics personNewStatistics : list){
+                    if(StringUtils.isNotBlank(endTime)){
+                        personNewStatistics.setCreateDate(DateUtil.getDateTimeFormat(endTime,"yyyy-MM-dd HH:mm:ss"));
+                    }else {
+                        personNewStatistics.setCreateDate(DateUtil.getDateTimeFormat(endTimes,"yyyy-MM-dd HH:mm:ss"));
+                    }
+                    personNewStatisticsDao.insertPersonNewStatistics(personNewStatistics);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }else {
+            logger.info("无数据");
+        }
     }
 
 }

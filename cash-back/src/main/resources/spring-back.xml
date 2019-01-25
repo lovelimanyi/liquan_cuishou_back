@@ -99,6 +99,7 @@
     </bean>
 
     <task:scheduled-tasks scheduler="myScheduler">
+        <task:scheduled ref="taskOrderExchangeNextMonth" method="handleLastMonthOrder" cron="0 1 0 1 * ?"/> <!-- 每月1号0点1分执行上月数据转接至下月 -->
         <task:scheduled ref="taskJobStatistics" method="personAndCompanyStatistics" cron="0 45 7-23 * * ?"/>  <!-- 个人和公司统计 整点45 -->
         <task:scheduled ref="taskJobStatistics" method="trackStatistics" cron="0 30 7-23 * * ?"/> <!-- 时间段累计统计 整点30 -->
         <task:scheduled ref="taskWithholdStatus" method="updateStatus" cron="0 25 10,14,21 * * ?"/>

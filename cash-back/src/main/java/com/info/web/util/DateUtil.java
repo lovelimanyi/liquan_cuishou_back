@@ -257,6 +257,18 @@ public class DateUtil {
 		return null;
 	}
 	/**
+	 * 获取上个月的第一天
+	 * */
+	public static Date getLastMonthFirstDay(){
+		Calendar   cal_1=Calendar.getInstance();//获取当前日期
+		cal_1.add(Calendar.MONTH, -1);
+		cal_1.set(Calendar.DAY_OF_MONTH,1);//设置为1号,当前日期既为本月第一天
+		return cal_1.getTime();
+	}
+
+
+
+	/**
 	 * 获取当月第一天
 	 * 
 	 * @param smdate

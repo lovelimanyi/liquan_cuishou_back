@@ -25,6 +25,9 @@ public class TodayRecovery {
     private BigDecimal remainPrincipal; //剩余本金
     private BigDecimal repaymentProbability;//本金还款率
 
+    private Integer todayDoneCount;
+    private BigDecimal todayDoneMoney;
+
     private BigDecimal totalPenalty;//总滞纳金
     private BigDecimal realgetTotalPenalty;//已还滞纳金
     private BigDecimal penaltyProbability;//滞纳金还款率
@@ -33,6 +36,22 @@ public class TodayRecovery {
     private int doneOrderCount;//完成订单数
     private BigDecimal orderProbability;//订单完成率
     private String merchantNo;
+
+    public Integer getTodayDoneCount() {
+        return todayDoneCount;
+    }
+
+    public void setTodayDoneCount(Integer todayDoneCount) {
+        this.todayDoneCount = todayDoneCount;
+    }
+
+    public BigDecimal getTodayDoneMoney() {
+        return todayDoneMoney;
+    }
+
+    public void setTodayDoneMoney(BigDecimal todayDoneMoney) {
+        this.todayDoneMoney = todayDoneMoney;
+    }
 
     public String getMerchantNo() {
         return merchantNo;

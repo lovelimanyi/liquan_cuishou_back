@@ -94,10 +94,12 @@ public class TaskJobStatistics {
         personStatisticsService.doStatistics(beginTime,endTime);
         logger.info("个人-公司统计执行完成,完成时间 :" + DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
 
-
-        logger.info("大额统计开始.....");
-        bigAmountStatisticsService.doStatistics(beginTime,endTime);
-        logger.info("大额统计执行完成,完成时间 :" + DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
+         logger.info("新小额统计开始.....");
+        personStatisticsService.doNewStatistics(beginTime,endTime);
+        logger.info("新小额统计执行完成,完成时间 :" + DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
+//        logger.info("大额统计开始.....");
+//        bigAmountStatisticsService.doStatistics(beginTime,endTime);
+//        logger.info("大额统计执行完成,完成时间 :" + DateUtil.getDateFormat("yyyy-MM-dd HH:mm:ss"));
     }
 
     //时间段累计统计  催收率统计  当日催回统计

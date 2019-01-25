@@ -124,4 +124,8 @@ public interface IMmanLoanCollectionOrderDao {
     void updateProductName(MmanLoanCollectionOrder order);
 
     void updateUpgradeOrder(MmanLoanCollectionOrder order);
+
+    List<MmanLoanCollectionOrder> getLastMonthOrder(String getLastMonthOrder);
+
+    void updateVirtualDispathTime(String loanId);
 }

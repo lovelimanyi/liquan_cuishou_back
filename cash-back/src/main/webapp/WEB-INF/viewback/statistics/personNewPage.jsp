@@ -6,7 +6,7 @@
     String path = request.getContextPath();
 %>
 
-<form id="pagerForm" onsubmit="return navTabSearch(this);" action="statisticsNew/todayStatistics?Flag=person&myId=${params.myId}">
+<form id="pagerForm" onsubmit="return navTabSearch(this);" action="statistics/smallAmountStatistics?Flag=personNew&myId=${params.myId}">
 
     <div class="pageHeader">
         <div class="searchBar">
@@ -16,47 +16,29 @@
                         统计时间:
                         <input type="text" name="createDate" id="createDate" value="${params.createDate}" class="date textInput readonly" datefmt="yyyy-MM-dd" readonly="readonly" />
                     </td>
-                    <c:if test="${roleId  != '10021' }">
+
+                    <c:if test="${params.roleId  != '10021' }">
+
                         <td>
                             催收组:
                             <select name="groupLevel" id="groupLevel">
                                 <option value="">全部</option>
                                 <c:forEach items="${groupLevelMap}" var="map">
-                                    <option value="${map.key}" <c:if test="${params.groupLevel eq map.key}">selected="selected"</c:if> >${map.value}</option>
-                                </c:forEach>
-                            </select>
-                        </td>
-                        <td>
-                            催收公司:
-                            <select name="companyId" id="companyId">
-                                <option value="">全部</option>
-                                <c:forEach items="${companys}" var="company">
-                                    <option value="${company.id}" <c:if test="${params.companyId eq company.id}">selected="selected"</c:if> >${company.title}</option>
+                                    <option value="${map.key}" <c:if test="${groupLevel eq map.key}">selected="selected"</c:if> >${map.value}</option>
                                 </c:forEach>
                             </select>
                         </td>
 
                         <td>
-                            借款类型:
-                            <select name="borrowingType" id="borrowingType">
+                            催收公司:
+                            <select name="companyId" id="companyId">
                                 <option value="">全部</option>
-                                <c:forEach items="${borrowingTypeMap}" var="map">
-                                    <option value="${map.key}"
-                                            <c:if test="${params.borrowingType eq map.key}">selected="selected"</c:if> >${map.value}</option>
+                                <c:forEach items="${company}" var="company">
+                                    <option value="${company.id}" <c:if test="${params.companyId == company.id}">selected="selected"</c:if>>${company.title}</option>
                                 </c:forEach>
                             </select>
                         </td>
-                        <td>
-                            产 品 名 称:
-                            <select id="merchantNo" name="merchantNo">
-                                <option value="">全部</option>
-                                <c:forEach var="merchantNo" items="${merchantNoMap }">
-                                    <option value="${merchantNo.key }" <c:if test="${merchantNo.key eq params.merchantNo}">selected="selected"</c:if>>
-                                            ${merchantNo.value}
-                                    </option>
-                                </c:forEach>
-                            </select>
-                        </td>
+
                         <td>
                             催收员姓名:
                             <input type="text" name="backUserName" id="backUserName"
@@ -64,17 +46,16 @@
                         </td>
                         <td>
                             排序:
-                            <select name="orderBy">
+                            <select name="orderBy" id="orderBy">
                                 <option value="" <c:if test="${params.orderBy eq ''}">selected="selected"</c:if>>默认排序</option>
-                                <option value="repaymentProbability ASC" <c:if test="${params.orderBy eq 'repaymentProbability ASC'}">selected="selected"</c:if>>按本金催回率升序</option>
-                                <option value="repaymentProbability DESC" <c:if test="${params.orderBy eq 'repaymentProbability DESC'}">selected="selected"</c:if>>按本金催回率降序</option>
-                                <option value="penaltyProbability ASC" <c:if test="${params.orderBy eq 'penaltyProbability ASC'}">selected="selected"</c:if>>按滞纳金催回率升序</option>
-                                <option value="penaltyProbability DESC" <c:if test="${params.orderBy eq 'penaltyProbability DESC'}">selected="selected"</c:if>>按滞纳金催回率降序</option>
-                                <option value="orderProbability ASC" <c:if test="${params.orderBy eq 'orderProbability ASC'}">selected="selected"</c:if>>按订单催回率升序</option>
-                                <option value="orderProbability DESC" <c:if test="${params.orderBy eq 'orderProbability DESC'}">selected="selected"</c:if>>按订单催回率降序</option>
+                                <option value="cleanPrincipalProbability ASC" <c:if test="${params.orderBy eq 'cleanPrincipalProbability ASC'}">selected="selected"</c:if>>本金完成率升序</option>
+                                <option value="cleanPrincipalProbability DESC" <c:if test="${params.orderBy eq 'cleanPrincipalProbability DESC'}">selected="selected"</c:if>>本金完成率降序</option>
+                                <option value="cleanPenaltyProbability ASC" <c:if test="${params.orderBy eq 'cleanPenaltyProbability ASC'}">selected="selected"</c:if>>滞纳金完成率升序</option>
+                                <option value="cleanPenaltyProbability DESC" <c:if test="${params.orderBy eq 'cleanPenaltyProbability DESC'}">selected="selected"</c:if>>滞纳金完成率降序</option>
                             </select>
                         </td>
                     </c:if>
+
                     <td>
                         <div class="buttonActive">
                             <div class="buttonContent">
@@ -92,7 +73,7 @@
 
     <div class="pageContent">
         <jsp:include page="${BACK_URL}/rightSubList">
-            <jsp:param value="" name=""/>
+            <jsp:param value="${params.myId}" name="parentId"/>
         </jsp:include>
         <table class="table" style="width: 100%;" layoutH="112"
                nowrapTD="false">
@@ -104,9 +85,6 @@
                 <th align="center" width="100">
                     统计日期
                 </th>
-                <th align="center" width="70">
-                    产品名称
-                </th>
                 <th align="center" width="100">
                     催收公司
                 </th>
@@ -117,45 +95,42 @@
                     催收员姓名
                 </th>
                 <th align="center" width="100">
-                    借款类型
+                    入催本金
                 </th>
                 <th align="center" width="100">
-                    本金金额
+                    入催订单数
                 </th>
                 <th align="center" width="100">
-                    当日催回本金
+                    当日完成单数
                 </th>
                 <th align="center" width="100">
-                    当日本金催回率
+                    当日完成金额
                 </th>
                 <th align="center" width="100">
-                    滞纳金总额
-                </th>
-                <th align="center" width="120">
-                    当日滞纳金
+                    完成单数
                 </th>
                 <th align="center" width="100">
-                    当日滞纳金催回率
+                    完成本金
+                </th>
+                <th align="center" width="100">
+                    完成订单滞纳金
+                </th>
+                <th align="center" width="100">
+                    实收滞纳金
+                </th>
+                <th align="center" width="100">
+                    不考核滞纳金
                 </th>
                 <th align="center" width="70">
-                    订单总数
+                    本金完成率
                 </th>
                 <th align="center" width="90">
-                    当日催回订单数
-                </th>
-                <th align="center" width="100">
-                    当日订单催回率
-                </th>
-                <th align="center" width="90">
-                    当日结清单数
-                </th>
-                <th align="center" width="90">
-                    当日结清金额
+                    滞纳金完成率
                 </th>
             </tr>
             </thead>
             <tbody>
-            <c:forEach var="list" items="${list }" varStatus="status">
+            <c:forEach var="list" items="${listNew }" varStatus="status">
                 <tr>
                     <td>
                             ${status.count}
@@ -163,11 +138,16 @@
                     <td>
                         <fmt:formatDate value="${list.createDate}" pattern="yyyy-MM-dd"/>
                     </td>
-                    <td align="center" width="50">
-                            ${merchantNoMap[list.merchantNo]}
-                    </td>
                     <td>
-                            ${list.companyName}
+                        <c:if test="${companyName == null}">
+                            <c:forEach items="${company}" var="company">
+                                <c:if test="${list.companyId == company.id}">${company.title}
+                                </c:if>
+                            </c:forEach>
+                        </c:if>
+                        <c:if test="${companyName != null}">
+                            ${companyName}
+                        </c:if>
                     </td>
                     <td>
                             ${dictMap[list.groupLevel] }
@@ -176,35 +156,10 @@
                             ${list.backUserName}
                     </td>
                     <td>
-                            ${borrowingTypeMap[list.borrowingType]}
-                    </td>
-                    <td>
                             ${list.totalPrincipal}
                     </td>
                     <td>
-                            ${list.realgetTotalPrincipal}
-                    </td>
-                    <td>
-                            ${list.repaymentProbability}%
-                    </td>
-
-                    <td>
-                            ${list.totalPenalty}
-                    </td>
-                    <td>
-                            ${list.realgetTotalPenalty}
-                    </td>
-                    <td>
-                            ${list.penaltyProbability}%
-                    </td>
-                    <td>
                             ${list.totalOrderCount}
-                    </td>
-                    <td>
-                            ${list.doneOrderCount}
-                    </td>
-                    <td>
-                            ${list.orderProbability}%
                     </td>
                     <td>
                             ${list.todayDoneCount}
@@ -212,6 +167,30 @@
                     <td>
                             ${list.todayDoneMoney}
                     </td>
+                    <td>
+                            ${list.doneOrderCount}
+                    </td>
+                    <td>
+                            ${list.donePrincipal}
+                    </td>
+                    <td>
+                            ${list.donePenalty}
+                    </td>
+                    <td>
+                            ${list.realgetPenalty}
+                    </td>
+                    <td>
+                            ${list.noCheckPenalty}
+                    </td>
+                    <td>
+                            ${list.cleanPrincipalProbability}%
+                    </td>
+
+                    <td>
+                            ${list.cleanPenaltyProbability}%
+                    </td>
+
+
                 </tr>
             </c:forEach>
             </tbody>
@@ -225,18 +204,15 @@
 
     function reportExcel(obj){
         var href=$(obj).attr("href");
-        if(href.indexOf('&begDate') > -1){
-            href = href.substring(0,href.indexOf('&begDate'));
-        }
-        var begDate=$("#begDate").val();
-        var endDate=$("#endDate").val();
-        var personName = $("#personName").val() == undefined ? '' : $("#personName").val();
-        var orderGroupId = $("#orderGroupId").val() == undefined ? '' : $("#orderGroupId").val();
-        var groupId = $("#groupId").val() == undefined ? '' : $("#groupId").val();
+        href = href.split("&")[0];
+        var createDate=$("#createDate").val();
+        var personName = $("#backUserName").val() == undefined ? '' : $("#backUserName").val();
+        var groupLevel = $("#groupLevel").val() == undefined ? '' : $("#groupLevel").val();
         var companyId = $("#companyId").val() == undefined ? '' : $("#companyId").val();
-        var type='${params.type}';
-        var toHref=href+"&begDate="+begDate+"&endDate="+endDate+"&personName="+personName+"&orderGroupId="+orderGroupId
-            +"&groupId="+groupId+"&companyId="+companyId+"&type="+type;
+        var orderBy = $("#orderBy").val() == undefined ? null : $("#orderBy").val();
+        var Flag='personNew';
+        var toHref=href+"&createDate="+createDate+"&personName="+personName+"&groupLevel="+groupLevel+"&companyId="+companyId
+            +"&Flag="+Flag +"&orderBy="+orderBy;
 
         $(obj).attr("href",toHref);
     }

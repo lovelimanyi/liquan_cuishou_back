@@ -1411,5 +1411,35 @@ public class MmanLoanCollectionOrderService implements IMmanLoanCollectionOrderS
 
     }
 
+    /**
+     *  查询派单时间是上个月且未还款完成的订单。
+     * */
+    @Override
+    public List<MmanLoanCollectionOrder> getLastMonthOrder(String getLastMonthOrder) {
+        return manLoanCollectionOrderDao.getLastMonthOrder(getLastMonthOrder);
+    }
 
+    /**
+     * 处理需要转到下月的订单
+     * 每月1号将上个月转过来的订单，添加流转日志和定单的虚拟派单时间（1号当天逾期升级的订单除外）
+     * */
+    @Override
+    public void handleLastMonthOrder(MmanLoanCollectionOrder order) {
+        manLoanCollectionOrderDao.updateVirtualDispathTime(order.getLoanId());
+
+        insertMmanLoanCollectionStatusChangeLog(
+                order.getOrderId(),
+                "1",
+                "1",
+                "系统",
+                "上月未完成订单流转",
+                order.getOutsideCompanyId(),
+                order.getCurrentCollectionUserId(),
+                order.getCurrentOverdueLevel(),
+                order.getCurrentOverdueLevel());
+
+        logger.info("handleLastMonthOrder-loanId="+order.getLoanId());
+
+
+    }
 }
