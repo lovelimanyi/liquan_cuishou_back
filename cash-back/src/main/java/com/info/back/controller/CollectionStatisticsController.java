@@ -572,6 +572,7 @@ public class CollectionStatisticsController extends BaseController {
 			model.addAttribute("dictMap",BackConstant.groupNameMap);
 			model.addAttribute("list",pageConfig.getItems());
 			model.addAttribute("listNew",pageConfigNew.getItems());
+			model.addAttribute("pm2", pageConfigNew);
 			model.addAttribute("pm", pageConfig);
 			model.addAttribute("params", params);// 用于搜索框保留值
 			model.addAttribute("merchantNoMap",BackConstant.merchantNoMap);

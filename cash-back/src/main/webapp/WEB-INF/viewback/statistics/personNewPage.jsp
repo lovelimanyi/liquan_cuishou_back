@@ -195,7 +195,7 @@
             </c:forEach>
             </tbody>
         </table>
-        <c:set var="page" value="${pm}"></c:set>
+        <c:set var="page" value="${pm2}"></c:set>
         <!-- 分页 -->
         <%@ include file="../page.jsp"%>
     </div>
