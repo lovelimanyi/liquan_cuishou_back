@@ -12,17 +12,21 @@ import java.util.Map;
  * 创建时间：2018/10/23 0023下午 05:32
  */
 public class MerchantNoUtils {
-//
-//    public static Map<String,String> getMerchantNoMap(){
-//        Map<String,String> map = new HashedMap();
-//        map.put("0","极速金掌柜");
-//        map.put("1000","急用帮");
-//        map.put("1001","金小侠");
-//        map.put("1002","极速币下");
-//        map.put("1005","易秒借款");
-//        map.put("1006","天下粮仓");
-//        return map;
-//    }
+
+
+    //第3方催收公司（AI智能催收）,商户号：
+    public static Map<String,String> getMerchantNoMap(){
+        Map<String,String> map = new HashedMap();
+        map.put("0","cjxjx");//极速金掌柜
+        map.put("1000","jyb");//急用帮
+        map.put("1001","jxx");//金小侠
+        map.put("1002","jqb");//极速币下(借钱呗)
+        map.put("1005","ymjk");//易秒借款
+        map.put("1006","txlc");//天下粮仓（猪有钱）
+        map.put("1007","tkj");//提款机TKJ 1007
+        map.put("1008","cjs");//财急送 CJS 1008
+        return map;
+    }
 
     public static String getMerchantName(){
         String merchantName = "";

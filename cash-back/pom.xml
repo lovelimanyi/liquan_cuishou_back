@@ -340,6 +340,11 @@
             <artifactId>apollo-client</artifactId>
             <version>1.2.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.senseinfo</groupId>
+            <artifactId>senseinfo-external-sdk</artifactId>
+            <version>1.0</version>
+        </dependency>
     </dependencies>
 
     <profiles>

@@ -101,4 +101,6 @@ public interface IMmanLoanCollectionCompanyDao {
     List<MmanLoanCollectionCompany> getCompanyByIds(HashMap<String, Object> param);
 
     List<Map<String,String>> getAllSaleCompany();
+
+    List<String> getBackUserUUId();
 }

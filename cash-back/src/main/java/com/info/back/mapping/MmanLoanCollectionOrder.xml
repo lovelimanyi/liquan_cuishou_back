@@ -1041,4 +1041,28 @@
 
     </update>
 
+    <select id="getBatchCommitData" resultType="com.info.web.pojo.JobDomain" parameterType="Map">
+        SELECT
+            o.loan_user_name AS loanUsername,
+            u.user_sex AS loanUserGender,
+            l.merchant_no AS loanChannel,
+            o.overdueDays AS loanOverdueDay,
+            l.loan_money AS loanRepayAmount,
+            o.loan_user_phone AS phone,
+            o.loan_user_phone AS jobId
+        FROM
+            mman_loan_collection_order o
+        LEFT JOIN mman_user_info u ON o.user_id = u.id
+        LEFT JOIN mman_user_loan l ON o.loan_id = l.id
+        WHERE
+            o. STATUS != 4
+        AND o.current_overdue_level = 3
+        AND l.merchant_no = #{merchantNo}
+        AND current_collection_user_id IN
+        <foreach collection="current_collection_user_id_list" open="(" close=")" separator="," item="current_collection_user_id">
+            #{current_collection_user_id}
+        </foreach>
+
+    </select>
+
 </mapper>

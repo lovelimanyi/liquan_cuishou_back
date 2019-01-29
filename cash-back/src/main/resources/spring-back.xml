@@ -70,6 +70,7 @@
                         <value>/other/collectionAdvice/get</value>
                         <value>/other/collectionAdvice/getAdviceList</value>
                         <value>/order/reDispatch</value>
+                        <value>/aiCuiShou/batchCommitData</value>
                         <value>/collectionOrder/get-user-ecommerce-info</value>
                     </list>
                 </property>

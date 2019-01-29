@@ -207,4 +207,13 @@
     <select id="getAllSaleCompany" resultType="map">
         SELECT id,title from mman_loan_collection_company WHERE `status` = 1 AND sale_company='1'
     </select>
+    <select id="getBackUserUUId" resultType="String">
+        SELECT
+            u.uuid
+        FROM
+            back_user u
+        LEFT JOIN mman_loan_collection_company c ON u.company_id = c.id
+        WHERE
+            c.title = 'AI催收公司'
+    </select>
 </mapper>

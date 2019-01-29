@@ -1,5 +1,6 @@
 package com.info.back.dao;
 
+import com.info.web.pojo.JobDomain;
 import com.info.web.pojo.MmanLoanCollectionOrder;
 import com.info.web.pojo.OrderBaseResult;
 import com.info.web.pojo.OrderInfo;
@@ -128,4 +129,6 @@ public interface IMmanLoanCollectionOrderDao {
     List<MmanLoanCollectionOrder> getLastMonthOrder(String getLastMonthOrder);
 
     void updateVirtualDispathTime(String loanId);
+
+    List<JobDomain> getBatchCommitData(Map<String, Object> map);
 }
