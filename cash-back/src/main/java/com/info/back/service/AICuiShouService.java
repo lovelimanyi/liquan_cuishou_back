@@ -39,6 +39,7 @@ public class AICuiShouService implements IAICuiShouService {
     @Override
     public String batchCommitData() {
         try {
+            logger.info("aiCuiShou   batchCommitData开始2......");
             List<String> current_collection_user_id_list = mmanLoanCollectionCompanyDao.getBackUserUUId();
 
             Map<String, String> merchantNoMap = MerchantNoUtils.getMerchantNoMap();
