@@ -14,17 +14,17 @@ import java.util.Map;
 public class MerchantNoUtils {
 
 
-    //第3方催收公司（AI智能催收）,商户号：
+    //第3方催收公司（AI智能催收）,商户号大写为corpCode：
     public static Map<String,String> getMerchantNoMap(){
         Map<String,String> map = new HashedMap();
-        map.put("0","cjxjx");//极速金掌柜
-        map.put("1000","jyb");//急用帮
-        map.put("1001","jxx");//金小侠
-        map.put("1002","jqb");//极速币下(借钱呗)
-        map.put("1005","ymjk");//易秒借款
-        map.put("1006","txlc");//天下粮仓（猪有钱）
-        map.put("1007","tkj");//提款机TKJ 1007
-        map.put("1008","cjs");//财急送 CJS 1008
+        map.put("0","CJXJX");//极速金掌柜
+        map.put("1000","JYB");//急用帮
+        map.put("1001","JXX");//金小侠
+        map.put("1002","JQB");//极速币下(借钱呗)
+        map.put("1005","YMJK");//易秒借款
+        map.put("1006","TXLC");//天下粮仓（猪有钱）
+        map.put("1007","TKJ");//提款机TKJ 1007
+        map.put("1008","CJS");//财急送 CJS 1008
         return map;
     }
 

@@ -1045,7 +1045,7 @@
         SELECT
             o.loan_user_name AS loanUsername,
             u.user_sex AS loanUserGender,
-            l.merchant_no AS loanChannel,
+            #{loanChannel} AS loanChannel,
             o.overdueDays AS loanOverdueDay,
             l.loan_money AS loanRepayAmount,
             o.loan_user_phone AS phone,
