@@ -113,6 +113,8 @@
                         <c:if test="${user.roleId  eq '10030'}">高级经理</c:if>
                         <c:if test="${user.roleId  eq '10033'}">电催员</c:if>
                         <c:if test="${user.roleId  eq '10034'}">电销经理</c:if>
+                        <c:if test="${user.roleId  eq '10035'}">坐席经理</c:if>
+                        <c:if test="${user.roleId  eq '10036'}">坐席</c:if>
                     </td>
                     <td>
                             ${user.userName }
