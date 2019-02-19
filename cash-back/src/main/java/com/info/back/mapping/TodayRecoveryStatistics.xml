@@ -515,12 +515,10 @@ group by   x.merchant_no,x.companyId,x.yqdj,x.lx
 
     <insert id="insertTodayPersonStatistics" parameterType="list">
         INSERT INTO today_person_statistics
-        (companyName,companyId,groupLevel,uuid,backUserName,borrowingType,totalPrincipal,realgetTotalPrincipal,remainPrincipal,repaymentProbability,totalPenalty,realgetTotalPenalty,penaltyProbability,totalOrderCount,doneOrderCount,orderProbability,createDate ,merchantNo,todayDoneCount,todayDoneMoney )
+        (companyName,companyId,groupLevel,uuid,backUserName,borrowingType,totalPrincipal,realgetTotalPrincipal,repaymentProbability,totalPenalty,realgetTotalPenalty,penaltyProbability,totalOrderCount,doneOrderCount,orderProbability,createDate ,merchantNo,todayDoneCount,todayDoneMoney )
         VALUES
         <foreach collection ="list" item="today" separator =",">
-            (#{today.companyName},#{today.companyId},#{today.groupLevel},#{today.uuid},
-            #{today.backUserName},#{today.borrowingType},#{today.totalPrincipal},#{today.realgetTotalPrincipal},#{today.remainPrincipal},
-            #{today.repaymentProbability},#{today.totalPenalty},#{today.realgetTotalPenalty},#{today.penaltyProbability},#{today.totalOrderCount},#{today.doneOrderCount},#{today.orderProbability},#{today.createDate},#{today.merchantNo}),#{today.todayDoneCount},#{today.todayDoneMoney})
+            (#{today.companyName},#{today.companyId},#{today.groupLevel},#{today.uuid},#{today.backUserName},#{today.borrowingType},#{today.totalPrincipal},#{today.realgetTotalPrincipal},#{today.repaymentProbability},#{today.totalPenalty},#{today.realgetTotalPenalty},#{today.penaltyProbability},#{today.totalOrderCount},#{today.doneOrderCount},#{today.orderProbability},#{today.createDate},#{today.merchantNo},#{today.todayDoneCount},#{today.todayDoneMoney})
 
         </foreach>
     </insert>
