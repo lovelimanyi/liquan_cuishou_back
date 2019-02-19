@@ -6,7 +6,7 @@
 	<select id="findAllCount"  parameterType="HashMap" resultType="Integer">
 		SELECT count(1) 
 		FROM back_user u LEFT JOIN mman_loan_collection_company c ON u.`company_id`=c.`id` LEFT JOIN back_user_company_permissions p on u.id = p.user_id
-		WHERE 1=1 AND EXISTS (SELECT 1 FROM back_user_role bb WHERE bb.user_id=u.id AND bb.role_id= #{realId})
+		WHERE 1=1 AND EXISTS (SELECT 1 FROM back_user_role bb WHERE bb.user_id=u.id AND bb.role_id in (10033,10034,10035,10036,10021))
 		<include refid="base_if"></include>
 	</select>
 	<select id="findAll" resultType="com.info.web.pojo.Collection" parameterType="HashMap">
