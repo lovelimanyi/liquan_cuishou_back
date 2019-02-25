@@ -18,7 +18,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <!-- <meta http-equiv="X-UA-Compatible" content="IE=7" /> -->
 <!-- <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE9" /> -->
-<title>${merchantName } </title>
+<title>催收系统 </title>
 <link href="${basePath }/themes/default/style.css" rel="stylesheet"
 	type="text/css" media="screen" />
 <link href="${basePath }/themes/css/core.css" rel="stylesheet"
@@ -125,13 +125,13 @@ $(function(){
 					<li><a style="color: black;" href="logout">退出</a></li>
 
 				</ul>
-				<ul class="themeList" id="themeList">
-					<li theme="default"><div class="selected">蓝色</div></li>
-					<li theme="green"><div>绿色</div></li>
-					<li theme="purple"><div>紫色</div></li>
-					<li theme="silver"><div>银色</div></li>
-					<li theme="azure"><div>天蓝</div></li>
-				</ul>
+				<%--<ul class="themeList" id="themeList">--%>
+					<%--<li theme="default"><div class="selected">蓝色</div></li>--%>
+					<%--&lt;%&ndash;<li theme="green"><div>绿色</div></li>&ndash;%&gt;--%>
+					<%--&lt;%&ndash;<li theme="purple"><div>紫色</div></li>&ndash;%&gt;--%>
+					<%--&lt;%&ndash;<li theme="silver"><div>银色</div></li>&ndash;%&gt;--%>
+					<%--&lt;%&ndash;<li theme="azure"><div>天蓝</div></li>&ndash;%&gt;--%>
+				<%--</ul>--%>
 			</div>
 
 			<div id="navMenu">
@@ -433,7 +433,7 @@ $(function(){
 	</div>
 
 	<div id="footer">
-		Copyright &copy; 2013-2014  技术支持：上海主林金融信息服务有限公司<a href="#" target="_blank"></a>
+		Copyright &copy; 技术支持：连米网络科技<a href="#" target="_blank"></a>
 	</div>
 
 </body>
