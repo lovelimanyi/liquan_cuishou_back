@@ -31,4 +31,6 @@ public class PayContents {
     public static final String QRCODE_URL=propertiesLoader.getProperty("qr.code");//还款二维码地址
     // 商户号
     public static final String MERCHANT_NUMBER = propertiesLoader.getProperty("merchant.number");
+    // AI催收公司请求地址
+    public static final String AI_CUISHOU_URL = propertiesLoader.getProperty("AIcuishou.url");
 }
