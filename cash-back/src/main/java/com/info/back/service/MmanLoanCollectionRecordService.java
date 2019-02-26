@@ -823,7 +823,7 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
                 reslut.setMsg("申请代扣成功");
                 reslut.setCode("0");
             } else {
-                reslut.setMsg(jos.getString("msg"));
+                reslut.setMsg("卡内无可扣金额");
                 WithholdingRecord.setStatus(2);
             }
             //添加一条扣款记录
