@@ -22,6 +22,16 @@ public class TemplateSms implements Serializable {
     //
     private Date updatetime;
 
+    private String channelFrom;
+
+    public String getChannelFrom() {
+        return channelFrom;
+    }
+
+    public void setChannelFrom(String channelFrom) {
+        this.channelFrom = channelFrom;
+    }
+
     public void setId(String id) {
         this.id = id;
     }

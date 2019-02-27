@@ -52,14 +52,19 @@ public class CollectionService implements ICollectionService {
         try {
             Collection oldCollection = collectionDao.findOneCollection(collection.getId());
             int count = 0;
-            if (oldCollection.getGroupLevel().equals(collection.getGroupLevel())) {
+            if (!oldCollection.getRoleId().equals("10021")){
+                collection.setGroupLevel(null);
                 count = collectionDao.updateById(collection);
-            } else {
-                int orderCount = collectionDao.findOrderCollection(oldCollection.getUuid());//统计催员手上未完成的订单
-                if (orderCount <= 0) {
+            }else {
+                if (oldCollection.getGroupLevel().equals(collection.getGroupLevel())) {
                     count = collectionDao.updateById(collection);
                 } else {
-                    result.setMsg("该催收员还有" + orderCount + "条订单未完成不能转组修改。等完成订单或转派给他人后再修改");
+                    int orderCount = collectionDao.findOrderCollection(oldCollection.getUuid());//统计催员手上未完成的订单
+                    if (orderCount <= 0) {
+                        count = collectionDao.updateById(collection);
+                    } else {
+                        result.setMsg("该催收员还有" + orderCount + "条订单未完成不能转组修改。等完成订单或转派给他人后再修改");
+                    }
                 }
             }
             if (count > 0) {

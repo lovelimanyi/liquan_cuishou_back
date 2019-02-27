@@ -74,7 +74,8 @@
 		u.`user_telephone` as userTelephone,
 		u.`user_sex` as userSex,
 		u.user_password as userPassword,
-		u.`company_id` as companyId
+		u.`company_id` as companyId,
+		u.role_id AS  roleId
 		FROM back_user u where u.id=#{id}
 	</select>
 	<select id="findOrderCollection" resultType="Integer" parameterType="String">

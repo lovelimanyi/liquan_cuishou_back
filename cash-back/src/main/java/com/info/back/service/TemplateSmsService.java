@@ -3,6 +3,9 @@ package com.info.back.service;
 import java.util.HashMap;
 import java.util.List;
 
+import com.info.back.utils.BackConstant;
+import com.info.web.util.JedisDataClient;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -91,6 +94,17 @@ public class TemplateSmsService implements ITemplateSmsService {
 	public List<TemplateSms> getType(HashMap<String, Object> params) {
 		
 		return templateSmsDao.getType( params);
+	}
+
+	@Override
+	public List<TemplateSms> getAllMsgByChannelFrom(String msgChannelForm) {
+		String msgKey = msgChannelForm +"_" + BackConstant.MESSAGE_REDIS_KEY;
+		List<TemplateSms> msgs = JedisDataClient.getList(BackConstant.REDIS_KEY_PREFIX,msgKey);
+		if (CollectionUtils.isEmpty(msgs)) {
+			msgs = templateSmsDao.getAllMsgByChannelFrom(msgChannelForm);
+			JedisDataClient.setList(BackConstant.REDIS_KEY_PREFIX, msgKey, msgs, 60 * 60);
+		}
+		return msgs;
 	}
 
 }

@@ -144,6 +144,13 @@ public class BackConstant {
 
     public static final String REDIS_KEY_PREFIX = "cuishou:";
 
+    public static final String MSG_CHANNEL_YMGJ = "ymgj";
+    public static final String MSG_CHANNEL_YMGJ_API = "ymgj-api"; //103后的有米管家
+    public static final String MSG_CHANNEL_OTHER = "0"; //原始
+    public static final String MSG_CHANNEL_BLACK_FISH = "bf-api"; //小黑鱼
+    public static final String MESSAGE_REDIS_KEY = "msgs"; //小黑鱼
+    public static final String TEMPLATE_SMS_CHANNEL_FROM_MULTI = "multi"; //多渠道
+    public static final String TEMPLATE_SMS_CHANNEL_FROM_OTHER = "other"; //原始订单
     static {
         channelFromMap.put("0","否");
         channelFromMap.put("ymgj","是");

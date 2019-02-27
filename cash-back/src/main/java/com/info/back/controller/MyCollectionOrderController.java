@@ -60,6 +60,8 @@ public class MyCollectionOrderController extends BaseController {
     private static final String SHORT_MESSAGE_LIST_REDIS_KEY = "msgs";
     private static final String SHORT_MESSAGE_YOUMI_CHANNEL_FROM_REDIS_KEY = "ymgj";
     private static final String SHORT_MESSAGE_YOUMI_CHANNEL_FROM = "ymgj";
+    private static final String SHORT_MESSAGE_XHY_CHANNEL_FROM = "xhy";
+    private static final String SHORT_MESSAGE_XHY_CHANNEL_FROM_REDIS_KEY = "xhy";
 
     private static final String SHORT_MESSAGE_LIMIT_COUNT_REDIS_KEY = "msgCountLimit";
 
@@ -140,6 +142,8 @@ public class MyCollectionOrderController extends BaseController {
 
     @Autowired
     private IMmanLoanCollectionRecordDao mmanLoanCollectionRecordDao;
+    @Autowired
+    private ITemplateSmsService templateSmsService;
 
     /**
      * 我的订单初始化加载查询
@@ -610,8 +614,9 @@ public class MyCollectionOrderController extends BaseController {
 
                 // 还款完成用户信息掩码处理
                 dealwithUserInfo(order, userInfo, userCar);
-
-                List<TemplateSms> msgs = getMatchMsgsTemplate(order);
+                MmanUserLoan userLoan = mmanUserLoanService.get(order.getLoanId());
+                String channelFrom = userLoan.getChannelFrom();
+                List<TemplateSms> msgs = getMatchMsgsTemplate(channelFrom);
                 int count = smsUserService.getSendMsgCount(order.getLoanId());
                 String msgLimitCountKey = BackConstant.REDIS_KEY_PREFIX + SHORT_MESSAGE_LIMIT_COUNT_REDIS_KEY;
                 int msgCountLimit = JedisDataClient.get(msgLimitCountKey) == null ? 0 : Integer.valueOf(JedisDataClient.get(msgLimitCountKey));
@@ -1189,19 +1194,24 @@ public class MyCollectionOrderController extends BaseController {
         return cookieMap;
     }
 
-    private List<TemplateSms> getMatchMsgsTemplate(MmanLoanCollectionOrder order){
+    private List<TemplateSms> getMatchMsgsTemplate(String channelFrom){
         List<TemplateSms> msgs = new ArrayList<>();
-        if (order != null) {
-            MmanUserLoan userLoan = mmanUserLoanService.get(order.getLoanId());
-            if (SHORT_MESSAGE_YOUMI_CHANNEL_FROM.equals(userLoan.getChannelFrom())){
-                msgs = getYoumiAllMsg();
-            }else {
-                msgs = getCjxjxAllMsg();
-            }
+        String msgChannelForm = "";
+        if(channelFrom.equals(BackConstant.MSG_CHANNEL_YMGJ) || channelFrom.equals(BackConstant.MSG_CHANNEL_BLACK_FISH) || channelFrom.equals(BackConstant.MSG_CHANNEL_YMGJ_API)){
+            msgChannelForm = BackConstant.TEMPLATE_SMS_CHANNEL_FROM_MULTI;
         }else {
-            logger.error("MmanLoanCollectionOrder 为null,获取getMatchMsgsTemplate出错！");
+            msgChannelForm = BackConstant.TEMPLATE_SMS_CHANNEL_FROM_OTHER;
         }
+        //根据渠道来源查询短信模板： multi:小黑鱼，有米管家  other:老订单
+        msgs = templateSmsService.getAllMsgByChannelFrom(msgChannelForm);
         return msgs;
+//            if (SHORT_MESSAGE_YOUMI_CHANNEL_FROM.equals(userLoan.getChannelFrom())){
+//                msgs = getYoumiAllMsg();
+//            }else if(SHORT_MESSAGE_XHY_CHANNEL_FROM.equals(getChannelFrom(order))) {
+//                msgs = getXhyAllMsg();
+//            }else{
+//                msgs = getCjxjxAllMsg();
+//            }
     }
 
     /**
@@ -1210,14 +1220,16 @@ public class MyCollectionOrderController extends BaseController {
      * @param model
      * @return
      */
-    @RequestMapping("/gotoSendMsg")
+  /*  @RequestMapping("/gotoSendMsg")
     public String gotoSendMsg(HttpServletRequest request, Model model) {
         HashMap<String, Object> params = this.getParametersO(request);
         try {
             String id = params.get("id") + "";
             if (StringUtils.isNotBlank(id)) {
                 MmanLoanCollectionOrder order = mmanLoanCollectionOrderService.getOrderById(id);
-                List<TemplateSms> msgs = getMatchMsgsTemplate(order);
+                MmanUserLoan userLoan = mmanUserLoanService.get(order.getLoanId());
+                String channelFrom = userLoan.getChannelFrom();
+                List<TemplateSms> msgs = getMatchMsgsTemplate(channelFrom);
 
 //                int code = RandomUtils.nextInt(0, msgs.size());
 //                TemplateSms msg = msgs.get(code);
@@ -1250,13 +1262,13 @@ public class MyCollectionOrderController extends BaseController {
         model.addAttribute("params", params);
         return "mycollectionorder/smsSendDetail";
     }
-
+*/
     /**
      * 查询所有cjxjx的短信模板
      *
      * @return
      */
-    private List<TemplateSms> getCjxjxAllMsg() {
+   /* private List<TemplateSms> getCjxjxAllMsg() {
         String msgKey = PayContents.MERCHANT_NUMBER+"_"+SHORT_MESSAGE_LIST_REDIS_KEY;
         List<TemplateSms> msgs = JedisDataClient.getList(BackConstant.REDIS_KEY_PREFIX,msgKey);
         if (CollectionUtils.isEmpty(msgs)) {
@@ -1264,14 +1276,14 @@ public class MyCollectionOrderController extends BaseController {
             JedisDataClient.setList(BackConstant.REDIS_KEY_PREFIX, msgKey, msgs, 60 * 60);
         }
         return msgs;
-    }
+    }*/
 
     /**
      * 查询所有有米管家的短信模板
      *
      * @return
      */
-    private List<TemplateSms> getYoumiAllMsg() {
+  /*  private List<TemplateSms> getYoumiAllMsg() {
         String msgKey = SHORT_MESSAGE_YOUMI_CHANNEL_FROM_REDIS_KEY +"_" + PayContents.MERCHANT_NUMBER +"_"+SHORT_MESSAGE_LIST_REDIS_KEY;
         List<TemplateSms> msgs = JedisDataClient.getList(BackConstant.REDIS_KEY_PREFIX,msgKey);
         if (CollectionUtils.isEmpty(msgs)) {
@@ -1279,7 +1291,7 @@ public class MyCollectionOrderController extends BaseController {
             JedisDataClient.setList(BackConstant.REDIS_KEY_PREFIX, msgKey, msgs, 60 * 60);
         }
         return msgs;
-    }
+    }*/
 
     /**
      * 拼接短信模板中需要的参数
@@ -1426,10 +1438,15 @@ public class MyCollectionOrderController extends BaseController {
             if (StringUtils.isEmpty(msgCode) || "0".equals(msgCode)) {
                 return new ServiceResult("-6", "请选择正确的短信模板！");
             }
+            String merchantNo = getMerchantNoByOrder(order);
+            merchantNo = MerchantNoUtils.getMerchantNo(merchantNo);
             String msgParam = null;
-            if(SHORT_MESSAGE_YOUMI_CHANNEL_FROM.equals(getChannelFrom(order))){
-                msgParam = getYoumiMsgParam(order);
-            }else {
+            String channelFromParam = getChannelFromLoan(order);
+            if(SHORT_MESSAGE_YOUMI_CHANNEL_FROM.equals(channelFromParam) ){
+                msgParam = getMultiMsgParam(order,BackConstant.MSG_CHANNEL_YMGJ);
+            }else if (SHORT_MESSAGE_XHY_CHANNEL_FROM.equals(channelFromParam)){
+                msgParam = getMultiMsgParam(order,BackConstant.MSG_CHANNEL_BLACK_FISH);
+            }else{
                 msgParam = getMsgParam2(order,msgCode);
             }
             if (msgParam == null) {
@@ -1455,8 +1472,7 @@ public class MyCollectionOrderController extends BaseController {
 //                String merchantNo = getMerchantNoByOrder(order);
 //                smsResult = SmsSendUtil.sendSmsNew(mobile, msgParam, msgCode,merchantNo);
 //            }
-            String merchantNo = getMerchantNoByOrder(order);
-            merchantNo = MerchantNoUtils.getMerchantNo(merchantNo);
+
             smsResult = SmsSendUtil.sendSmsNew(mobile, msgParam, msgCode,merchantNo);
             if (smsResult) {
                 // 插入短信记录
@@ -1549,7 +1565,9 @@ public class MyCollectionOrderController extends BaseController {
         msg.setSendUserId(user.getUuid());
         msg.setAddTime(new Date());
         msg.setLoanOrderId(order.getLoanId());
-        List<TemplateSms> msgs = getMatchMsgsTemplate(order);
+        MmanUserLoan userLoan = mmanUserLoanService.get(order.getLoanId());
+        String channelFrom = userLoan.getChannelFrom();
+        List<TemplateSms> msgs = getMatchMsgsTemplate(channelFrom);
         TemplateSms sms = null;
         for (TemplateSms s : msgs) {
             if (s.getId().equals(msgCode)) {
@@ -1577,25 +1595,36 @@ public class MyCollectionOrderController extends BaseController {
         if (StringUtils.isNotBlank(id)) {
             MmanLoanCollectionOrder order = mmanLoanCollectionOrderService.getOrderById(id);
             if(null == order) {
-                logger.error("refreshMsg抛异常问题排查，催收订单id：" + id);
-            }
-            List<TemplateSms> msgs = getMatchMsgsTemplate(order);
-            TemplateSms templateSms = null;
-            String msgId = params.get("msgId") + "";
-            for (TemplateSms msg : msgs) {
-                if (msg.getId().equals(msgId)) {
-                    templateSms = msg;
-                    break;
-                }
-            }
-            String content = null;
-            if(SHORT_MESSAGE_YOUMI_CHANNEL_FROM.equals(getChannelFrom(order))){
-                content = MessageFormat.format(templateSms.getContenttext(), StringUtils.split(getYoumiMsgParam(order), ','));
+                logger.error("refreshMsg-未查到该订单，催收订单id：" + id);
             }else {
-                content = MessageFormat.format(templateSms.getContenttext(), StringUtils.split(getMsgParam(order,templateSms.getId()), ','));
+                MmanUserLoan userLoan = mmanUserLoanService.get(order.getLoanId());
+                String channelFrom = userLoan.getChannelFrom();
+                List<TemplateSms> msgs = getMatchMsgsTemplate(channelFrom);
+                TemplateSms templateSms = null;
+                String msgId = params.get("msgId") + "";
+                for (TemplateSms msg : msgs) {
+                    if (msg.getId().equals(msgId)) {
+                        templateSms = msg;
+                        break;
+                    }
+                }
+                String msgContent = null;
+                if (templateSms.getChannelFrom().equals(BackConstant.TEMPLATE_SMS_CHANNEL_FROM_MULTI)){
+                    msgContent=MessageFormat.format(templateSms.getContenttext(), StringUtils.split(getMultiMsgParam(order,channelFrom), ','));
+                }else if (templateSms.getChannelFrom().equals(BackConstant.TEMPLATE_SMS_CHANNEL_FROM_OTHER)){
+                    msgContent = MessageFormat.format(templateSms.getContenttext(), StringUtils.split(getMsgParam(order,templateSms.getId()), ','));
+                }
+
+//                String content = null;
+//                if(SHORT_MESSAGE_YOUMI_CHANNEL_FROM.equals(getChannelFrom(order)) || SHORT_MESSAGE_XHY_CHANNEL_FROM.equals(getChannelFrom(order))){
+//                    content = MessageFormat.format(templateSms.getContenttext(), StringUtils.split(getMultiMsgParam(order), ','));
+//                }else {
+//                    content = MessageFormat.format(templateSms.getContenttext(), StringUtils.split(getMsgParam(order,templateSms.getId()), ','));
+//                }
+                map.put("msgContent", msgContent);
+                map.put("msgId", templateSms.getId());
             }
-            map.put("msgContent", content);
-            map.put("msgId", templateSms.getId());
+
         }
         return JSON.toJSONString(map);
     }
@@ -1606,27 +1635,36 @@ public class MyCollectionOrderController extends BaseController {
      * @param order
      * @return
      */
-    private String getYoumiMsgParam(MmanLoanCollectionOrder order) {
+    private String getMultiMsgParam(MmanLoanCollectionOrder order,String channelFrom) {
         if (order == null) {
             return null;
+        }
+        String channelName = null;
+        if (channelFrom.equals(BackConstant.MSG_CHANNEL_YMGJ) || channelFrom.equals(BackConstant.MSG_CHANNEL_YMGJ_API)) {
+            channelName = "有米管家";
+        }else if(channelFrom.equals(BackConstant.MSG_CHANNEL_BLACK_FISH)){
+            channelName = "小黑鱼";
         }
         String loanId = order.getLoanId();
 //        String merchantNo = dataDao.getMerchantNumberByLoanId(loanId);//从业务库中查询
         String merchantNo = mmanUserLoanService.getMerchantNoByLoanId(loanId);
         String merchantName = MerchantNoUtils.getMerchantName2(merchantNo);
         StringBuilder msgParam = new StringBuilder();
-        msgParam.append(merchantName).append(",").append(merchantName);
+        msgParam.append(merchantName).append(",").append(channelName).append(",").append(merchantName);
         return msgParam.toString();
     }
 
     //获取渠道来源
-    private String getChannelFrom(MmanLoanCollectionOrder order) {
+    private String getChannelFromLoan(MmanLoanCollectionOrder order) {
         if (order != null) {
             MmanUserLoan userLoan = mmanUserLoanService.get(order.getLoanId());
-            if (SHORT_MESSAGE_YOUMI_CHANNEL_FROM.equals(userLoan.getChannelFrom())) {
+            String channelFrom = userLoan.getChannelFrom();
+            if (channelFrom.equals(BackConstant.MSG_CHANNEL_YMGJ) || channelFrom.equals(BackConstant.MSG_CHANNEL_YMGJ_API)) {
                 return "ymgj";
-            } else {
-                return userLoan.getChannelFrom();
+            }else if(channelFrom.equals(BackConstant.MSG_CHANNEL_BLACK_FISH)){
+                return "xhy";
+            }else {
+                return "other";
             }
         }else {
             logger.error("MmanLoanCollectionOrder 为null,获取渠道来源getChannelFrom出错！"+ JSONObject.toJSONString(order));

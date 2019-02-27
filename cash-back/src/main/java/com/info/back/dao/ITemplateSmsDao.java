@@ -52,4 +52,5 @@ public interface ITemplateSmsDao {
 	
 	List<TemplateSms> getType(HashMap<String, Object> params);
 
+    List<TemplateSms> getAllMsgByChannelFrom(String msgChannelForm);
 }

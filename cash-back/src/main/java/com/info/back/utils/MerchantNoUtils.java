@@ -76,6 +76,8 @@ public class MerchantNoUtils {
             merchantNoTemp = "ymjk";
         }else if("1006".equals(merchantNo)){
             merchantNoTemp = "txlc";
+        }else if("1007".equals(merchantNo)){
+            merchantNoTemp = "tkj";
         }
         return merchantNoTemp;
     }
@@ -122,6 +124,8 @@ public class MerchantNoUtils {
             merchantName = "易秒借款";
         }else if("1006".equals(merchantNo)){
             merchantName = "天下粮仓";
+        }else if("1007".equals(merchantNo)){
+            merchantName = "提款机";
         }
         return merchantName;
     }

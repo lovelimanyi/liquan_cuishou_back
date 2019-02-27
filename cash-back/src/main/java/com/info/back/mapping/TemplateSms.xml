@@ -57,6 +57,12 @@
     <select id="getAllMsg" resultType="com.info.web.pojo.TemplateSms">
         select id,`name`,contenttext from template_sms where status = '1'
     </select>
+    <select id="getAllMsgByChannelFrom" resultType="com.info.web.pojo.TemplateSms">
+        select id,`name`,contenttext,msg_type AS msgType,channel_from AS channelFrom from template_sms where status = '1' and channel_from = #{msgChannelForm}
+    </select>
+
+
+
     <!-- 分組查詢  -->
     <sql id="base_select">
         t.id AS id,

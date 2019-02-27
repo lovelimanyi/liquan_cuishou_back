@@ -42,4 +42,6 @@ public interface ITemplateSmsService {
      * 類型查詢
      */
     public List<TemplateSms> getType(HashMap<String, Object> params);
+
+    List<TemplateSms> getAllMsgByChannelFrom(String msgChannelForm);
 }
