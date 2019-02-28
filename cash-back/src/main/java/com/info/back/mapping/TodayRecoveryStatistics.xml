@@ -25,7 +25,7 @@
 
 	count(if(x.ycbj != 0,x.ycbj,null)) AS 'totalOrderCount', -- 订单总数
 	sum(x.drhks) AS 'doneOrderCount', -- 当日催回订单数
-	round(ifnull(sum(x.drhks)/count(*),0)*100,2) AS 'orderProbability', -- 当日订单催回率
+	round(ifnull(sum(x.drhks)/count(if(x.ycbj != 0,x.ycbj,null)),0)*100,2) AS 'orderProbability', -- 当日订单催回率
 
     sum(x.a) as todayDoneCount, -- 当日催回单数（当日入催）
     sum(x.b) as todayDoneMoney -- 当日催回本金（当日入催）
@@ -290,7 +290,7 @@ group by   x.merchant_no,x.companyId,x.csyid,x.yqdj,x.lx
 
 	count(if(x.ycbj != 0,x.ycbj,null)) AS 'totalOrderCount', -- 订单总数
 	sum(x.drhks) AS 'doneOrderCount', -- 当日催回订单数
-	round(ifnull(sum(x.drhks)/count(*),0)*100,2) AS 'orderProbability', -- 当日订单催回率
+	round(ifnull(sum(x.drhks)/count(if(x.ycbj != 0,x.ycbj,null)),0)*100,2) AS 'orderProbability', -- 当日订单催回率
 
    sum(x.a) as todayDoneCount, -- 当日催回单数（当日入催）
     sum(x.b) as todayDoneMoney -- 当日催回本金（当日入催）
