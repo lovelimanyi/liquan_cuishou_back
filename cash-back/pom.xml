@@ -356,6 +356,13 @@
             </properties>
         </profile>
         <profile>
+            <!-- cb生产环境 -->
+            <id>prod_cb</id>
+            <properties>
+                <environment>prod_cb</environment>
+            </properties>
+        </profile>
+        <profile>
             <!-- 开发环境 -->
             <id>docker1</id>
             <properties>
