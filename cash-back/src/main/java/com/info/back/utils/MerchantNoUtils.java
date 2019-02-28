@@ -54,6 +54,12 @@ public class MerchantNoUtils {
             merchantNum = 1000;
         }else if("jqb".equals(merchantNo)){
             merchantNum = 1002;
+        }else if("ymjk".equals(merchantNo)){
+            merchantNum = 1005;
+        }else if("txlc".equals(merchantNo)){
+            merchantNum = 1006;
+        }else if("tkj".equals(merchantNo)){
+            merchantNum = 1007;
         }
         return merchantNum;
     }
@@ -101,6 +107,8 @@ public class MerchantNoUtils {
             merchantNoTemp = "1005";
         }else if("天下粮仓".equals(merchantName) || "猪有钱".equals(merchantName)){
             merchantNoTemp = "1006";
+        }else if("提款机".equals(merchantName)){
+            merchantNoTemp = "1007";
         }
         return merchantNoTemp;
     }
@@ -123,7 +131,7 @@ public class MerchantNoUtils {
         }else if("1005".equals(merchantNo)){
             merchantName = "易秒借款";
         }else if("1006".equals(merchantNo)){
-            merchantName = "天下粮仓";
+            merchantName = "猪有钱";
         }else if("1007".equals(merchantNo)){
             merchantName = "提款机";
         }
