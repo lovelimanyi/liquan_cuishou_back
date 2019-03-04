@@ -1000,7 +1000,7 @@ public class MyCollectionOrderController extends BaseController {
                 map.put("status", 1); // 代扣成功
             } else {
                 map.put("status", 2); // 代扣失败
-                map.put("msg", msg); // 代扣失败原因
+                map.put("msg", "卡内无可扣金额"); // 代扣失败原因
             }
             map.put("updateDate", new Date());
             int count = collectionWithholdingRecordService.updateWithholdStatus(map);// 更新代扣记录状态
