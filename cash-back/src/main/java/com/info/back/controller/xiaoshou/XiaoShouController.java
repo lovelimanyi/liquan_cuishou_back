@@ -1,5 +1,7 @@
 package com.info.back.controller.xiaoshou;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.info.back.controller.BaseController;
 import com.info.back.dao.IMmanLoanCollectionCompanyDao;
 import com.info.back.dao.IXiaoShouOrderDao;
@@ -10,11 +12,13 @@ import com.info.back.utils.BackConstant;
 import com.info.back.utils.DwzResult;
 import com.info.back.utils.ExcelUtil;
 import com.info.back.utils.SpringUtils;
+import com.info.config.PayContents;
 import com.info.constant.Constant;
 import com.info.web.pojo.BackUser;
 import com.info.web.pojo.XiaoShouOrder;
 import com.info.web.synchronization.dao.IDataDao;
 import com.info.web.util.DateUtil;
+import com.info.web.util.HttpUtil;
 import com.info.web.util.PageConfig;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.log4j.Logger;
@@ -73,7 +77,11 @@ public class XiaoShouController  extends BaseController {
     public String toImportUserInfoPage(HttpServletRequest request, HttpServletResponse response,Model model) {
         HashMap<String, Object> params = getParametersO(request);
         model.addAttribute("params", params);
-        return "xiaoshou/importUserInfo";
+        String url = "xiaoshou/importUserInfo";
+        if ("ymgj".equals(String.valueOf(params.get("orderFrom")))){
+            url = "xiaoshouYoumi/importUserInfo";
+        }
+        return url;
     }
 
 
@@ -93,7 +101,33 @@ public class XiaoShouController  extends BaseController {
             MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
             MultipartFile multipartFile = multipartRequest.getFile("file");
 //            String filename = file.getOriginalFilename();
-            Integer count = xiaoShouService.importExcel(multipartFile);
+            Integer count = xiaoShouService.importExcel(multipartFile,BackConstant.ORDER_FROM_XJX);
+            result.setCode("0");
+            result.setMsg("导入成功！");
+            model.addAttribute("params", params);
+        } catch (Exception e) {
+            logger.error("导入订单出错");
+            result.setCode("-1");
+            result.setMsg("导入失败！");
+            e.printStackTrace();
+        }
+        SpringUtils.renderDwzResult(response, "0".equals(result.getCode()),
+                result.getMsg(), DwzResult.CALLBACK_CLOSECURRENT,
+                null);
+        return null;
+    }
+
+    @RequestMapping(value = "importExcelFromYoumi", method = {RequestMethod.GET, RequestMethod.POST}, produces = "text/json;charset=UTF-8")
+    @ResponseBody
+    public String uploadExcelFromYoumi(HttpServletRequest request, HttpServletResponse response, Model model) {
+        HashMap<String, Object> params = getParametersO(request);
+        JsonResult result = new JsonResult("-1", "导入失败！");
+        try {
+            logger.info("开始导入excel");
+            MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+            MultipartFile multipartFile = multipartRequest.getFile("file");
+//            String filename = file.getOriginalFilename();
+            Integer count = xiaoShouService.importExcel(multipartFile,BackConstant.ORDER_FROM_YMGJ);
             result.setCode("0");
             result.setMsg("导入成功！");
             model.addAttribute("params", params);
@@ -114,8 +148,9 @@ public class XiaoShouController  extends BaseController {
     public String dispatcherOrder(HttpServletRequest request, HttpServletResponse response, Model model){
         JsonResult result = new JsonResult("-1", "分单失败！");
         try{
-
-            distributeXiaoShouOrderService.handleXiaoShouOrder();
+            HashMap<String,Object> params = getParametersO(request);
+            String orderFrom = String.valueOf(params.get("orderFrom"));
+            distributeXiaoShouOrderService.handleXiaoShouOrder(orderFrom);
             result.setCode("0");
             result.setMsg("已完成分单！");
         }catch (Exception e){
@@ -131,20 +166,30 @@ public class XiaoShouController  extends BaseController {
 
     @RequestMapping("getAllXiaoShouOrder")
     public String getAllXiaoShouOrder(HttpServletRequest request, Model model) {
+        String url = "xiaoshou/allXiaoShouOrder";
         HashMap<String, Object> params = this.getParametersO(request);
-        PageConfig<XiaoShouOrder> page = xiaoShouService.findAllUserPage(params);
-        page = handleLoanOrderStatus2(page);
+        String orderFrom = String.valueOf(params.get("orderFrom"));
         Map<String,String> saleCompanyMap = getSaleCompanyMap();
+
+        PageConfig<XiaoShouOrder> page = null;
+        if (BackConstant.ORDER_FROM_YMGJ.equals(orderFrom)){
+            page = xiaoShouService.findAllUserPageFromYoumi(params);
+            page = handleOrderInfoFromYoumi(page);
+            url = "xiaoshouYoumi/allXiaoShouOrder";
+        }else {
+            page = xiaoShouService.findAllUserPage(params);
+            page = handleLoanOrderStatus(page);
+        }
 
         model.addAttribute("page",page);
         model.addAttribute("params",params);
         model.addAttribute("merchantNoMap", BackConstant.merchantNoMap);
         model.addAttribute("saleCompanyMap", saleCompanyMap);
         model.addAttribute("userIntentionMap", userIntentionMap);
-        return "xiaoshou/allXiaoShouOrder";
+        return url;
     }
 
-    private PageConfig<XiaoShouOrder> handleLoanOrderStatus2(PageConfig<XiaoShouOrder> page) {
+    private PageConfig<XiaoShouOrder> handleLoanOrderStatus(PageConfig<XiaoShouOrder> page) {
         List<XiaoShouOrder> items = page.getItems();
         if(null != items && items.size()>0){
             for(XiaoShouOrder xiaoShouOrder : items){
@@ -163,23 +208,80 @@ public class XiaoShouController  extends BaseController {
         return page;
     }
 
+    private PageConfig<XiaoShouOrder> handleOrderInfoFromYoumi(PageConfig<XiaoShouOrder> page) {
+        List<XiaoShouOrder> items = page.getItems();
+        if(null != items && items.size()>0){
+            List<Long> userIdList = new ArrayList<>();
+            for(XiaoShouOrder xiaoShouOrder : items){
+                //todo_lmy 请求第三方
+//                HashMap<String,String> map = new HashMap();
+//                map.put("userId",xiaoShouOrder.getUserId());
+//                map.put("merchantNo",xiaoShouOrder.getMerchantNo());
+//                HashMap<String,String> borrowOrder = dataDao.getBorrowOrderOnBorrowing2(map);
+//                if (null != borrowOrder && borrowOrder.size() > 0){
+//                    xiaoShouOrder.setLoanOrderStatus(1);
+//                }else {
+//                    xiaoShouOrder.setLoanOrderStatus(0);
+//                }
+                userIdList.add(Long.valueOf(xiaoShouOrder.getUserId()));
+            }
+            logger.info("调用有米渠道接口，获取用户信息，参数：" + JSONObject.toJSONString(userIdList));
+            try{
+                //通过userId、商户号查询在借状态借款单；
+                String returnInfo = HttpUtil.getInstance().doPost2(PayContents.GET_YMGJ_USER_INFOS, JSON.toJSONString(userIdList));
+//                Map<String, Object> o = (Map<String, Object>) JSONObject.parse(returnInfo);
+                List<Map<String, Object>> o = (List<Map<String, Object>>) JSONObject.parse(returnInfo);
+                Map<String,Map<String,Object>> mapResult = new HashMap<>();
+                for(Map<String,Object> map :o){
+                    for (Map.Entry<String, Object> entry : map.entrySet()) {
+                        mapResult.put(entry.getKey(),(Map<String, Object>)entry.getValue());
+                    }
+                }
+
+                for(XiaoShouOrder xiaoShouOrder : items){
+                    String mobile = String.valueOf(mapResult.get(xiaoShouOrder.getUserId()).get("mobile"));
+                    String currentStatus = String.valueOf(mapResult.get(xiaoShouOrder.getUserId()).get("currentStatus"));
+                    String merchantNo = String.valueOf(mapResult.get(xiaoShouOrder.getUserId()).get("merchantNo"));
+                    xiaoShouOrder.setMobile(mobile);
+                    xiaoShouOrder.setCurrentStatus(currentStatus);
+                    xiaoShouOrder.setMerchantNo(merchantNo);
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+                logger.error("调用有米渠道接口，获取用户信息，处理异常，，，");
+            }
+        }
+        page.setItems(items);
+        return page;
+    }
+
     @RequestMapping("getMyXiaoShouOrder")
     public String getMyXiaoShouOrder(HttpServletRequest request, Model model) {
+        String url = "xiaoshou/myXiaoShouOrder";
         HashMap<String, Object> params = this.getParametersO(request);
         BackUser backUser = (BackUser) request.getSession().getAttribute(
                 Constant.BACK_USER);
         if (String.valueOf(SALER_ROLE_ID).equals(backUser.getRoleId())){
             params.put("currentCollectionUserId",backUser.getUuid());
         }
-        PageConfig<XiaoShouOrder> page = xiaoShouService.findAllUserPage(params);
-        handleLoanOrderStatus2(page);
+        String orderFrom = String.valueOf(params.get("orderFrom"));
+        PageConfig<XiaoShouOrder> page = null;
+        if(BackConstant.ORDER_FROM_YMGJ.equals(orderFrom)){
+            page = xiaoShouService.findAllUserPageFromYoumi(params);
+            handleOrderInfoFromYoumi(page);
+            url = "xiaoshouYoumi/allXiaoShouOrder";
+        }else {
+            page = xiaoShouService.findAllUserPage(params);
+            handleLoanOrderStatus(page);
+        }
         Map<String,String> saleCompanyMap = getSaleCompanyMap();
 
         model.addAttribute("page",page);
         model.addAttribute("params",params);
         model.addAttribute("merchantNoMap", BackConstant.merchantNoMap);
+        model.addAttribute("saleCompanyMap", saleCompanyMap);
         model.addAttribute("userIntentionMap", userIntentionMap);
-        return "xiaoshou/myXiaoShouOrder";
+        return url;
     }
 
     private Map<String,String> getSaleCompanyMap() {
@@ -207,7 +309,14 @@ public class XiaoShouController  extends BaseController {
             int size = 50000;
             int total = 0;
             params.put(Constant.PAGE_SIZE, size);
-            int totalPageNum = xiaoShouOrderDao.findAllUserCount(params);
+            String orderFrom = String.valueOf(params.get("orderFrom"));
+            int totalPageNum = 0;
+            if(BackConstant.ORDER_FROM_YMGJ.equals(orderFrom)){
+                totalPageNum = xiaoShouOrderDao.findAllUserCountFromYmgj(params);
+            }else {
+                totalPageNum = xiaoShouOrderDao.findAllUserCount(params);
+            }
+
             if (totalPageNum > 0) {
                 if (totalPageNum % size > 0) {
                     total = totalPageNum / size + 1;
@@ -223,8 +332,15 @@ public class XiaoShouController  extends BaseController {
             String[] titles = {"批次", "销售公司", "坐席", "商户号", "User ID", "客户姓名", "注册时间", "当前状态", "用户意向", "备注", "分单时间"};
             for (int i = 1; i <= total; i++) {
                 params.put(Constant.CURRENT_PAGE, i);
-                PageConfig<XiaoShouOrder> pm = xiaoShouService.findAllUserPage(params);
-                pm = handleLoanOrderStatus2(pm);
+                PageConfig<XiaoShouOrder> pm = new PageConfig<>();
+                if(BackConstant.ORDER_FROM_YMGJ.equals(orderFrom)){
+                    pm = xiaoShouService.findAllUserPageFromYoumi(params);
+                    pm = handleOrderInfoFromYoumi(pm);
+                }else {
+                    pm = xiaoShouService.findAllUserPage(params);
+                    pm = handleLoanOrderStatus(pm);
+                }
+
                 List<XiaoShouOrder> list = pm.getItems();
                 List<Object[]> contents = new ArrayList<Object[]>();
                 for (XiaoShouOrder r : list) {
@@ -232,7 +348,11 @@ public class XiaoShouController  extends BaseController {
                     conList[0] = r.getBatchId() == null ? "" : String.valueOf(r.getBatchId());
                     conList[1] = r.getCompanyId() == null ? "" : saleCompanyMap.get(r.getCompanyId());
                     conList[2] = r.getCurrentCollectionUserName() == null ? "" : r.getCurrentCollectionUserName();
-                    conList[3] = r.getMerchantNo() == null ? "" : merchantNoMap.get(r.getMerchantNo());
+                    if(BackConstant.ORDER_FROM_YMGJ.equals(orderFrom)){
+                        conList[3] = r.getMerchantNo() == null ? "" : String.valueOf(r.getMerchantNo());
+                    }else {
+                        conList[3] = r.getMerchantNo() == null ? "" : merchantNoMap.get(r.getMerchantNo());
+                    }
                     conList[4] = r.getUserId() == null ? "" : r.getUserId();
                     conList[5] = r.getUserName() == null ? "" : r.getUserName();
                     conList[6] = r.getRegisterTime() == null ? "" : DateUtil.getDateFormat(r.getRegisterTime(), "yyyy-MM-dd HH:mm:ss");
@@ -260,10 +380,18 @@ public class XiaoShouController  extends BaseController {
 
     @RequestMapping("getUserMobile")
     public String getUserMobile(HttpServletRequest request, Model model) {
+        String url = "xiaoshou/userMobile";
         HashMap<String, Object> params = this.getParametersO(request);
-        String mobile = String.valueOf(params.get("mobile"));
-        model.addAttribute("mobile",mobile);
-        return "xiaoshou/userMobile";
+        String orderFrom = String.valueOf(params.get("orderFrom"));
+        if(BackConstant.ORDER_FROM_YMGJ.equals(orderFrom)){
+            url = "xiaoshouYoumi/userMobile";
+            String mobile = String.valueOf(params.get("mobile"));//todo_lmy 调取第三方获取手机号
+            model.addAttribute("mobile",mobile);
+        }else {
+            String mobile = String.valueOf(params.get("mobile"));
+            model.addAttribute("mobile",mobile);
+        }
+        return url;
     }
 
     /**
@@ -274,12 +402,17 @@ public class XiaoShouController  extends BaseController {
      */
     @RequestMapping("addRemarkPage")
     public String addRemarkPage(HttpServletRequest request, Model model) {
+        String url = "xiaoshou/addRemark";
         HashMap<String, Object> params = this.getParametersO(request);
+        String orderFrom = String.valueOf(params.get("orderFrom"));
+        if(BackConstant.ORDER_FROM_YMGJ.equals(orderFrom)){
+            url = "xiaoshouYoumi/addRemark";
+        }
         String id = String.valueOf(params.get("id"));
         String remark = String.valueOf(params.get("remark"));
         model.addAttribute("id",id);
         model.addAttribute("params",params);
-        return "xiaoshou/addRemark";
+        return url;
     }
 
     @RequestMapping("addRemark")
@@ -291,7 +424,14 @@ public class XiaoShouController  extends BaseController {
         XiaoShouOrder xiaoShouOrder = new XiaoShouOrder();
         xiaoShouOrder.setId(id);
         xiaoShouOrder.setRemark(remark);
-        int resultTemp = xiaoShouOrderDao.updateRemark(xiaoShouOrder);
+
+        int resultTemp = 0;
+        String orderFrom = String.valueOf(params.get("orderFrom"));
+        if(BackConstant.ORDER_FROM_YMGJ.equals(orderFrom)){
+            resultTemp = xiaoShouOrderDao.updateRemarkFromYmgj(xiaoShouOrder);
+        }else {
+            resultTemp = xiaoShouOrderDao.updateRemark(xiaoShouOrder);
+        }
         if (1 == resultTemp){
             result.setCode("0");
             result.setMsg("已修改备注");
@@ -312,13 +452,18 @@ public class XiaoShouController  extends BaseController {
      */
     @RequestMapping("updateUserIntentionPage")
     public String updateUserIntentionPage(HttpServletRequest request, Model model) {
+        String url = "xiaoshou/updateUserIntention";
         HashMap<String, Object> params = this.getParametersO(request);
+        String orderFrom = String.valueOf(params.get("orderFrom"));
+        if(BackConstant.ORDER_FROM_YMGJ.equals(orderFrom)){
+            url = "xiaoshouYoumi/updateUserIntention";
+        }
         String id = String.valueOf(params.get("id"));
         String remark = String.valueOf(params.get("userIntention"));
         model.addAttribute("id",id);
         model.addAttribute("params",params);
         model.addAttribute("userIntentionMap", userIntentionMap);
-        return "xiaoshou/updateUserIntention";
+        return url;
     }
 
     @RequestMapping("updateUserIntention")
@@ -330,7 +475,14 @@ public class XiaoShouController  extends BaseController {
         XiaoShouOrder xiaoShouOrder = new XiaoShouOrder();
         xiaoShouOrder.setId(id);
         xiaoShouOrder.setUserIntention(userIntention);
-        int resultTemp = xiaoShouOrderDao.updateUserIntention(xiaoShouOrder);
+        String orderFrom = String.valueOf(params.get("orderFrom"));
+        int resultTemp = 0;
+        if(BackConstant.ORDER_FROM_YMGJ.equals(orderFrom)){
+            resultTemp = xiaoShouOrderDao.updateUserIntentionFromYmgj(xiaoShouOrder);
+        }else {
+            resultTemp = xiaoShouOrderDao.updateUserIntention(xiaoShouOrder);
+        }
+
         if (1 == resultTemp){
             result.setCode("0");
             result.setMsg("已修改用户意向");

@@ -21,6 +21,15 @@ public class XiaoShouOrder {
     private String companyId;
     private Date createTime;
     private Date updatetime;
+    private String currentStatus;
+
+    public String getCurrentStatus() {
+        return currentStatus;
+    }
+
+    public void setCurrentStatus(String currentStatus) {
+        this.currentStatus = currentStatus;
+    }
 
     public Long getId() {
         return id;
