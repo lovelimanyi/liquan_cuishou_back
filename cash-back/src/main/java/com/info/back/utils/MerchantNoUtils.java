@@ -84,6 +84,8 @@ public class MerchantNoUtils {
             merchantNoTemp = "txlc";
         }else if("1007".equals(merchantNo)){
             merchantNoTemp = "tkj";
+        }else if("1008".equals(merchantNo)){
+            merchantNoTemp = "cjs";
         }
         return merchantNoTemp;
     }
@@ -109,6 +111,8 @@ public class MerchantNoUtils {
             merchantNoTemp = "1006";
         }else if("提款机".equals(merchantName)){
             merchantNoTemp = "1007";
+        }else if("财急送".equals(merchantName)){
+            merchantNoTemp = "1008";
         }
         return merchantNoTemp;
     }
@@ -134,6 +138,8 @@ public class MerchantNoUtils {
             merchantName = "猪有钱";
         }else if("1007".equals(merchantNo)){
             merchantName = "提款机";
+        }else if("1008".equals(merchantNo)){
+            merchantName = "财急送";
         }
         return merchantName;
     }

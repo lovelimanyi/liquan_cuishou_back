@@ -163,6 +163,7 @@ public class BackConstant {
         merchantNoMap.put("1005","易秒借款");
         merchantNoMap.put("1006","猪有钱");
         merchantNoMap.put("1007","提款机");
+        merchantNoMap.put("1008","财急送");
 
 
         groupNameMap.put(BackConstant.XJX_OVERDUE_LEVEL_S1, "S1");
