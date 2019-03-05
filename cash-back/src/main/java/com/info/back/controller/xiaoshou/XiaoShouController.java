@@ -238,9 +238,14 @@ public class XiaoShouController  extends BaseController {
                 }
 
                 for(XiaoShouOrder xiaoShouOrder : items){
-                    String mobile = String.valueOf(mapResult.get(xiaoShouOrder.getUserId()).get("mobile"));
-                    String currentStatus = String.valueOf(mapResult.get(xiaoShouOrder.getUserId()).get("currentStatus"));
-                    String merchantNo = String.valueOf(mapResult.get(xiaoShouOrder.getUserId()).get("merchantNo"));
+                    String mobile = null;
+                    String currentStatus = null;
+                    String merchantNo = null;
+                    if(null != mapResult.get(xiaoShouOrder.getUserId()) && mapResult.get(xiaoShouOrder.getUserId()).size()>0){
+                        mobile = String.valueOf(mapResult.get(xiaoShouOrder.getUserId()).get("mobile"));
+                        currentStatus = String.valueOf(mapResult.get(xiaoShouOrder.getUserId()).get("currentStatus"));
+                        merchantNo = String.valueOf(mapResult.get(xiaoShouOrder.getUserId()).get("merchantNo"));
+                    }
                     xiaoShouOrder.setMobile(mobile);
                     xiaoShouOrder.setCurrentStatus(currentStatus);
                     xiaoShouOrder.setMerchantNo(merchantNo);
