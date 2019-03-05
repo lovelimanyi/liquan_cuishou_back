@@ -150,9 +150,13 @@ public class XiaoShouService implements IXiaoShouService{
             execlParams.put("userId",rows[0]);
             //用户姓名
             execlParams.put("userName",rows[1]);
-            //注册时间
+//            //注册时间
             try{
-                execlParams.put("registerTime",rows[2]);
+                if (StringUtils.isNotEmpty(rows[2])){
+                    execlParams.put("registerTime",rows[2]);
+                }else {
+                    execlParams.put("registerTime",null);
+                }
             }catch (Exception e){
                 execlParams.put("registerTime",null);
             }

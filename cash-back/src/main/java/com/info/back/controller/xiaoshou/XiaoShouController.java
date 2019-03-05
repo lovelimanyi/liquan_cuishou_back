@@ -8,10 +8,7 @@ import com.info.back.dao.IXiaoShouOrderDao;
 import com.info.back.result.JsonResult;
 import com.info.back.service.DistributeXiaoShouOrderService;
 import com.info.back.service.IXiaoShouService;
-import com.info.back.utils.BackConstant;
-import com.info.back.utils.DwzResult;
-import com.info.back.utils.ExcelUtil;
-import com.info.back.utils.SpringUtils;
+import com.info.back.utils.*;
 import com.info.config.PayContents;
 import com.info.constant.Constant;
 import com.info.web.pojo.BackUser;
@@ -234,7 +231,9 @@ public class XiaoShouController  extends BaseController {
                 Map<String,Map<String,Object>> mapResult = new HashMap<>();
                 for(Map<String,Object> map :o){
                     for (Map.Entry<String, Object> entry : map.entrySet()) {
-                        mapResult.put(entry.getKey(),(Map<String, Object>)entry.getValue());
+                        if(null != entry.getKey() && StringUtils.isNotEmpty(entry.getKey())){
+                            mapResult.put(entry.getKey(),(Map<String, Object>)entry.getValue());
+                        }
                     }
                 }
 

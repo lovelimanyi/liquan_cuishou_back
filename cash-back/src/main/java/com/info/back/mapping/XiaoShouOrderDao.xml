@@ -9,7 +9,7 @@
 		</foreach>
 	</insert>
 	<insert id="importExcelFromYmgj" parameterType="List" >
-		insert into xiao_shou_info_ymgj ( user_id,user_name, register_time,create_time )
+		insert into xiao_shou_info_ymgj ( user_id,user_name,register_time,create_time )
 		values
 		<foreach collection="list" item="item" index="index" separator=",">
 			( #{item.userId},#{item.userName}, #{item.registerTime}, now())
