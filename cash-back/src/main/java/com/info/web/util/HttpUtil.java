@@ -15,6 +15,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URLEncodedUtils;
@@ -99,6 +102,25 @@ public class HttpUtil {
             logger.error("调用异常：{}", e);
         } finally {
             httpClient.getConnectionManager().shutdown();
+        }
+        return result;
+    }
+
+    public static String doPost3(String url, String json) {
+        HttpPost post = new HttpPost(url);
+        JSONObject response = null;
+        String result = null;
+        try {
+            StringEntity s = new StringEntity(json, "UTF-8"); // 中文乱码在此解决
+            s.setContentType("application/json");
+            post.setEntity(s);
+            HttpResponse res = HttpClients.createDefault().execute(post);
+            if (res.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                result = EntityUtils.toString(res.getEntity());// 返回json格式：
+//                response = JSON.parseObject(result);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return result;
     }
