@@ -226,7 +226,8 @@ public class XiaoShouController  extends BaseController {
             try{
                 //通过userId、商户号查询在借状态借款单；
 //                String returnInfo = HttpUtil.getInstance().doPost2(PayContents.GET_YMGJ_USER_INFOS, JSON.toJSONString(userIdList));
-                String returnInfo = HttpUtil.doPost3(PayContents.GET_YMGJ_USER_INFOS, JSON.toJSONString(userIdList));
+//                String returnInfo = HttpUtil.doPost3(PayContents.GET_YMGJ_USER_INFOS, JSON.toJSONString(userIdList));
+                String returnInfo = HttpUtil.getJSON(PayContents.GET_YMGJ_USER_INFOS, JSON.toJSONString(userIdList));
 //                Map<String, Object> o = (Map<String, Object>) JSONObject.parse(returnInfo);
                 List<Map<String, Object>> o = (List<Map<String, Object>>) JSONObject.parse(returnInfo);
                 Map<String,Map<String,Object>> mapResult = new HashMap<>();
