@@ -230,7 +230,7 @@ public class XiaoShouController  extends BaseController {
 //                String returnInfo = HttpUtil.doPost3(PayContents.GET_YMGJ_USER_INFOS, JSON.toJSONString(userIdList));
 
                 RestTemplate restTemplate = new RestTemplate();
-                String returnInfo = RestTemplateUtil.postJsonForEntity(restTemplate,PayContents.GET_YMGJ_USER_INFOS,JSON.toJSONString(userIdList),String.class);
+                String returnInfo = RestTemplateUtil.postJsonForEntity(restTemplate,PayContents.GET_YMGJ_USER_INFOS,userIdList,String.class);
 //                Map<String, Object> o = (Map<String, Object>) JSONObject.parse(returnInfo);
                 List<Map<String, Object>> o = (List<Map<String, Object>>) JSONObject.parse(returnInfo);
                 Map<String,Map<String,Object>> mapResult = new HashMap<>();
