@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -227,7 +228,9 @@ public class XiaoShouController  extends BaseController {
                 //通过userId、商户号查询在借状态借款单；
 //                String returnInfo = HttpUtil.getInstance().doPost2(PayContents.GET_YMGJ_USER_INFOS, JSON.toJSONString(userIdList));
 //                String returnInfo = HttpUtil.doPost3(PayContents.GET_YMGJ_USER_INFOS, JSON.toJSONString(userIdList));
-                String returnInfo = HttpUtil.getJSON(PayContents.GET_YMGJ_USER_INFOS, JSON.toJSONString(userIdList));
+
+                RestTemplate restTemplate = new RestTemplate();
+                String returnInfo = RestTemplateUtil.postJsonForEntity(restTemplate,PayContents.GET_YMGJ_USER_INFOS,JSON.toJSONString(userIdList),String.class);
 //                Map<String, Object> o = (Map<String, Object>) JSONObject.parse(returnInfo);
                 List<Map<String, Object>> o = (List<Map<String, Object>>) JSONObject.parse(returnInfo);
                 Map<String,Map<String,Object>> mapResult = new HashMap<>();
