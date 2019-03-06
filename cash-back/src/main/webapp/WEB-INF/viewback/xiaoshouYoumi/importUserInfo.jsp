@@ -29,7 +29,7 @@
     <title>订单导入</title>
 </head>
 <body>
-<form name="form" action="xiaoShou/importExcel" enctype="multipart/form-data" method="post" onsubmit="return iframeCallback(this,dialogAjaxDone);">
+<form name="form" action="xiaoShou/importExcelFromYoumi" enctype="multipart/form-data" method="post" onsubmit="return iframeCallback(this,dialogAjaxDone);">
     <input type="hidden" name="parentId" value="${params.parentId}"/>
     <input type="hidden" name="navTabId" value="${params.parentId}"/>
     <div id="top" class="pageFormContent" layoutH="120">
@@ -83,7 +83,7 @@
     function dispatcherOrder() {
         // debugger;
         $.ajax({
-            url: "xiaoShou/dispatcherOrder?orderFrom=xjx",
+            url: "xiaoShou/dispatcherOrder?orderFrom=ymgj",
             type: "GET",
             success: function (data) {
                 alertMsg.info("已完成分单!");

@@ -6,6 +6,10 @@ import java.util.*;
 import com.info.web.pojo.SysDict;
 
 public class BackConstant {
+
+    public final static String ORDER_FROM_XJX = "xjx";// 渠道来源，现金侠（代运营）
+    public final static String ORDER_FROM_YMGJ = "ymgj";// 渠道来源，有米管家（代运营）
+
     public static final String DEL_FLAG_ON = "0";// 删除标志 0：有效
 
     public final static String ON = "1";// 开关-开

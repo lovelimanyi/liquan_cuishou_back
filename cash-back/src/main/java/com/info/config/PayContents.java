@@ -17,6 +17,7 @@ public class PayContents {
     public static final String JXL_HBASE_SERVER_URL = propertiesLoader.getProperty("jxl.hbase.server.rul");//rong360聚信立报告地址
     public static final String XJX_SMS_SEND_URL_NEW = propertiesLoader.getProperty("XJX.sms_send_url_new");//短信调用地址
     public static final String XJX_GET_PHONES = propertiesLoader.getProperty("XJX.GET.PHONES");//获取共债手机号地址
+    public static final String GET_YMGJ_USER_INFOS = propertiesLoader.getProperty("GET.YMGJ.USER.INFOS");//获取有米管家用户信息
 
     public static final String JXL_OSS_SERVER_URL = propertiesLoader.getProperty("jxl.oss.server.rul");//oss地址
     //获取商品名称

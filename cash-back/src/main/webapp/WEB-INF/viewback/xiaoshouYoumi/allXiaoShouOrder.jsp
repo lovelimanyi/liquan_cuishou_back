@@ -20,20 +20,20 @@
 <form id="pagerForm" onsubmit="return navTabSearch(this);" action="xiaoShou/getAllXiaoShouOrder?orderFrom=ymgj&myId=${params.myId}" method="post">
     <div class="pageHeader">
         <input type="hidden" id="parentId" name="parentId" value="${params.myId}">
-        <input type="hidden" id="orderFrom444" name="orderFrom444" value="ymgj">
+        <input type="hidden" id="orderFrom333" name="orderFrom333" value="${params.orderFrom}">
         <div class="searchBar">
             <table class="searchContent">
                 <tr>
-                    <td>商户:
-                        <select id="merchantNo" name="merchantNo">
-                            <option value="">全部</option>
-                            <c:forEach var="merchantNo" items="${merchantNoMap }">
-                                <option value="${merchantNo.key }" <c:if test="${merchantNo.key eq params.merchantNo}">selected="selected"</c:if>>
-                                        ${merchantNo.value}
-                                </option>
-                            </c:forEach>
-                        </select>
-                    </td>
+                    <%--<td>商户:--%>
+                        <%--<select id="merchantNo" name="merchantNo">--%>
+                            <%--<option value="">全部</option>--%>
+                            <%--<c:forEach var="merchantNo" items="${merchantNoMap }">--%>
+                                <%--<option value="${merchantNo.key }" <c:if test="${merchantNo.key eq params.merchantNo}">selected="selected"</c:if>>--%>
+                                        <%--${merchantNo.value}--%>
+                                <%--</option>--%>
+                            <%--</c:forEach>--%>
+                        <%--</select>--%>
+                    <%--</td>--%>
                     <td>批次: <input type="text" id="batchId" name="batchId" value="${params.batchId}"/></td>
                     <td>用户意向:
                         <select id="userIntention" name="userIntention">
@@ -147,7 +147,8 @@
                             ${order.currentCollectionUserName}
                     </td>
                     <td align="center" width="50">
-                            ${merchantNoMap[order.merchantNo]}
+                            <%--${merchantNoMap[order.merchantNo]}--%>
+                            ${order.merchantNo}
                     </td>
                     <td align="center" width="50">
                             ${order.userId}
@@ -161,11 +162,12 @@
                     <td align="center" width="100">
                             <fmt:formatDate value="${order.registerTime}" pattern="yyyy-MM-dd HH:mm:ss"/>
                     </td>
-                    <td align="center" width="80">
-                        <c:choose>
-                            <c:when test="${order.loanOrderStatus eq 0}">无在借订单</c:when>
-                            <c:when test="${order.loanOrderStatus eq 1}">有在借订单</c:when>
-                        </c:choose>
+                    <td align="center" width="200">
+                        <%--<c:choose>--%>
+                            <%--<c:when test="${order.loanOrderStatus eq 0}">无在借订单</c:when>--%>
+                            <%--<c:when test="${order.loanOrderStatus eq 1}">有在借订单</c:when>--%>
+                        <%--</c:choose>--%>
+                                ${order.currentStatus}
                     </td>
                     <td>
                         <c:choose>
@@ -180,14 +182,14 @@
                     <td align="center" width="100">
                             <fmt:formatDate value="${order.dispatcherTime}" pattern="yyyy-MM-dd HH:mm:ss"/>
                     </td>
-                    <td align="center" width="350">
-                        <a href="xiaoShou/getUserMobile?mobile=${order.mobile }&myId=${params.myId}" target="dialog"
+                    <td align="center" width="300">
+                        <a href="xiaoShou/getUserMobile?orderFrom=ymgj&userId=${order.userId}&mobile=${order.mobile }&myId=${params.myId}" target="dialog"
                            style="color: #1b8d0f;margin: 8px;font-size: 15px;text-decoration: none;">查看手机号
                         </a>
-                        <a href="xiaoShou/addRemarkPage?id=${order.id }&remark=${order.remark }&myId=${params.myId}" target="dialog"
+                        <a href="xiaoShou/addRemarkPage?orderFrom=ymgj&id=${order.id }&remark=${order.remark }&myId=${params.myId}" target="dialog"
                            style="color: #0f579f;margin: 8px;font-size: 15px;text-decoration: none;">添加备注
                         </a>
-                        <a href="xiaoShou/updateUserIntentionPage?id=${order.id }&userIntention=${order.userIntention }&myId=${params.myId}" target="dialog"
+                        <a href="xiaoShou/updateUserIntentionPage?orderFrom=ymgj&id=${order.id }&userIntention=${order.userIntention }&myId=${params.myId}" target="dialog"
                            style="color: #0f579f;margin: 8px;font-size: 15px;text-decoration: none;">修改用户意向
                         </a>
                     </td>

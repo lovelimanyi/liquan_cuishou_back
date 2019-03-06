@@ -1,20 +1,18 @@
 package com.info.web.util;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URLEncodedUtils;
@@ -102,6 +100,27 @@ public class HttpUtil {
         }
         return result;
     }
+
+    public static String doPost3(String url, String json) {
+        HttpPost post = new HttpPost(url);
+        JSONObject response = null;
+        String result = null;
+        try {
+            StringEntity s = new StringEntity(json, "UTF-8"); // 中文乱码在此解决
+            s.setContentType("application/json");
+            post.setEntity(s);
+            HttpResponse res = HttpClients.createDefault().execute(post);
+            if (res.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                result = EntityUtils.toString(res.getEntity());// 返回json格式：
+//                response = JSON.parseObject(result);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+
 
 
     public static String dopostMap(String url, Map<String, String> params) {

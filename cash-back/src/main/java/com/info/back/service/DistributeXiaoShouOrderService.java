@@ -14,10 +14,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 类描述：分配销售订单service
@@ -33,7 +30,7 @@ public class DistributeXiaoShouOrderService {
     @Autowired
     private IDataDao dataDao;
 
-    public void handleXiaoShouOrder() throws Exception {
+    public void handleXiaoShouOrder(String orderFrom) throws Exception {
 
 
         String redisKey = BackConstant.XIAO_SHOU_BACK_USER;
@@ -51,13 +48,19 @@ public class DistributeXiaoShouOrderService {
                 }
             }
         }
-        List<XiaoShouOrder> orderList = xiaoShouService.getXiaoShouOrder();
+        List<XiaoShouOrder> orderList = new ArrayList<>();
+        if (BackConstant.ORDER_FROM_XJX.equals(orderFrom)) {
+            orderList = xiaoShouService.getXiaoShouOrder();
+        }
+        if (BackConstant.ORDER_FROM_YMGJ.equals(orderFrom)) {
+            orderList = xiaoShouService.getXiaoShouOrderYmgj();//请求有米
+        }
         if (CollectionUtils.isNotEmpty(orderList)){
             for (XiaoShouOrder order : orderList){
                 String backUser = JedisDataClient.lpop(BackConstant.XIAO_SHOU_BACK_USER);
                 JedisDataClient.rpush(BackConstant.XIAO_SHOU_BACK_USER,backUser);
                 JSONObject user = JSON.parseObject(backUser);
-                ThreadPoolInstance.getInstance().doExecute(new XiaoShouThread(order,user));
+                ThreadPoolInstance.getInstance().doExecute(new XiaoShouThread(order,user,orderFrom));
             }
             JedisDataClient.del(redisKey);
         }
@@ -71,11 +74,12 @@ public class DistributeXiaoShouOrderService {
 
         private XiaoShouOrder order;
         private JSONObject user;
+        private String orderFrom;
 
-        public XiaoShouThread(XiaoShouOrder order,JSONObject user){
+        public XiaoShouThread(XiaoShouOrder order,JSONObject user,String orderFrom){
             this.order = order;
             this.user = user;
-
+            this.orderFrom = orderFrom;
         }
         @Override
         public void run() {
@@ -92,18 +96,24 @@ public class DistributeXiaoShouOrderService {
                 order.setCompanyId(companyId);
                 order.setCreateTime(new Date());
                 order.setDispatcherTime(new Date());
-                HashMap<String,String> map = new HashMap<String,String>();
-                map.put("USER_ID", userId);//还款id
-                Map<String, Object> userInfo = dataDao.getUserInfo(map);
-                if (null != userInfo && null != userInfo.get("user_name")){
-                    order.setMobile(userInfo.get("user_name").toString());
-                }else {
-                    order.setMobile("");
+
+                if(BackConstant.ORDER_FROM_XJX.equals(orderFrom)){
+                    HashMap<String,String> map = new HashMap<String,String>();
+                    map.put("USER_ID", userId);
+                    Map<String, Object> userInfo = dataDao.getUserInfo(map);
+                    if (null != userInfo && null != userInfo.get("user_name")){
+                        order.setMobile(userInfo.get("user_name").toString());
+                    }else {
+                        order.setMobile("");
+                    }
+                    xiaoShouService.insertXiaoShouOrder(order);
+                    xiaoShouService.delXiaoShouInfo(order.getId());
                 }
 
-//                order.setMobile("18737191376");
-                xiaoShouService.insertXiaoShouOrder(order);
-                xiaoShouService.delXiaoShouInfo(order.getId());
+                if (BackConstant.ORDER_FROM_YMGJ.equals(orderFrom)){
+                    xiaoShouService.insertXiaoShouOrderFromYmgj(order);
+                    xiaoShouService.delXiaoShouInfoFromYmgj(order.getId());
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }

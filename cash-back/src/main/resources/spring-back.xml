@@ -71,6 +71,8 @@
                         <value>/other/collectionAdvice/getAdviceList</value>
                         <value>/order/reDispatch</value>
                         <value>/aiCuiShou/batchCommitData</value>
+                        <value>/xiaoShou/getAllXiaoShouOrder</value>
+                        <value>/xiaoShou/getMyXiaoShouOrder</value>
                         <value>/collectionOrder/get-user-ecommerce-info</value>
                     </list>
                 </property>
