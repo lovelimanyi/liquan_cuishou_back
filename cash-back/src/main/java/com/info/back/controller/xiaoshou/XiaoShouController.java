@@ -278,7 +278,7 @@ public class XiaoShouController  extends BaseController {
         if(BackConstant.ORDER_FROM_YMGJ.equals(orderFrom)){
             page = xiaoShouService.findAllUserPageFromYoumi(params);
             handleOrderInfoFromYoumi(page);
-            url = "xiaoshouYoumi/allXiaoShouOrder";
+            url = "xiaoshouYoumi/myXiaoShouOrder";
         }else {
             page = xiaoShouService.findAllUserPage(params);
             handleLoanOrderStatus(page);
