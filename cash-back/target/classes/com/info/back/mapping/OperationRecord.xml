@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.info.back.dao.IOperationRecordDao">
+    <resultMap id="BaseResultMap" type="com.info.web.pojo.OperationRecord">
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="operate_user_account" jdbcType="VARCHAR" property="operateUserAccount"/>
+        <result column="operate_time" property="operateTime"/>
+        <result column="loan_Id" jdbcType="VARCHAR" property="loanId"/>
+        <result column="loan_user_name" jdbcType="VARCHAR" property="loanUserName"/>
+        <result column="loan_user_phone" jdbcType="VARCHAR" property="loanUserPhone"/>
+        <result column="begin_collection_time" jdbcType="DATE" property="beginCollectionTime"/>
+        <result column="end_collection_time" jdbcType="DATE" property="endCollectionTime"/>
+        <result column="begin_dispatch_time" jdbcType="DATE" property="beginDispatchTime"/>
+        <result column="end_dispatch_time" jdbcType="DATE" property="endDispatchTime"/>
+        <result column="begin_overDuedays" jdbcType="INTEGER" property="beginOverDuedays"/>
+        <result column="end_overDuedays" jdbcType="INTEGER" property="endOverDuedays"/>
+        <result column="follow_up_grad" jdbcType="VARCHAR" property="followUpGrad"/>
+        <result column="collection_company_id" jdbcType="VARCHAR" property="collectionCompanyId"/>
+        <result column="collection_group" jdbcType="VARCHAR" property="collectionGroup"/>
+        <result column="collection_status" jdbcType="VARCHAR" property="collectionStatus"/>
+        <result column="current_collection_user_name" jdbcType="VARCHAR" property="currentCollectionUserName"/>
+        <result column="extra_filed_one" jdbcType="VARCHAR" property="extraFiledOne"/>
+        <result column="extra_filed_two" jdbcType="VARCHAR" property="extraFiledTwo"/>
+        <result column="extra_filed_three" jdbcType="VARCHAR" property="extraFiledThree"/>
+        <result column="source" jdbcType="INTEGER" property="source"/>
+    </resultMap>
+    <sql id="base_Column_List">
+		id, operate_user_account AS operateUserAccount, operate_time AS operateTime, loan_Id AS loanId, loan_user_name AS loanUserName, loan_user_phone AS loanUserPhone,
+		begin_collection_time AS beginCollectionTime, end_collection_time AS endCollectionTime, begin_dispatch_time AS beginDispatchTime, end_dispatch_time AS endDispatchTime,
+		begin_overDuedays AS beginOverDuedays, end_overDuedays AS endOverDuedays, follow_up_grad AS followUpGrad, collection_company_id AS collectionCompanyId, collection_group AS collectionGroup,
+		collection_status AS collectionStatus, current_collection_user_name AS currentCollectionUserName,source
+	</sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="base_Column_List"/>
+        from operation_record
+        where id = #{id,jdbcType=BIGINT}
+    </select>
+    <delete id="deleteByDate" parameterType="HashMap">
+		delete from operation_record
+		where operate_time &lt;= #{endDate}
+	</delete>
+
+    <insert id="insert" parameterType="com.info.web.pojo.OperationRecord">
+        insert into operation_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="operateUserAccount != null">
+                operate_user_account,
+            </if>
+            <if test="operateTime != null">
+                operate_time,
+            </if>
+            <if test="loanId != null">
+                loan_Id,
+            </if>
+            <if test="loanUserName != null">
+                loan_user_name,
+            </if>
+            <if test="loanUserPhone != null">
+                loan_user_phone,
+            </if>
+            <if test="beginCollectionTime != null">
+                begin_collection_time,
+            </if>
+            <if test="endCollectionTime != null">
+                end_collection_time,
+            </if>
+            <if test="beginDispatchTime != null">
+                begin_dispatch_time,
+            </if>
+            <if test="endDispatchTime != null">
+                end_dispatch_time,
+            </if>
+            <if test="beginOverDuedays != null">
+                begin_overDuedays,
+            </if>
+            <if test="endOverDuedays != null">
+                end_overDuedays,
+            </if>
+            <if test="followUpGrad != null">
+                follow_up_grad,
+            </if>
+            <if test="collectionCompanyId != null">
+                collection_company_id,
+            </if>
+            <if test="collectionGroup != null">
+                collection_group,
+            </if>
+            <if test="collectionStatus != null">
+                collection_status,
+            </if>
+            <if test="currentCollectionUserName != null">
+                current_collection_user_name,
+            </if>
+            <if test="source != null">
+                source,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=BIGINT},
+            </if>
+            <if test="operateUserAccount != null">
+                #{operateUserAccount,jdbcType=VARCHAR},
+            </if>
+            <if test="operateTime != null">
+                #{operateTime},
+            </if>
+            <if test="loanId != null">
+                #{loanId,jdbcType=VARCHAR},
+            </if>
+            <if test="loanUserName != null">
+                #{loanUserName,jdbcType=VARCHAR},
+            </if>
+            <if test="loanUserPhone != null">
+                #{loanUserPhone,jdbcType=VARCHAR},
+            </if>
+            <if test="beginCollectionTime != null">
+                #{beginCollectionTime,jdbcType=DATE},
+            </if>
+            <if test="endCollectionTime != null">
+                #{endCollectionTime,jdbcType=DATE},
+            </if>
+            <if test="beginDispatchTime != null">
+                #{beginDispatchTime,jdbcType=DATE},
+            </if>
+            <if test="endDispatchTime != null">
+                #{endDispatchTime,jdbcType=DATE},
+            </if>
+            <if test="beginOverDuedays != null">
+                #{beginOverDuedays,jdbcType=INTEGER},
+            </if>
+            <if test="endOverDuedays != null">
+                #{endOverDuedays,jdbcType=INTEGER},
+            </if>
+            <if test="followUpGrad != null">
+                #{followUpGrad,jdbcType=VARCHAR},
+            </if>
+            <if test="collectionCompanyId != null">
+                #{collectionCompanyId,jdbcType=VARCHAR},
+            </if>
+            <if test="collectionGroup != null">
+                #{collectionGroup,jdbcType=VARCHAR},
+            </if>
+            <if test="collectionStatus != null">
+                #{collectionStatus,jdbcType=VARCHAR},
+            </if>
+            <if test="currentCollectionUserName != null">
+                #{currentCollectionUserName,jdbcType=VARCHAR},
+            </if>
+            <if test="source != null">
+                #{source,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <select id="findAll" parameterType="HashMap" resultType="com.info.web.pojo.OperationRecord">
+        SELECT
+        <include refid="base_Column_List"/>
+        FROM operation_record
+        <include refid="base_where" />
+        ORDER BY operate_time DESC
+    </select>
+    <select id="findAllCount" parameterType="HashMap" resultType="Integer">
+        SELECT
+        COUNT(*)
+        FROM operation_record
+        <include refid="base_where" />
+    </select>
+    <sql id="base_where">
+        <where>
+            <if test="operateUserAccount != null and operateUserAccount != ''">
+                AND operate_user_account = #{operateUserAccount}
+            </if>
+            <if test="beginOperateTime != null and beginOperateTime != ''">
+                AND operate_time &gt;= #{beginOperateTime}
+            </if>
+            <if test="endOperateTime != null and endOperateTime != ''">
+                AND operate_time &lt;= DATE_ADD(#{endOperateTime},INTERVAL 1 DAY)
+            </if>
+        </where>
+    </sql>
+</mapper>

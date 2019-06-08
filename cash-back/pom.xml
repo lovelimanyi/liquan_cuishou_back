@@ -25,11 +25,11 @@
         </dependency>
 
         <!-- cat -->
-        <dependency>
-            <groupId>com.xianjinxia</groupId>
-            <artifactId>logcenter-sdk</artifactId>
-            <version>1.0.3-SNAPSHOT</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.xianjinxia</groupId>-->
+            <!--<artifactId>logcenter-sdk</artifactId>-->
+            <!--<version>1.0.3-SNAPSHOT</version>-->
+        <!--</dependency>-->
 
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -301,38 +301,43 @@
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>oss_op</groupId>
-            <artifactId>oss_op</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>oss_op</groupId>-->
+            <!--<artifactId>oss_op</artifactId>-->
+            <!--<version>0.0.1-SNAPSHOT</version>-->
+        <!--</dependency>-->
         <!-- https://mvnrepository.com/artifact/net.sourceforge.jexcelapi/jxl -->
         <dependency>
             <groupId>net.sourceforge.jexcelapi</groupId>
             <artifactId>jxl</artifactId>
             <version>2.6.12</version>
         </dependency>
-        <dependency>
-            <groupId>com.xjx</groupId>
-            <artifactId>mqclient</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>mqtt-client</artifactId>
-                    <groupId>org.fusesource.mqtt-client</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>logback-classic</artifactId>
-                    <groupId>ch.qos.logback</groupId>
-                </exclusion>
-            </exclusions>
+        <!--<dependency>-->
+            <!--<groupId>com.xjx</groupId>-->
+            <!--<artifactId>mqclient</artifactId>-->
+            <!--<version>1.0-SNAPSHOT</version>-->
+            <!--<exclusions>-->
+                <!--<exclusion>-->
+                    <!--<artifactId>mqtt-client</artifactId>-->
+                    <!--<groupId>org.fusesource.mqtt-client</groupId>-->
+                <!--</exclusion>-->
+                <!--<exclusion>-->
+                    <!--<artifactId>logback-classic</artifactId>-->
+                    <!--<groupId>ch.qos.logback</groupId>-->
+                <!--</exclusion>-->
+            <!--</exclusions>-->
 
-        </dependency>
+        <!--</dependency>-->
 
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.8.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>5.0.6.RELEASE</version>
         </dependency>
 
         <!--<dependency>-->
@@ -340,11 +345,11 @@
             <!--<artifactId>apollo-client</artifactId>-->
             <!--<version>1.2.0</version>-->
         <!--</dependency>-->
-        <dependency>
-            <groupId>com.senseinfo</groupId>
-            <artifactId>senseinfo-external-sdk</artifactId>
-            <version>1.0</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.senseinfo</groupId>-->
+            <!--<artifactId>senseinfo-external-sdk</artifactId>-->
+            <!--<version>1.0</version>-->
+        <!--</dependency>-->
     </dependencies>
 
     <profiles>

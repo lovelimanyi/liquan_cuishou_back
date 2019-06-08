@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.info.back.dao.IOrderDispatchRuleDao">
+    <resultMap id="BaseResultMap" type="com.info.web.pojo.OrderDispatchRule">
+        <id column="id" property="id"/>
+        <result column="company_id" property="companyId"/>
+        <result column="company_name" property="companyName"/>
+        <result column="average_order" property="averageOrder"/>
+        <result column="status" property="status"/>
+        <result column="group_level" property="groupLevel"/>
+    </resultMap>
+
+    <select id="listAllInfo" resultMap="BaseResultMap">
+        SELECT * FROM order_dispatch_rule ORDER BY id
+    </select>
+</mapper>

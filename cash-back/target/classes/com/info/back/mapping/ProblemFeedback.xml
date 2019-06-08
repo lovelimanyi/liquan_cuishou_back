@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.info.back.dao.IProblemFeedbackDao">
+	<resultMap id="BaseResultMap" type="com.info.web.pojo.ProblemFeedback">
+		<id column="id" property="id"/>
+		<result column="create_date" property="createDate" />
+		<result column="type" property="type" />
+		<result column="collection_company_id" property="collectionCompanyId"/>
+		<result column="operator_id" property="operatorId"/>
+		<result column="loan_id" property="loanId"/>
+		<result column="loan_user_phone" property="loanUserPhone"/>
+		<result column="details" property="details"/>
+		<result column="create_user_role_id" property="createUserRoleId"/>
+		<result column="status" property="status"/>
+	</resultMap>
+
+	<insert id="insert" parameterType="com.info.web.pojo.ProblemFeedback">
+		insert into problem_feedback(
+			create_date,
+			`type`,
+			collection_company_id,
+			operator_id,
+			loan_id,
+			loan_user_phone,
+			details,
+			create_user_role_id,
+			create_user_id,
+			status
+			) values(
+			#{createDate},
+			#{type},
+			#{collectionCompanyId},
+			#{operatorId},
+			#{loanId},
+			#{loanUserPhone},
+			#{details},
+			#{createUserRoleId},
+			#{createUserId},
+			#{status}
+			)
+	</insert>
+
+	<update id="updateStatus" parameterType="HashMap">
+		UPDATE problem_feedback p SET p.status = #{status},p.operator_id = #{uuid} WHERE id = #{id};
+	</update>
+
+	<select id="findAllCount" resultType="Integer" parameterType="HashMap">
+			SELECT COUNT(1)
+			FROM
+			<include refid="base_table"></include>
+			<include refid="base_where"></include>
+	</select>
+
+	<select id="getStatusById" parameterType="String" resultType="String">
+		SELECT f.status FROM problem_feedback f WHERE f.id = #{id}
+	</select>
+
+	<select id="findAll" resultMap="BaseResultMap" parameterType="HashMap">
+			 SELECT
+				 p.id,
+				 p.create_date,
+				 p.type,
+				 com.title AS companyTitle,
+				 c.user_name AS operator,
+				 p.loan_id,
+				 p.loan_user_phone,
+				 p.details,
+				 b.role_id AS createUserRoleId,
+				 b.user_name AS createUsername,
+				 p.status
+			 FROM
+			 <include refid="base_table"></include>
+			 <include refid="base_where"></include>
+			 ORDER BY
+				p.create_date
+			 DESC
+	</select>
+
+	<sql id="base_table">
+			problem_feedback p
+			 LEFT JOIN
+			 	back_user b ON p.create_user_id = b.uuid
+			 LEFT JOIN
+			 	back_user c ON p.operator_id = c.uuid
+			 LEFT JOIN
+				mman_loan_collection_company com ON com.id = p.collection_company_id
+	</sql>
+
+	<sql id="base_where">
+		<where>
+			<if test="beginTime != null and beginTime != ''">
+					AND DATE_FORMAT(p.create_date,"%Y-%m-%d") &gt;= #{beginTime}
+			</if>
+			<if test="endTime != null and endTime != ''">
+					AND DATE_FORMAT(p.create_date,"%Y-%m-%d") &lt;= #{endTime}
+			</if>
+			<if test="endTime != null and endTime != '' and beginTime != null and beginTime != ''">
+					AND DATE_FORMAT(p.create_date,"%Y-%m-%d") &lt;= #{endTime} AND DATE_FORMAT(p.create_date,"%Y-%m-%d") &gt;= #{beginTime}
+			</if>
+			<if test="companyId != null and companyId != ''">
+					AND	p.collection_company_id = #{companyId}
+			</if>
+			<if test="type != null and type != ''">
+					AND p.type = #{type}
+			</if>
+			<if test="status != null and status != ''">
+					AND p.status = #{status}
+			</if>
+			<if test="loanUserPhone != null and loanUserPhone != ''">
+					AND p.loan_user_phone = #{loanUserPhone}
+			</if>
+			<if test="loanId != null and loanId != ''">
+					AND p.loan_id = #{loanId}
+			</if>
+			<if test="operator != null and operator != ''">
+					AND p.operator = #{operator}
+			</if>
+			<if test="createUsername != null and createUsername != ''">
+					AND b.user_name = #{createUsername}
+			</if>
+			<if test="problemNumber != null and problemNumber != ''">
+					AND p.id = #{problemNumber}
+			</if>
+		</where>
+	</sql>
+</mapper>

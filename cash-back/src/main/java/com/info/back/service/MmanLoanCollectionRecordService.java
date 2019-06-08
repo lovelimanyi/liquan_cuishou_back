@@ -11,8 +11,8 @@ import com.info.web.pojo.*;
 import com.info.web.util.*;
 import com.info.web.util.encrypt.AESUtil;
 import com.info.web.util.encrypt.MD5coding;
-import com.xjx.mqclient.pojo.MqMessage;
-import com.xjx.mqclient.service.MqClient;
+//import com.xjx.mqclient.pojo.MqMessage;
+//import com.xjx.mqclient.service.MqClient;
 import net.sf.json.JSONObject;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -84,8 +84,8 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
     private ISysDictService dictService;
 
     @Qualifier("mqClient")
-    @Autowired
-    MqClient mqClient;
+//    @Autowired
+//    MqClient mqClient;
 
     public void assignCollectionOrderToRelatedGroup(
             List<MmanLoanCollectionOrder> mmanLoanCollectionOrderList,
@@ -696,7 +696,7 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
             // 根据渠道区分代扣请求发送地方
             if (BackConstant.CUISHOU_WITHHOLD_CHANNEL_PAYMENTCENTER.equals(withholdChannel)) {
                 logger.info("订单: " + params.get("id").toString() + " 通过支付中心发起代扣...");
-                sendMqMsg(params, order, actualPayMonery, uuid, sign);
+//                sendMqMsg(params, order, actualPayMonery, uuid, sign);
 
                 //插入一条代扣记录
                 saveWithholdRecord(params, order, creditLoanPay, payMonery, uuid);
@@ -729,23 +729,23 @@ public class MmanLoanCollectionRecordService implements IMmanLoanCollectionRecor
      * @param uuid
      * @param sign
      */
-    private void sendMqMsg(Map<String, String> params, MmanLoanCollectionOrder mmanLoanCollectionOrderOri, long actualPayMonery, String uuid, String sign) {
-        String json = getMessageString(mmanLoanCollectionOrderOri, actualPayMonery, uuid, sign);
-        MqMessage msg = new MqMessage();
-        // 区分大小额 向不同的队列发送消息
-        String type = params.get("borrowingType");
-        if (Constant.SMALL.equals(type)) {
-            // 小额
-            msg.setQueueName(Constant.CUISHOU_WITHHOLD_QUEUE);
-            msg.setMessage(json);
-            mqClient.sendMessage(msg);
-        } else {
-            // 大额
-            msg.setQueueName(Constant.CUISHOU_WITHHOLD_QUEUE_BIG);
-            msg.setMessage(json);
-            mqClient.sendMessage(msg);
-        }
-    }
+//    private void sendMqMsg(Map<String, String> params, MmanLoanCollectionOrder mmanLoanCollectionOrderOri, long actualPayMonery, String uuid, String sign) {
+//        String json = getMessageString(mmanLoanCollectionOrderOri, actualPayMonery, uuid, sign);
+//        MqMessage msg = new MqMessage();
+//        // 区分大小额 向不同的队列发送消息
+//        String type = params.get("borrowingType");
+//        if (Constant.SMALL.equals(type)) {
+//            // 小额
+//            msg.setQueueName(Constant.CUISHOU_WITHHOLD_QUEUE);
+//            msg.setMessage(json);
+//            mqClient.sendMessage(msg);
+//        } else {
+//            // 大额
+//            msg.setQueueName(Constant.CUISHOU_WITHHOLD_QUEUE_BIG);
+//            msg.setMessage(json);
+//            mqClient.sendMessage(msg);
+//        }
+//    }
 
     /**
      * 插入代扣记录

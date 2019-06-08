@@ -13,8 +13,8 @@ import com.info.web.util.JSONUtil;
 import com.info.web.util.PageConfig;
 import com.info.web.util.encrypt.AESUtil;
 import com.info.web.util.encrypt.MD5coding;
-import com.xjx.mqclient.pojo.MqMessage;
-import com.xjx.mqclient.service.MqClient;
+//import com.xjx.mqclient.pojo.MqMessage;
+//import com.xjx.mqclient.service.MqClient;
 import net.sf.json.JSONObject;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang.StringUtils;
@@ -41,8 +41,8 @@ public class AuditCenterService implements IAuditCenterService {
     @Autowired
     private IMmanLoanCollectionOrderDao manLoanCollectionOrderDao;
 
-    @Autowired
-    private MqClient mqClient;
+//    @Autowired
+//    private MqClient mqClient;
 
     @Override
     public JsonResult svueAuditCenter(Map<String, String> params) {
@@ -92,145 +92,151 @@ public class AuditCenterService implements IAuditCenterService {
         pageConfig = paginationDao.findPage("findAll", "findAllCount", params, null);
         return pageConfig;
     }
+
+    @Override
+    public JsonResult updateAuditCenter(Map<String, String> params) {
+        return null;
+    }
+
     /**
      * 审核处理
      */
-    @Override
-    public JsonResult updateAuditCenter(Map<String, String> params) {
-        JsonResult result = new JsonResult("-1", "审核失败了");
-        String ids = params.get("id");
-        String[] auditIds = null;
-        if(StringUtils.isNotBlank(ids)){
-            auditIds= ids.split(",");
-        }else{
-            result.setMsg("请至少勾选一条数据！");
-            return result;
-        }
-        if (auditIds.length > 200) {
-            result.setMsg("勾选的条数不能超过200条！");
-        }else{
-            AuditCenter auditCenter = null;
-            //判断所选的是否申请类型一致且审核状态为审核中
-            for(int i = 0;i < auditIds.length;i++){
-                AuditCenter auditCenter0 = auditCenterDao.findAuditId(auditIds[0]);
-                auditCenter = auditCenterDao.findAuditId(auditIds[i]);
-                if(!auditCenter0.getType().equals(auditCenter.getType()) || !auditCenter.getStatus().equals(Constant.AUDIT_CHECKING)){
-                    //申请类型不一致或审核状态非审核中-->返回
-                    result.setMsg("请选择申请类型一致且状态为审核中的数据");
-                    return result;
-                }
-            }
-            //所选的申请类型一致且审核状态为审核中-->逐条审核
-            for(String auditId : auditIds){
-                HashMap<String ,Object > map = new HashMap<>();
-                auditCenter = auditCenterDao.findAuditId(auditId);
-                map.put("auditId",auditId);
-                map.put("orderId",auditCenter.getOrderid());
-                map.put("auditTime",new Date());
-                map.put("updateTime",new Date());
-                map.put("status",params.get("status"));
-                try {
-                    //add by yyf 在审核中时，客户还款，只能等待审核失效
-                    MmanLoanCollectionOrder order = manLoanCollectionOrderDao.getOrderById(auditCenter.getOrderid());
-                    if (Constant.STATUS_OVERDUE_FOUR.equals(order.getStatus())){
-                        result.setCode("-1");
-                        result.setMsg(order.getLoanId()+"该借款编号的订单在审核前已经完成，请等待审核失效！");
-                        return  result;
-                    }
-                    if (auditCenter.getType().equals(Constant.AUDIT_TYPE_REDUCTION)){ //申请类型--减免
-                        if (params.get("status").equals(Constant.AUDIT_REFUSE)){ // 审核状态--3拒绝
-                            map.put("orderStatus",Constant.STATUS_OVERDUE_EIGHT);
-                            auditCenterDao.updateAuditStatus(map);
-                            manLoanCollectionOrderDao.updateReductionOrder(map);
-                            result.setCode("0");
-                            result.setMsg("审核已拒绝");
-                        }else{ //审核状态  5通过不计入考核  或   2通过
-                            BigDecimal reductionMoneyBig = auditCenter.getReductionMoney();
-                            BigDecimal big100 = new BigDecimal(100);
-                            int reductionMoney = reductionMoneyBig.multiply(big100).intValue();//减免滞纳金
-                            //如果是大额的  需要处理还款id
-                            if (auditCenter.getPayId().contains(Constant.SEPARATOR_FOR_ORDER_SOURCE)){
-                                String payId = StringUtils.substringBefore(auditCenter.getPayId(),Constant.SEPARATOR_FOR_ORDER_SOURCE);
-                                auditCenter.setPayId(payId);
-                            }
-
-                            String sign = MD5coding.MD5(AESUtil.encrypt(auditCenter.getLoanUserId()+auditCenter.getPayId()+reductionMoney+auditCenter.getId(),PayContents.XJX_WITHHOLDING_NOTIFY_KEY));
-                            //TODO 如果是大额或者分期商城订单减免，调用大额减免接口
-                            if(Constant.ORDER_TYPE_BIG.equals(auditCenter.getOrderType()) ||Constant.ORDER_TYPE_FEN.equals(auditCenter.getOrderType())){
-                                MqMessage msg = new MqMessage();
-                                msg.setQueueName(Constant.CUISHOU_BIG_REDUCTION_QUEUE);
-                                Map<String,Object> mapParam = new HashedMap();
-                                mapParam.put("reductionMoney",reductionMoney);
-                                mapParam.put("uuid",auditCenter.getId());
-                                mapParam.put("sign",sign);
-                                mapParam.put("status",params.get("status"));
-                                mapParam.put("repaymentId",auditCenter.getPayId());
-                                mapParam.put("userId",auditCenter.getLoanUserId());
-                                msg.setMessage(JSONUtil.beanToJson(mapParam));
-                                mqClient.sendMessage(msg);
-                                result.setCode("0");
-                                result.setMsg("减免处理中，请稍查看状态");
-                                map.put("status",Constant.AUDIT_DOING);
-                                auditCenterDao.updateAuditStatus(map);
-                                return result;
-                            }
-
-
-                            //调用减免http接口
-                            String withholdPostUrl=PayContents.XJX_JIANMIAN_URL+"/"+auditCenter.getLoanUserId()+"/"+auditCenter.getPayId()+"/"+reductionMoney+"/"+auditCenter.getId()+"/"+sign;
-                            String xjxWithholdingStr = HttpUtil.getHttpMess(withholdPostUrl, "", "POST", "UTF-8");
-                            if(StringUtils.isNotBlank(xjxWithholdingStr)) {
-                                JSONObject jos = new JSONObject().fromObject(xjxWithholdingStr);
-                                logger.info("返回还款结果信息jos转换"+jos);
-                                if("0".equals(jos.get("code"))){ //接口返回成功 -- 本地update审核表，订单表
-                                    if(params.get("status").equals(Constant.AUDIT_PASS)){ //减免计入考核
-                                        map.put("reductionMoney",auditCenter.getReductionMoney()); //减免金额
-                                    }else {
-                                        map.put("reductionMoney",0);
-                                    }
-                                    auditCenterDao.updateAuditStatus(map);
-                                    manLoanCollectionOrderDao.updateReductionOrder(map);
-                                    result.setCode("0");
-                                    result.setMsg("审核已通过");
-                                    logger.error("0","减免成功！");
-                                }else if("-101".equals(jos.get("code"))){
-                                    result.setMsg("参数错误 减免失败！！！");
-                                }else if (!"-100".equals(jos.get("code"))) {
-                                    result.setMsg("系统错误！！！");
-                                }
-                            }
-                        }
-                    }else { //申请类型--聚信立，详情
-                        if (params.get("status").equals(Constant.AUDIT_REFUSE)){ // 审核状态--3拒绝
-                            map.put("orderStatus",Constant.STATUS_OVERDUE_EIGHT);
-                            auditCenterDao.updateAuditStatus(map);
-                        }else{ //审核状态--同意
-                            params.put("id", auditCenter.getId());
-                            auditCenterDao.updateStatus(params);
-                            HashMap<String, String> auditMap = new HashMap<>();
-                            auditMap.put("id", auditCenter.getOrderid());
-                            if ("2".equals(auditCenter.getType())) {
-                                auditMap.put("csstatus", params.get("status"));
-                                manLoanCollectionOrderDao.updateAuditStatus(auditMap);
-                                if ("2".equals(auditCenter.getStatus())) {
-                                    params.put("id", auditCenter.getLoanUserId());
-                                    params.put("collection_advise", auditCenter.getNote());
-                                    String resultT = HttpUtil.dopostMap(PayContents.COLLECTION_ADVISE_UPDATE_URL, params);
-                                    logger.error("updateAuditStatus COLLECTION_ADVISE_UPDATE_URL=" + PayContents.COLLECTION_ADVISE_UPDATE_URL + " params=" + params.toString() + " resultT=" + resultT);
-                                }
-                            } else if ("1".equals(auditCenter.getType())) {
-                                auditMap.put("jxlStatus", params.get("status"));
-                                manLoanCollectionOrderDao.updateAuditStatus(auditMap);
-                            }
-                        }
-                    }
-                }catch (Exception e){
-                    logger.error("减免审核："+auditCenter.getLoanId()+"申请类型type:"+auditCenter.getType()+"审核状态status:"+params.get("stauts"),e);
-                }
-            }
-        }
-        return result;
-    }
+//    @Override
+//    public JsonResult updateAuditCenter(Map<String, String> params) {
+//        JsonResult result = new JsonResult("-1", "审核失败了");
+//        String ids = params.get("id");
+//        String[] auditIds = null;
+//        if(StringUtils.isNotBlank(ids)){
+//            auditIds= ids.split(",");
+//        }else{
+//            result.setMsg("请至少勾选一条数据！");
+//            return result;
+//        }
+//        if (auditIds.length > 200) {
+//            result.setMsg("勾选的条数不能超过200条！");
+//        }else{
+//            AuditCenter auditCenter = null;
+//            //判断所选的是否申请类型一致且审核状态为审核中
+//            for(int i = 0;i < auditIds.length;i++){
+//                AuditCenter auditCenter0 = auditCenterDao.findAuditId(auditIds[0]);
+//                auditCenter = auditCenterDao.findAuditId(auditIds[i]);
+//                if(!auditCenter0.getType().equals(auditCenter.getType()) || !auditCenter.getStatus().equals(Constant.AUDIT_CHECKING)){
+//                    //申请类型不一致或审核状态非审核中-->返回
+//                    result.setMsg("请选择申请类型一致且状态为审核中的数据");
+//                    return result;
+//                }
+//            }
+//            //所选的申请类型一致且审核状态为审核中-->逐条审核
+//            for(String auditId : auditIds){
+//                HashMap<String ,Object > map = new HashMap<>();
+//                auditCenter = auditCenterDao.findAuditId(auditId);
+//                map.put("auditId",auditId);
+//                map.put("orderId",auditCenter.getOrderid());
+//                map.put("auditTime",new Date());
+//                map.put("updateTime",new Date());
+//                map.put("status",params.get("status"));
+//                try {
+//                    //add by yyf 在审核中时，客户还款，只能等待审核失效
+//                    MmanLoanCollectionOrder order = manLoanCollectionOrderDao.getOrderById(auditCenter.getOrderid());
+//                    if (Constant.STATUS_OVERDUE_FOUR.equals(order.getStatus())){
+//                        result.setCode("-1");
+//                        result.setMsg(order.getLoanId()+"该借款编号的订单在审核前已经完成，请等待审核失效！");
+//                        return  result;
+//                    }
+//                    if (auditCenter.getType().equals(Constant.AUDIT_TYPE_REDUCTION)){ //申请类型--减免
+//                        if (params.get("status").equals(Constant.AUDIT_REFUSE)){ // 审核状态--3拒绝
+//                            map.put("orderStatus",Constant.STATUS_OVERDUE_EIGHT);
+//                            auditCenterDao.updateAuditStatus(map);
+//                            manLoanCollectionOrderDao.updateReductionOrder(map);
+//                            result.setCode("0");
+//                            result.setMsg("审核已拒绝");
+//                        }else{ //审核状态  5通过不计入考核  或   2通过
+//                            BigDecimal reductionMoneyBig = auditCenter.getReductionMoney();
+//                            BigDecimal big100 = new BigDecimal(100);
+//                            int reductionMoney = reductionMoneyBig.multiply(big100).intValue();//减免滞纳金
+//                            //如果是大额的  需要处理还款id
+//                            if (auditCenter.getPayId().contains(Constant.SEPARATOR_FOR_ORDER_SOURCE)){
+//                                String payId = StringUtils.substringBefore(auditCenter.getPayId(),Constant.SEPARATOR_FOR_ORDER_SOURCE);
+//                                auditCenter.setPayId(payId);
+//                            }
+//
+//                            String sign = MD5coding.MD5(AESUtil.encrypt(auditCenter.getLoanUserId()+auditCenter.getPayId()+reductionMoney+auditCenter.getId(),PayContents.XJX_WITHHOLDING_NOTIFY_KEY));
+//                            //TODO 如果是大额或者分期商城订单减免，调用大额减免接口
+//                            if(Constant.ORDER_TYPE_BIG.equals(auditCenter.getOrderType()) ||Constant.ORDER_TYPE_FEN.equals(auditCenter.getOrderType())){
+//                                MqMessage msg = new MqMessage();
+//                                msg.setQueueName(Constant.CUISHOU_BIG_REDUCTION_QUEUE);
+//                                Map<String,Object> mapParam = new HashedMap();
+//                                mapParam.put("reductionMoney",reductionMoney);
+//                                mapParam.put("uuid",auditCenter.getId());
+//                                mapParam.put("sign",sign);
+//                                mapParam.put("status",params.get("status"));
+//                                mapParam.put("repaymentId",auditCenter.getPayId());
+//                                mapParam.put("userId",auditCenter.getLoanUserId());
+//                                msg.setMessage(JSONUtil.beanToJson(mapParam));
+//                                mqClient.sendMessage(msg);
+//                                result.setCode("0");
+//                                result.setMsg("减免处理中，请稍查看状态");
+//                                map.put("status",Constant.AUDIT_DOING);
+//                                auditCenterDao.updateAuditStatus(map);
+//                                return result;
+//                            }
+//
+//
+//                            //调用减免http接口
+//                            String withholdPostUrl=PayContents.XJX_JIANMIAN_URL+"/"+auditCenter.getLoanUserId()+"/"+auditCenter.getPayId()+"/"+reductionMoney+"/"+auditCenter.getId()+"/"+sign;
+//                            String xjxWithholdingStr = HttpUtil.getHttpMess(withholdPostUrl, "", "POST", "UTF-8");
+//                            if(StringUtils.isNotBlank(xjxWithholdingStr)) {
+//                                JSONObject jos = new JSONObject().fromObject(xjxWithholdingStr);
+//                                logger.info("返回还款结果信息jos转换"+jos);
+//                                if("0".equals(jos.get("code"))){ //接口返回成功 -- 本地update审核表，订单表
+//                                    if(params.get("status").equals(Constant.AUDIT_PASS)){ //减免计入考核
+//                                        map.put("reductionMoney",auditCenter.getReductionMoney()); //减免金额
+//                                    }else {
+//                                        map.put("reductionMoney",0);
+//                                    }
+//                                    auditCenterDao.updateAuditStatus(map);
+//                                    manLoanCollectionOrderDao.updateReductionOrder(map);
+//                                    result.setCode("0");
+//                                    result.setMsg("审核已通过");
+//                                    logger.error("0","减免成功！");
+//                                }else if("-101".equals(jos.get("code"))){
+//                                    result.setMsg("参数错误 减免失败！！！");
+//                                }else if (!"-100".equals(jos.get("code"))) {
+//                                    result.setMsg("系统错误！！！");
+//                                }
+//                            }
+//                        }
+//                    }else { //申请类型--聚信立，详情
+//                        if (params.get("status").equals(Constant.AUDIT_REFUSE)){ // 审核状态--3拒绝
+//                            map.put("orderStatus",Constant.STATUS_OVERDUE_EIGHT);
+//                            auditCenterDao.updateAuditStatus(map);
+//                        }else{ //审核状态--同意
+//                            params.put("id", auditCenter.getId());
+//                            auditCenterDao.updateStatus(params);
+//                            HashMap<String, String> auditMap = new HashMap<>();
+//                            auditMap.put("id", auditCenter.getOrderid());
+//                            if ("2".equals(auditCenter.getType())) {
+//                                auditMap.put("csstatus", params.get("status"));
+//                                manLoanCollectionOrderDao.updateAuditStatus(auditMap);
+//                                if ("2".equals(auditCenter.getStatus())) {
+//                                    params.put("id", auditCenter.getLoanUserId());
+//                                    params.put("collection_advise", auditCenter.getNote());
+//                                    String resultT = HttpUtil.dopostMap(PayContents.COLLECTION_ADVISE_UPDATE_URL, params);
+//                                    logger.error("updateAuditStatus COLLECTION_ADVISE_UPDATE_URL=" + PayContents.COLLECTION_ADVISE_UPDATE_URL + " params=" + params.toString() + " resultT=" + resultT);
+//                                }
+//                            } else if ("1".equals(auditCenter.getType())) {
+//                                auditMap.put("jxlStatus", params.get("status"));
+//                                manLoanCollectionOrderDao.updateAuditStatus(auditMap);
+//                            }
+//                        }
+//                    }
+//                }catch (Exception e){
+//                    logger.error("减免审核："+auditCenter.getLoanId()+"申请类型type:"+auditCenter.getType()+"审核状态status:"+params.get("stauts"),e);
+//                }
+//            }
+//        }
+//        return result;
+//    }
 
     @Override
     public JsonResult saveorderdeduction(Map<String, Object> params) throws ParseException {

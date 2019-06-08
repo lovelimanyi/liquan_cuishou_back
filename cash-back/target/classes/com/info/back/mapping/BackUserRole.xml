@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.info.back.dao.IBackUserRoleDao">
+	<resultMap id="BaseResultMap" type="BackUserRole">
+		<id column="id" property="id" />
+		<result column="role_id" property="roleId" />
+		<result column="user_id" property="userId" />
+	</resultMap>
+	<select id="findAll" resultType="BackUserRole" parameterType="HashMap">
+			select * from back_user_role
+	</select>
+	<delete id="deleteByRoleId" parameterType="Integer">
+		delete from back_user_role where role_id=#{roleId}
+	</delete>
+<!--	根据用户删除所有关联的角色-->
+	<delete id="deleteUserRoleByUserId" parameterType="java.lang.Integer">
+		DELETE FROM
+		back_user_role
+		WHERE user_id=#{id}
+	</delete>
+<!--	插入用户关联的角色-->
+	<insert id="inserUserRoleList" parameterType="HashMap">
+		INSERT INTO back_user_role(role_id,user_id)
+		VALUES
+		<foreach collection="roleIds" item="item" index="index"
+			separator=",">
+			( #{item}, #{id})
+		</foreach>
+	</insert>
+	<insert id="inserUserRole" parameterType="BackUserRole">
+		INSERT INTO back_user_role(role_id,user_id)
+		VALUES (#{roleId}, #{userId})
+	</insert>
+</mapper>

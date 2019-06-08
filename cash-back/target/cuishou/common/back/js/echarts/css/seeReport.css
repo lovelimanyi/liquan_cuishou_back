@@ -1,0 +1,44 @@
+@charset "utf-8";
+/* CSS Document */
+.add_report_edit{ height:50px;}
+.add_report_edit1{ height:30px; line-height:30px;}
+.fl{ float:left;}
+.fr{ float:right;}
+
+
+.add_table{ width:60px; height:20px; line-height:20px; border:solid 1px #faa128; color:#faa128; background:url(../images/icon_add_table1.png) no-repeat 10px center; text-align:center; border-radius:4px; margin-top:14px; margin-left:20px; padding-left:10px; cursor:pointer; position:relative; display:none;}
+.table_type{ position:absolute; width:160px; border:solid 1px #e5e5e5; border-radius:5px; left:100%; margin-left:9px; top:-3px; z-index:999; background-color:white; display:none;}
+.table_type ul{ padding:10px;}
+.table_type ul li{ line-height:32px; font-size:14px; color:#666;}
+.table_type ul li:hover{ background-color:#e5e5e5;}
+.icon_left1{ position:absolute; width:10px; height:16px; background-image:url(../images/icon_left1.png); top:2px; right:-10px; z-index:1999; display:none;}
+
+.add_table1{ width:15px; height:15px; background-image:url(../images/icon_add_table2.png); position:relative; margin-top:8px; margin-left:20px; display:none; cursor:pointer;}
+
+/*输入行数*/
+.input_number{ position:fixed; left:50%; top:50px; padding:30px; margin-left:-130px; box-shadow:2px 2px 8px #d8d8d8,-2px -2px 8px #d8d8d8; background-color:white; z-index:9000; border-radius:3px; display:none;}
+.input_number span{ line-height:30px; padding-right:10px;}
+.input_number input{ width:100px; height:30px; border:solid 1px #e5e5e5; border-radius:5px;}
+.input_number p{ margin-top:14px; border-top:solid 1px #e5e5e5; overflow:hidden; padding-top:14px;}
+.input_number p button{ width:60px; height:30px; line-height:30px; text-align:center; cursor:pointer; float:right; border:none; display:block; background-color:#007ddb; color:white; border-radius:4px;}
+.input_number p button:hover{ background-color:#026fc1;}
+.input_number p button#close_input{ margin-right:14px;}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

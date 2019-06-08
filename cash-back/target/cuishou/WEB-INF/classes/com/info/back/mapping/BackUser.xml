@@ -1,0 +1,506 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.info.back.dao.IBackUserDao">
+    <resultMap id="BaseResultMap" type="BackUser">
+        <id column="id" property="id"/>
+        <result column="user_account" property="userAccount"/>
+        <result column="user_password" property="userPassword"/>
+        <result column="user_name" property="userName"/>
+        <result column="user_sex" property="userSex"/>
+        <result column="user_address" property="userAddress"/>
+        <result column="user_telephone" property="userTelephone"/>
+        <result column="user_mobile" property="userMobile"/>
+        <result column="user_email" property="userEmail"/>
+        <result column="user_qq" property="userQq"/>
+        <result column="create_date" property="createDate"/>
+        <result column="update_date" property="updateDate"/>
+        <result column="add_ip" property="addIp"/>
+        <result column="remark" property="remark"/>
+        <result column="status" property="userStatus"/>
+        <result column="company_id" property="companyId"/>
+        <result column="group_level" property="groupLevel"/>
+        <result column="role_id" property="roleId"/>
+        <result column="uuid" property="uuid"></result>
+    </resultMap>
+    <sql id="findAllSql">
+        from back_user u left join mman_loan_collection_company c on u.company_id = c.id
+        where u.`status` != 2 <!-- status=1 -->
+        <if test="id != null and id !=''">
+            and u.id = #{id}
+        </if>
+        <if test="noAdmin == 10000">
+            and u.id != #{noAdmin}
+        </if>
+        <if test="userAccount != null and userAccount !=''">
+            and u.user_account = #{userAccount}
+        </if>
+        <if test="userAccountLike != null and userAccountLike !=''">
+            and u.user_account like CONCAT('%', #{userAccountLike}, '%')
+        </if>
+        <if test="userMobile != null and userMobile !=''">
+            and u.user_mobile = #{userMobile}
+        </if>
+        <if test="userMobileLike != null and userMobileLike !=''">
+            and u.user_mobile like CONCAT('%', #{userMobileLike}, '%')
+        </if>
+        <if test="userName != null and userName !=''">
+            and u.user_name like CONCAT('%', #{userName}, '%')
+        </if>
+        <if test="roleId!=null and roleId!=''">
+            and u.role_id!=#{roleId}
+        </if>
+    </sql>
+    <select id="findAllCount" parameterType="HashMap" resultType="Integer">
+        select count(1)
+        <include refid="findAllSql"/>
+    </select>
+    <select id="findAll" resultMap="BaseResultMap" parameterType="HashMap">
+        SELECT u.id,u.user_account,u.user_password,u.user_name,u.user_sex,u.user_address,u.user_telephone,
+        u.user_mobile,u.user_qq,u.user_email,u.create_date,u.add_ip,u.remark,u.group_level,u.role_id,u.uuid,
+        u.status,c.title AS companyTitle,c.id AS companyId
+        <include refid="findAllSql"/>
+        ORDER BY id ASC
+    </select>
+    <!--	插入用户-->
+    <insert id="insert" parameterType="BackUser" useGeneratedKeys="true" keyProperty="id">
+		insert back_user  
+			(user_account,user_password,user_name,user_sex,user_address,user_telephone,
+			user_mobile,user_email,user_qq,add_ip,remark,company_id,group_level,viewdata_status,uuid)
+		values 
+		(#{userAccount},#{userPassword},#{userName},#{userSex},#{userAddress},#{userTelephone},
+		#{userMobile},#{userEmail},#{userQq},#{addIp},#{remark},#{companyId},#{groupLevel},#{viewdataStatus},#{uuid})
+	</insert>
+    <!--	删除用户-->
+    <update id="deleteById" parameterType="Integer">
+		update back_user set status = 2 where id =#{id} and id !=10000
+	</update>
+    <!--	更新用户对象-->
+    <update id="updateById" parameterType="BackUser">
+        update back_user
+        <set>
+            <if test="userAccount != null and userAccount != ''">
+                user_account =#{userAccount},
+            </if>
+            <if test="userPassword != null and userPassword !=''">
+                user_password =#{userPassword},
+            </if>
+            <if test="userName != null and userName != ''">
+                user_name =#{userName},
+            </if>
+            <if test="userSex != null and userSex != ''">
+                user_sex =#{userSex},
+            </if>
+            <if test="userAddress != null and userAddress != ''">
+                user_address =#{userAddress},
+            </if>
+            <if test="userTelephone != null and userTelephone != ''">
+                user_telephone =#{userTelephone},
+            </if>
+            <if test="userMobile != null and userMobile != ''">
+                user_mobile =#{userMobile},
+            </if>
+            <if test="userEmail != null and userEmail != ''">
+                user_email =#{userEmail},
+            </if>
+            <if test="userQq != null and userQq != ''">
+                user_qq =#{userQq},
+            </if>
+            <if test="companyId != null and companyId != ''">
+                company_id =#{companyId},
+            </if>
+            <if test="remark != null and remark != ''">
+                remark =#{remark},
+            </if>
+        </set>
+        where id =#{id} and id !=10000
+    </update>
+    <!--	更新密码-->
+    <update id="updatePwdById" parameterType="BackUser">
+		update back_user set user_password =#{userPassword} where id =#{id}
+	</update>
+
+    <!-- 查询当前组中所有非禁用的催收员，按照当前手里总未处理的订单数升序排序 -->
+    <select id="findUnCompleteCollectionOrderByCurrentUnCompleteCountListByMap" resultType="com.info.web.pojo.MmanLoanCollectionPerson" parameterType="com.info.web.pojo.BackUser">
+        SELECT
+        a.id AS id,
+        a.uuid AS userId,
+        a.user_account AS loginName,
+        a.user_name AS username,
+        a.user_mobile AS phone,
+        a.group_level AS groupLevel,
+        a.company_id AS companyId,
+        c.title AS companyName,
+        a. STATUS AS userStatus,
+        a.user_account AS realName,
+        IFNULL(d.orderCount, 0) AS orderCount
+        FROM
+        back_user a
+        LEFT JOIN mman_loan_collection_company c ON a.company_id = c.id
+        LEFT JOIN (
+        SELECT
+        mco.`current_collection_user_id`,
+        count(mul.id) as orderCount
+        /*
+        SUM(mul.`loan_money` + mul.`loan_penalty`) AS loanMoney
+        */
+        FROM
+        (
+        SELECT
+        o.loan_id,
+        o.current_collection_user_id
+        FROM
+        mman_loan_collection_order o
+        WHERE
+        o.`dispatch_time` &gt;= #{beginDispatchTime}
+        AND o.`dispatch_time` &lt; #{endDispatchTime}
+        ) mco
+        LEFT JOIN mman_user_loan mul ON mul.id = mco.`loan_id`
+        GROUP BY
+        mco.`current_collection_user_id`
+        ) AS d ON d.current_collection_user_id = a.uuid
+        WHERE
+        c.`status` = '1'
+        AND EXISTS (
+        SELECT
+        1
+        FROM
+        back_user_role bb
+        WHERE
+        bb.user_id = a.id
+        AND bb.role_id = '10021'
+        )
+
+        <if test="companyId != null and companyId != ''">
+            AND a.company_id = #{companyId}
+        </if>
+        <if test="groupLevel != null and groupLevel != '' and groupLevel != '34'">
+            AND a.group_level = #{groupLevel}
+        </if>
+        <if test="groupLevel != null and groupLevel != '' and groupLevel == '34'">
+            AND (a.group_level = '3' OR a.group_level = '4')
+        </if>
+        <if test="userStatus != null and userStatus != ''">
+            AND a.status= #{userStatus}
+        </if>
+        <if test="notUser != null and notUser != ''">
+            AND a.id not in(#{notUser})
+        </if>
+        /*
+        ORDER BY loanMoney ASC;
+        */
+        ORDER BY orderCount ASC;
+    </select>
+
+
+    <!-- 查询订单分派 -->
+    <select id="findbackUserByLoanUserPhone" resultType="com.info.web.pojo.MmanLoanCollectionPerson" parameterType="com.info.web.pojo.BackUser">
+        SELECT
+        a.id AS id,
+        a.uuid AS userId,
+        a.user_account AS loginName,
+        a.user_name AS username,
+        a.user_mobile AS phone,
+        a.group_level AS groupLevel,
+        a.company_id AS companyId,
+        c.title AS companyName,
+        a.status AS userStatus,
+        a.user_account AS realName
+        FROM back_user a
+        LEFT JOIN mman_loan_collection_company c ON a.company_id = c.id
+        INNER JOIN
+        (SELECT mco.`current_collection_user_id` FROM mman_loan_collection_order mco
+        WHERE 1=1 AND DATE_FORMAT(mco.`dispatch_time`,'%Y-%m-%d') = #{dispatchTime}
+        AND mco.loan_user_phone=#{loanUserPhone} ) AS d ON d.current_collection_user_id = a.uuid
+        WHERE 1 = 1 AND c.status=1 AND EXISTS (SELECT 1 FROM back_user_role bb WHERE bb.user_id=a.id AND bb.role_id='10021')
+        <if test="companyId != null and companyId != ''">
+            AND a.company_id = #{companyId}
+        </if>
+        <if test="groupLevel != null and groupLevel != '' and groupLevel != '34'">
+            AND a.group_level = #{groupLevel}
+        </if>
+        <if test="groupLevel != null and groupLevel != '' and groupLevel == '34'">
+            AND (a.group_level = '3' OR a.group_level = '4')
+        </if>
+        <if test="userStatus != null and userStatus != ''">
+            AND a.status= #{userStatus}
+        </if>
+    </select>
+
+
+    <select id="findTodayAssignedCount" resultType="Integer" parameterType="com.info.web.pojo.MmanLoanCollectionPerson">
+  		SELECT 
+		  COUNT(d.id) 
+		FROM
+		  back_user a 
+		  LEFT JOIN mman_loan_collection_order d 
+		    ON d.current_collection_user_id = a.uuid 
+		WHERE a.id = #{id}
+		  AND (
+		    d.dispatch_time IS NULL 
+		    OR (
+		      TO_DAYS(NOW()) - TO_DAYS(d.dispatch_time) = 0
+		    )
+		  )
+	</select>
+
+
+    <select id="findUserRoleByUserId" parameterType="com.info.web.pojo.BackUserRole" resultType="com.info.web.pojo.BackUserRole">
+		SELECT t.id as id,t.role_id as roleId,t.user_id as userId FROM back_user_role t
+		where t.user_id=#{userId}
+	</select>
+    <select id="updateRoleId" parameterType="HashMap">
+		update back_user set role_id =#{roleIds} where id =#{id}
+	</select>
+    <!-- 根据id查询用户手机号个数 -->
+    <select id="getUserPhoneCount" resultType="Integer" parameterType="HashMap">
+        <if test="ids != null and ids.size()>0">
+            select count(user_mobile) from back_user
+            <where>
+                AND id IN
+            </where>
+            <foreach collection="ids" open="(" close=")" separator="," item="item">
+                #{item.id}
+            </foreach>
+        </if>
+    </select>
+
+
+    <select id="findList" resultMap="BaseResultMap" parameterType="BackUser">
+        select u.*
+        <include refid="findAllSql"/>
+        WHERE 1 = 1 AND EXISTS (SELECT 1 FROM back_user_role bb WHERE bb.user_id=a.id AND bb.role_id='10021')
+        <if test="companyId != null and companyId != ''">
+            AND a.company_id = #{companyId}
+        </if>
+        <if test="groupLevel != null and groupLevel != '' and groupLevel != '34'">
+            AND a.group_level = #{groupLevel}
+        </if>
+        <if test="groupLevel != null and groupLevel != '' and groupLevel == '34'">
+            AND (a.group_level = '3' OR a.group_level = '4')
+        </if>
+        <if test="userStatus != null and userStatus != ''">
+            AND a.status= #{userStatus}
+        </if>
+    </select>
+    <select id="findUserByDispatch" parameterType="BackUser" resultMap="BaseResultMap">
+        select uuid,user_name from back_user where 1=1 AND status=1 and role_id='10021'
+        <if test="companyId != null and companyId != ''">
+            and company_id=#{companyId}
+        </if>
+        <if test="groupLevel != null and groupLevel != ''">
+            and group_level = #{groupLevel}
+        </if>
+        <if test="notMineId != null and notMineId != ''">
+            and uuid != #{notMineId}
+        </if>
+    </select>
+
+    <select id="getBackUserByUuid" parameterType="String" resultMap="BaseResultMap">
+	  select u.uuid,u.company_id,u.group_level,u.user_mobile,u.user_name,u.id,u.user_account,u.status
+			from back_user u where u.uuid=#{_parameter}
+	</select>
+
+    <!-- 依据用户id查询公司id -->
+    <!-- <select id="getCompanyId" resultType="String">
+        SELECT company_id from back_user where user_id = #{userId}
+    </select> -->
+
+
+    <!-- 查询出有M3+组及以上的公司id -->
+    <select id="getM3Companys" resultMap="BaseResultMap">
+		SELECT company_id FROM back_user WHERE group_level &gt;= #{groupLevel} AND status = #{status} GROUP BY company_id
+	</select>
+    <!-- 查询出每个公司添加时间最早的催收员uuid(启用中的) -->
+    <select id="getEarliestCollection" resultMap="BaseResultMap" parameterType="HashMap">
+		SELECT uuid,company_id FROM back_user WHERE create_date = (SELECT MIN(create_date) FROM back_user WHERE company_id = #{companyId} AND group_level = #{groupLevel}) AND company_id = #{companyId} AND `status` = #{status}
+	</select>
+    <!-- 查询该公司对应的其他启用中的催收员(需要被禁用的)UUID -->
+    <select id="getOtherCollections" resultMap="BaseResultMap" parameterType="HashMap">
+		SELECT uuid,company_id FROM back_user WHERE uuid != #{userId} AND company_id = #{companyId} AND group_level = #{groupLevel} AND `status` = #{status}
+	</select>
+    <select id="getUsersByStatusAndCompanyId" resultMap="BaseResultMap" parameterType="HashMap">
+        SELECT uuid,company_id FROM back_user WHERE company_id IN
+        <foreach collection="companyIds" open="(" close=")" item="companyId" separator=",">
+            #{companyId}
+        </foreach>
+        AND `status` = #{status} and group_level &gt;= #{groupLevel}
+    </select>
+
+    <update id="disableOrEnableCollections" parameterType="HashMap">
+        UPDATE back_user SET `status` = #{status} WHERE uuid IN
+        <foreach collection="uuids" open="(" close=")" item="uuid" separator=",">
+            #{uuid}
+        </foreach>
+    </update>
+
+    <select id="getUserByAccount" parameterType="String" resultType="com.info.web.pojo.BackUser">
+		SELECT id AS id,user_account AS userAccount,user_name AS userName,company_id AS companyId FROM  back_user
+		WHERE user_account = #{userAccount}
+	</select>
+
+    <select id="selectUserCount4Estimate" parameterType="String" resultType="java.lang.Integer">
+        SELECT COUNT(*)  FROM  back_user
+        WHERE role_id =10021 and status=1 and group_level=${groupLevel}
+    </select>
+
+    <select id="getUserByCompanyIdAndGroupLevel" parameterType="map" resultMap="BaseResultMap">
+        SELECT id,company_id,user_name,group_level,user_mobile,uuid FROM back_user
+        <where>
+            AND role_id = '10021'
+            <if test="status != null">
+                AND status = #{status}
+            </if>
+            <if test="companyId != null">
+                AND company_id = #{companyId}
+            </if>
+            <if test="groupLevel != null">
+                AND group_level = #{groupLevel}
+            </if>
+        </where>
+    </select>
+
+    <select id="getUserByName" parameterType="String" resultMap="BaseResultMap">
+        SELECT id,user_name AS userName,uuid,`status`,company_id,group_level FROM back_user where user_name = #{username};
+    </select>
+
+    <select id="getUserByCompany" parameterType="String" resultType="com.info.web.pojo.BackUser">
+        SELECT id,user_name AS userName from back_user where `status` = 1 AND company_id = (SELECT id from mman_loan_collection_company where title = #{companyName}) and
+        role_id = "10021" and group_level = "8"
+    </select>
+
+    <select id="dianXiaoBackUserByOrderCount" resultType="com.info.web.pojo.DianXiaoBackUser" parameterType="map">
+
+        SELECT
+        u.id AS id,
+        u.uuid AS uuid,
+        u.user_name AS userName,
+        u.company_id AS companyId,
+        u.role_id AS roleId,
+        IFNULL(c.orderCount, 0) AS currentOrderCount,
+        u.status AS userStatus
+        FROM
+        back_user u
+        LEFT JOIN (
+            SELECT
+            o.current_collection_user_id AS currentCollectionUserId,
+            count(1) AS orderCount
+            FROM
+            dian_xiao_order o
+            WHERE
+            <![CDATA[ o.create_date > current_date() ]]>
+            GROUP BY
+            o.current_collection_user_id
+        ) c ON u.uuid = c.currentCollectionUserId
+        WHERE
+        u.status = 1
+        <if test="roleId != null and roleId != ''">
+            AND u.role_id=#{roleId}
+        </if>
+        ORDER BY orderCount
+        LIMIT 1
+
+
+
+
+    </select>
+
+
+    <select id="getBackUserGroupByOrderCount" parameterType="map" resultType="com.info.web.pojo.CollectionBackUser">
+         SELECT
+        u.id AS id,
+        u.uuid AS uuid,
+        u.user_name AS userName,
+        u.company_id AS companyId,
+        u.role_id AS roleId,
+        u.group_level AS groupLevel,
+        IFNULL(c.orderCount, 0) AS currentOrderCount,
+        u.status AS userStatus
+        FROM
+        back_user u
+        LEFT JOIN (
+            SELECT
+            o.current_collection_user_id AS currentCollectionUserId,
+            count(1) AS orderCount
+            FROM
+            mman_loan_collection_order o
+            WHERE
+             <![CDATA[ o.create_date > current_date() ]]>
+            GROUP BY
+            o.current_collection_user_id
+        ) c ON u.uuid = c.currentCollectionUserId
+        WHERE
+        u.status = 1
+        AND u.role_id = '10021'
+        <if test="groupLevel != null and groupLevel != ''">
+            AND u.group_level=#{groupLevel}
+        </if>
+        ORDER BY orderCount
+    </select>
+
+
+
+    <select id="getOneCollectionBackUserGroupByOrderCount" parameterType="map" resultType="com.info.web.pojo.CollectionBackUser">
+        SELECT
+        u.id AS id,
+        u.uuid AS uuid,
+        u.user_name AS userName,
+        u.company_id AS companyId,
+        u.role_id AS roleId,
+        u.group_level AS groupLevel,
+        IFNULL(c.orderCount, 0) AS currentOrderCount,
+        u.status AS userStatus
+        FROM
+        back_user u
+        LEFT JOIN (
+        SELECT
+        o.current_collection_user_id AS currentCollectionUserId,
+        count(1) AS orderCount
+        FROM
+        mman_loan_collection_order o
+        WHERE
+        <![CDATA[ o.dispatch_time > current_date() ]]>
+        GROUP BY
+        o.current_collection_user_id
+        ) c ON u.uuid = c.currentCollectionUserId
+        WHERE
+        u.status = 1
+        AND u.role_id = '10021'
+        <if test="groupLevel != null and groupLevel != ''">
+            AND u.group_level=#{groupLevel}
+        </if>
+        ORDER BY orderCount
+        LIMIT 1
+    </select>
+
+
+    <select id="getXiaoShouBackUser" resultType="com.info.web.pojo.CollectionBackUser">
+        SELECT
+        u.id AS id,
+        u.uuid AS uuid,
+        u.user_name AS userName,
+        u.company_id AS companyId,
+        u.role_id AS roleId,
+        u.group_level AS groupLevel,
+        IFNULL(c.orderCount, 0) AS currentOrderCount,
+        u.status AS userStatus
+        FROM
+        back_user u
+        LEFT JOIN (
+        SELECT
+        o.current_collection_user_id AS currentCollectionUserId,
+        count(1) AS orderCount
+        FROM
+        xiao_shou_order o
+        WHERE
+        <![CDATA[ o.create_time > current_date() ]]>
+        GROUP BY
+        o.current_collection_user_id
+        ) c ON u.uuid = c.currentCollectionUserId
+        WHERE
+        u.status = 1
+        AND u.role_id = '10036'
+        ORDER BY orderCount
+    </select>
+</mapper>

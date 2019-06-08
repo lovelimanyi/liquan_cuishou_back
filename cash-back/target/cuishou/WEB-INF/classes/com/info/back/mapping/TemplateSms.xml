@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- column prefix alias: ts -->
+<mapper namespace="com.info.back.dao.ITemplateSmsDao">
+    <resultMap id="queryResultMap" type="com.info.web.pojo.TemplateSms">
+        <result column="id" property="id" jdbcType="VARCHAR"/>
+        <!-- 名称 -->
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <!-- 短信内容 -->
+        <result column="contenttext" property="contenttext" jdbcType="VARCHAR"/>
+        <!-- 短信类型 3为S1组，4为S2组，5为M组 -->
+        <result column="msgType" property="msgType" jdbcType="VARCHAR"/>
+        <!-- 状态 1 可用 ，2 禁用 -->
+        <result column="status" property="status" jdbcType="VARCHAR"/>
+        <result column="createtime" property="createtime" jdbcType="TIMESTAMP"/>
+        <result column="updatetime" property="updatetime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="sqlTemplateSmsColumns">
+		ts.id AS id,
+		ts.name AS name,
+		ts.contenttext AS contenttext,
+		ts.msg_type AS msgType,
+		ts.status AS status,
+		ts.createtime AS createtime,
+		ts.updatetime AS updatetime
+	</sql>
+
+    <select id="findAllCount" parameterType="HashMap" resultType="Integer">
+        select count(1) from template_sms ts
+        <where>
+            <if test="status!=null and status!=''">
+                ts.status = #{status}
+            </if>
+            <if test="msgType!=null and msgType!=''">
+                ts.msg_type = #{msgType}
+            </if>
+            <if test="beginTime !=null and beginTime !=''">
+                <![CDATA[	and DATE_FORMAT(ts.createtime,'%Y-%m-%d') >=  #{beginTime}  ]]>
+            </if>
+            <if test="endTime !=null and endTime !=''">
+                <![CDATA[	and DATE_FORMAT(ts.createtime,'%Y-%m-%d') <=  #{endTime}  ]]>
+            </if>
+        </where>
+    </select>
+
+    <!-- 查询所有  cjxjx渠道来源  的可用的短信模板 -->
+    <select id="getMsgs" resultType="com.info.web.pojo.TemplateSms">
+		select id,`name`,contenttext from template_sms where status = '1' and channel_from is null
+	</select>
+    <!-- 查询所有 有米管家渠道来源  的可用的短信模板 -->
+    <select id="getYoumiAllMsg" resultType="com.info.web.pojo.TemplateSms">
+        select id,`name`,contenttext from template_sms where status = '1' and channel_from = 'ymgj'
+    </select>
+    <!-- 查询所有 渠道来源  的可用的短信模板 -->
+    <select id="getAllMsg" resultType="com.info.web.pojo.TemplateSms">
+        select id,`name`,contenttext from template_sms where status = '1'
+    </select>
+    <select id="getAllMsgByChannelFrom" resultType="com.info.web.pojo.TemplateSms">
+        select id,`name`,contenttext,msg_type AS msgType,channel_from AS channelFrom from template_sms where status = '1' and channel_from = #{msgChannelForm}
+    </select>
+
+
+
+    <!-- 分組查詢  -->
+    <sql id="base_select">
+        t.id AS id,
+		t.name AS name,
+		t.contenttext AS contenttext,
+		t.msg_type AS msgType,
+		t.status AS status
+	</sql>
+    <!-- 分組限制 -->
+    <select id="getType" resultMap="queryResultMap" parameterType="HashMap">
+        SELECT
+        <include refid="base_select"></include>
+        FROM template_sms t
+        where t.msg_type IN
+        <foreach collection="msgType" item="msgType" close=")" open="(" separator=",">
+            #{msgType}
+        </foreach>
+    </select>
+    <select id="findAll" resultType="com.info.web.pojo.TemplateSms" parameterType="HashMap">
+        SELECT
+        <include refid="sqlTemplateSmsColumns"/>
+        FROM template_sms ts
+        <where>
+            <if test="status!=null and status!=''">
+                ts.status = #{status}
+            </if>
+            <if test="msgType!=null and msgType!=''">
+                ts.msg_type = #{msgType}
+            </if>
+            <if test="beginTime !=null and beginTime !=''">
+                <![CDATA[	and DATE_FORMAT(ts.createtime,'%Y-%m-%d') >=  #{beginTime}  ]]>
+            </if>
+            <if test="endTime !=null and endTime !=''">
+                <![CDATA[	and DATE_FORMAT(ts.createtime,'%Y-%m-%d') <=  #{endTime}  ]]>
+            </if>
+        </where>
+        ORDER BY ts.createtime DESC
+    </select>
+
+    <!-- 保存,保存不为NULL的字段 -->
+    <insert id="insert" parameterType="com.info.web.pojo.TemplateSms">
+		INSERT INTO template_sms (id,name,contenttext,msg_type,status,createtime)
+		VALUES(#{id},#{name},#{contenttext},#{msgType},#{status},now())
+	</insert>
+    <!-- 更新短信模板 -->
+    <update id="update" parameterType="com.info.web.pojo.TemplateSms">
+        UPDATE template_sms
+        <set>
+            <if test="name != null and name != ''">name=#{name,jdbcType=VARCHAR},</if>
+            <if test="contenttext != null and contenttext != ''">contenttext=#{contenttext,jdbcType=VARCHAR},</if>
+            <if test="msgType != null and msgType != ''">msg_type=#{msgType,jdbcType=VARCHAR},</if>
+            <if test="status != null and status != ''">status=#{status,jdbcType=VARCHAR},</if>
+            updatetime = now()
+        </set>
+        WHERE id = #{id,jdbcType=VARCHAR}
+    </update>
+    <!-- 根据id获取单条记录 -->
+    <select id="getTemplateSmsById" resultMap="queryResultMap" parameterType="String">
+        SELECT
+        <include refid="sqlTemplateSmsColumns"/>
+        FROM template_sms ts
+        WHERE ts.id = #{id,jdbcType=VARCHAR}
+    </select>
+
+    <!-- 根据id删除记录 -->
+    <delete id="delete" parameterType="String">DELETE FROM template_sms WHERE id = #{id,jdbcType=VARCHAR}</delete>
+</mapper>

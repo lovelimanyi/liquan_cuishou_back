@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.info.back.dao.IEstimateOrderDao">
+	<resultMap id="BaseResultMap" type="com.info.web.pojo.EstimateOrder" >
+		<id column="id" jdbcType="BIGINT" property="id" />
+		<result column="over_date" property="overDate" jdbcType="TIMESTAMP" />
+		<result column="order_count" property="orderCount" jdbcType="INTEGER" />
+		<result column="amount_total" property="amountTotal" jdbcType="BIGINT" />
+		<result column="collection_date" property="collectionDate" jdbcType="TIMESTAMP" />
+		<result column="collection_company_id" property="collectionCompanyId" jdbcType="BIGINT" />
+		<result column="order_age" property="orderAge" jdbcType="INTEGER" />
+		<result column="estimate_order_count" property="estimateOrderCount" jdbcType="INTEGER" />
+		<result column="estimate_amount_count" property="estimateAmountCount" jdbcType="BIGINT" />
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="orderType" property="orderType" jdbcType="TINYINT" />
+		<result column="real_collection_order_count" property="realCollectionOrderCount" jdbcType="INTEGER" />
+		<result column="old_collection_rate" property="oldCollectionRate" jdbcType="INTEGER" />
+		<result column="old_collection_amount_rate" property="oldCollectionAmountRate" jdbcType="INTEGER" />
+	</resultMap>
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="com.info.web.pojo.EstimateOrder">
+		insert into estimate_order (over_date,
+		order_count,
+		amount_total,
+		collection_date,
+		collection_company_id,
+		order_age,
+		estimate_order_count,
+		estimate_amount_count,
+		orderType,
+		old_collection_rate,
+		old_collection_amount_rate)
+		values ( #{overDate,jdbcType=TIMESTAMP},
+		 #{orderCount,jdbcType=INTEGER},
+		#{amountTotal,jdbcType=BIGINT},
+		 #{collectionDate,jdbcType=TIMESTAMP},
+		 #{collectionCompanyId,jdbcType=BIGINT},
+		#{orderAge,jdbcType=INTEGER},
+		#{estimateOrderCount,jdbcType=INTEGER},
+		#{estimateAmountCount,jdbcType=BIGINT},
+		#{orderType,jdbcType=TINYINT},
+		#{oldCollectionRate,jdbcType=INTEGER},
+		#{oldCollectionAmountRate,jdbcType=INTEGER})
+	</insert>
+	<update id="updateById" parameterType="com.info.web.pojo.EstimateOrder">
+		update
+			estimate_order
+		set
+			order_count=#{orderCount,jdbcType=INTEGER},
+			amount_total=#{amountTotal,jdbcType=BIGINT},
+			collection_date=#{collectionDate,jdbcType=TIMESTAMP},
+			collection_company_id= #{collectionCompanyId,jdbcType=BIGINT},
+			order_age=#{orderAge,jdbcType=INTEGER},
+			estimate_order_count=#{estimateOrderCount,jdbcType=INTEGER},
+			estimate_amount_count=#{estimateAmountCount,jdbcType=BIGINT},
+			real_collection_order_count=#{realCollectionOrderCount,jdbcType=INTEGER},
+			old_collection_rate=#{oldCollectionRate,jdbcType=INTEGER},
+			old_collection_amount_rate=#{oldCollectionAmountRate,jdbcType=INTEGER}
+		where id = #{id,jdbcType=BIGINT}
+
+	</update>
+	<select id="findAll" resultMap="BaseResultMap" parameterType="HashMap">
+		SELECT
+		id,
+		over_date,
+		order_count,
+		amount_total,
+		collection_date,
+		collection_company_id,
+		order_age,
+		estimate_order_count,
+		estimate_amount_count,
+		create_time,
+		orderType,
+		real_collection_order_count,
+		old_collection_rate,
+		old_collection_amount_rate
+		<include refid="selectWhere"></include>
+	</select>
+
+	<sql id="selectWhere">
+		from estimate_order
+		<where>
+			<if test="overDate != null">
+				<![CDATA[ over_date =#{overDate,jdbcType=TIMESTAMP} ]]>
+			</if>
+			<if test="startOverDate != null">
+				<![CDATA[ over_date >=#{startOverDate,jdbcType=TIMESTAMP} ]]>
+			</if>
+			<if test="endOverDate != null">
+				<![CDATA[ and  over_date <= #{endOverDate,jdbcType=TIMESTAMP} ]]>
+			</if>
+			<if test="collectionCompanyId != null">
+				and collection_company_id = #{collectionCompanyId,jdbcType=BIGINT}
+			</if>
+			<if test="orderAge != null">
+				and order_age = #{orderAge,jdbcType=INTEGER}
+			</if>
+			<if test="orderType != null">
+				and orderType = #{orderType,jdbcType=INTEGER}
+			</if>
+		</where>
+	</sql>
+
+	<select id="findByDate" resultMap="BaseResultMap" parameterType="HashMap">
+		SELECT
+			id,
+			over_date,
+			order_count,
+			amount_total,
+			collection_date,
+			collection_company_id,
+			order_age,
+			estimate_order_count,
+			estimate_amount_count,
+			create_time,
+			real_collection_order_count,
+			old_collection_rate,
+			old_collection_amount_rate
+		from estimate_order
+		where over_date =#{overDate,jdbcType=TIMESTAMP} and orderType = #{orderType,jdbcType=VARCHAR}
+	</select>
+
+</mapper>

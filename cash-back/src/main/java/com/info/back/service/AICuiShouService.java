@@ -1,9 +1,7 @@
 package com.info.back.service;
 
-import cn.senseinfo.api.DefaultSenseClient;
-import cn.senseinfo.api.SenseClient;
-import cn.senseinfo.api.request.BatchJobRequest;
-import com.alibaba.fastjson.JSON;
+
+
 import com.info.back.dao.IMmanLoanCollectionCompanyDao;
 import com.info.back.dao.IMmanLoanCollectionOrderDao;
 import com.info.back.utils.MerchantNoUtils;
@@ -89,15 +87,15 @@ public class AICuiShouService implements IAICuiShouService {
                         jobList.setJobData(jobData);
                         dataList.add(jobList);
                     }
-                    SenseClient client = new DefaultSenseClient(entry.getValue(), accessToken);//第一个参数是corpCode
-                    BatchJobRequest batchJobRequest = new BatchJobRequest(requestUrl, templateCode, JSON.toJSONString(dataList));
-                    try{
-                        client.execute(batchJobRequest);
-                    }catch (Exception e){
-                        if("http://www.baidu.com".equals(requestUrl)){
-                            logger.info("测试环境请求地址不匹配，非bug");
-                        }
-                    }
+//                    SenseClient client = new DefaultSenseClient(entry.getValue(), accessToken);//第一个参数是corpCode
+//                    BatchJobRequest batchJobRequest = new BatchJobRequest(requestUrl, templateCode, JSON.toJSONString(dataList));
+//                    try{
+//                        client.execute(batchJobRequest);
+//                    }catch (Exception e){
+//                        if("http://www.baidu.com".equals(requestUrl)){
+//                            logger.info("测试环境请求地址不匹配，非bug");
+//                        }
+//                    }
                 }
             }
             logger.info("aiCuiShou   batchCommitData结束......");

@@ -14,7 +14,7 @@ import com.info.constant.Constant;
 import com.info.web.pojo.*;
 import com.info.web.synchronization.dao.IDataDao;
 import com.info.web.util.*;
-import com.liquan.oss.OSSUpload;
+//import com.liquan.oss.OSSUpload;
 import com.sun.tracing.dtrace.ArgsAttributes;
 import net.sf.json.JSONArray;
 import org.apache.commons.collections.CollectionUtils;
@@ -607,7 +607,7 @@ public class MyCollectionOrderController extends BaseController {
                 }
 
                 // 从oss获取图片地址
-                getUserImageUrl(userInfo);
+//                getUserImageUrl(userInfo);
 
                 // 银行卡
                 SysUserBankCard userCar = sysUserBankCardService.findUserId(order.getUserId());
@@ -682,31 +682,31 @@ public class MyCollectionOrderController extends BaseController {
      *
      * @param userInfo
      */
-    private void getUserImageUrl(MmanUserInfo userInfo) {
-        OSSUpload ossUpload = new OSSUpload();
-        if (userInfo != null) {
-            String userHeadUrl = userInfo.getHeadPortrait();
-            String userFrontImgUrl = userInfo.getIdcardImgZ();
-            String userBackImgUrl = userInfo.getIdcardImgF();
-
-            // 针对老用户特殊处理
-            if (userHeadUrl != null && userHeadUrl.startsWith("/")) {
-                userHeadUrl = userHeadUrl.substring(1);
-            }
-            if (userFrontImgUrl != null && userFrontImgUrl.startsWith("/")) {
-                userFrontImgUrl = userFrontImgUrl.substring(1);
-            }
-            if (userBackImgUrl != null && userBackImgUrl.startsWith("/")) {
-                userBackImgUrl = userBackImgUrl.substring(1);
-            }
-            URL headImageUrl = ossUpload.sampleGetFileUrl("xjx-files", userHeadUrl, 1000l * 3600l);
-            URL frontImageUrl = ossUpload.sampleGetFileUrl("xjx-files", userFrontImgUrl, 1000l * 3600l);
-            URL backImageUrl = ossUpload.sampleGetFileUrl("xjx-files", userBackImgUrl, 1000l * 3600l);
-            userInfo.setHeadPortrait(headImageUrl.toString());
-            userInfo.setIdcardImgZ(frontImageUrl.toString());
-            userInfo.setIdcardImgF(backImageUrl.toString());
-        }
-    }
+//    private void getUserImageUrl(MmanUserInfo userInfo) {
+//        OSSUpload ossUpload = new OSSUpload();
+//        if (userInfo != null) {
+//            String userHeadUrl = userInfo.getHeadPortrait();
+//            String userFrontImgUrl = userInfo.getIdcardImgZ();
+//            String userBackImgUrl = userInfo.getIdcardImgF();
+//
+//            // 针对老用户特殊处理
+//            if (userHeadUrl != null && userHeadUrl.startsWith("/")) {
+//                userHeadUrl = userHeadUrl.substring(1);
+//            }
+//            if (userFrontImgUrl != null && userFrontImgUrl.startsWith("/")) {
+//                userFrontImgUrl = userFrontImgUrl.substring(1);
+//            }
+//            if (userBackImgUrl != null && userBackImgUrl.startsWith("/")) {
+//                userBackImgUrl = userBackImgUrl.substring(1);
+//            }
+//            URL headImageUrl = ossUpload.sampleGetFileUrl("xjx-files", userHeadUrl, 1000l * 3600l);
+//            URL frontImageUrl = ossUpload.sampleGetFileUrl("xjx-files", userFrontImgUrl, 1000l * 3600l);
+//            URL backImageUrl = ossUpload.sampleGetFileUrl("xjx-files", userBackImgUrl, 1000l * 3600l);
+//            userInfo.setHeadPortrait(headImageUrl.toString());
+//            userInfo.setIdcardImgZ(frontImageUrl.toString());
+//            userInfo.setIdcardImgF(backImageUrl.toString());
+//        }
+//    }
 
     /**
      * 更新用户共债手机号信息

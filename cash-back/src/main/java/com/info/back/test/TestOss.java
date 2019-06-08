@@ -15,7 +15,7 @@ import com.info.constant.Constant;
 import com.info.web.pojo.BackUser;
 import com.info.web.pojo.MmanLoanCollectionCompany;
 import com.info.web.util.DateUtil;
-import com.liquan.oss.OSSUpload;
+//import com.liquan.oss.OSSUpload;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -152,10 +152,10 @@ public class TestOss {
     /**
      * 借款用户身份证照片获取
      */
-    @Test
-    public void testIdAddress() {
-        OSSUpload ossUpload = new OSSUpload();
-        URL headImageUrl = ossUpload.sampleGetFileUrl("xjx-files", "files/2017-08-25/431a2be478c041f1b4a03b97e2d8fcfb.png", 1000l * 3600l);
-        System.out.println(headImageUrl + "");
-    }
+//    @Test
+//    public void testIdAddress() {
+//        OSSUpload ossUpload = new OSSUpload();
+//        URL headImageUrl = ossUpload.sampleGetFileUrl("xjx-files", "files/2017-08-25/431a2be478c041f1b4a03b97e2d8fcfb.png", 1000l * 3600l);
+//        System.out.println(headImageUrl + "");
+//    }
 }

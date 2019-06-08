@@ -1,0 +1,674 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.info.back.dao.ITodayRecoveryDao">
+    <select id="doTodayPersonStatistics" resultType="com.info.web.pojo.TodayRecovery">
+        <![CDATA[
+
+-- 个人
+          SELECT
+	x.merchant_no as merchantNo,
+	now() AS 'createDate', -- 统计日期
+	x.gsmc AS 'companyName', -- 催收公司
+	x.companyId AS'companyId', -- 催收公司id
+	x.csyxm AS'backUserName', -- 用户名称
+	x.csyid AS 'uuid', -- 上一催收员id
+	x.yqdj AS'groupLevel', -- 催收组编号
+	x.lx AS'borrowingType', -- 借款类型 1 大额  2 小额    3分期商城
+
+	sum(x.ycbj) AS'totalPrincipal', -- 本金金额
+	sum(x.drbj) AS'realgetTotalPrincipal', -- 当日催回本金
+	round(ifnull(sum(x.drbj)/sum(x.ycbj),0)*100,2) AS 'repaymentProbability', -- 当日本金催回率
+
+	sum(x.ycznj) AS 'totalPenalty', -- 滞纳金总额
+	sum(x.drznj) AS 'realgetTotalPenalty', -- 当日滞纳金
+	round(ifnull(sum(x.drznj)/sum(x.ycznj),0)*100,2) AS 'penaltyProbability', -- 当日滞纳金催回率
+
+	count(if(x.ycbj != 0,x.ycbj,null)) AS 'totalOrderCount', -- 订单总数
+	sum(x.drhks) AS 'doneOrderCount', -- 当日催回订单数
+	round(ifnull(sum(x.drhks)/count(if(x.ycbj != 0,x.ycbj,null)),0)*100,2) AS 'orderProbability', -- 当日订单催回率
+
+    sum(x.a) as todayDoneCount, -- 当日催回单数（当日入催）
+    sum(x.b) as todayDoneMoney -- 当日催回本金（当日入催）
+from
+	(
+	select
+		d.merchant_no,
+		date(b.dispatch_time) dt,
+		b.current_collection_user_id csyid,
+		usr.user_name csyxm,
+		cmp.title gsmc,
+		cmp.id AS companyId,
+		d.borrowing_type AS lx,
+		usr.group_level AS yqdj,
+		if(d.borrowing_type=2 and  d.paid_money>0,d.paid_money,d.loan_money+ifnull(d.accrual,0))-ifnull(hk.zqbj,0)  ycbj, -- 当日入催本金
+		0  drbj, -- 当日催回本金
+		d.loan_penalty-ifnull(hk.zqznj,0)  ycznj, -- 当日入催滞纳金
+		0  drznj, -- 当日催回滞纳金
+		0 drhks, -- 当日催回订单数
+        0 a,
+        0 b
+	from  mman_loan_collection_order  b
+	left join   back_user usr ON  usr.uuid=b.current_collection_user_id
+	left join   mman_loan_collection_company cmp ON usr.company_id = cmp.id
+	left join   mman_user_loan d  on  d.id=b.loan_id
+	left join   bi_order  bo  on  d.user_id=bo.user_id
+	left join   credit_loan_pay  clp  on  clp.loan_id=b.loan_id
+	left join
+		    (
+		    select
+		    	d.merchant_no,
+		    	a.pay_id id,
+		    	date(b.dispatch_time) dt,
+		    	sum(if( date(a.update_Date)<=DATE_ADD(curdate(),interval -1 day) ,a.real_money+ifnull(a.realget_accrual,0),0)) zqbj,
+		    	sum(if( date(a.update_Date)<=DATE_ADD(curdate(),interval -1 day) ,a.real_penlty,0)) zqznj,
+		    	sum(if(date(a.update_Date)=date(NOW()), a.real_money+ifnull(a.realget_accrual,0),0))  drbj,
+		    	sum(if(date(a.update_Date)=date(NOW()), a.real_penlty,0))  drznj
+		    from credit_loan_pay_detail a
+		    left join mman_loan_collection_order b on a.pay_id = b.pay_id
+		    left join mman_user_loan d  on  d.id=b.loan_id
+		    where b.dispatch_time >= CURDATE()
+		    group by  d.merchant_no,a.pay_id
+		    ) hk  on  hk.id=b.pay_id and hk.merchant_no=d.merchant_no
+	where 1=1
+		and (b.`status`<>4
+            or date(clp.update_Date)>DATE_ADD(curdate(),interval -1 day)
+            and  cmp.title  is  not  null)
+		and usr.group_level in (3,4)
+		and b.dispatch_time >= curdate()
+
+    union all
+
+	select
+		d.merchant_no,
+		hk.dt dt,
+		b.current_collection_user_id csyid,
+		usr.user_name csyxm,
+		cmp.title gsmc,
+		cmp.id AS companyId,
+		d.borrowing_type AS lx,
+		usr.group_level AS yqdj,
+		0  ycbj, -- 当日入催本金
+		ifnull(hk.drbj,0)  drbj, -- 当日催回本金
+		0  ycznj, -- 当日入催滞纳金
+		ifnull(hk.drznj,0)  drznj, -- 当日催回滞纳金
+		if(b.`status`=4 and date(clp.update_Date)=date(now()),1,0) drhks, -- 当日催回订单数
+        0 a,
+        0 b
+	from  mman_loan_collection_order  b
+	left join   back_user usr ON  usr.uuid=b.current_collection_user_id
+	left join   mman_loan_collection_company cmp ON usr.company_id = cmp.id
+	left join   mman_user_loan d  on  d.id=b.loan_id
+	left join   bi_order  bo  on  d.user_id=bo.user_id
+	left join   credit_loan_pay  clp  on  clp.loan_id=b.loan_id
+	left join
+		    (
+		    select
+		    	d.merchant_no,
+		    	a.pay_id id,
+		    	date(a.update_Date) dt,
+		    	sum(if( date(a.update_Date)<=DATE_ADD(curdate(),interval -1 day) ,a.real_money+ifnull(a.realget_accrual,0),0)) zqbj,
+		    	sum(if( date(a.update_Date)<=DATE_ADD(curdate(),interval -1 day) ,a.real_penlty,0)) zqznj,
+		    	sum(if(date(a.update_Date)=date(NOW()), a.real_money+ifnull(a.realget_accrual,0),0))  drbj,
+		    	sum(if(date(a.update_Date)=date(NOW()), a.real_penlty,0))  drznj
+		    from   credit_loan_pay_detail a
+		    left join mman_loan_collection_order b on a.pay_id = b.pay_id
+		    left join   mman_user_loan d  on  d.id=b.loan_id
+		    where b.dispatch_time >= CURDATE()
+		    group by  d.merchant_no,a.pay_id
+		    ) hk  on  hk.id=b.pay_id and hk.merchant_no=d.merchant_no
+	where 1=1
+	    and (
+			b.`status`<>4
+			or date(clp.update_Date)>DATE_ADD(curdate(),interval -1 day)
+			and  cmp.title  is  not  null
+		    )
+	    and usr.group_level in (3,4)
+	    and hk.dt >= CURDATE()
+
+    union all
+
+    SELECT
+		l.merchant_no,
+        curdate() dt,
+		o.current_collection_user_id csyid,
+		u.user_name csyxm,
+        cmp.title gsmc,
+        cmp.id companyId,
+        l.borrowing_type lx,
+        u.group_level yqdj,
+        0 ycbj,
+        0 drbj,
+        0 ycznj,
+        0 drznj,
+        0 drhks,
+		count(distinct o.id) a, -- 结清单数
+		sum(d.real_money) b -- 结清本金
+	from mman_loan_collection_order o
+	left join back_user u on u.uuid = o.current_collection_user_id
+	left join credit_loan_pay p on p.loan_id = o.loan_id
+	left join credit_loan_pay_detail d on d.pay_id = o.pay_id
+	LEFT JOIN mman_user_loan l ON o.loan_id = l.id
+	left join mman_loan_collection_company cmp ON u.company_id = cmp.id
+	where 1=1
+		and o.dispatch_time >= curdate()
+		and o.dispatch_time < date_add(curdate(), interval +1 day)
+		and o.status in (4)
+		and u.`status` = 1
+		AND u.role_id = '10021'
+	    and u.group_level in (3,4)
+    group by o.loan_id
+    )  x
+group by   x.merchant_no,x.companyId,x.csyid,x.yqdj,x.lx
+-- order by  x.companyId,x.yqdj,x.csyid,x.lx
+
+union all
+
+SELECT
+	x.merchant_no,
+	now() AS 'createDate',
+	x.gsmc AS 'companyName',
+	x.companyId AS'companyId',
+	x.csyxm AS'backUserName',
+	x.csyid AS 'uuid',
+	x.yqdj AS'groupLevel',
+	x.lx AS'borrowingType',
+
+	sum(x.ycbj) AS'totalPrincipal',
+	sum(x.drbj) AS'realgetTotalPrincipal',
+	round(ifnull(sum(x.drbj)/sum(x.ycbj),0)*100,2) AS 'repaymentProbability',
+
+	sum(x.ycznj) AS 'totalPenalty',
+	sum(x.drznj) AS 'realgetTotalPenalty',
+	round(ifnull(sum(x.drznj)/sum(x.ycznj),0)*100,2) AS 'penaltyProbability',
+
+	count(*) AS 'totalOrderCount',
+	sum(x.drhks) AS 'doneOrderCount',
+	round(ifnull(sum(x.drhks)/count(*),0)*100,2) AS 'orderProbability',
+
+    sum(x.a), -- 当日结清单数（当日入催）
+    sum(x.b) -- 当日结清本金（当日入催）
+from
+	(
+	select
+		d.merchant_no,
+		b.current_collection_user_id csyid,
+		usr.user_name csyxm,
+		cmp.title gsmc,
+		cmp.id AS companyId,
+		d.borrowing_type AS lx,
+		usr.group_level AS yqdj,
+		if(d.borrowing_type=2 and  d.paid_money>0,d.paid_money,d.loan_money+ifnull(d.accrual,0))-ifnull(hk.zqbj,0)  ycbj,
+		ifnull(hk.drbj,0)  drbj,
+		if(d.borrowing_type=2 and  d.paid_money>0,d.paid_money,d.loan_money+ifnull(d.accrual,0))-ifnull(hk.zqbj,0)-ifnull(hk.drbj,0)  sybj,
+		d.loan_penalty-ifnull(hk.zqznj,0)  ycznj,
+		ifnull(hk.drznj,0)  drznj,
+		if(b.`status`=4 and date(clp.update_Date)=date(now()),1,0) drhks,
+        0 a,
+        0 b
+	from mman_loan_collection_order  b
+	left join   back_user usr ON  usr.uuid=b.current_collection_user_id
+	left join   mman_loan_collection_company cmp ON usr.company_id = cmp.id
+	left join   mman_user_loan d  on  d.id=b.loan_id
+	left join   bi_order  bo  on  d.user_id=bo.user_id
+	left join   credit_loan_pay  clp  on  clp.loan_id=b.loan_id
+	left join
+		(
+		select
+			d.merchant_no,
+			a.pay_id id,
+			sum(if(  date(a.update_Date)<=DATE_ADD(curdate(),interval -1 day) ,a.real_money+ifnull(a.realget_accrual,0),0)) zqbj,
+			sum(if(  date(a.update_Date)<=DATE_ADD(curdate(),interval -1 day) ,a.real_penlty,0)) zqznj,
+			sum(if(date(a.update_Date)=date(NOW()), a.real_money+ifnull(a.realget_accrual,0),0))  drbj,
+			sum(if(date(a.update_Date)=date(NOW()), a.real_penlty,0))  drznj
+		from credit_loan_pay_detail a
+		left join mman_loan_collection_order b on a.pay_id = b.pay_id
+		left join   mman_user_loan d  on  d.id=b.loan_id
+		group by  a.pay_id
+		) hk  on  hk.id=b.pay_id and hk.merchant_no=d.merchant_no
+	where 1=1
+		and (b.`status`<>4   or date(clp.update_Date)>DATE_ADD(curdate(),interval -1 day))
+		and  cmp.title  is  not  null
+		and usr.group_level not in (3,4)
+
+    union all
+
+    SELECT
+		l.merchant_no,
+		o.current_collection_user_id csyid,
+		u.user_name csyxm,
+        cmp.title gsmc,
+        cmp.id companyId,
+        l.borrowing_type lx,
+        u.group_level yqdj,
+        0 ycbj,
+        0 drbj,
+        0 sybj,
+        0 ycznj,
+        0 drznj,
+        0 drhks,
+		count(distinct o.id) a, -- 结清单数
+		sum(d.real_money) b -- 结清本金
+	from mman_loan_collection_order o
+	left join back_user u on u.uuid = o.current_collection_user_id
+	left join credit_loan_pay p on p.loan_id = o.loan_id
+	left join credit_loan_pay_detail d on d.pay_id = o.pay_id
+	LEFT JOIN mman_user_loan l ON o.loan_id = l.id
+	left join mman_loan_collection_company cmp ON u.company_id = cmp.id
+	where 1=1
+		and o.dispatch_time >= curdate()
+		and o.dispatch_time < date_add(curdate(), interval +1 day)
+		and o.status in (4)
+		and u.`status` = 1
+		AND u.role_id = '10021'
+	    and u.group_level not in (3,4)
+    group by o.loan_id
+	)  x
+group by   x.merchant_no,x.companyId,x.csyid,x.yqdj,x.lx
+
+
+
+        ]]>
+    </select>
+
+    <select id="doTodayCompanyStatistics" resultType="com.info.web.pojo.TodayRecovery">
+        <![CDATA[
+            SELECT
+	x.merchant_no as merchantNo,
+	now() AS 'createDate', -- 日期
+	x.gsmc AS 'companyName', -- 催收公司
+	x.companyId AS'companyId', -- 催收公司id
+	x.yqdj AS'groupLevel', -- 催收组编号
+	x.lx AS'borrowingType', -- 借款类型 1.大额  2.小额  3.分期商城
+
+	sum(x.ycbj) AS'totalPrincipal', -- 当日入催本金金额
+	sum(x.drbj) AS'realgetTotalPrincipal', -- 当日催回本金（当日入催本金中）
+	round(ifnull(sum(x.drbj)/sum(x.ycbj),0)*100,2) AS 'repaymentProbability', -- 当日本金催回率
+
+	sum(x.ycznj) AS 'totalPenalty', -- 当日入催滞纳金总额
+	sum(x.drznj) AS 'realgetTotalPenalty', -- 当日催回滞纳金（当日入催滞纳金中）
+	round(ifnull(sum(x.drznj)/sum(x.ycznj),0)*100,2) AS 'penaltyProbability', -- 当日滞纳金催回率
+
+	count(if(x.ycbj != 0,x.ycbj,null)) AS 'totalOrderCount', -- 订单总数
+	sum(x.drhks) AS 'doneOrderCount', -- 当日催回订单数
+	round(ifnull(sum(x.drhks)/count(if(x.ycbj != 0,x.ycbj,null)),0)*100,2) AS 'orderProbability', -- 当日订单催回率
+
+   sum(x.a) as todayDoneCount, -- 当日催回单数（当日入催）
+    sum(x.b) as todayDoneMoney -- 当日催回本金（当日入催）
+from
+	(
+	select
+		d.merchant_no,
+		date(b.dispatch_time) dt,
+		cmp.title gsmc,
+		d.borrowing_type AS lx,
+		cmp.id AS companyId,
+		usr.group_level AS yqdj	,
+		if(d.borrowing_type=2 and  d.paid_money>0,d.paid_money,d.loan_money+ifnull(d.accrual,0))-ifnull(hk.zqbj,0)  ycbj,
+		0  drbj,
+		d.loan_penalty-ifnull(hk.zqznj,0)  ycznj,
+		0 drznj,
+		0 drhks,
+        0 a,
+        0 b
+	from  mman_loan_collection_order  b
+	left join   back_user usr ON  usr.uuid=b.current_collection_user_id
+	left join   mman_loan_collection_company cmp ON usr.company_id = cmp.id
+	left join   mman_user_loan d  on  d.id=b.loan_id
+	left join   bi_order  bo  on  d.user_id=bo.user_id
+	left join   credit_loan_pay  clp  on  clp.loan_id=b.loan_id
+	left join
+		    (
+			select
+				d.merchant_no,
+				a.pay_id id,
+				date(b.dispatch_time) dt,
+				sum(if(date(a.update_Date)<=DATE_ADD(curdate(),interval -1 day),a.real_money+ifnull(a.realget_accrual,0),0)) zqbj,
+				sum(if(date(a.update_Date)<=DATE_ADD(curdate(),interval -1 day),a.real_penlty,0)) zqznj,
+				sum(if(date(a.update_Date)=date(NOW()), a.real_money+ifnull(a.realget_accrual,0),0))  drbj,
+				sum(if(date(a.update_Date)=date(NOW()), a.real_penlty,0))  drznj
+			from credit_loan_pay_detail a
+				left join mman_loan_collection_order b on a.pay_id = b.pay_id
+				left join   mman_user_loan d  on  d.id=b.loan_id
+			where b.dispatch_time >= CURDATE()
+			group by  a.pay_id
+		    ) hk  on  hk.id=b.pay_id and hk.merchant_no=d.merchant_no
+	where 1=1
+		and (b.`status`<>4 or date(clp.update_Date)>DATE_ADD(curdate(),interval -1 day) and cmp.title is not null)
+		and b.dispatch_time >= curdate()
+		and usr.group_level in (3,4)
+
+    union all
+
+	select
+		d.merchant_no,
+		hk.dt dt,
+		cmp.title gsmc,
+		d.borrowing_type AS lx,
+		cmp.id AS companyId,
+		usr.group_level AS yqdj	,
+		0 ycbj,
+		ifnull(hk.drbj,0)  drbj,
+		0  ycznj,
+		ifnull(hk.drznj,0)  drznj,
+		if(b.`status`=4 and date(clp.update_Date)=date(now()),1,0) drhks,
+        0 a,
+        0 b
+	from  mman_loan_collection_order  b
+	left join   back_user usr ON  usr.uuid=b.current_collection_user_id
+	left join   mman_loan_collection_company cmp ON usr.company_id = cmp.id
+	left join   mman_user_loan d  on  d.id=b.loan_id
+	left join   bi_order  bo  on  d.user_id=bo.user_id
+	left join   credit_loan_pay  clp  on  clp.loan_id=b.loan_id
+	left join
+		    (
+			select
+				d.merchant_no,
+				a.pay_id id,
+				date(a.update_Date) dt,
+				sum(if(date(a.update_Date)<=DATE_ADD(curdate(),interval -1 day),a.real_money+ifnull(a.realget_accrual,0),0)) zqbj,
+				sum(if(date(a.update_Date)<=DATE_ADD(curdate(),interval -1 day),a.real_penlty,0)) zqznj,
+				sum(if(date(a.update_Date)=date(NOW()), a.real_money+ifnull(a.realget_accrual,0),0))  drbj,
+				sum(if(date(a.update_Date)=date(NOW()), a.real_penlty,0))  drznj
+			from credit_loan_pay_detail a
+				left join mman_loan_collection_order b on a.pay_id = b.pay_id
+				left join   mman_user_loan d  on  d.id=b.loan_id
+			where b.dispatch_time >= CURDATE()
+			group by  a.pay_id
+		    ) hk  on  hk.id=b.pay_id and hk.merchant_no=d.merchant_no
+ 	where 1=1
+		and (b.`status`<>4 or date(clp.update_Date)>DATE_ADD(curdate(),interval -1 day) and cmp.title is not null)
+		and hk.dt >= CURDATE()
+		and usr.group_level in (3,4)
+
+    union all
+
+    SELECT
+		l.merchant_no,
+        curdate() dt,
+        cmp.title gsmc,
+        l.borrowing_type lx,
+        cmp.id companyId,
+        u.group_level yqdj,
+        0 ycbj,
+        0 drbj,
+        0 ycznj,
+        0 drznj,
+        0 drhks,
+		count(distinct o.id) a, -- 结清单数
+		sum(d.real_money) b -- 结清本金
+	from mman_loan_collection_order o
+	left join back_user u on u.uuid = o.current_collection_user_id
+	left join credit_loan_pay p on p.loan_id = o.loan_id
+	left join credit_loan_pay_detail d on d.pay_id = o.pay_id
+	LEFT JOIN mman_user_loan l ON o.loan_id = l.id
+	left join mman_loan_collection_company cmp ON u.company_id = cmp.id
+	where 1=1
+		and o.dispatch_time >= curdate()
+		and o.dispatch_time < date_add(curdate(), interval +1 day)
+		and o.status in (4)
+		and u.`status` = 1
+		AND u.role_id = '10021'
+	    and u.group_level in (3,4)
+    group by o.loan_id
+	)  x
+group by x.merchant_no,x.companyId,x.yqdj,x.lx
+
+union all
+
+SELECT
+	x.merchant_no,
+	now() AS 'createDate',
+	x.gsmc AS 'companyName',
+	x.companyId AS'companyId',
+	x.yqdj AS'groupLevel',
+	x.lx AS'borrowingType',
+	sum(x.ycbj) AS'totalPrincipal',
+	sum(x.drbj) AS'realgetTotalPrincipal',
+	round(ifnull(sum(x.drbj)/sum(x.ycbj),0)*100,2) AS 'repaymentProbability',
+	sum(x.ycznj) AS 'totalPenalty',
+	sum(x.drznj) AS 'realgetTotalPenalty',
+	round(ifnull(sum(x.drznj)/sum(x.ycznj),0)*100,2) AS 'penaltyProbability',
+	count(*) AS 'totalOrderCount',
+	sum(x.drhks) AS 'doneOrderCount',
+	round(ifnull(sum(x.drhks)/count(*),0)*100,2) AS 'orderProbability',
+
+     sum(x.a), -- 当日结清单数（当日入催）
+    sum(x.b) -- 当日结清本金（当日入催）
+from
+	(
+	select
+		d.merchant_no,
+		cmp.title gsmc,
+		d.borrowing_type AS lx,
+		cmp.id AS companyId,
+		usr.group_level AS yqdj	,
+		if(d.borrowing_type=2 and  d.paid_money>0,d.paid_money,d.loan_money+ifnull(d.accrual,0))-ifnull(hk.zqbj,0)  ycbj,
+		ifnull(hk.drbj,0)  drbj,
+		if(d.borrowing_type=2 and  d.paid_money>0,d.paid_money,d.loan_money+ifnull(d.accrual,0))-ifnull(hk.zqbj,0)-ifnull(hk.drbj,0)  sybj,
+		d.loan_penalty-ifnull(hk.zqznj,0)  ycznj,
+		ifnull(hk.drznj,0)  drznj,
+		if(b.`status`=4 and date(clp.update_Date)=date(now()),1,0) drhks,
+        0 a,
+        0 b
+	from  mman_loan_collection_order  b
+	left join   back_user usr ON  usr.uuid=b.current_collection_user_id
+	left join   mman_loan_collection_company cmp ON usr.company_id = cmp.id
+	left join   mman_user_loan d  on  d.id=b.loan_id
+	left join   bi_order  bo  on  d.user_id=bo.user_id
+	left join   credit_loan_pay  clp  on  clp.loan_id=b.loan_id
+	left join
+		    (
+			select
+				d.merchant_no,
+				a.pay_id id,
+				sum(if(date(a.update_Date)<=DATE_ADD(curdate(),interval -1 day),a.real_money+ifnull(a.realget_accrual,0),0)) zqbj,
+				sum(if(date(a.update_Date)<=DATE_ADD(curdate(),interval -1 day),a.real_penlty,0)) zqznj,
+				sum(if(date(a.update_Date)=date(NOW()), a.real_money+ifnull(a.realget_accrual,0),0))  drbj,
+				sum(if(date(a.update_Date)=date(NOW()), a.real_penlty,0))  drznj
+			from credit_loan_pay_detail a
+			left join mman_loan_collection_order b on a.pay_id = b.pay_id
+			left join mman_user_loan d  on  d.id=b.loan_id
+			group by  a.pay_id
+		    ) hk  on  hk.id=b.pay_id and hk.merchant_no=d.merchant_no
+	where 1=1
+		and (b.`status`<>4  or date(clp.update_Date)>DATE_ADD(curdate(),interval -1 day))
+		and  cmp.title  is  not  null
+		and usr.group_level not in (3,4)
+
+    union all
+
+    SELECT
+		l.merchant_no,
+        cmp.title gsmc,
+        l.borrowing_type lx,
+        cmp.id companyId,
+        u.group_level yqdj,
+        0 ycbj,
+        0 drbj,
+        0 sybj,
+        0 ycznj,
+        0 drznj,
+        0 drhks,
+		count(distinct o.id) a, -- 结清单数
+		sum(d.real_money) b -- 结清本金
+	from mman_loan_collection_order o
+	left join back_user u on u.uuid = o.current_collection_user_id
+	left join credit_loan_pay p on p.loan_id = o.loan_id
+	left join credit_loan_pay_detail d on d.pay_id = o.pay_id
+	LEFT JOIN mman_user_loan l ON o.loan_id = l.id
+	left join mman_loan_collection_company cmp ON u.company_id = cmp.id
+	where 1=1
+		and o.dispatch_time >= curdate()
+		and o.dispatch_time < date_add(curdate(), interval +1 day)
+		and o.status in (4)
+		and u.`status` = 1
+		AND u.role_id = '10021'
+	    and u.group_level not in (3,4)
+    group by o.loan_id
+	) x
+group by   x.merchant_no,x.companyId,x.yqdj,x.lx
+
+
+        ]]>
+
+    </select>
+
+    <insert id="insertTodayPersonStatistics" parameterType="list">
+        INSERT INTO today_person_statistics
+        (companyName,companyId,groupLevel,uuid,backUserName,borrowingType,totalPrincipal,realgetTotalPrincipal,repaymentProbability,totalPenalty,realgetTotalPenalty,penaltyProbability,totalOrderCount,doneOrderCount,orderProbability,createDate ,merchantNo,todayDoneCount,todayDoneMoney )
+        VALUES
+        <foreach collection ="list" item="today" separator =",">
+            (#{today.companyName},#{today.companyId},#{today.groupLevel},#{today.uuid},#{today.backUserName},#{today.borrowingType},#{today.totalPrincipal},#{today.realgetTotalPrincipal},#{today.repaymentProbability},#{today.totalPenalty},#{today.realgetTotalPenalty},#{today.penaltyProbability},#{today.totalOrderCount},#{today.doneOrderCount},#{today.orderProbability},#{today.createDate},#{today.merchantNo},#{today.todayDoneCount},#{today.todayDoneMoney})
+
+        </foreach>
+    </insert>
+
+    <insert id="insertTodayCompanyStatistics" parameterType="list">
+        INSERT INTO today_company_statistics
+        (companyName,companyId,groupLevel,borrowingType,totalPrincipal,realgetTotalPrincipal,remainPrincipal,repaymentProbability,totalPenalty,realgetTotalPenalty,penaltyProbability,totalOrderCount,doneOrderCount,orderProbability,createDate,merchantNo,todayDoneCount,todayDoneMoney)
+        VALUES
+        <foreach collection ="list" item="today" separator =",">
+            (#{today.companyName},#{today.companyId},#{today.groupLevel},
+            #{today.borrowingType},#{today.totalPrincipal},#{today.realgetTotalPrincipal},#{today.remainPrincipal},
+            #{today.repaymentProbability},#{today.totalPenalty},#{today.realgetTotalPenalty},#{today.penaltyProbability},#{today.totalOrderCount},#{today.doneOrderCount},#{today.orderProbability},#{today.createDate},#{today.merchantNo},#{today.todayDoneCount},#{today.todayDoneMoney})
+
+        </foreach>
+    </insert>
+
+    <sql id="whereTodayPersonColumn">
+        <where>
+            <if test="createDate != null and createDate != ''">
+                AND date(s.createDate) = #{createDate}
+            </if>
+            <if test="borrowingType != null and borrowingType != ''">
+                AND s.borrowingType = #{borrowingType}
+            </if>
+            <if test="uuid != null and uuid != ''">
+                AND s.uuid = #{uuid}
+            </if>
+            <if test="companyId != null and companyId != ''">
+                AND s.companyId = #{companyId}
+            </if>
+            <if test="merchantNo != null and merchantNo != ''">
+                AND s.merchantNo = #{merchantNo}
+            </if>
+            <if test="groupLevel != null and groupLevel != ''">
+                AND s.groupLevel = #{groupLevel}
+            </if>
+            <if test="companys != null and companyId == null">
+                AND s.companyId IN
+                <foreach collection="companys" open="(" close=")" item="company" separator=",">
+                    #{company.id}
+                </foreach>
+            </if>
+        </where>
+        <if test="orderBy != null and orderBy != ''">
+            ORDER by ${orderBy}
+        </if>
+    </sql>
+
+    <select id="findAllPerson" resultType="com.info.web.pojo.TodayRecovery" parameterType="hashmap">
+        SELECT
+            s.createDate,
+            s.companyName,
+            s.companyId,
+            s.backUserName,
+            s.uuid,
+            s.groupLevel,
+            s.borrowingType,
+            s.todayDoneCount,
+            s.todayDoneMoney,
+
+            s.totalPrincipal,
+            s.realgetTotalPrincipal,
+            s.remainPrincipal,
+            s.repaymentProbability,
+
+            s.totalPenalty,
+            s.realgetTotalPenalty,
+            s.penaltyProbability,
+
+            s.totalOrderCount,
+            s.doneOrderCount,
+            s.merchantNo,
+            s.orderProbability
+        FROM today_person_statistics s
+        <include refid="whereTodayPersonColumn"/>
+    </select>
+
+    <select id="findAllCountPerson" resultType="integer" parameterType="hashmap">
+        SELECT count(1)
+        FROM today_person_statistics s
+        <include refid="whereTodayPersonColumn"/>
+    </select>
+
+    <sql id="whereTodayCompanyColumn">
+        <where>
+            <if test="createDate != null and createDate != ''">
+                AND date(s.createDate) = #{createDate}
+            </if>
+            <if test="borrowingType != null and borrowingType != ''">
+                AND s.borrowingType = #{borrowingType}
+            </if>
+            <if test="companyId != null and companyId != ''">
+                AND s.companyId = #{companyId}
+            </if>
+            <if test="merchantNo != null and merchantNo != ''">
+                AND s.merchantNo = #{merchantNo}
+            </if>
+            <if test="groupLevel != null and groupLevel != ''">
+                AND s.groupLevel = #{groupLevel}
+            </if>
+
+        </where>
+        <if test="orderBy != null and orderBy != ''">
+            ORDER by ${orderBy}
+        </if>
+    </sql>
+
+    <select id="findAllCompany" resultType="com.info.web.pojo.TodayRecovery" parameterType="hashmap">
+        SELECT
+        s.createDate,
+        s.companyName,
+        s.companyId,
+        s.groupLevel,
+        s.borrowingType,
+        s.todayDoneCount,
+        s.todayDoneMoney,
+        s.totalPrincipal,
+        s.realgetTotalPrincipal,
+        s.remainPrincipal,
+        s.repaymentProbability,
+
+        s.totalPenalty,
+        s.realgetTotalPenalty,
+        s.penaltyProbability,
+
+        s.totalOrderCount,
+        s.doneOrderCount,
+        s.merchantNo,
+        s.orderProbability
+        FROM today_company_statistics s
+        <include refid="whereTodayCompanyColumn"/>
+    </select>
+
+    <select id="findAllCountCompany" resultType="integer" parameterType="hashmap">
+        SELECT count(1)
+        FROM today_company_statistics s
+        <include refid="whereTodayCompanyColumn"/>
+    </select>
+
+
+
+
+
+
+    <delete id="delTodayStatistics" parameterType="hashmap">
+        DELETE s FROM today_person_statistics s
+        WHERE <![CDATA[ s.createDate >= #{delTime} ]]>;
+
+        DELETE cs FROM today_company_statistics cs
+        WHERE <![CDATA[ cs.createDate >= #{delTime} ]]>;
+    </delete>
+
+</mapper>

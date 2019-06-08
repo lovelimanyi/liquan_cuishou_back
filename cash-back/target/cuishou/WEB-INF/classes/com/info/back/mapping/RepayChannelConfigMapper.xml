@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.info.back.dao.IRepayChannelConfigDao" >
+<select id="getAll" resultType="com.info.web.pojo.RepayChannelConfig">
+SELECT
+	id AS id,
+	repay_channel AS repayChannel,
+	repay_channel_name AS repayChannelName,
+	create_time AS createTime,
+	update_time AS updateTime
+FROM
+	repay_channel_config
+</select>
+</mapper>

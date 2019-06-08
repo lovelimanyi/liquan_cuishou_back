@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="cash-back:war">
+    <output-path>$PROJECT_DIR$/cash-back/target</output-path>
+    <root id="archive" name="cuishou.war">
+      <element id="artifact" artifact-name="cash-back:war exploded" />
+    </root>
+  </artifact>
+</component>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.info.back.dao.IDataDao">
+	<!-- 还款信息 -->
+	<select id="getAssetRepayment"  resultType="HashMap" parameterType="HashMap">
+		select * from asset_repayment where id = #{ID}
+	</select>
+	<!-- 还款详情-->
+	<select id="getAssetRepaymentDetail" resultType="HashMap"  parameterType="HashMap">
+		select * from asset_repayment_detail  where asset_repayment_id = #{ID} and status in (2,30)
+	</select>
+	<!-- 通过用户ID拿到联系人列表 -->
+	<select id="getUserContacts" resultType="HashMap"  parameterType="HashMap">
+		select  * from user_contacts where user_id = #{USER_ID}
+	</select>
+	<!-- 银行卡信息 -->
+	<select id="getUserCardInfo" resultType="HashMap"  parameterType="HashMap">
+		select * from user_card_info where user_id = #{USER_ID} limit 1
+	</select>
+	<!-- 用户信息信息 -->
+	<select id="getUserInfo" resultType="HashMap"  parameterType="HashMap">
+		select * from user_info where id = #{USER_ID}
+	</select>
+	<!-- 通过借款ID拿到借款详情 -->
+	<select id="getAssetBorrowOrder" resultType="HashMap"  parameterType="HashMap">
+		select * from asset_borrow_order where id  = #{ORDER_ID}
+	</select>
+
+	<!-- 获得 -->
+	<select id="getEstimateOrder" resultType="HashMap"  parameterType="HashMap">
+		<![CDATA[
+		select
+			count(0) as orderCount,
+			sum(r.repayment_amount) as principal,
+			DATE_FORMAT(r.repayment_time,'%Y-%m-%d') as repaymentTime
+		from asset_repayment r LEFT JOIN asset_borrow_order o ON r.asset_order_id = o.id where r.repayment_time>=#{startTime,jdbcType=TIMESTAMP} and r.repayment_time<#{endTime,jdbcType=TIMESTAMP} and o.merchant_number = #{merchantNumber,jdbcType=INTEGER}
+		GROUP BY DATE_FORMAT(repayment_time,'%Y-%m-%d')
+		]]>
+	</select>
+
+
+	<select id="getDianXiaoOrder" resultType="hashmap" parameterType="hashmap">
+		  select id,money_amount,loan_interests,loan_time,loan_end_time,realname,user_phone,status,ifnull(merchant_number,0) AS merchant_number
+		  from asset_borrow_order
+		  where id  = #{loanId} and status= 21
+	</select>
+
+<select id="getMerchantNumberByLoanId" parameterType="String" resultType="String">
+	select merchant_number
+	from asset_borrow_order
+	where id = #{loanId}
+</select>
+
+<select id="getBorrowOrderOnBorrowing2" resultType="hashmap" parameterType="hashmap">
+		SELECT
+			id AS loanId,
+			user_id AS userId,
+			merchant_number AS merchantNumber,
+			`status` AS `status`,
+			user_phone AS mobile
+		FROM
+			asset_borrow_order
+		WHERE
+			user_id = #{userId}
+		AND merchant_number = #{merchantNo}
+		AND `status` IN (- 20 ,- 11, 0, 1, 20, 21, 22, 23);
+</select>
+
+</mapper>

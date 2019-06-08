@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.info.back.dao.IBackRoleDao">
+	<resultMap id="BaseResultMap" type="BackRole">
+		<id column="id" property="id" />
+		<result column="role_name" property="roleName" />
+		<result column="role_summary" property="roleSummary" />
+		<result column="role_super" property="roleSuper"/>
+		<result column="role_addtime" property="roleAddtime"/>
+		<result column="role_addip" property="roleAddip"/>
+	</resultMap>
+	<!--	获得超级管理员的角色树-->
+	<select id="findAdminRoleTree" resultType="BackTree" parameterType="HashMap">
+			select 
+			br.id ,
+			br.role_name as title,
+			br.role_super as pid
+			from back_role br 
+	</select>
+	<!-- 得到角色树 -->
+	<select id="findUserRoleTree" resultType="BackTree" parameterType="HashMap" >
+			SELECT 
+			br.id,
+			br.role_name as title,
+			br.role_super as pid 
+			FROM back_role br 
+			LEFT JOIN back_user_role bur ON br.id=bur.role_id 
+			LEFT JOIN back_user u ON u.id=bur.user_id
+			WHERE  u.id= #{userId} 
+	</select>
+	<!--	根据父节点获得超级管理员的所有角色总数-->
+	<select id="findAdminCount" resultType="Integer" parameterType="HashMap">
+			select count(1)  
+			from back_role br 
+			where br.role_super=#{parentId}
+	</select>
+<!--	根据父节点获得超级管理员的所有角色-->
+	<select id="findAdminAll" resultMap="BaseResultMap" parameterType="HashMap">
+			select 
+			*
+			from back_role br 
+			where br.role_super=#{parentId}
+	</select>
+	<sql id="sql">
+			FROM back_role r 
+			LEFT JOIN back_user_role ur ON r.id=ur.role_id 
+			LEFT JOIN back_user u ON u.id=ur.user_id
+			WHERE
+			u.id=${userId}
+			and r.role_super=#{roleId}
+	</sql>
+	<!--	根据父节点获得某个的所有角色总数-->
+	<select id="findUserCount" resultType="Integer" parameterType="HashMap">
+			select count(1)  
+			<include refid="sql"/>
+	</select>
+	<!--	根据父节点获得某个用户的所有角色-->
+	<select id="findUserAll" resultMap="BaseResultMap" parameterType="HashMap">
+			SELECT  r.* 
+			<include refid="sql"/>
+	</select>
+	<select id="findById" resultMap="BaseResultMap" parameterType="HashMap">
+		select * from back_role where id =#{id}
+	</select>
+<!--	根据主键更新-->
+	<update id="updateById" parameterType="BackRole">
+		update back_role 
+		<set>
+			<if test="roleName != null and roleName != ''">
+				role_name =#{roleName}, 
+			</if>
+			<if test="roleSummary != null and roleSummary !=''">
+				role_summary =#{roleSummary}, 
+			</if>
+			<if test="roleSuper != null and roleSuper != ''">
+				role_super =#{roleSuper},
+			</if>
+		</set>
+		where id =#{id}
+	</update>
+<!--	根据主键删除对象-->
+	<delete id="deleteById" parameterType="Integer">
+		delete from  back_role   where id =#{id}
+	</delete>
+	<insert id="insert" parameterType="BackModule" useGeneratedKeys="true" keyProperty="id">
+		insert back_role  
+			(role_name,role_summary,role_super,role_addip)
+		values (#{roleName},#{roleSummary},#{roleSuper},#{roleAddip})
+	</insert>
+<!--	根据角色ID查询该角色及该角色的子角色（向下无限递归）-->
+	<select id="showChildRoleListByRoleId" parameterType="map" resultType="java.lang.Integer">
+		SELECT id FROM back_role WHERE  FIND_IN_SET(id, getChildUserRole(#{roleId}))
+	</select>
+<!--	根据角色查询出关联的用户-->
+	<select id="showUserListByRoleId" parameterType="long" resultType="BackTree">
+		SELECT 
+		distinct bu.id,
+		bu.user_account as title 
+		FROM back_user bu	
+		LEFT JOIN back_user_role bur ON bu.id=bur.user_id
+		LEFT JOIN back_role br ON bur.role_id=br.id
+		WHERE 1=1
+		<foreach collection="roleChildIds" close=")" item="role_id"
+			open="AND (" separator="OR">
+			br.id=#{role_id}
+		</foreach>
+		ORDER BY bu.id
+	</select>
+	<!-- 根据角色ID得到角色权限树 -->
+	<select id="getTreeByRoleId" parameterType="int" resultType="BackTree">
+		SELECT 
+		bm.id,
+		bm.module_name as title,
+		bm.module_parent_id as pid 
+		FROM back_module	bm
+		LEFT JOIN back_role_module brm ON bm.id=brm.module_id
+		LEFT JOIN back_role br ON br.id=brm.role_id
+		WHERE   bm.module_view=1 AND
+		br.id=#{roleId}
+	</select>
+</mapper>

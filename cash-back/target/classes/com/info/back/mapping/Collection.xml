@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.info.back.dao.ICollectionDao">
+	<select id="findAllCount"  parameterType="HashMap" resultType="Integer">
+		SELECT count(1) 
+		FROM back_user u LEFT JOIN mman_loan_collection_company c ON u.`company_id`=c.`id` LEFT JOIN back_user_company_permissions p on u.id = p.user_id
+		WHERE 1=1 AND EXISTS (SELECT 1 FROM back_user_role bb WHERE bb.user_id=u.id AND bb.role_id in (10033,10034,10035,10036,10021))
+		<include refid="base_if"></include>
+	</select>
+	<select id="findAll" resultType="com.info.web.pojo.Collection" parameterType="HashMap">
+		SELECT 
+			u.`id` as id,
+			u.`add_ip` as addIp,
+			u.`create_date` as createDate,
+			u.`group_level` as groupLevel,
+			u.`remark` as remark,
+			u.`status` as userStatus,
+			u.`update_date` as updateDate,
+			u.`user_account` as userAccount,
+			u.`user_address` as userAddress,
+			u.`user_email` as userEmail,
+			u.`user_mobile` as userMobile,
+			u.`user_name` as userName,
+			u.`user_qq` as userQq,
+			u.`user_telephone` as userTelephone, 
+			c.`title` as companyName 
+			FROM back_user u LEFT JOIN mman_loan_collection_company c ON u.`company_id`=c.`id` LEFT JOIN back_user_company_permissions p on u.id = p.user_id
+			WHERE 1=1 AND EXISTS (SELECT 1 FROM back_user_role bb WHERE bb.user_id=u.id AND bb.role_id in (10033,10034,10035,10036,10021))
+
+		<include refid="base_if"></include>
+	</select>
+	<sql id="base_if">
+		<if test="userMobile != null and userMobile !=''">
+			and u.`user_mobile`= #{userMobile}
+		</if>
+		<if test="userName != null and userName !=''">
+			and u.`user_name`= #{userName}
+		</if>
+		<if test="groupLevel!=null and groupLevel!=''">
+			and u.group_level=#{groupLevel}
+		</if>
+		<if test="companyId !=null and companyId!=''">
+			and u.company_id=#{companyId}
+		</if>
+		<if test="userStatus !=null and userStatus!=''">
+			and u.status=#{userStatus}
+		</if>
+		<if test="companyIds != null and companyIds != ''">
+			and p.company_id IN
+			<foreach collection="companyIds" item="companyId" open="(" separator="," close=")">
+				#{companyId}
+			</foreach>
+		</if>
+	</sql>
+
+	<select id="findOneCollection" resultType="com.info.web.pojo.Collection" parameterType="Integer">
+		SELECT 
+		u.`id` as id,
+		u.uuid as uuid,
+		u.`add_ip` as addIp,
+		u.`create_date` as createDate,
+		u.`group_level` as groupLevel,
+		u.`remark` as remark,
+		u.`status` as userStatus,
+		u.`update_date` as updateDate,
+		u.`user_account` as userAccount,
+		u.`user_address` as userAddress,
+		u.`user_email` as userEmail,
+		u.`user_mobile` as userMobile,
+		u.`user_name` as userName,
+		u.`user_qq` as userQq,
+		u.`user_telephone` as userTelephone,
+		u.`user_sex` as userSex,
+		u.user_password as userPassword,
+		u.`company_id` as companyId,
+		u.role_id AS  roleId
+		FROM back_user u where u.id=#{id}
+	</select>
+	<select id="findOrderCollection" resultType="Integer" parameterType="String">
+		SELECT  count(1)  FROM mman_loan_collection_order o WHERE o.`current_collection_user_id`=#{id} and o.status!=4 and o.status!=0 
+	</select>
+	<insert id="insert" parameterType="com.info.web.pojo.Collection" useGeneratedKeys="true" keyProperty="id">
+		insert back_user  
+			(user_account,user_password,user_name,status,user_sex,user_address,user_telephone,
+			user_mobile,user_email,user_qq,add_ip,remark,company_id,group_level,role_id,uuid)
+		values 
+		(#{userAccount},#{userPassword},#{userName},#{userStatus},#{userSex},#{userAddress},#{userTelephone},
+		#{userMobile},#{userEmail},#{userQq},#{addIp},#{remark},#{companyId},#{groupLevel},#{roleId},#{uuid})
+	</insert>
+	<select id="findTagDelete" parameterType="HashMap" resultType="Integer">
+		SELECT  count(1)  FROM mman_loan_collection_order o WHERE o.renew_status=0
+	</select>
+	<!--更新用户对象-->
+	<update id="updateById" parameterType="com.info.web.pojo.Collection" >
+		update back_user  
+		<set>
+			<if test="userAccount != null and userAccount != ''">
+				user_account =#{userAccount}, 
+			</if>
+			<if test="userPassword != null and userPassword !=''">
+				user_password =#{userPassword},
+			</if>
+			<if test="userName != null and userName != ''">
+				user_name =#{userName}, 
+			</if>
+			<if test="userSex != null and userSex != ''">
+				user_sex =#{userSex}, 
+			</if>
+			<if test="userAddress != null and userAddress != ''">
+				user_address =#{userAddress}, 
+			</if>
+			<if test="userTelephone != null and userTelephone != ''">
+				user_telephone =#{userTelephone},
+			</if>
+			<if test="userMobile != null and userMobile != ''">
+				user_mobile =#{userMobile},
+			</if>
+			<if test="userEmail != null and userEmail != ''">
+				user_email =#{userEmail},
+			</if>
+			<if test="userQq != null and userQq != ''">
+				user_qq =#{userQq},
+			</if>
+			<if test="remark != null and remark != ''">
+				remark=#{remark},
+			</if>
+			<if test="userStatus!=null and userStatus!=''">
+				status=#{userStatus},
+			</if>
+			<if test="companyId != null and companyId != ''">
+				company_id=#{companyId},
+			</if>
+			<if test="groupLevel != null and groupLevel != ''">
+				group_level=#{groupLevel},
+			</if>
+		</set>
+		where id =#{id} and id !=10000
+	</update>
+	<!-- 根据主键删除记录 -->
+	<delete id="del" parameterType="Integer"> 
+			DELETE FROM back_user WHERE id = #{id,jdbcType=VARCHAR} and id!=1000
+	</delete>
+	<update id="updateDeleteCoection" parameterType="String">
+		update back_user u set u.`status`=3 WHERE u.`uuid`=#{id}
+	</update>
+
+	<select id="getCollectionByUserName" parameterType="String" resultType="com.info.web.pojo.Collection">
+		SELECT id,user_name AS userName,status FROM back_user WHERE user_name = #{username}
+	</select>
+
+	<select id="getCollectionByUserAccount" parameterType="String" resultType="com.info.web.pojo.Collection">
+		SELECT id,user_account AS userAccount,status FROM back_user WHERE user_account = #{userAccount}
+	</select>
+</mapper>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.info.back.dao.ISmsUserDao">
+	<resultMap id="BaseResultMap" type="SmsUser">
+		<id column="id" property="id"/>
+		<result column="user_name" property="userName" />
+		<result column="user_phone" property="userPhone" />
+		<result column="sms_content" property="smsContent" />
+		<result column="add_time" property="addTime" />
+		<result column="update_time" property="updateTime"/>
+		<result column="send_user_id" property="sendUserId"/>
+	</resultMap>
+ 	<sql id="findAllSql">
+		from info_sms_user  a
+		<where>
+			<if test="userName != null and userName != ''">
+				and a.user_name like CONCAT('%', #{userName}, '%')
+			</if>
+			<if test="userPhone != null and userPhone != ''">
+				and a.user_phone like CONCAT('%', #{userPhone}, '%')
+			</if>
+		</where> 
+	</sql>
+	<select id="findAllCount" resultType="Integer" parameterType="HashMap">
+			select count(1)  
+			<include refid="findAllSql"/>
+	</select>
+	<select id="findAll" resultMap="BaseResultMap" parameterType="HashMap">
+			select aa.* from info_sms_user as aa 
+			inner join 
+			(select a.id 
+				<include refid="findAllSql"/>
+				 ORDER BY a.id asc 
+				limit #{pageNum},#{numPerPage}
+				)cc on aa.id=cc.id
+				order by aa.id asc
+	</select>
+	<select id="findPartList"  resultMap="BaseResultMap" parameterType="HashMap">
+		select a.* from info_sms_user as a 
+			inner join (select b.id from info_sms_user order by a.id asc limit #{bg},#{ed})
+			order by a.id asc
+	</select>
+ 	<sql id="sql">
+		from info_sms 
+		<where>
+			<if test="userName != null and userName != ''">
+				and user_name like CONCAT('%', #{userName}, '%')
+			</if>
+			<if test="userPhone != null and userPhone != ''">
+				and user_phone like CONCAT('%', #{userPhone}, '%')
+			</if>
+		</where> 
+	</sql>
+	<select id="findCount" resultType="Integer" parameterType="HashMap">
+			select count(1)  
+			<include refid="sql"/>
+	</select>
+	<select id="findList" resultMap="BaseResultMap" parameterType="HashMap">
+			select 	* <include refid="sql"/>	order by id desc
+	</select>
+	<select id="findPhones" parameterType="HashMap" resultType="String">
+		select user_phone from info_sms_user limit ${rowBegin},${rowEnd}
+	</select>
+	<select id="findPhonesForSend" parameterType="HashMap" resultType="String">
+			SELECT GROUP_CONCAT(user_phone SEPARATOR  ';')  FROM (SELECT user_phone FROM info_sms_user LIMIT #{begin},#{end})t
+	</select>
+	<select id="findStringPhones" parameterType="HashMap" resultType="String">
+		SELECT GROUP_CONCAT(user_phone)  FROM (SELECT user_phone FROM info_sms_user LIMIT ${rowBegin},${rowEnd})t
+	</select>
+	<select id="findIds" parameterType="HashMap" resultType="Integer">
+		select id from info_sms_user limit ${rowBegin},${rowEnd}
+	</select>
+	<insert id="batchInsert" parameterType="HashMap">
+		insert into info_sms(user_name,user_phone,sms_content) select user_name,user_phone,#{smsContent} from info_sms_user where 
+		id in
+		 <foreach collection="list" item="item" index="index" open="(" close=")" separator=",">
+				 ${item}
+	   </foreach>
+	</insert>
+	
+	<insert id="insert" parameterType="com.info.web.pojo.SmsUser">
+		insert into info_sms (user_name,user_phone,add_time,sms_content,loan_order_id,send_user_id)
+		values (#{userName},#{userPhone},#{addTime},#{smsContent},#{loanOrderId},#{sendUserId})
+	</insert>
+	<!-- 查询该订单当天已发短信次数 -->
+	<select id="getSendMsgCount" resultType="Integer">
+		select count(1) from info_sms where loan_order_id = #{orderId} and DATE_FORMAT(add_time,'%Y-%m-%d') = DATE_FORMAT(now(),'%Y-%m-%d')
+	</select>
+
+	<!-- 查询该借款的所有短信数 -->
+	<select id="getSendTotalMsgCount" resultType="Integer">
+		select count(1) from info_sms where loan_order_id = #{orderId}
+	</select>
+</mapper>

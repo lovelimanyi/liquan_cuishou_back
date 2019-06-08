@@ -1,0 +1,435 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE  mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.info.back.dao.IAuditCenterDao">
+	<resultMap id="queryResultMap" type="com.info.web.pojo.AuditCenter">
+		<!-- 序列号 -->
+		<result column="id" property="id" jdbcType="VARCHAR" />
+		<!-- 操作用户编号 -->
+		<result column="operation_user_id" property="operationUserId" jdbcType="VARCHAR" />
+		<!-- 用户编号 -->
+		<result column="loan_user_id" property="loanUserId" jdbcType="VARCHAR" />
+		<!-- 催收订单编号 -->
+		<result column="orderId" jdbcType="VARCHAR" property="orderid" />
+		<!-- 借款编号-->
+		<result column="loan_id" property="loanId" jdbcType="VARCHAR" />
+		<!-- 0:聚信立，1 催收建议 -->
+		<result column="type" property="type" jdbcType="VARCHAR" />
+		<!-- 状态 1 申请，1审核 2，拒绝  4失效-->
+		<result column="status" property="status" jdbcType="VARCHAR" />
+		<!-- 审核时间 -->
+		<result column="audittime" property="audittime" jdbcType="TIMESTAMP" />
+		<!-- 申请时间 -->
+		<result column="createtime" property="createtime" jdbcType="TIMESTAMP" />
+		<!-- 修改时间 -->
+		<result column="updatetime" property="updatetime" jdbcType="TIMESTAMP" />
+		<!-- 标签 -->
+		<result column="note" property="note" jdbcType="VARCHAR" />
+		<!-- 备注 -->
+		<result column="remark" property="remark" />
+		<!-- 减免滞纳金  -->
+		<result column="reduction_money" jdbcType="BIGINT" property="reductionMoney" />
+		<!-- 滞纳金金额  -->
+		<result column="loan_penalty" jdbcType="DECIMAL" property="loanPenalty" />
+		<!-- 还款ID -->
+		<result column="pay_id" jdbcType="VARCHAR" property="payId" />
+		
+		<result column="loan_user_name" jdbcType="VARCHAR" property="loanUserName" />
+		
+		<result column="loan_user_phone" jdbcType="VARCHAR" property="loanUserPhone" />
+
+		<result column="order_status" jdbcType="VARCHAR" property="orderStatus" />
+		<result column="order_type" jdbcType="VARCHAR" property="orderType" />
+
+	</resultMap>
+	<sql id="sqlAuditCenterColumns">
+		ac.id,
+		ac.operation_user_id,
+		ac.loan_user_id,
+		ac.loan_id,
+		ac.pay_id,
+		ac.orderId,
+		ac.type,
+		ac.order_type AS orderType,
+		ac.status,
+		ac.audittime,
+		ac.createtime,
+		ac.updatetime,
+		ac.note,
+		ac.remark,
+		ac.loan_penalty,
+		ac.loan_user_name,
+		ac.loan_user_phone,
+		ac.reduction_money,
+		ac.order_status
+	</sql>
+	
+	<select id="findAllCount"  parameterType="HashMap" resultType="Integer">
+		select count(1) FROM audit_center ac
+		LEFT JOIN back_user u ON ac.`operation_user_id`=u.`id`
+		LEFT JOIN mman_loan_collection_company co on co.id = u.company_id
+		<where>
+			<if test="type!=null and type!=''">
+				AND ac.type=#{type}
+			</if>
+			<if test="status!=null and status!=''">
+				AND ac.status=#{status}
+			</if>
+			<if test="beginTime !=null and beginTime !=''">
+				AND DATE_FORMAT(ac.createtime,'%Y-%m-%d') &gt;=   #{beginTime}
+			</if>
+			<if test="endTime !=null and endTime !=''">
+			   AND DATE_FORMAT(ac.createtime,'%Y-%m-%d') &lt;=  #{endTime}
+			</if>
+			<if test="beginTime != null and beginTime != '' and endTime != null and endTime != ''">
+				AND DATE_FORMAT(ac.createtime,'%Y-%m-%d') &gt;=   #{beginTime} 	AND DATE_FORMAT(ac.createtime,'%Y-%m-%d') &lt;=  #{endTime}
+			</if>
+			<if test="companyId != null and companyId != ''">
+				AND u.company_id=#{companyId}
+			</if>
+			<if test="loanId != null and loanId != ''">
+				AND ac.loan_id=#{loanId}
+			</if>
+			<if test="userName != null and userName != ''">
+				AND u.user_name=#{userName}
+			</if>
+		</where>
+	</select>
+	<select id="findAll" resultType="com.info.web.pojo.AuditCenter" parameterType="HashMap">
+		SELECT 
+		ac.`id`,
+		ac.`createtime`,
+		ac.`operation_user_id` as operationUserId,
+		co.title as companyName,
+		ac.`type`,
+		ac.`order_type` AS orderType,
+		ac.`status`,
+		ac.`audittime`,
+		ac.`remark`,
+		ac.note,
+		ac.`loan_id` as loanId,
+		u.`user_name` as userName,
+		ac.`status`,
+		u.company_id,
+		ac.reduction_money as reductionMoney
+		FROM audit_center ac
+		LEFT JOIN back_user u ON ac.`operation_user_id`=u.`id`
+		LEFT JOIN mman_loan_collection_company co on co.id = u.company_id
+		<where>
+			<if test="type!=null and type!=''">
+				AND ac.type=#{type}
+			</if>
+			<if test="status!=null and status!=''">
+				AND ac.status=#{status}
+			</if>
+			<if test="beginTime !=null and beginTime !=''">
+				AND DATE_FORMAT(ac.createtime,'%Y-%m-%d') &gt;=   #{beginTime}
+			</if>
+			<if test="endTime !=null and endTime !=''">
+				AND DATE_FORMAT(ac.createtime,'%Y-%m-%d') &lt;=  #{endTime}
+			</if>
+			<if test="beginTime != null and beginTime != '' and endTime != null and endTime != ''">
+				AND DATE_FORMAT(ac.createtime,'%Y-%m-%d') &gt;=   #{beginTime}  AND  DATE_FORMAT(ac.createtime,'%Y-%m-%d') &lt;=  #{endTime}
+			</if>
+			<if test="companyId != null and companyId != ''">
+				AND u.company_id=#{companyId}
+			</if>
+			<if test="loanId != null and loanId != ''">
+				AND ac.loan_id=#{loanId}
+			</if>
+			<if test="userName != null and userName != ''">
+				AND u.user_name=#{userName}
+			</if>
+		</where>
+		ORDER BY createtime DESC
+	</select>
+	<select id="findAuditId" resultType="com.info.web.pojo.AuditCenter" parameterType="String">
+		SELECT 
+		ac.`id`,
+		ac.`orderId`,
+		ac.`createtime`,
+		ac.`operation_user_id` AS operationUserId,
+		ac.`type`,
+		ac.`order_type` AS orderType,
+		ac.`status`,
+		ac.`audittime`,
+		ac.`remark`,
+		ac.`loan_id` AS loanId,
+		ac.loan_user_id as loanUserId,
+		ac.note,
+		ac.`status` ,
+		ac.reduction_money as reductionMoney,
+		ac.loan_penalty as loanPenalty,
+		ac.pay_id AS payId,
+		ac.loan_user_phone AS loanUserPhone,
+		ac.loan_user_name AS  loanUserName
+		FROM audit_center ac  WHERE ac.`id`=#{id}
+	</select>
+	<select id="auditBayId" resultMap="queryResultMap" parameterType="String">
+	   SELECT
+	   `loan_id` AS loanId,
+	   `status`
+       FROM
+	  audit_center
+      WHERE
+	 `status` IN (0,2,5)
+   AND loan_id = #{loanId}
+	</select>
+	<!-- 保存,保存不为NULL的字段 -->
+	<insert id="saveNotNull" parameterType="com.info.web.pojo.AuditCenter">
+		INSERT INTO audit_center
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="operationUserId != null">
+        operation_user_id,
+      </if>
+      <if test="loanUserId != null">
+        loan_user_id,
+      </if>
+      <if test="loanId != null">
+        loan_id,
+      </if>
+      <if test="payId != null">
+        pay_id,
+      </if>
+      <if test="orderid != null">
+        orderId,
+      </if>
+      <if test="reductionMoney != null">
+        reduction_money,
+      </if>
+      <if test="type != null">
+        type,
+      </if>
+	<if test="orderType != null">
+		order_type,
+	</if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="audittime != null">
+        audittime,
+      </if>
+      <if test="createtime != null">
+        createtime,
+      </if>
+      <if test="updatetime != null">
+        updatetime,
+      </if>
+      <if test="note != null">
+        note,
+      </if>
+      <if test="labelValue != null">
+        "label value",
+      </if>
+      <if test="loanPenalty != null">
+        loan_penalty,
+      </if>
+      <if test="loanUserName != null">
+        loan_user_name,
+      </if>
+      <if test="loanUserPhone != null">
+        loan_user_phone,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+	  <if test="orderStatus != null">
+	  order_status,
+	  </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="operationUserId != null">
+        #{operationUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="loanUserId != null">
+        #{loanUserId,jdbcType=VARCHAR},
+      </if>
+      <if test="loanId != null">
+        #{loanId,jdbcType=VARCHAR},
+      </if>
+      <if test="payId != null">
+        #{payId,jdbcType=VARCHAR},
+      </if>
+      <if test="orderid != null">
+        #{orderid,jdbcType=VARCHAR},
+      </if>
+      <if test="reductionMoney != null">
+        #{reductionMoney,jdbcType=BIGINT},
+      </if>
+      <if test="type != null">
+        #{type,jdbcType=VARCHAR},
+      </if>
+		<if test="orderType != null">
+			#{orderType,jdbcType=VARCHAR},
+		</if>
+      <if test="status != null">
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="audittime != null">
+        #{audittime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createtime != null">
+        #{createtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatetime != null">
+        #{updatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="note != null">
+        #{note,jdbcType=VARCHAR},
+      </if>
+      <if test="labelValue != null">
+        #{labelValue,jdbcType=VARCHAR},
+      </if>
+      <if test="loanPenalty != null">
+        #{loanPenalty,jdbcType=DECIMAL},
+      </if>
+      <if test="loanUserName != null">
+        #{loanUserName,jdbcType=VARCHAR},
+      </if>
+      <if test="loanUserPhone != null">
+        #{loanUserPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=LONGVARCHAR},
+      </if>
+	  <if test="orderStatus != null">
+		#{orderStatus,jdbcType=VARCHAR},
+	  </if>
+    </trim>
+	</insert>
+	<insert id="saveUpdate" parameterType="com.info.web.pojo.AuditCenter">
+		insert into audit_center (id, operation_user_id, loan_user_id,
+		loan_id,orderId,`type`, status,
+		audittime, createtime, updatetime,note,order_status, remark
+		)
+		values (#{id,jdbcType=VARCHAR}, #{operationUserId,jdbcType=VARCHAR}, #{loanUserId,jdbcType=VARCHAR},
+		#{loanId,jdbcType=VARCHAR}, #{orderid,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR},
+		#{audittime,jdbcType=TIMESTAMP}, #{createtime,jdbcType=TIMESTAMP}, #{updatetime,jdbcType=TIMESTAMP},
+		#{note,jdbcType=VARCHAR},#{orderStatus,jdbcType=VARCHAR},  #{remark,jdbcType=LONGVARCHAR}
+		)
+	</insert>
+
+   <!--减免记录查询  -->
+		<select id="find" resultType="com.info.web.pojo.AuditCenter" parameterType="HashMap">
+		SELECT 
+			a.loan_user_phone as loanUserPhone,
+			a.loan_user_name as loanUserName,
+			a.createtime,
+			a.audittime,
+			a.updatetime,
+			a.reduction_money as reductionMoney,
+		    a.loan_penalty as loanPenalty,
+			a.status,
+			a.loan_id as loanId
+		FROM
+		audit_center AS a  LEFT JOIN back_user u ON a.`operation_user_id`=u.`id`
+		<where>
+		  a.type=3
+			<if test="status!=null and status!=''">
+				AND a.status=#{status}
+			</if>
+			<if test="beginTime !=null and beginTime !=''">
+		    		<![CDATA[	and DATE_FORMAT(a.createtime,'%Y-%m-%d') >=  #{beginTime}  ]]>
+			</if>
+			<if test="endTime !=null and endTime !=''">
+			    	<![CDATA[	and DATE_FORMAT(a.audittime,'%Y-%m-%d') <=  #{endTime}  ]]>
+			</if>
+			<if test="loanId !=null and loanId!=''">
+				AND a.`loan_id`=#{loanId}
+			</if>
+			<if test="loanRealName !=null and loanRealName!=''">
+				AND a.loan_user_name=#{loanRealName}
+			</if>
+		</where>
+		ORDER BY createtime DESC
+	</select>
+	<!--查询  -->
+	<select id="findCount"  parameterType="HashMap" resultType="Integer">
+		select count(1) FROM audit_center AS a LEFT JOIN back_user u ON a.`operation_user_id`=u.`id`
+		<where>
+		 a.type=3
+			<if test="status!=null and status!=''">
+				AND a.status=#{status}
+			</if>
+			<if test="beginTime !=null and beginTime !=''">
+		    		<![CDATA[	and DATE_FORMAT(a.createtime,'%Y-%m-%d') >=  #{beginTime}  ]]>
+			</if>
+			<if test="endTime !=null and endTime !=''">
+			    	<![CDATA[	and DATE_FORMAT(a.createtime,'%Y-%m-%d') <=  #{endTime}  ]]>
+			</if>
+			<if test="loanId !=null and loanId!=''">
+				AND a.`loan_id`=#{loanId}
+			</if>
+			<if test="loanRealName !=null and loanRealName!=''">
+				AND a.loan_user_name=#{loanRealName}
+			</if>
+		</where>
+	</select>
+	<update id="updateSysStatus" parameterType="HashMap">
+		<![CDATA[	UPDATE  audit_center a SET a.`status` =#{status}  WHERE a.loan_id = #{loanId} ]]>
+   </update>
+	<select id="findgetList" resultMap="queryResultMap">
+	   SELECT
+			a.`status` ,
+			m.`status`AS  collectionStatus,
+			m.reduction_money ,
+			a.loan_id as loanId,
+			a.audittime,
+			a.order_status AS orderStatus,
+			a.reduction_money as reductionMoney
+	  FROM audit_center AS a
+      INNER JOIN mman_loan_collection_order AS m ON a.loan_id = m.loan_id
+      WHERE
+	      a.`status` IN (0, 2, 3, 5) AND  m.`status` IN (6, 7, 8) AND TO_DAYS(a.createtime) = TO_DAYS(NOW())  AND a.type = 3
+	</select>
+	<select id="selectGetList" resultMap="queryResultMap">
+		SELECT
+		a.`status`,
+		m.`status`
+		FROM audit_center AS a
+		INNER JOIN mman_loan_collection_order AS m ON a.loan_id = m.loan_id
+		WHERE
+		a.`status` =0 AND  m.`status`=4 AND TO_DAYS(m.update_Date) = TO_DAYS(NOW())  AND a.type = 3
+	</select>
+
+	<select id="findAuditStatus" parameterType="HashMap" resultType="Integer">
+		select count(1) from audit_center  a
+		where a.type = 4 and (a.status = '2' or a.status = '5')
+		and a.orderId = #{id}
+	</select>
+
+	<select id="findAuditStatusByOrderId" parameterType="HashMap" resultType="Integer">
+		select count(1) from audit_center a
+		where a.type = #{type} and a.status = '0'
+		and a.orderId = #{id}
+	</select>
+
+
+	<select id="getAuditChecking" resultType="Integer" parameterType="HashMap">
+		SELECT count(1)
+		FROM audit_center ac
+		<where>
+			ac.type = "3" AND  ac.status = #{status} AND ac.loan_id=#{loanId}
+		</where>
+
+	</select>
+	<update id="updateStatus" parameterType="HashMap">
+		UPDATE audit_center  a SET a.`status` =#{status},a.`audittime`=NOW()  WHERE a.`id`=#{id}
+	</update>
+	<!-- 更新订单减免的状态status 0:申请中 2:通过 3:拒绝 4:失效 5:通过不计入考核 -->
+	<update id="updateAuditStatus" parameterType="HashMap">
+		UPDATE audit_center ac SET ac.status =#{status},ac.audittime=NOW(),ac.updatetime=NOW() WHERE ac.id = #{auditId}
+	</update>
+	<!-- 获取减免状态是审核中的减免申请 -->
+	<select id="getAuditCheckingList" resultMap="queryResultMap" parameterType="HashMap">
+		SELECT  <include refid="sqlAuditCenterColumns" />
+		FROM audit_center ac
+		WHERE ac.type = #{type} AND (ac.status = '0' or ac.status = '6')
+	</select>
+</mapper>
