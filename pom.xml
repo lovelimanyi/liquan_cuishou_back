@@ -529,7 +529,7 @@
         <!-- spring version -->
         <spring.version>4.1.6.RELEASE</spring.version>
         <spring.security.version>4.0.3.RELEASE</spring.security.version>
-        <jackson.version>2.7.3 </jackson.version>
+        <jackson.version>2.12.1</jackson.version>
 
         <!-- test version -->
         <junit.version>4.12</junit.version>
