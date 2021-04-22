@@ -562,7 +562,7 @@
         <jcaptcha.version>1.0</jcaptcha.version>
 
         <!-- mybatis version -->
-        <mybatis.version>3.3.0</mybatis.version>
+        <mybatis.version>3.5.6</mybatis.version>
 
         <!-- poi version -->
         <poi.version>3.14</poi.version>
