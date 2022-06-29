@@ -565,7 +565,7 @@
         <mybatis.version>3.3.0</mybatis.version>
 
         <!-- poi version -->
-        <poi.version>3.14</poi.version>
+        <poi.version>4.1.1</poi.version>
 
         <!-- apache httpcomponents version -->
         <httpcore.version>4.4.6</httpcore.version>
